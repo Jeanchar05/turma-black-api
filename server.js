@@ -30,13 +30,20 @@ const usuarioSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     senha: { type: String, required: true },
     nome: String,
-    tipo: { type: String, default: "aluno" },
+
+    tipo: { type: String, default: "aluno" }, // aluno | admin
+    plano: { type: String, default: "free" }, // free | premium | admin
+    status: { type: String, default: "pendente" }, // pendente | ativo | suspenso | expirado
+
     aprovado: { type: Boolean, default: false },
     suspenso: { type: Boolean, default: false },
+
     codigo: String,
-    plano: { type: String, default: "Turma Black" },
     acessos: { type: Number, default: 0 },
     dispositivos: { type: Array, default: [] },
+
+    dataExpiracao: { type: String, default: null },
+
     ultimoLogin: String,
     criadoEm: String,
     aprovadoEm: String
@@ -54,6 +61,14 @@ function normalizarEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
 
+function calcularExpirado(user) {
+  if (user.tipo === "admin") return false;
+  if (user.plano !== "premium") return false;
+  if (!user.dataExpiracao) return false;
+
+  return new Date(user.dataExpiracao) < new Date();
+}
+
 async function garantirAdmin() {
   const existe = await Usuario.findOne({ email: "admin@turmablack.com" });
 
@@ -63,10 +78,11 @@ async function garantirAdmin() {
       senha: "admin123",
       nome: "Administrador",
       tipo: "admin",
+      plano: "admin",
+      status: "ativo",
       aprovado: true,
       suspenso: false,
       codigo: "999999",
-      plano: "Admin",
       criadoEm: new Date().toISOString()
     });
 
@@ -87,6 +103,7 @@ app.post("/criar", async (req, res) => {
   try {
     const email = normalizarEmail(req.body.email);
     const senha = String(req.body.senha || "").trim();
+    const nome = String(req.body.nome || email.split("@")[0]).trim();
 
     if (!email || !senha) {
       return res.json({ erro: "Preencha e-mail e senha." });
@@ -103,14 +120,16 @@ app.post("/criar", async (req, res) => {
     const novoUsuario = await Usuario.create({
       email,
       senha,
-      nome: email.split("@")[0],
+      nome,
       tipo: "aluno",
+      plano: "free",
+      status: "pendente",
       aprovado: false,
       suspenso: false,
       codigo,
-      plano: "Turma Black",
       acessos: 0,
       dispositivos: [],
+      dataExpiracao: null,
       criadoEm: new Date().toISOString()
     });
 
@@ -121,6 +140,9 @@ app.post("/criar", async (req, res) => {
       usuario: {
         email: novoUsuario.email,
         nome: novoUsuario.nome,
+        tipo: novoUsuario.tipo,
+        plano: novoUsuario.plano,
+        status: novoUsuario.status,
         aprovado: novoUsuario.aprovado
       }
     });
@@ -140,7 +162,7 @@ app.post("/login", async (req, res) => {
       return res.json({ erro: "E-mail ou senha incorretos." });
     }
 
-    if (user.suspenso) {
+    if (user.suspenso || user.status === "suspenso") {
       return res.json({ erro: "Conta suspensa. Fale com o suporte." });
     }
 
@@ -149,6 +171,13 @@ app.post("/login", async (req, res) => {
         erro: "Sua conta ainda não foi aprovada.",
         codigo: user.codigo
       });
+    }
+
+    if (calcularExpirado(user)) {
+      user.status = "expirado";
+      user.plano = "free";
+      user.dataExpiracao = null;
+      await user.save();
     }
 
     user.acessos = Number(user.acessos || 0) + 1;
@@ -174,8 +203,10 @@ app.post("/login", async (req, res) => {
         nome: user.nome,
         tipo: user.tipo,
         plano: user.plano,
+        status: user.status,
         aprovado: user.aprovado,
         suspenso: user.suspenso,
+        dataExpiracao: user.dataExpiracao,
         acessos: user.acessos
       }
     });
@@ -190,18 +221,21 @@ app.get("/usuarios", async (req, res) => {
 
     res.json({
       sucesso: true,
-      usuarios: usuarios.map(u => ({
+      usuarios: usuarios.map((u) => ({
         id: u._id,
         email: u.email,
         nome: u.nome,
         tipo: u.tipo,
+        plano: u.plano || "free",
+        status: u.status || "pendente",
         aprovado: u.aprovado,
         suspenso: u.suspenso,
         codigo: u.codigo,
-        plano: u.plano,
+        dataExpiracao: u.dataExpiracao || null,
         acessos: u.acessos || 0,
         ultimoLogin: u.ultimoLogin || "",
         criadoEm: u.criadoEm || "",
+        aprovadoEm: u.aprovadoEm || "",
         dispositivos: u.dispositivos || []
       }))
     });
@@ -222,6 +256,12 @@ app.post("/aprovar", async (req, res) => {
 
     user.aprovado = true;
     user.suspenso = false;
+    user.status = "ativo";
+
+    if (!user.plano || user.plano === "Turma Black") {
+      user.plano = "free";
+    }
+
     user.aprovadoEm = new Date().toISOString();
 
     await user.save();
@@ -232,11 +272,57 @@ app.post("/aprovar", async (req, res) => {
       usuario: {
         email: user.email,
         nome: user.nome,
-        codigo: user.codigo
+        codigo: user.codigo,
+        plano: user.plano,
+        status: user.status
       }
     });
   } catch (error) {
     res.json({ erro: "Erro ao aprovar aluno.", detalhe: error.message });
+  }
+});
+
+app.post("/usuario/plano", async (req, res) => {
+  try {
+    const email = normalizarEmail(req.body.email);
+
+    const user = await Usuario.findOne({ email });
+
+    if (!user) {
+      return res.json({ erro: "Usuário não encontrado." });
+    }
+
+    if (user.tipo === "admin") {
+      return res.json({ erro: "Não é permitido alterar plano do admin." });
+    }
+
+    user.plano = req.body.plano || user.plano || "free";
+    user.status = req.body.status || "ativo";
+    user.aprovado = req.body.aprovado !== undefined ? req.body.aprovado : true;
+    user.suspenso = req.body.suspenso !== undefined ? req.body.suspenso : false;
+    user.dataExpiracao = req.body.dataExpiracao || null;
+
+    if (user.plano === "free") {
+      user.dataExpiracao = null;
+    }
+
+    await user.save();
+
+    res.json({
+      sucesso: true,
+      mensagem: "Plano atualizado com sucesso.",
+      usuario: {
+        email: user.email,
+        nome: user.nome,
+        plano: user.plano,
+        status: user.status,
+        aprovado: user.aprovado,
+        suspenso: user.suspenso,
+        dataExpiracao: user.dataExpiracao
+      }
+    });
+  } catch (error) {
+    res.json({ erro: "Erro ao atualizar plano.", detalhe: error.message });
   }
 });
 
@@ -255,6 +341,7 @@ app.post("/suspender", async (req, res) => {
     }
 
     user.suspenso = true;
+    user.status = "suspenso";
     await user.save();
 
     res.json({
@@ -280,12 +367,22 @@ app.post("/reativar", async (req, res) => {
     user.suspenso = false;
     user.aprovado = true;
 
+    if (!user.plano) user.plano = "free";
+    if (user.plano === "premium") {
+      user.status = "ativo";
+    } else {
+      user.status = "ativo";
+      user.dataExpiracao = null;
+    }
+
     await user.save();
 
     res.json({
       sucesso: true,
       mensagem: "Usuário reativado.",
-      email: user.email
+      email: user.email,
+      plano: user.plano,
+      status: user.status
     });
   } catch (error) {
     res.json({ erro: "Erro ao reativar usuário.", detalhe: error.message });
