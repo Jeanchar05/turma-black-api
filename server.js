@@ -770,6 +770,29 @@ async function garantirAdmin() {
 
   console.log("Admin padrão verificado/atualizado.");
 }
+app.get("/minhas-provas", autenticar, async (req, res) => {
+  try {
+
+    const resultados = await ProvaResultado.find({
+      email: req.user.email
+    })
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    res.json({
+      sucesso: true,
+      resultados
+    });
+
+  } catch (error) {
+
+    res.json({
+      erro: "Erro ao buscar provas.",
+      detalhe: error.message
+    });
+
+  }
+});
 
 // ===============================
 // START
