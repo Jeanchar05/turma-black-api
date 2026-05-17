@@ -300,7 +300,40 @@ app.post("/login", async (req, res) => {
     });
   }
 });
+app.get("/me", autenticar, async (req, res) => {
+  try {
+    const user = await Usuario.findById(req.user.id).select("-senha");
 
+    if (!user) {
+      return res.status(404).json({ erro: "Usuário não encontrado." });
+    }
+
+    if (user.suspenso || user.status === "suspenso") {
+      return res.status(403).json({ erro: "Conta suspensa." });
+    }
+
+    res.json({
+      sucesso: true,
+      usuario: {
+        id: user._id,
+        email: user.email,
+        nome: user.nome,
+        tipo: user.tipo,
+        plano: user.plano,
+        status: user.status,
+        aprovado: user.aprovado,
+        suspenso: user.suspenso,
+        dataExpiracao: user.dataExpiracao || null,
+        acessos: user.acessos || 0
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro ao validar usuário.",
+      detalhe: error.message
+    });
+  }
+});
 // ===============================
 // USUÁRIOS ADMIN
 // ===============================
