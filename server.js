@@ -26,7 +26,7 @@ mongoose
   });
 
 // ===============================
-// SCHEMA USUÁRIO
+// SCHEMAS
 // ===============================
 
 const usuarioSchema = new mongoose.Schema(
@@ -50,12 +50,6 @@ const usuarioSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Usuario = mongoose.model("Usuario", usuarioSchema);
-
-// ===============================
-// SCHEMA CHAMADOS
-// ===============================
-
 const chamadoSchema = new mongoose.Schema(
   {
     aluno: String,
@@ -73,7 +67,36 @@ const chamadoSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const historicoAdminSchema = new mongoose.Schema(
+  {
+    acao: String,
+    adminEmail: String,
+    tipo: { type: String, default: "geral" },
+    criadoEm: String
+  },
+  { timestamps: true }
+);
+
+const provaResultadoSchema = new mongoose.Schema(
+  {
+    aluno: String,
+    email: String,
+    tipoProva: String,
+    titulo: String,
+    nota: Number,
+    acertos: Number,
+    erros: Number,
+    totalQuestoes: Number,
+    percentual: Number,
+    criadoEm: String
+  },
+  { timestamps: true }
+);
+
+const Usuario = mongoose.model("Usuario", usuarioSchema);
 const Chamado = mongoose.model("Chamado", chamadoSchema);
+const HistoricoAdmin = mongoose.model("HistoricoAdmin", historicoAdminSchema);
+const ProvaResultado = mongoose.model("ProvaResultado", provaResultadoSchema);
 
 // ===============================
 // HELPERS
@@ -112,11 +135,11 @@ function somenteAdmin(req, res, next) {
 }
 
 async function garantirAdmin() {
-  const existe = await Usuario.findOne({
+  const admin = await Usuario.findOne({
     email: "admin@turmablack.com"
   });
 
-  if (!existe) {
+  if (!admin) {
     await Usuario.create({
       email: "admin@turmablack.com",
       senha: "admin123",
@@ -127,15 +150,28 @@ async function garantirAdmin() {
       status: "ativo",
       codigo: "999999",
       plano: "Admin",
+      acessos: 0,
+      dispositivos: [],
       criadoEm: new Date().toISOString()
     });
 
     console.log("Admin padrão criado.");
+    return;
   }
+
+  admin.tipo = "admin";
+  admin.aprovado = true;
+  admin.suspenso = false;
+  admin.status = "ativo";
+  admin.plano = "Admin";
+
+  await admin.save();
+
+  console.log("Admin padrão verificado/atualizado.");
 }
 
 // ===============================
-// ROTA TESTE
+// TESTE
 // ===============================
 
 app.get("/", (req, res) => {
@@ -171,13 +207,13 @@ app.post("/criar", async (req, res) => {
     const novoUsuario = await Usuario.create({
       email,
       senha,
-      nome: email.split("@")[0],
+      nome: req.body.nome || email.split("@")[0],
       tipo: "aluno",
       aprovado: false,
       suspenso: false,
       status: "pendente",
       codigo,
-      plano: "Turma Black",
+      plano: "free",
       acessos: 0,
       dispositivos: [],
       criadoEm: new Date().toISOString()
@@ -217,9 +253,7 @@ app.post("/login", async (req, res) => {
     }
 
     if (user.suspenso || user.status === "suspenso") {
-      return res.json({
-        erro: "Conta suspensa. Fale com o suporte."
-      });
+      return res.json({ erro: "Conta suspensa. Fale com o suporte." });
     }
 
     if (!user.aprovado) {
@@ -268,7 +302,7 @@ app.post("/login", async (req, res) => {
 });
 
 // ===============================
-// USUÁRIOS
+// USUÁRIOS ADMIN
 // ===============================
 
 app.get("/usuarios", autenticar, somenteAdmin, async (req, res) => {
@@ -290,7 +324,7 @@ app.get("/usuarios", autenticar, somenteAdmin, async (req, res) => {
         dataExpiracao: u.dataExpiracao || "",
         acessos: u.acessos || 0,
         ultimoLogin: u.ultimoLogin || "",
-        criadoEm: u.criadoEm || "",
+        criadoEm: u.criadoEm || u.createdAt || "",
         dispositivos: u.dispositivos || []
       }))
     });
@@ -301,10 +335,6 @@ app.get("/usuarios", autenticar, somenteAdmin, async (req, res) => {
     });
   }
 });
-
-// ===============================
-// APROVAÇÃO
-// ===============================
 
 app.post("/aprovar", autenticar, somenteAdmin, async (req, res) => {
   try {
@@ -340,10 +370,6 @@ app.post("/aprovar", autenticar, somenteAdmin, async (req, res) => {
   }
 });
 
-// ===============================
-// PLANO DO USUÁRIO
-// ===============================
-
 app.post("/usuario/plano", autenticar, somenteAdmin, async (req, res) => {
   try {
     const email = normalizarEmail(req.body.email);
@@ -378,10 +404,6 @@ app.post("/usuario/plano", autenticar, somenteAdmin, async (req, res) => {
     });
   }
 });
-
-// ===============================
-// SUSPENDER / REATIVAR
-// ===============================
 
 app.post("/suspender", autenticar, somenteAdmin, async (req, res) => {
   try {
@@ -444,10 +466,6 @@ app.post("/reativar", autenticar, somenteAdmin, async (req, res) => {
   }
 });
 
-// ===============================
-// EXCLUIR USUÁRIO
-// ===============================
-
 app.delete("/usuario/:email", autenticar, somenteAdmin, async (req, res) => {
   try {
     const email = normalizarEmail(req.params.email);
@@ -478,7 +496,7 @@ app.delete("/usuario/:email", autenticar, somenteAdmin, async (req, res) => {
 });
 
 // ===============================
-// SUPORTE / CHAMADOS
+// SUPORTE
 // ===============================
 
 app.post("/suporte", autenticar, async (req, res) => {
@@ -489,9 +507,7 @@ app.post("/suporte", autenticar, async (req, res) => {
     const prioridade = String(req.body.prioridade || "Média").trim();
 
     if (!assunto || !mensagem) {
-      return res.json({
-        erro: "Preencha assunto e mensagem."
-      });
+      return res.json({ erro: "Preencha assunto e mensagem." });
     }
 
     const chamado = await Chamado.create({
@@ -536,9 +552,9 @@ app.get("/suporte", autenticar, somenteAdmin, async (req, res) => {
 
 app.get("/meus-chamados", autenticar, async (req, res) => {
   try {
-    const chamados = await Chamado.find({
-      email: req.user.email
-    }).sort({ createdAt: -1 });
+    const chamados = await Chamado.find({ email: req.user.email }).sort({
+      createdAt: -1
+    });
 
     res.json({
       sucesso: true,
@@ -557,17 +573,13 @@ app.post("/suporte/:id/responder", autenticar, somenteAdmin, async (req, res) =>
     const resposta = String(req.body.resposta || "").trim();
 
     if (!resposta) {
-      return res.json({
-        erro: "Digite uma resposta."
-      });
+      return res.json({ erro: "Digite uma resposta." });
     }
 
     const chamado = await Chamado.findById(req.params.id);
 
     if (!chamado) {
-      return res.json({
-        erro: "Chamado não encontrado."
-      });
+      return res.json({ erro: "Chamado não encontrado." });
     }
 
     chamado.resposta = resposta;
@@ -593,25 +605,16 @@ app.post("/suporte/:id/status", autenticar, somenteAdmin, async (req, res) => {
   try {
     const status = String(req.body.status || "").trim();
 
-    const statusPermitidos = [
-      "aberto",
-      "analise",
-      "respondido",
-      "fechado"
-    ];
+    const permitidos = ["aberto", "analise", "respondido", "fechado"];
 
-    if (!statusPermitidos.includes(status)) {
-      return res.json({
-        erro: "Status inválido."
-      });
+    if (!permitidos.includes(status)) {
+      return res.json({ erro: "Status inválido." });
     }
 
     const chamado = await Chamado.findById(req.params.id);
 
     if (!chamado) {
-      return res.json({
-        erro: "Chamado não encontrado."
-      });
+      return res.json({ erro: "Chamado não encontrado." });
     }
 
     chamado.status = status;
@@ -640,14 +643,10 @@ app.delete("/suporte/:id", autenticar, somenteAdmin, async (req, res) => {
     const chamado = await Chamado.findById(req.params.id);
 
     if (!chamado) {
-      return res.json({
-        erro: "Chamado não encontrado."
-      });
+      return res.json({ erro: "Chamado não encontrado." });
     }
 
-    await Chamado.deleteOne({
-      _id: req.params.id
-    });
+    await Chamado.deleteOne({ _id: req.params.id });
 
     res.json({
       sucesso: true,
@@ -660,21 +659,10 @@ app.delete("/suporte/:id", autenticar, somenteAdmin, async (req, res) => {
     });
   }
 });
-// ===============================
-// HISTÓRICO ADMIN ONLINE
-// ===============================
 
-const historicoAdminSchema = new mongoose.Schema(
-  {
-    acao: String,
-    adminEmail: String,
-    tipo: { type: String, default: "geral" },
-    criadoEm: String
-  },
-  { timestamps: true }
-);
-
-const HistoricoAdmin = mongoose.model("HistoricoAdmin", historicoAdminSchema);
+// ===============================
+// HISTÓRICO ADMIN
+// ===============================
 
 app.post("/admin/historico", autenticar, somenteAdmin, async (req, res) => {
   try {
@@ -737,42 +725,51 @@ app.delete("/admin/historico", autenticar, somenteAdmin, async (req, res) => {
     });
   }
 });
-async function garantirAdmin() {
-  const admin = await Usuario.findOne({
-    email: "admin@turmablack.com"
-  });
 
-  if (!admin) {
-    await Usuario.create({
-      email: "admin@turmablack.com",
-      senha: "admin123",
-      nome: "Administrador",
-      tipo: "admin",
-      aprovado: true,
-      suspenso: false,
-      status: "ativo",
-      codigo: "999999",
-      plano: "Admin",
+// ===============================
+// PROVAS
+// ===============================
+
+app.post("/provas/resultado", autenticar, async (req, res) => {
+  try {
+    const totalQuestoes = Number(req.body.totalQuestoes || 0);
+    const acertos = Number(req.body.acertos || 0);
+    const erros = Number(req.body.erros || 0);
+
+    if (!req.body.tipoProva || totalQuestoes <= 0) {
+      return res.json({ erro: "Dados da prova incompletos." });
+    }
+
+    const percentual = Math.round((acertos / totalQuestoes) * 100);
+
+    const resultado = await ProvaResultado.create({
+      aluno: req.body.aluno || req.user.email,
+      email: req.user.email,
+      tipoProva: req.body.tipoProva,
+      titulo: req.body.titulo || req.body.tipoProva,
+      nota: Number(req.body.nota || percentual),
+      acertos,
+      erros,
+      totalQuestoes,
+      percentual,
       criadoEm: new Date().toISOString()
     });
 
-    console.log("Admin padrão criado.");
-    return;
+    res.json({
+      sucesso: true,
+      mensagem: "Resultado salvo com sucesso.",
+      resultado
+    });
+  } catch (error) {
+    res.json({
+      erro: "Erro ao salvar resultado da prova.",
+      detalhe: error.message
+    });
   }
+});
 
-  admin.tipo = "admin";
-  admin.aprovado = true;
-  admin.suspenso = false;
-  admin.status = "ativo";
-  admin.plano = "Admin";
-
-  await admin.save();
-
-  console.log("Admin padrão verificado/atualizado.");
-}
 app.get("/minhas-provas", autenticar, async (req, res) => {
   try {
-
     const resultados = await ProvaResultado.find({
       email: req.user.email
     })
@@ -783,14 +780,45 @@ app.get("/minhas-provas", autenticar, async (req, res) => {
       sucesso: true,
       resultados
     });
-
   } catch (error) {
-
     res.json({
       erro: "Erro ao buscar provas.",
       detalhe: error.message
     });
+  }
+});
 
+app.get("/admin/provas", autenticar, somenteAdmin, async (req, res) => {
+  try {
+    const resultados = await ProvaResultado.find()
+      .sort({ createdAt: -1 })
+      .limit(500);
+
+    res.json({
+      sucesso: true,
+      resultados
+    });
+  } catch (error) {
+    res.json({
+      erro: "Erro ao buscar resultados de provas.",
+      detalhe: error.message
+    });
+  }
+});
+
+app.delete("/admin/provas", autenticar, somenteAdmin, async (req, res) => {
+  try {
+    await ProvaResultado.deleteMany({});
+
+    res.json({
+      sucesso: true,
+      mensagem: "Registros de provas apagados."
+    });
+  } catch (error) {
+    res.json({
+      erro: "Erro ao apagar registros de provas.",
+      detalhe: error.message
+    });
   }
 });
 
