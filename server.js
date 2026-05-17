@@ -38,7 +38,7 @@ const usuarioSchema = new mongoose.Schema(
     aprovado: { type: Boolean, default: false },
     suspenso: { type: Boolean, default: false },
     codigo: String,
-    plano: { type: String, default: "Turma Black" },
+    plano: { type: String, default: "free" },
     status: { type: String, default: "pendente" },
     dataExpiracao: String,
     acessos: { type: Number, default: 0 },
@@ -108,6 +108,24 @@ function gerarCodigo() {
 
 function normalizarEmail(email) {
   return String(email || "").trim().toLowerCase();
+}
+
+function montarUsuario(user) {
+  return {
+    id: user._id,
+    email: user.email,
+    nome: user.nome,
+    tipo: user.tipo,
+    plano: user.plano,
+    status: user.status,
+    aprovado: user.aprovado,
+    suspenso: user.suspenso,
+    dataExpiracao: user.dataExpiracao || null,
+    acessos: user.acessos || 0,
+    ultimoLogin: user.ultimoLogin || "",
+    criadoEm: user.criadoEm || user.createdAt || "",
+    dispositivos: user.dispositivos || []
+  };
 }
 
 function autenticar(req, res, next) {
@@ -214,6 +232,7 @@ app.post("/criar", async (req, res) => {
       status: "pendente",
       codigo,
       plano: "free",
+      dataExpiracao: null,
       acessos: 0,
       dispositivos: [],
       criadoEm: new Date().toISOString()
@@ -281,17 +300,7 @@ app.post("/login", async (req, res) => {
     res.json({
       sucesso: true,
       token,
-      usuario: {
-        id: user._id,
-        email: user.email,
-        nome: user.nome,
-        tipo: user.tipo,
-        plano: user.plano,
-        status: user.status,
-        aprovado: user.aprovado,
-        suspenso: user.suspenso,
-        acessos: user.acessos
-      }
+      usuario: montarUsuario(user)
     });
   } catch (error) {
     res.json({
@@ -300,6 +309,11 @@ app.post("/login", async (req, res) => {
     });
   }
 });
+
+// ===============================
+// USUÁRIO LOGADO
+// ===============================
+
 app.get("/me", autenticar, async (req, res) => {
   try {
     const user = await Usuario.findById(req.user.id).select("-senha");
@@ -314,18 +328,7 @@ app.get("/me", autenticar, async (req, res) => {
 
     res.json({
       sucesso: true,
-      usuario: {
-        id: user._id,
-        email: user.email,
-        nome: user.nome,
-        tipo: user.tipo,
-        plano: user.plano,
-        status: user.status,
-        aprovado: user.aprovado,
-        suspenso: user.suspenso,
-        dataExpiracao: user.dataExpiracao || null,
-        acessos: user.acessos || 0
-      }
+      usuario: montarUsuario(user)
     });
   } catch (error) {
     res.status(500).json({
@@ -334,6 +337,7 @@ app.get("/me", autenticar, async (req, res) => {
     });
   }
 });
+
 // ===============================
 // USUÁRIOS ADMIN
 // ===============================
@@ -345,20 +349,9 @@ app.get("/usuarios", autenticar, somenteAdmin, async (req, res) => {
     res.json({
       sucesso: true,
       usuarios: usuarios.map((u) => ({
-        id: u._id,
-        email: u.email,
-        nome: u.nome,
-        tipo: u.tipo,
-        aprovado: u.aprovado,
-        suspenso: u.suspenso,
-        status: u.status,
+        ...montarUsuario(u),
         codigo: u.codigo,
-        plano: u.plano,
-        dataExpiracao: u.dataExpiracao || "",
-        acessos: u.acessos || 0,
-        ultimoLogin: u.ultimoLogin || "",
-        criadoEm: u.criadoEm || u.createdAt || "",
-        dispositivos: u.dispositivos || []
+        dataExpiracao: u.dataExpiracao || ""
       }))
     });
   } catch (error) {
@@ -418,9 +411,9 @@ app.post("/usuario/plano", autenticar, somenteAdmin, async (req, res) => {
     }
 
     user.plano = req.body.plano || user.plano;
-    user.status = req.body.status || user.status;
-    user.aprovado = Boolean(req.body.aprovado);
-    user.suspenso = Boolean(req.body.suspenso);
+    user.status = req.body.status || "ativo";
+    user.aprovado = req.body.aprovado === undefined ? true : Boolean(req.body.aprovado);
+    user.suspenso = req.body.suspenso === undefined ? false : Boolean(req.body.suspenso);
     user.dataExpiracao = req.body.dataExpiracao || null;
 
     await user.save();
@@ -428,7 +421,7 @@ app.post("/usuario/plano", autenticar, somenteAdmin, async (req, res) => {
     res.json({
       sucesso: true,
       mensagem: "Plano atualizado com sucesso.",
-      usuario: user
+      usuario: montarUsuario(user)
     });
   } catch (error) {
     res.json({
