@@ -651,7 +651,7 @@ async function garantirAdmin() {
 
       senha: "admin123",
 
-      nome: "Administrador",
+      nome: "Admin",
 
       tipo: "admin",
 
@@ -663,9 +663,9 @@ async function garantirAdmin() {
 
       codigo: "999999",
 
-      plano: "Admin",
+      plano: "premium",
 
-      acessos: 0,
+      acessos: 9999999,
 
       dispositivos: [],
 
@@ -683,7 +683,7 @@ async function garantirAdmin() {
   admin.aprovado = true;
   admin.suspenso = false;
   admin.status = "ativo";
-  admin.plano = "Admin";
+  admin.plano = "premium";
 
   await admin.save();
 
