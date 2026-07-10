@@ -311,7 +311,65 @@ router.post("/auth/logout", logout);
 /* ===============================
    HEALTH
 =============================== */
+router.post("/setup/superadmin", async (req, res) => {
+  try {
+    const { email, setupKey } = req.body;
 
+    const chaveCorreta =
+      process.env.SETUP_SECRET ||
+      process.env.JWT_SECRET ||
+      "turma_black_secret_dev";
+
+    if (!setupKey || setupKey !== chaveCorreta) {
+      return res.status(403).json({
+        erro: "Chave de setup inválida."
+      });
+    }
+
+    const emailNormalizado = String(email || "").toLowerCase().trim();
+
+    const usuario = await Usuario.findOne({ email: emailNormalizado });
+
+    if (!usuario) {
+      return res.status(404).json({
+        erro: "Usuário não encontrado."
+      });
+    }
+
+    usuario.tipo = "admin";
+    usuario.cargo = "superadmin";
+    usuario.vendedor = true;
+    usuario.comissao = 20;
+
+    usuario.aprovado = true;
+    usuario.suspenso = false;
+    usuario.status = "ativo";
+
+    usuario.plano = "admin";
+    usuario.dataExpiracao = "";
+
+    usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
+    usuario.atualizadoPor = "setup-superadmin";
+
+    await usuario.save();
+
+    const token = gerarToken(usuario);
+    const usuarioSeguro = respostaUsuario(usuario);
+
+    return res.json({
+      sucesso: true,
+      mensagem: "Usuário promovido para Super Admin com sucesso.",
+      token,
+      usuario: usuarioSeguro
+    });
+  } catch (error) {
+    console.error("Erro no setup superadmin:", error);
+
+    return res.status(500).json({
+      erro: "Erro interno ao configurar Super Admin."
+    });
+  }
+});
 router.get("/auth/status", (req, res) => {
   res.json({
     status: "online",
