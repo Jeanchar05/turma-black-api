@@ -274,6 +274,26 @@ async function buscarOuCriarAluno({
 
   return aluno;
 }
+/* ===============================
+   STATUS DO MÓDULO
+=============================== */
+
+router.get("/vendas/status", (req, res) => {
+  res.json({
+    status: "online",
+    modulo: "vendas",
+    rotas: [
+      "GET /vendas",
+      "GET /vendas/resumo",
+      "GET /vendas/ranking",
+      "GET /vendas/:id",
+      "POST /vendas",
+      "PUT /vendas/:id",
+      "POST /vendas/:id/status",
+      "DELETE /vendas/:id"
+    ]
+  });
+});
 
 /* ===============================
    RESUMO DE VENDAS
