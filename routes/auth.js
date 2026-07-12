@@ -56,7 +56,11 @@ function respostaUsuario(usuario) {
 
 /* ===============================
    CRIAR CONTA
-   Compatível com: POST /criar
+   POST /criar
+   Novo fluxo:
+   - Conta comum nasce FREE
+   - Login liberado imediatamente
+   - Código Premium será gerado depois no dashboard-free
 =============================== */
 
 async function criarConta(req, res) {
@@ -86,13 +90,9 @@ async function criarConta(req, res) {
     }
 
     const totalUsuarios = await Usuario.countDocuments();
-
-    /*
-      Se for o primeiro usuário do banco,
-      ele vira Super Admin automaticamente.
-    */
-
     const primeiroUsuario = totalUsuarios === 0;
+
+    const agora = new Date().toISOString();
 
     const usuario = await Usuario.create({
       nome: String(nome || "").trim(),
@@ -106,11 +106,11 @@ async function criarConta(req, res) {
       vendedor: primeiroUsuario ? true : false,
       comissao: 20,
 
-      aprovado: primeiroUsuario ? true : false,
+      aprovado: true,
       suspenso: false,
-      status: primeiroUsuario ? "ativo" : "pendente",
+      status: "ativo",
 
-      codigo: gerarCodigoAluno(),
+      codigo: primeiroUsuario ? gerarCodigoAluno() : "",
 
       plano: primeiroUsuario ? "admin" : "free",
       dataExpiracao: "",
@@ -118,7 +118,9 @@ async function criarConta(req, res) {
       acessos: 0,
       dispositivos: [],
       ultimoLogin: "",
-      aprovadoEm: primeiroUsuario ? new Date().toISOString() : ""
+      aprovadoEm: agora,
+      criadoPor: "cadastro-online",
+      atualizadoPor: "cadastro-online"
     });
 
     const usuarioSeguro = respostaUsuario(usuario);
@@ -136,7 +138,7 @@ async function criarConta(req, res) {
 
     return res.status(201).json({
       sucesso: true,
-      mensagem: "Conta criada com sucesso. Aguarde aprovação da equipe.",
+      mensagem: "Conta criada com sucesso. Faça login para acessar o plano gratuito.",
       usuario: usuarioSeguro
     });
   } catch (error) {
@@ -150,7 +152,7 @@ async function criarConta(req, res) {
 
 /* ===============================
    LOGIN
-   Compatível com: POST /login
+   POST /login
 =============================== */
 
 async function login(req, res) {
@@ -193,6 +195,21 @@ async function login(req, res) {
       });
     }
 
+    /*
+      Compatibilidade:
+      Se existirem contas antigas pendentes/free no banco,
+      elas serão liberadas como FREE no primeiro login.
+    */
+    if (!usuario.aprovado && usuario.plano === "free" && usuario.cargo === "aluno") {
+      usuario.aprovado = true;
+      usuario.status = "ativo";
+      usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
+    }
+
+    /*
+      Bloqueia apenas casos antigos realmente pendentes,
+      que não sejam conta free/aluno.
+    */
     if (!usuario.aprovado && usuario.cargo !== "superadmin") {
       return res.status(403).json({
         erro: "Sua conta ainda está pendente de aprovação.",
@@ -206,6 +223,10 @@ async function login(req, res) {
 
     if (!usuario.status || usuario.status === "pendente") {
       usuario.status = "ativo";
+    }
+
+    if (!usuario.plano) {
+      usuario.plano = "free";
     }
 
     await usuario.save();
@@ -230,7 +251,7 @@ async function login(req, res) {
 
 /* ===============================
    ME
-   Compatível com: GET /me
+   GET /me
 =============================== */
 
 async function me(req, res) {
@@ -299,7 +320,6 @@ router.post("/logout", logout);
 
 /* ===============================
    ALIASES /auth
-   Caso futuramente o frontend use /auth/login
 =============================== */
 
 router.post("/auth/criar", criarConta);
@@ -309,8 +329,10 @@ router.get("/auth/validar-token", auth, validarToken);
 router.post("/auth/logout", logout);
 
 /* ===============================
-   HEALTH
+   SETUP SUPER ADMIN
+   Rota temporária
 =============================== */
+
 router.post("/setup/superadmin", async (req, res) => {
   try {
     const { email, setupKey } = req.body;
@@ -326,7 +348,13 @@ router.post("/setup/superadmin", async (req, res) => {
       });
     }
 
-    const emailNormalizado = String(email || "").toLowerCase().trim();
+    const emailNormalizado = normalizarEmail(email);
+
+    if (!emailNormalizado) {
+      return res.status(400).json({
+        erro: "Informe o e-mail do usuário."
+      });
+    }
 
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
@@ -347,6 +375,10 @@ router.post("/setup/superadmin", async (req, res) => {
 
     usuario.plano = "admin";
     usuario.dataExpiracao = "";
+
+    if (!usuario.codigo) {
+      usuario.codigo = gerarCodigoAluno();
+    }
 
     usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
     usuario.atualizadoPor = "setup-superadmin";
@@ -370,11 +402,28 @@ router.post("/setup/superadmin", async (req, res) => {
     });
   }
 });
+
+/* ===============================
+   HEALTH
+=============================== */
+
 router.get("/auth/status", (req, res) => {
   res.json({
     status: "online",
     modulo: "auth",
-    rotas: ["/criar", "/login", "/me", "/validar-token", "/logout"]
+    fluxo: {
+      cadastro: "Conta FREE criada automaticamente",
+      premium: "Ativação Premium será feita no dashboard-free",
+      login: "Usuário free pode entrar imediatamente"
+    },
+    rotas: [
+      "/criar",
+      "/login",
+      "/me",
+      "/validar-token",
+      "/logout",
+      "/setup/superadmin"
+    ]
   });
 });
 
