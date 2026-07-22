@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Fibonacci | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/fibonacci.js"></script>
+</head>
+
+<body class="fibonacci-body">
+
+  <main class="fibonacci-page">
+
+    <header class="fibonacci-header">
+
+      <div class="fibonacci-header-content">
+
+        <div class="fibonacci-topbar">
+          <button class="fibonacci-btn-outline" type="button" data-page="../modulos.html">
+            ← Módulos
+          </button>
+
+          <button class="fibonacci-btn-gradient" type="button" data-page="../dashboard.html">
+            🏠 Dashboard
+          </button>
+
+          <button class="fibonacci-btn-outline" type="button" data-page="./magnetismo.html">
+            🧲 Magnetismo
+          </button>
+        </div>
+
+        <span class="fibonacci-badge">
+          FIBONACCI • RACE SYSTEM
+        </span>
+
+        <h1>🔢 Fibonacci</h1>
+
+        <p>
+          Digite dois números da roleta e descubra automaticamente a soma,
+          subtração, distância na race e os pontos marcados na roleta inteligente.
+        </p>
+
+      </div>
+
+    </header>
+
+    <section class="fibonacci-layout">
+
+      <section class="fibonacci-race-card">
+
+        <div class="fibonacci-race-header">
+          <div>
+            <span>VISUALIZAÇÃO</span>
+            <h2>Race Inteligente</h2>
+          </div>
+
+          <button id="btnLimparCrazy" class="fibonacci-clear-btn" type="button">
+            Limpar marcações
+          </button>
+        </div>
+
+        <div class="fibonacci-race-container">
+
+          <img
+            src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628296/race_gujiqx.png"
+            alt="Race da Roleta"
+            class="fibonacci-race-img"
+          >
+
+          <svg id="crazyLinhas" class="fibonacci-linhas"></svg>
+
+          <div id="crazyMarcacoes" class="fibonacci-marcacoes"></div>
+
+        </div>
+
+      </section>
+
+      <aside class="fibonacci-panel">
+
+        <div class="fibonacci-panel-title">
+          <span>ENTRADA</span>
+          <h2>Calcular leitura</h2>
+        </div>
+
+        <div class="fibonacci-form">
+
+          <label>
+            Número 1
+
+            <input
+              type="number"
+              id="numero1"
+              min="0"
+              max="36"
+              placeholder="Ex: 20"
+            >
+          </label>
+
+          <label>
+            Número 2
+
+            <input
+              type="number"
+              id="numero2"
+              min="0"
+              max="36"
+              placeholder="Ex: 4"
+            >
+          </label>
+
+          <button id="btnCalcularCrazy" type="button">
+            ⚡ Calcular Fibonacci
+          </button>
+
+        </div>
+
+        <div class="fibonacci-results">
+
+          <div class="fibonacci-result-box">
+            <span>Soma</span>
+            <strong id="resultadoSoma">--</strong>
+          </div>
+
+          <div class="fibonacci-result-box">
+            <span>Subtração</span>
+            <strong id="resultadoSubtracao">--</strong>
+          </div>
+
+          <div class="fibonacci-result-box">
+            <span>Distância na race</span>
+            <strong id="resultadoDistancia">--</strong>
+          </div>
+
+        </div>
+
+        <div class="fibonacci-info-box">
+
+          <span>📌 Leitura Fibonacci</span>
+
+          <p id="crazyLeitura">
+            Aguardando cálculo...
+          </p>
+
+        </div>
+
+      </aside>
+
+    </section>
+
+    <section class="fibonacci-history-card">
+
+      <div class="fibonacci-history-header">
+
+        <div>
+          <span>ÚLTIMOS CÁLCULOS</span>
+          <h2>Histórico Fibonacci</h2>
+        </div>
+
+        <button id="btnLimparHistoricoCrazy" type="button">
+          Limpar histórico
+        </button>
+
+      </div>
+
+      <div id="crazyHistorico" class="fibonacci-history-list">
+
+        <div class="fibonacci-empty">
+          Nenhum cálculo realizado ainda.
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Minigame Eclipse 0 | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/eclipse01.js"></script>
+</head>
+
+<body class="eclipse01-body">
+
+  <main class="eclipse01-page">
+
+    <nav class="eclipse01-nav">
+      <button type="button" data-page="../minigames.html">← Minigames</button>
+      <button type="button" data-page="../dashboard.html">🏠 Dashboard</button>
+      <button type="button" data-page="./eclipse-0.html">📚 Aula Eclipse 0</button>
+    </nav>
+
+    <header class="eclipse01-header">
+      <div>
+        <span class="eclipse01-tag">TREINO ECLIPSE 0</span>
+
+        <h1>🌑 Minigame Eclipse 0</h1>
+
+        <p>
+          O sistema vai gerar uma repetição inicial e depois roletar 4 números.
+          Analise se a entrada Eclipse 0 está liberada ou invalidada.
+        </p>
+      </div>
+
+      <button id="btnResetEclipse01" class="eclipse01-clear-btn" type="button">
+        🧹 Resetar treino
+      </button>
+    </header>
+
+    <section class="eclipse01-layout">
+
+      <section class="eclipse01-roleta-card">
+
+        <div class="eclipse01-card-title">
+          <span>🎰</span>
+
+          <div>
+            <h2>Roleta de treino</h2>
+            <p>Gere a repetição inicial e os 4 giros de espera.</p>
+          </div>
+        </div>
+
+        <div class="eclipse01-wheel-area">
+
+          <div class="eclipse01-wheel-frame">
+            <img
+              src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777757465/roleta-real.png_upenvz.jpg"
+              alt="Roleta Eclipse 0"
+              class="eclipse01-wheel"
+              id="eclipse01Wheel"
+            >
+
+            <div class="eclipse01-ball"></div>
+          </div>
+
+          <div class="eclipse01-current-number" id="numeroAtualEclipse01">
+            --
+          </div>
+
+        </div>
+
+        <button id="btnGerarRodadaEclipse01" class="eclipse01-main-btn" type="button">
+          ▶ Gerar rodada
+        </button>
+
+      </section>
+
+      <section class="eclipse01-game-card">
+
+        <div class="eclipse01-card-title">
+          <span>🧠</span>
+
+          <div>
+            <h2>Análise do aluno</h2>
+            <p>Responda se os 4 giros fazem parte do Eclipse 0.</p>
+          </div>
+        </div>
+
+        <div class="eclipse01-sequencia-box">
+
+          <div>
+            <small>Repetição inicial</small>
+
+            <div id="repeticaoEclipse01" class="eclipse01-repeticao">
+              <span>--</span>
+              <span>--</span>
+            </div>
+          </div>
+
+          <div>
+            <small>4 giros de espera</small>
+
+            <div id="girosEclipse01" class="eclipse01-giros">
+              <span>--</span>
+              <span>--</span>
+              <span>--</span>
+              <span>--</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="eclipse01-question-card" id="perguntaEclipse01">
+          <h3>Essa rodada faz parte do Eclipse 0?</h3>
+
+          <p>
+            Lembre: se aparecer qualquer número do Terminal 0 + 2 vizinhos nos 4 giros,
+            a entrada é invalidada.
+          </p>
+
+          <div class="eclipse01-actions">
+            <button id="btnSimEclipse01" type="button">
+              ✅ Sim, faz parte
+            </button>
+
+            <button id="btnNaoEclipse01" type="button">
+              ❌ Não faz parte
+            </button>
+          </div>
+        </div>
+
+        <div id="resultadoEclipse01" class="eclipse01-result">
+          Gere uma rodada para começar.
+        </div>
+
+      </section>
+
+      <aside class="eclipse01-side-card">
+
+        <div class="eclipse01-card-title">
+          <span>📊</span>
+
+          <div>
+            <h2>Placar</h2>
+            <p>Acompanhe sua evolução.</p>
+          </div>
+        </div>
+
+        <div class="eclipse01-score-grid">
+          <div>
+            <small>Acertos</small>
+            <strong id="acertosEclipse01">0</strong>
+          </div>
+
+          <div>
+            <small>Erros</small>
+            <strong id="errosEclipse01">0</strong>
+          </div>
+
+          <div>
+            <small>Total</small>
+            <strong id="totalEclipse01">0</strong>
+          </div>
+        </div>
+      </aside>
+
+    </section>
+
+    <section class="eclipse01-history-card">
+
+      <div class="eclipse01-history-header">
+        <div>
+          <span>HISTÓRICO</span>
+          <h2>Últimas rodadas</h2>
+        </div>
+
+        <button id="btnLimparHistoricoEclipse01" type="button">
+          Limpar histórico
+        </button>
+      </div>
+
+      <div id="historicoEclipse01Lista" class="eclipse01-history-list">
+        <div class="eclipse01-empty">Nenhuma rodada ainda.</div>
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

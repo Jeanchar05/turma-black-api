@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+<meta name="theme-color" content="#0b0614">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Estudos Free | Turma Black do Primo</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="free-body">
+
+  <aside class="free-sidebar">
+    <div class="free-logo">
+      <h2>TURMA <span>BLACK</span></h2>
+      <p>Estudos bloqueados</p>
+    </div>
+
+    <nav class="free-menu">
+      <a href="dashboard-free.html">🏠 Início</a>
+      <a href="estudo-free.html" class="active">📚 Estudos</a>
+      <a href="assinatura.html">💎 Assinatura</a>
+      <button onclick="sairFree()">🚪 Sair</button>
+    </nav>
+  </aside>
+
+  <main class="free-main">
+
+    <header class="free-header">
+      <div>
+        <h1>Área de Estudos</h1>
+        <p>Veja uma prévia dos módulos premium disponíveis para assinantes.</p>
+      </div>
+
+      <a class="free-whatsapp" href="https://wa.me/5533998097595" target="_blank">
+        💬 Falar no WhatsApp
+      </a>
+    </header>
+
+    <section class="study-free-alert">
+      <h2>🔒 Conteúdo Premium Bloqueado</h2>
+      <p>
+        Os módulos abaixo fazem parte da versão completa da Turma Black.
+        Assine para desbloquear o conteúdo completo.
+      </p>
+    </section>
+
+    <section class="study-free-grid">
+
+      <div class="study-free-card">
+        <div class="lock-bg">🔒</div>
+        <span>🎯</span>
+        <h3>Terminal X</h3>
+        <p>Identifique tendências por grupos finais e melhore sua leitura da mesa.</p>
+        <button onclick="abrirAssinatura()">Liberar módulo</button>
+      </div>
+
+      <div class="study-free-card">
+        <div class="lock-bg">🔒</div>
+        <span>💎</span>
+        <h3>Reflexo Fatal</h3>
+        <p>Observe relações ocultas entre números conectados e padrões repetidos.</p>
+        <button onclick="abrirAssinatura()">Liberar módulo</button>
+      </div>
+
+      <div class="study-free-card">
+        <div class="lock-bg">🔒</div>
+        <span>🧲</span>
+        <h3>Pull System</h3>
+        <p>Veja regiões próximas da race e possíveis zonas de atenção.</p>
+        <button onclick="abrirAssinatura()">Liberar módulo</button>
+      </div>
+
+      <div class="study-free-card">
+        <div class="lock-bg">🔒</div>
+        <span>📐</span>
+        <h3>Pitagoras</h3>
+        <p>Use cruzamentos estratégicos para visualizar áreas de possível reação.</p>
+        <button onclick="abrirAssinatura()">Liberar módulo</button>
+      </div>
+
+      <div class="study-free-card">
+        <div class="lock-bg">🔒</div>
+        <span>🚨</span>
+        <h3>Triggers</h3>
+        <p>Receba sinais visuais para acompanhar possíveis chamadas da mesa.</p>
+        <button onclick="abrirAssinatura()">Liberar módulo</button>
+      </div>
+
+      <div class="study-free-card">
+        <div class="lock-bg">🔒</div>
+        <span>🎰</span>
+        <h3>Roleta</h3>
+        <p>Área inteligente para análise de padrões e comportamento da banca.</p>
+        <button onclick="abrirAssinatura()">Liberar módulo</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <a class="whatsapp-float" href="https://wa.me/5533998097595" target="_blank">
+    💬
+  </a>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem("usuarioLogado") || "null");
+
+    if (!usuario) {
+      window.location.href = "index.html";
+    }
+
+    function abrirAssinatura() {
+      window.location.href = "assinatura.html";
+    }
+
+    function sairFree() {
+      localStorage.removeItem("usuarioLogado");
+      localStorage.removeItem("token");
+      window.location.href = "index.html";
+    }
+  </script>
+<script src="js/seguranca.js"></script>
+</body>
+</html>

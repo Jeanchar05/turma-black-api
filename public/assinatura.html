@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+<meta name="theme-color" content="#0b0614">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Assinatura | Turma Black</title>
+
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+</head>
+
+<body class="free-body">
+
+  <aside class="free-sidebar">
+    <div class="free-logo">
+      <h2>TURMA <span>BLACK</span></h2>
+      <p>Área Premium</p>
+    </div>
+
+    <nav class="free-menu">
+      <a href="dashboard-free.html">🏠 Início</a>
+      <a href="estudo-free.html">📚 Estudos</a>
+      <a href="assinatura.html" class="active">💎 Assinatura</a>
+      <button onclick="sairFree()">🚪 Sair</button>
+    </nav>
+  </aside>
+
+  <main class="free-main">
+
+    <header class="free-header">
+      <div>
+        <h1>Libere o acesso completo</h1>
+        <p>Entre para a Turma Black Premium.</p>
+      </div>
+
+      <a class="free-whatsapp"
+         href="https://wa.me/5533998097595"
+         target="_blank">
+         💬 WhatsApp
+      </a>
+    </header>
+
+    <section class="assinatura-hero">
+
+      <div class="assinatura-card destaque">
+
+        <div class="assinatura-top">
+          <span class="premium-badge">🔥 MAIS ESCOLHIDO</span>
+
+          <h2>Plano Premium</h2>
+
+          <div class="assinatura-preco">
+            <strong>R$ 289,90</strong>
+            <small>/ mês</small>
+          </div>
+          <p>
+            Libere TODOS os módulos, ferramentas e recursos premium da plataforma.
+          </p>
+        </div>
+
+        <div class="assinatura-beneficios">
+
+          <div>✅ IA da Roleta</div>
+          <div>✅ Estudos completos</div>
+          <div>✅ Estratégias avançadas</div>
+          <div>✅ Provas e simulados</div>
+          <div>✅ Racetrack premium</div>
+          <div>✅ Atualizações constantes</div>
+          <div>✅ Suporte exclusivo</div>
+
+        </div>
+
+        <div class="assinatura-botoes">
+
+          <a href="https://wa.me/5533998097595"
+             target="_blank"
+             class="btn-premium">
+             💎 Assinar agora
+          </a>
+
+          <a href="https://wa.me/5533998199610"
+             class="btn-secundario">
+             💬 Tirar dúvida
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <a class="whatsapp-float"
+     href="https://wa.me/5533998097595"
+     target="_blank">
+     💬
+  </a>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem("usuarioLogado") || "null");
+
+    if (!usuario) {
+      window.location.href = "index.html";
+    }
+
+    function sairFree() {
+      localStorage.removeItem("usuarioLogado");
+      localStorage.removeItem("token");
+      window.location.href = "index.html";
+    }
+  </script>
+<script src="js/seguranca.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "Turma Black do Primo",
+  "short_name": "Turma Black",
+  "start_url": "/dashboard.html",
+  "display": "standalone",
+  "background_color": "#07030f",
+  "theme_color": "#0b0614",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

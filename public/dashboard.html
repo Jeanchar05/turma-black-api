@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Dashboard | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  />
+
+  <link
+    rel="apple-touch-icon"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  />
+
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+
+  <script defer src="dashboard.js?v=20260721-1"></script>
+
+</head>
+
+<body class="dashboard-body">
+
+  <div class="dashboard-layout">
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>TURMA <span>BLACK</span></h1>
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <button class="menu-item active" data-page="dashboard.html">
+          <span>🏠</span>
+          Dashboard
+        </button>
+
+        <button class="menu-item" data-page="perfil.html">
+          <span>👤</span>
+          Perfil
+        </button>
+
+        <button class="menu-item" data-page="modulos.html">
+          <span>📚</span>
+          Módulos
+        </button>
+
+        <button class="menu-item" data-page="estudo.html">
+          <span>🗂️</span>
+          Estudo
+        </button>
+
+        <button class="menu-item" data-page="provas.html">
+          <span>📝</span>
+          Provas
+        </button>
+
+        <button class="menu-item" data-page="favoritos.html">
+          <span>⭐</span>
+          Favoritos
+        </button>
+
+        <button class="menu-item" data-page="notas.html">
+          <span>🧾</span>
+          Anotações
+        </button>
+
+        <button class="menu-item" data-page="minigames.html">
+          <span>🎮</span>
+          Minigames
+        </button>
+
+        <button class="menu-item" data-page="roleta.html">
+          <span>🎰</span>
+          Roleta
+        </button>
+
+        <button class="menu-item" data-page="banca.html">
+  <span>💰</span> Gestão
+</button>
+
+        <button class="menu-item" data-page="suporte.html">
+          <span>💬</span>
+          Suporte
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+
+        <button class="logout-btn" id="btnSair">
+          🚪 Sair da conta
+        </button>
+
+      </div>
+
+    </aside>
+
+    <!-- ======================================
+         MAIN
+    ======================================= -->
+
+    <main class="dashboard-main">
+
+      <!-- ======================================
+           HEADER
+      ======================================= -->
+
+      <header class="dashboard-header">
+
+        <button class="mobile-menu-btn" id="btnMenu">
+          ☰
+        </button>
+
+        <div>
+
+          <h2>
+            Bem-vindo,
+            <span id="nomeAluno">Aluno</span>
+            👋
+          </h2>
+
+          <p>
+            Sua central premium da Turma Black.
+          </p>
+
+        </div>
+
+        <div class="header-actions">
+
+          <div class="status-badge">
+            <span></span>
+            Online
+          </div>
+
+          <button
+            class="profile-shortcut"
+            data-page="perfil.html"
+          >
+            👤
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- ======================================
+           HERO
+      ======================================= -->
+
+      <section class="dashboard-hero">
+
+        <div class="hero-content">
+
+          <span class="hero-tag">
+            PLATAFORMA PREMIUM
+          </span>
+
+          <h1>
+            Domine estratégias,
+            padrões e operações
+            com uma plataforma
+            premium profissional.
+          </h1>
+
+          <p>
+            Acesse módulos premium,
+            minigames, operações especiais,
+            favoritos rápidos e atividades
+            recentes online.
+          </p>
+
+          <div class="hero-buttons">
+
+            <button
+              class="primary-btn"
+              data-page="estudo.html"
+            >
+              Continuar aprendendo
+            </button>
+
+            <button
+              class="secondary-btn"
+              data-page="favoritos.html"
+            >
+              Ver favoritos
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="hero-card">
+
+          <p>Progresso geral</p>
+
+          <strong id="progressoGeral">
+            0%
+          </strong>
+
+          <div class="progress-bar">
+            <div id="barraProgresso"></div>
+          </div>
+
+          <small id="textoProgresso">
+            Carregando progresso...
+          </small>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================
+           CARDS
+      ======================================= -->
+
+      <section class="dashboard-cards">
+
+        <article class="dash-card">
+
+          <div class="card-icon">
+            📚
+          </div>
+
+          <div>
+            <p>Módulos estudados</p>
+            <h3 id="modulosEstudados">0</h3>
+          </div>
+
+        </article>
+
+        <article class="dash-card">
+
+          <div class="card-icon">
+            🗂️
+          </div>
+
+          <div>
+            <p>Arquivos lidos</p>
+            <h3 id="arquivosLidos">0</h3>
+          </div>
+
+        </article>
+
+        <article class="dash-card">
+
+          <div class="card-icon">
+            📝
+          </div>
+
+          <div>
+            <p>Provas feitas</p>
+            <h3 id="provasFeitas">0</h3>
+          </div>
+
+        </article>
+
+        <article class="dash-card">
+
+          <div class="card-icon">
+            ⭐
+          </div>
+
+          <div>
+            <p>Favoritos</p>
+            <h3 id="totalFavoritos">0</h3>
+          </div>
+
+        </article>
+
+      </section>
+
+      <!-- ======================================
+           FAVORITOS + ATIVIDADES
+      ======================================= -->
+
+      <section class="dashboard-grid">
+
+        <!-- FAVORITOS -->
+
+        <div class="panel premium-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h2>
+                Favoritos rápidos
+              </h2>
+
+              <p>
+                Seus atalhos favoritos da plataforma.
+              </p>
+
+            </div>
+
+          </div>
+
+          <div
+            class="module-list"
+            id="listaModulosDashboard"
+          ></div>
+
+        </div>
+
+        <!-- ATIVIDADES -->
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h2>
+                Atividades recentes online
+              </h2>
+
+              <p>
+                Últimas ações registradas na plataforma.
+              </p>
+
+            </div>
+
+          </div>
+
+          <div
+            class="activity-list"
+            id="listaAtividades"
+          ></div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================
+           MÓDULOS PREMIUM
+      ======================================= -->
+
+      <section class="modules-showcase">
+
+        <div class="section-title">
+
+          <h2>
+            Módulos premium
+          </h2>
+
+          <p>
+            Aprendizados disponíveis na plataforma.
+          </p>
+
+        </div>
+
+        <div class="modules-grid">
+
+          <button
+            class="premium-module-card"
+            data-page="modules/reflexivos.html"
+          >
+            <span>🧠</span>
+
+            <strong>Reflexivos</strong>
+
+            <p>
+              Reflexos e leitura estratégica.
+            </p>
+          </button>
+
+          <button
+            class="premium-module-card"
+            data-page="modules/gatilhos.html"
+          >
+            <span>🚨</span>
+
+            <strong>Gatilhos</strong>
+
+            <p>
+              Chamadas e sinais inteligentes.
+            </p>
+          </button>
+
+          <button
+            class="premium-module-card"
+            data-page="modules/camaleoes.html"
+          >
+            <span>🦎</span>
+
+            <strong>Camaleões</strong>
+
+            <p>
+              Adaptação e leitura dinâmica.
+            </p>
+          </button>
+
+          <button
+            class="premium-module-card"
+            data-page="modules/eclipse0.html"
+          >
+            <span>🌑</span>
+
+            <strong>Eclipse 0</strong>
+
+            <p>
+              Operações premium ocultas.
+            </p>
+          </button>
+
+          <button
+            class="premium-module-card"
+            data-page="modules/magnetismo.html"
+          >
+            <span>🧲</span>
+
+            <strong>Magnetismo</strong>
+
+            <p>
+              Atração de padrões estratégicos.
+            </p>
+          </button>
+
+          <button
+            class="premium-module-card"
+            data-page="modules/fibonacci.html"
+          >
+            <span>🌀</span>
+
+            <strong>Fibonacci</strong>
+
+            <p>
+              Sequências numéricas avançadas.
+            </p>
+          </button>
+
+          <button
+            class="premium-module-card"
+            data-page="modules/pitagoras.html"
+          >
+            <span>📐</span>
+
+            <strong>Pitágoras</strong>
+
+            <p>
+              Conexões matemáticas estratégicas.
+            </p>
+          </button>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ======================================
+       OVERLAY
+  ======================================= -->
+
+  <div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+  ></div>
+
+  <script src="js/seguranca.js?v=20260721-1"></script>
+
+</body>
+</html>

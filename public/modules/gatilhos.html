@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Gatilhos | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/gatilhos.js"></script>
+</head>
+
+<body class="gatilhos-body">
+
+  <main class="gatilhos-page">
+
+    <nav class="gatilhos-nav">
+      <button type="button" data-page="../modulos.html">
+        ← Módulos
+      </button>
+
+      <button type="button" data-page="../dashboard.html">
+        🏠 Dashboard
+      </button>
+
+      <button type="button" data-page="./reflexivos.html">
+        🧠 Reflexivos
+      </button>
+    </nav>
+
+    <header class="gatilhos-header">
+      <div>
+        <span class="gatilhos-tag">SISTEMA DE ALERTAS</span>
+
+        <h1>🚨 Gatilhos</h1>
+
+        <p>
+          Selecione um número gatilho para marcar automaticamente na race
+          os números que ele costuma chamar dentro da leitura.
+        </p>
+      </div>
+
+      <button type="button" class="gatilhos-clear-btn" id="btnLimparTriggers">
+        🧹 Limpar Marcações
+      </button>
+    </header>
+
+    <section class="gatilhos-layout">
+
+      <aside class="gatilhos-panel">
+
+        <div class="gatilhos-card-title">
+          <span>⚡</span>
+
+          <div>
+            <h2>Alertas rápidos</h2>
+            <p>Números que puxam outros pontos na race.</p>
+          </div>
+        </div>
+
+        <div class="gatilhos-buttons">
+
+          <button type="button" data-trigger="36">
+            <strong>36</strong>
+            <span>chama 18, 19, 9</span>
+          </button>
+
+          <button type="button" data-trigger="3">
+            <strong>3</strong>
+            <span>chama 22, 31</span>
+          </button>
+
+          <button type="button" data-trigger="11">
+            <strong>11</strong>
+            <span>chama 22, 33</span>
+          </button>
+
+        </div>
+
+      </aside>
+
+      <section class="gatilhos-race-card">
+
+        <div class="gatilhos-status-bar">
+
+          <div>
+            <small>Gatilho atual</small>
+            <strong id="triggerAtual">Nenhum</strong>
+          </div>
+
+          <div>
+            <small>Total marcado</small>
+            <strong id="totalMarcadoTriggers">0 números</strong>
+          </div>
+
+        </div>
+
+        <div class="gatilhos-race-area">
+          <img
+            src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628296/race_gujiqx.png"
+            class="gatilhos-race-img"
+            alt="Race da roleta"
+          >
+
+          <div id="marcadoresTriggers" class="gatilhos-markers"></div>
+        </div>
+
+        <div class="gatilhos-numeros-box">
+          <h3>📌 Números marcados</h3>
+
+          <div id="listaNumerosTriggers" class="gatilhos-lista-numeros">
+            Nenhum número marcado ainda.
+          </div>
+        </div>
+
+      </section>
+
+      <aside class="gatilhos-info-card">
+
+        <div class="gatilhos-card-title">
+          <span>📊</span>
+
+          <div>
+            <h2>Leitura dos Gatilhos</h2>
+            <p>Resumo simples da marcação selecionada.</p>
+          </div>
+        </div>
+
+        <div class="gatilhos-info-grid">
+
+          <div>
+            <small>Entrada principal</small>
+            <strong id="entradaPrincipalTriggers">---</strong>
+          </div>
+
+          <div>
+            <small>Tipo</small>
+            <strong id="tipoTriggers">Alerta</strong>
+          </div>
+
+          <div>
+            <small>Cobertura</small>
+            <strong id="coberturaTriggers">---</strong>
+          </div>
+
+        </div>
+
+        <div class="gatilhos-analise" id="analiseTriggers">
+          Selecione um gatilho para visualizar a leitura.
+        </div>
+
+        <div class="gatilhos-legenda">
+          <div><span class="legenda-principal"></span> Número principal</div>
+          <div><span class="legenda-alerta"></span> Números chamados</div>
+        </div>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

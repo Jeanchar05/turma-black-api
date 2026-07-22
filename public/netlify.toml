@@ -1,0 +1,32 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/perfil"
+  to = "/perfil.html"
+  status = 200
+
+[[redirects]]
+  from = "/banca"
+  to = "/modules/banca.html"
+  status = 200
+
+[[redirects]]
+  from = "/racetrack"
+  to = "/modules/racetrack.html"
+  status = 200
+
+[[redirects]]
+  from = "/estudos"
+  to = "/modules/estudos.html"
+  status = 200

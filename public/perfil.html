@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Perfil | Turma Black</title>
+
+  <script>
+    (function () {
+      try {
+        const temaSalvo = localStorage.getItem("temaSite") || "escuro";
+        document.documentElement.dataset.theme = temaSalvo;
+        document.documentElement.classList.toggle("tema-claro", temaSalvo === "claro");
+        document.documentElement.classList.toggle("tema-escuro", temaSalvo !== "claro");
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="manifest" href="/manifest.json" />
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  />
+
+  <link
+    rel="apple-touch-icon"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  />
+
+  <meta name="theme-color" content="#0b0614" />
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+  <link rel="stylesheet" href="css/premium-upgrade.css" />
+
+  <script defer src="perfil.js"></script>
+</head>
+
+<body class="perfil-body">
+
+  <div class="perfil-layout">
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>
+          TURMA <span>BLACK</span>
+        </h1>
+
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <button class="menu-item" data-page="dashboard.html">
+          <span>🏠</span>
+          Dashboard
+        </button>
+
+        <button class="menu-item active" data-page="perfil.html">
+          <span>👤</span>
+          Perfil
+        </button>
+
+        <button class="menu-item" data-page="modulos.html">
+          <span>📚</span>
+          Módulos
+        </button>
+
+        <button class="menu-item" data-page="estudo.html">
+          <span>🗂️</span>
+          Estudo
+        </button>
+
+        <button class="menu-item" data-page="provas.html">
+          <span>📝</span>
+          Provas
+        </button>
+
+        <button class="menu-item" data-page="favoritos.html">
+          <span>⭐</span>
+          Favoritos
+        </button>
+
+        <button class="menu-item" data-page="notas.html">
+          <span>🧾</span>
+          Anotações
+        </button>
+
+        <button class="menu-item" data-page="minigames.html">
+          <span>🎮</span>
+          Minigames
+        </button>
+
+        <button class="menu-item" data-page="roleta.html">
+          <span>🎰</span>
+          Roleta
+        </button>
+
+        <button class="menu-item" data-page="banca.html">
+          <span>💰</span>
+          Gestão
+        </button>
+
+        <button class="menu-item" data-page="suporte.html">
+          <span>💬</span>
+          Suporte
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="btnSair">
+          🚪 Sair da conta
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- ======================================
+         MAIN
+    ======================================= -->
+
+    <main class="perfil-main">
+
+      <!-- ======================================
+           HEADER
+      ======================================= -->
+
+      <header class="dashboard-header perfil-top-header">
+
+        <button class="mobile-menu-btn" id="btnMenu">
+          ☰
+        </button>
+
+        <div class="perfil-header-title">
+          <span class="page-kicker">Área do aluno</span>
+
+          <h2>
+            Meu Perfil 👤
+          </h2>
+
+          <p>
+            Gerencie sua foto, dados, progresso, segurança e nível da conta.
+          </p>
+        </div>
+
+        <div class="header-actions perfil-header-actions">
+
+          <!-- BOTÃO DE TEMA -->
+          <button
+            class="theme-toggle"
+            id="btnTemaPerfil"
+            type="button"
+            aria-label="Alternar tema do site"
+            aria-pressed="false"
+          >
+            <span class="theme-toggle-track">
+
+              <span class="theme-sky">
+                <span class="theme-star star-1"></span>
+                <span class="theme-star star-2"></span>
+                <span class="theme-star star-3"></span>
+              </span>
+
+              <span class="theme-toggle-thumb">
+                <span class="theme-icon theme-icon-sun">☀️</span>
+                <span class="theme-icon theme-icon-moon">🌙</span>
+              </span>
+
+            </span>
+
+            <strong id="temaTexto">
+              Escuro
+            </strong>
+          </button>
+
+          <div class="status-badge perfil-online-badge" id="perfilOnlineStatus">
+            <span></span>
+            Online agora
+          </div>
+
+          <button
+            class="profile-shortcut"
+            data-page="dashboard.html"
+            title="Voltar para o dashboard"
+          >
+            🏠
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- ======================================
+           HERO PERFIL
+      ======================================= -->
+
+      <section class="perfil-hero perfil-hero-premium">
+
+        <div class="perfil-user-card perfil-user-card-premium">
+
+          <div class="perfil-avatar-area">
+
+            <div class="perfil-avatar perfil-avatar-premium" id="avatarAluno">
+
+              <img
+                id="avatarImagem"
+                class="avatar-imagem"
+                src=""
+                alt="Foto do perfil"
+              />
+
+              <span id="avatarLetra">
+                A
+              </span>
+
+              <div class="avatar-glow"></div>
+            </div>
+
+            <div class="perfil-photo-actions">
+
+              <input
+                type="file"
+                id="inputFotoPerfil"
+                accept="image/*"
+                hidden
+              />
+
+              <label
+                for="inputFotoPerfil"
+                class="photo-action-btn photo-upload-btn"
+              >
+                📷 Trocar foto
+              </label>
+
+              <button
+                type="button"
+                class="photo-action-btn photo-remove-btn"
+                id="btnRemoverFoto"
+              >
+                🗑️ Remover
+              </button>
+
+            </div>
+
+          </div>
+
+          <div class="perfil-identity">
+
+            <span class="perfil-tag" id="perfilPlanoTag">
+              ALUNO PREMIUM
+            </span>
+
+            <h1 id="perfilNome">
+              Aluno
+            </h1>
+
+            <p id="perfilEmail">
+              email@exemplo.com
+            </p>
+
+            <div class="perfil-mini-info">
+
+              <span>
+                <b id="perfilTipoConta">Turma Black</b>
+                Tipo de conta
+              </span>
+
+              <span>
+                <b id="perfilDataEntrada">Hoje</b>
+                Entrada
+              </span>
+
+              <span>
+                <b id="perfilAcessos">0</b>
+                Acessos
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- NÍVEL DA CONTA -->
+
+        <div class="perfil-level-card perfil-level-card-premium">
+
+          <div class="level-top">
+
+            <div>
+              <p>Nível da conta</p>
+
+              <h2 id="nivelAluno">
+                Iniciante
+              </h2>
+            </div>
+
+            <div class="level-medal" id="nivelMedalha">
+              🥉
+            </div>
+
+          </div>
+
+          <div class="progress-bar progress-bar-premium">
+            <div id="barraNivel" style="width: 0%;"></div>
+          </div>
+
+          <div class="level-details">
+
+            <span>
+              <strong id="nivelTempoConta">0 dias</strong>
+              Tempo ativo
+            </span>
+
+            <span>
+              <strong id="nivelProgressoTexto">0%</strong>
+              Progresso
+            </span>
+
+          </div>
+
+          <p class="level-next" id="nivelProximo">
+            Continue acessando a plataforma para evoluir seu nível.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================
+           GRID PERFIL
+      ======================================= -->
+
+      <section class="perfil-grid perfil-grid-premium">
+
+        <!-- ======================================
+             DADOS PESSOAIS
+        ======================================= -->
+
+        <div class="perfil-panel perfil-panel-premium">
+
+          <div class="panel-header">
+
+            <div>
+              <span class="panel-icon">👤</span>
+
+              <h2>
+                Dados pessoais
+              </h2>
+
+              <p>
+                Edite apenas as informações permitidas do seu perfil.
+              </p>
+            </div>
+
+          </div>
+
+          <form id="formPerfil" class="perfil-form">
+
+            <div class="input-group">
+
+              <label>
+                Nome completo
+              </label>
+
+              <input
+                type="text"
+                id="inputNome"
+                placeholder="Digite seu nome"
+              />
+
+            </div>
+
+            <div class="input-group locked-group">
+
+              <label>
+                E-mail
+              </label>
+
+              <div class="locked-input-box">
+
+                <input
+                  type="email"
+                  id="inputEmail"
+                  placeholder="email@exemplo.com"
+                  disabled
+                  readonly
+                />
+
+                <span class="lock-badge">
+                  🔒 Bloqueado
+                </span>
+
+              </div>
+
+              <small>
+                O e-mail fica vinculado à conta e não pode ser alterado por segurança.
+              </small>
+
+            </div>
+
+            <div class="input-group locked-group">
+
+              <label>
+                Senha
+              </label>
+
+              <div class="locked-input-box">
+
+                <input
+                  type="password"
+                  id="inputSenhaBloqueada"
+                  value="********"
+                  disabled
+                  readonly
+                />
+
+                <span class="lock-badge">
+                  🔒 Protegida
+                </span>
+
+              </div>
+
+              <small>
+                A senha não é exibida no perfil para proteger sua conta.
+              </small>
+
+            </div>
+
+            <div class="input-group">
+
+              <label>
+                Telefone
+              </label>
+
+              <input
+                type="text"
+                id="inputTelefone"
+                placeholder="(00) 00000-0000"
+              />
+
+            </div>
+
+            <button type="submit" class="primary-btn perfil-save-btn">
+              💾 Salvar alterações
+            </button>
+
+          </form>
+
+        </div>
+
+        <!-- ======================================
+             RESUMO DO ALUNO
+        ======================================= -->
+
+        <div class="perfil-panel perfil-panel-premium">
+
+          <div class="panel-header">
+
+            <div>
+              <span class="panel-icon">📊</span>
+
+              <h2>
+                Resumo do aluno
+              </h2>
+
+              <p>
+                Seu desempenho geral dentro da plataforma.
+              </p>
+            </div>
+
+            <span class="online-chip">
+              <i></i>
+              Online
+            </span>
+
+          </div>
+
+          <div class="perfil-stats perfil-stats-premium">
+
+            <div class="perfil-stat-card stat-online">
+
+              <span>🟢</span>
+
+              <p>
+                Status
+              </p>
+
+              <strong id="perfilStatusAluno">
+                Online
+              </strong>
+
+            </div>
+
+            <div class="perfil-stat-card">
+
+              <span>📚</span>
+
+              <p>
+                Módulos
+              </p>
+
+              <strong id="perfilModulos">
+                0
+              </strong>
+
+            </div>
+
+            <div class="perfil-stat-card">
+
+              <span>⭐</span>
+
+              <p>
+                Favoritos
+              </p>
+
+              <strong id="perfilFavoritos">
+                0
+              </strong>
+
+            </div>
+
+            <div class="perfil-stat-card">
+
+              <span>📝</span>
+
+              <p>
+                Provas
+              </p>
+
+              <strong id="perfilProvas">
+                0
+              </strong>
+
+            </div>
+
+            <div class="perfil-stat-card stat-fire" id="cardSequencia">
+
+              <span
+                class="fire-icon fire-zero"
+                id="iconeSequencia"
+              >
+                🔥
+              </span>
+
+              <p>
+                Sequência
+              </p>
+
+              <strong id="perfilSequencia">
+                0 dias
+              </strong>
+
+              <small id="textoSequencia">
+                Comece sua sequência hoje
+              </small>
+
+            </div>
+
+            <div class="perfil-stat-card">
+
+              <span>⏱️</span>
+
+              <p>
+                Tempo ativo
+              </p>
+
+              <strong id="perfilTempoAtivo">
+                0 dias
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ======================================
+             SEGURANÇA
+        ======================================= -->
+
+        <div class="perfil-panel perfil-panel-premium perfil-security-panel">
+
+          <div class="panel-header">
+
+            <div>
+              <span class="panel-icon">🛡️</span>
+
+              <h2>
+                Segurança
+              </h2>
+
+              <p>
+                Informações do acesso atual e proteção da conta.
+              </p>
+            </div>
+
+            <span class="security-status">
+              Protegido
+            </span>
+
+          </div>
+
+          <div class="security-grid">
+
+            <div class="security-item security-item-premium">
+
+              <span class="security-icon">
+                💻
+              </span>
+
+              <div>
+                <strong>
+                  Dispositivo atual
+                </strong>
+
+                <p id="dispositivoAtual">
+                  Detectando...
+                </p>
+              </div>
+
+            </div>
+
+            <div class="security-item security-item-premium">
+
+              <span class="security-icon">
+                🕒
+              </span>
+
+              <div>
+                <strong>
+                  Último acesso
+                </strong>
+
+                <p id="ultimoAcesso">
+                  Agora
+                </p>
+              </div>
+
+            </div>
+
+            <div class="security-item security-item-premium">
+
+              <span class="security-icon">
+                🌐
+              </span>
+
+              <div>
+                <strong>
+                  Navegador
+                </strong>
+
+                <p id="navegadorAtual">
+                  Detectando...
+                </p>
+              </div>
+
+            </div>
+
+            <div class="security-item security-item-premium">
+
+              <span class="security-icon">
+                🔐
+              </span>
+
+              <div>
+                <strong>
+                  Conta protegida
+                </strong>
+
+                <p id="statusSegurancaConta">
+                  Token ativo e sessão validada
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="security-lock-box">
+
+            <div>
+              <strong>
+                E-mail e senha bloqueados
+              </strong>
+
+              <p>
+                Esses dados ficam em modo protegido para evitar alterações indevidas.
+              </p>
+            </div>
+
+            <span>
+              🔒
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- ======================================
+             ATIVIDADE DA CONTA
+        ======================================= -->
+
+        <div class="perfil-panel perfil-panel-premium perfil-activity-panel">
+
+          <div class="panel-header">
+
+            <div>
+              <span class="panel-icon">🚀</span>
+
+              <h2>
+                Evolução da conta
+              </h2>
+
+              <p>
+                Seu nível cresce conforme você acessa e utiliza a plataforma.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="activity-timeline">
+
+            <div class="activity-step active" id="stepNivel1">
+              <span>1</span>
+
+              <div>
+                <strong>Iniciante</strong>
+                <p>Primeiros acessos na plataforma.</p>
+              </div>
+            </div>
+
+            <div class="activity-step" id="stepNivel2">
+              <span>2</span>
+
+              <div>
+                <strong>Intermediário</strong>
+                <p>Conta com boa frequência de acesso.</p>
+              </div>
+            </div>
+
+            <div class="activity-step" id="stepNivel3">
+              <span>3</span>
+
+              <div>
+                <strong>Avançado</strong>
+                <p>Aluno constante, estudando e evoluindo.</p>
+              </div>
+            </div>
+
+            <div class="activity-step" id="stepNivel4">
+              <span>4</span>
+
+              <div>
+                <strong>Elite Black</strong>
+                <p>Conta com alto tempo ativo e desempenho.</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ======================================
+       OVERLAY
+  ======================================= -->
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <script src="js/seguranca.js"></script>
+
+</body>
+</html>

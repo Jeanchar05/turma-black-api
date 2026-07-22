@@ -13,12 +13,6 @@ app.use(express.json({ limit: "10mb" }));
 const PORT = process.env.PORT || 3000;
 
 /* ===============================
-   BANCO DE DADOS
-=============================== */
-
-connectDatabase();
-
-/* ===============================
    ROTA PRINCIPAL
 =============================== */
 
@@ -77,6 +71,36 @@ carregarRota("/", "suporte.js");
 carregarRota("/", "provas.js");
 
 /* ===============================
+   FRONTEND VERSIONADO
+=============================== */
+
+const publicDirectory = path.join(__dirname, "public");
+
+if (fs.existsSync(publicDirectory)) {
+  app.use(
+    express.static(publicDirectory, {
+      index: false,
+      etag: true,
+      lastModified: true,
+      maxAge: 0,
+      setHeaders(res, filePath) {
+        if (/\.(?:html|css|js)$/i.test(filePath)) {
+          res.setHeader("Cache-Control", "no-cache");
+        }
+      }
+    })
+  );
+
+  app.get("/admin", (req, res) => {
+    res.redirect(302, "/admin.html");
+  });
+
+  app.get("/app", (req, res) => {
+    res.redirect(302, "/index.html");
+  });
+}
+
+/* ===============================
    ROTA 404
 =============================== */
 
@@ -91,6 +115,19 @@ app.use((req, res) => {
    START
 =============================== */
 
-app.listen(PORT, () => {
-  console.log(`API Turma do Primo rodando na porta ${PORT}`);
-});
+async function startServer() {
+  await connectDatabase();
+
+  return app.listen(PORT, () => {
+    console.log(`API Turma do Primo rodando na porta ${PORT}`);
+  });
+}
+
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = {
+  app,
+  startServer
+};

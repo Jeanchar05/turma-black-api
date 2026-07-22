@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Pitágoras | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/pitagoras.js"></script>
+</head>
+
+<body class="pitagoras-body">
+
+  <main id="pitagoras" class="pita-page">
+
+    <section class="pita-box">
+
+      <nav class="pita-nav">
+        <button type="button" data-page="../modulos.html">
+          ← Módulos
+        </button>
+
+        <button type="button" data-page="../dashboard.html">
+          🏠 Dashboard
+        </button>
+      </nav>
+
+      <header class="pita-topo">
+        <div>
+          <span class="pita-tag">CONEXÃO GEOMÉTRICA</span>
+
+          <h1>📐 Pitágoras</h1>
+
+          <p>
+            Marque 2 ou 3 números na race para visualizar conexões estratégicas.
+            Com 2 números o sistema cria uma linha. Com 3 números ele tenta formar
+            uma triangulação.
+          </p>
+        </div>
+
+        <button class="pita-clear-btn" id="btnLimparPitagoras" type="button">
+          🧹 Limpar Marcações
+        </button>
+      </header>
+
+      <section class="pita-layout">
+
+        <section class="pita-race-card">
+
+          <div class="pita-race-header">
+            <div>
+              <h2>Mapa Pitágoras</h2>
+              <span>Conexão visual na race</span>
+            </div>
+          </div>
+
+          <div class="pita-race-area">
+            <img
+              src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628296/race_gujiqx.png"
+              class="pita-race-img"
+              alt="Race Pitágoras"
+            >
+
+            <svg id="pitagorasSvg" class="pitagoras-svg"></svg>
+            <div id="marcadoresPitagoras" class="marcadores-pitagoras"></div>
+          </div>
+
+        </section>
+
+        <aside class="pita-painel">
+
+          <div class="pita-card">
+            <h2>Números da entrada</h2>
+
+            <p>
+              Digite 2 ou 3 números válidos. Você também pode clicar na grade
+              de números para preencher automaticamente.
+            </p>
+
+            <div class="pita-inputs">
+              <input type="number" id="pitaNum1" placeholder="Nº 1" min="0" max="36">
+              <input type="number" id="pitaNum2" placeholder="Nº 2" min="0" max="36">
+              <input type="number" id="pitaNum3" placeholder="Nº 3" min="0" max="36">
+            </div>
+
+            <div class="pita-botoes">
+              <button type="button" id="btnMarcarPitagoras">
+                📍 Marcar
+              </button>
+
+              <button type="button" id="btnSugestaoPitagoras">
+                ✨ Sugestão
+              </button>
+            </div>
+          </div>
+
+          <div class="pita-status-grid">
+            <div>
+              <span>Selecionados</span>
+              <strong id="pitaSelecionados">---</strong>
+            </div>
+
+            <div>
+              <span>Tipo</span>
+              <strong id="pitaTipo">---</strong>
+            </div>
+
+            <div>
+              <span>Status</span>
+              <strong id="pitaStatus">Aguardando</strong>
+            </div>
+          </div>
+
+          <div class="pita-info-card">
+            <h3>📊 Leitura Pitágoras</h3>
+
+            <p id="pitaTexto">
+              Digite os números para iniciar a leitura.
+            </p>
+          </div>
+
+          <div class="pita-grade-card">
+            <h3>🎯 Grade de Números</h3>
+            <p>Clique nos números para preencher os campos.</p>
+
+            <div id="pitaGradeNumeros" class="pita-grade-numeros"></div>
+          </div>
+
+        </aside>
+
+      </section>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Camaleões | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/camaleoes.js"></script>
+</head>
+
+<body class="camaleoes-body">
+
+  <main class="camaleoes-page">
+
+    <nav class="camaleoes-nav">
+      <button type="button" data-page="../modulos.html">
+        ← Módulos
+      </button>
+
+      <button type="button" data-page="../dashboard.html">
+        🏠 Dashboard
+      </button>
+
+      <button type="button" data-page="./gatilhos.html">
+        🚨 Gatilhos
+      </button>
+    </nav>
+
+    <header class="camaleoes-header">
+      <div>
+        <span class="camaleoes-tag">MÓDULO DE LEITURA</span>
+
+        <h1>🦎 Camaleões</h1>
+
+        <p>
+          Identifique números escondidos dentro da roleta e use essas conexões
+          para melhorar sua leitura de padrões.
+        </p>
+      </div>
+
+      <button class="camaleoes-clear-btn" id="btnLimparCamaleoes" type="button">
+        🧹 Limpar marcações
+      </button>
+    </header>
+
+    <section class="camaleoes-hero">
+      <article class="camaleoes-card">
+        <h2>O que são Camaleões?</h2>
+
+        <p>
+          Camaleões são números que ficam disfarçados dentro da leitura da roleta.
+          Eles não aparecem como ligação óbvia, mas podem revelar conexões importantes.
+        </p>
+
+        <p>
+          A ideia é observar um número base e entender quais números podem estar
+          camuflados atrás dele dentro da estratégia.
+        </p>
+      </article>
+
+      <article class="camaleoes-card destaque">
+        <h2>Como usar?</h2>
+
+        <p>
+          Quando sair um número base, observe os números Camaleões ligados a ele.
+          Eles servem como apoio para estudo, leitura e confirmação de possíveis padrões.
+        </p>
+      </article>
+    </section>
+
+    <section class="camaleoes-layout">
+
+      <aside class="camaleoes-panel">
+
+        <div class="camaleoes-section-title">
+          <span>📌</span>
+          <div>
+            <h2>Tabela Camaleões</h2>
+            <p>Selecione um número para visualizar suas conexões camufladas.</p>
+          </div>
+        </div>
+
+        <div id="listaCamuflados" class="camaleoes-grid"></div>
+
+      </aside>
+
+      <section class="camaleoes-race-card">
+
+        <div class="camaleoes-section-title">
+          <span>🎯</span>
+          <div>
+            <h2>Race Camaleões</h2>
+            <p>Clique em um número da tabela para marcar o número base e suas conexões.</p>
+          </div>
+        </div>
+
+        <div class="race-camaleoes-area">
+          <img
+            src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628296/race_gujiqx.png"
+            class="race-camaleoes-img"
+            alt="Race Roleta"
+          >
+
+          <div id="marcadoresCamuflados" class="marcadores-camaleoes"></div>
+        </div>
+
+      </section>
+
+      <aside class="camaleoes-info-card">
+
+        <section class="resultado-camaleao" id="resultadoCamuflado">
+          <h2>🔎 Análise Camaleões</h2>
+          <p>Escolha um número acima para ver a explicação.</p>
+        </section>
+
+        <section class="aula-camaleoes">
+          <h2>📚 Aula rápida</h2>
+
+          <div class="aula-camaleao-item">
+            <h3>1. Número base</h3>
+            <p>É o número principal que saiu ou que você deseja estudar.</p>
+          </div>
+
+          <div class="aula-camaleao-item">
+            <h3>2. Números Camaleões</h3>
+            <p>
+              São números escondidos por trás daquele padrão. Eles seguem uma lógica
+              de conexão e repetição dentro da leitura.
+            </p>
+          </div>
+
+          <div class="aula-camaleao-item">
+            <h3>3. Leitura inteligente</h3>
+            <p>
+              A melhor forma de estudar é observar se alguma conexão Camaleão aparece
+              depois do número base.
+            </p>
+          </div>
+        </section>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

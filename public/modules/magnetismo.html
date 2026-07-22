@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Magnetismo | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/magnetismo.js"></script>
+</head>
+
+<body class="magnetismo-body">
+
+  <main class="magnetismo-page">
+
+    <nav class="magnetismo-nav">
+      <button type="button" data-page="../modulos.html">
+        ← Módulos
+      </button>
+
+      <button type="button" data-page="../dashboard.html">
+        🏠 Dashboard
+      </button>
+
+      <button type="button" data-page="./fibonacci.html">
+        🔢 Fibonacci
+      </button>
+    </nav>
+
+    <header class="magnetismo-header">
+      <div>
+        <span class="magnetismo-tag">SISTEMA DE CONEXÕES</span>
+
+        <h1>🧲 Magnetismo</h1>
+
+        <p>
+          Digite ou selecione um número principal para encontrar as conexões
+          puxadas por ele e visualizar tudo diretamente na race.
+        </p>
+      </div>
+
+      <button class="magnetismo-clear-btn" id="btnLimparMagnetismo" type="button">
+        🧹 Limpar Marcações
+      </button>
+    </header>
+
+    <section class="magnetismo-layout">
+
+      <section class="magnetismo-race-card">
+
+        <div class="magnetismo-race-header">
+          <div>
+            <h2>Radar Magnetismo</h2>
+            <span>Marcação estratégica na race</span>
+          </div>
+        </div>
+
+        <div class="magnetismo-race-area">
+          <img
+            src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628296/race_gujiqx.png"
+            class="magnetismo-race-img"
+            alt="Race Magnetismo"
+          >
+
+          <div id="marcadoresPull" class="marcadores-magnetismo"></div>
+        </div>
+
+      </section>
+
+      <aside class="magnetismo-panel">
+
+        <div class="magnetismo-card-input">
+          <h2>Número principal</h2>
+
+          <p>
+            Digite ou selecione um número para buscar suas conexões magnéticas.
+          </p>
+
+          <input
+            type="number"
+            id="numeroPullInput"
+            min="0"
+            max="36"
+            placeholder="Ex: 17"
+          >
+
+          <button class="magnetismo-analisar-btn" id="btnBuscarPull" type="button">
+            🔍 Analisar Magnetismo
+          </button>
+        </div>
+
+        <div class="magnetismo-grade-card">
+          <h3>🎯 Grade de números</h3>
+          <p>Clique em um número para analisar rapidamente.</p>
+
+          <div id="gradeNumerosPull" class="grade-numeros-magnetismo"></div>
+        </div>
+
+        <div class="magnetismo-resultado-box">
+          <span>Conexões detectadas</span>
+          <div id="resultadoPull" class="magnetismo-resultado">---</div>
+        </div>
+
+        <div class="magnetismo-info-box">
+          <h3>📊 Leitura Magnetismo</h3>
+          <p id="textoPull">Aguardando leitura estratégica...</p>
+        </div>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

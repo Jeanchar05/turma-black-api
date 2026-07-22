@@ -7,7 +7,9 @@ const Configuracao = require("../models/Configuracao");
 const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 const {
   requirePermission,
+  requireAdmin,
   requireSuperAdmin,
+  temPermissao,
   getPermissoes,
   getCargo
 } = require("../middleware/permissions");
@@ -158,6 +160,27 @@ function formatarUsuarioAdmin(usuario) {
     createdAt: usuario.createdAt || "",
     updatedAt: usuario.updatedAt || ""
   };
+}
+
+function formatarConfiguracaoParaUsuario(config, usuario) {
+  const configuracao = config?.toObject
+    ? config.toObject()
+    : { ...(config || {}) };
+
+  if (!temPermissao(usuario, "seguranca")) {
+    delete configuracao.seguranca;
+  }
+
+  if (!temPermissao(usuario, "planos")) {
+    delete configuracao.planos;
+    delete configuracao.comissaoPadrao;
+  }
+
+  if (!temPermissao(usuario, "controleAdmin")) {
+    delete configuracao.permissoes;
+  }
+
+  return configuracao;
 }
 
 function filtroEquipeAdmin() {
@@ -492,6 +515,12 @@ router.post(
       let usuario = await Usuario.findOne({ email: emailNormalizado });
 
       if (!usuario) {
+        if (String(senha).length < 6) {
+          return res.status(400).json({
+            erro: "A senha precisa ter pelo menos 6 caracteres."
+          });
+        }
+
         usuario = await Usuario.create({
           nome: nome || emailNormalizado.split("@")[0],
           email: emailNormalizado,
@@ -852,7 +881,8 @@ router.delete(
 router.get(
   "/vendedores",
   auth,
-  requirePermission("vendedores"),
+  requireAdmin,
+  requirePermission("painelVendas"),
   async (req, res) => {
     try {
       const {
@@ -908,7 +938,8 @@ router.get(
 router.get(
   "/vendedores/resumo",
   auth,
-  requirePermission("vendedores"),
+  requireAdmin,
+  requirePermission("painelVendas"),
   async (req, res) => {
     try {
       const [
@@ -1105,7 +1136,7 @@ router.get(
 
       return res.json({
         sucesso: true,
-        configuracao: config
+        configuracao: formatarConfiguracaoParaUsuario(config, req.usuario)
       });
     } catch (error) {
       console.error("Erro ao buscar configuração:", error);
@@ -1125,12 +1156,11 @@ router.get(
 router.put(
   "/configuracao",
   auth,
-  requireSuperAdmin,
   async (req, res) => {
     try {
       const config = await Configuracao.obterConfiguracao();
 
-      const camposPermitidos = [
+      const camposCompletos = [
         "nomeSistema",
         "nomePremium",
         "versao",
@@ -1149,7 +1179,29 @@ router.put(
         "links"
       ];
 
-      camposPermitidos.forEach((campo) => {
+      const superadmin = getCargo(req.usuario) === "superadmin";
+      const camposPermitidos = superadmin ? [...camposCompletos] : [];
+
+      if (!superadmin && temPermissao(req.usuario, "planos")) {
+        camposPermitidos.push("comissaoPadrao", "planos");
+      }
+
+      if (!superadmin && temPermissao(req.usuario, "seguranca")) {
+        camposPermitidos.push("seguranca");
+      }
+
+      const camposSolicitados = Object.keys(req.body || {});
+      const camposAutorizados = camposSolicitados.filter((campo) =>
+        camposPermitidos.includes(campo)
+      );
+
+      if (!camposAutorizados.length) {
+        return res.status(403).json({
+          erro: "Você não tem permissão para alterar estas configurações."
+        });
+      }
+
+      camposAutorizados.forEach((campo) => {
         if (req.body[campo] !== undefined) {
           config[campo] = req.body[campo];
         }
@@ -1162,7 +1214,7 @@ router.put(
       return res.json({
         sucesso: true,
         mensagem: "Configuração atualizada com sucesso.",
-        configuracao: config
+        configuracao: formatarConfiguracaoParaUsuario(config, req.usuario)
       });
     } catch (error) {
       console.error("Erro ao atualizar configuração:", error);

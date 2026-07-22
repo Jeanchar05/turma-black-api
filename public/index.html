@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Login | Turma do Primo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+  <link rel="stylesheet" href="css/login.css" />
+
+  <script defer src="script.js?v=20260721-1"></script>
+
+  <link rel="manifest" href="/manifest.json" />
+  <link
+    rel="icon"
+    type="image/png"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  />
+  <link
+    rel="apple-touch-icon"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  />
+
+  <meta name="theme-color" content="#0b0614" />
+</head>
+
+<body class="auth-body">
+
+  <div class="auth-bg-glow auth-bg-glow-1" aria-hidden="true"></div>
+  <div class="auth-bg-glow auth-bg-glow-2" aria-hidden="true"></div>
+  <div class="auth-grid-bg" aria-hidden="true"></div>
+
+  <div class="auth-particles" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <main class="auth-container">
+
+    <section class="auth-brand">
+      <div class="auth-showcase">
+        <div class="auth-showcase-orbit"></div>
+
+        <img
+          src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1782012862/ChatGPT_Image_21_de_jun._de_2026_00_33_28_ebqj12.png"
+          alt="Turma do Primo"
+        />
+
+        <div class="auth-floating-card auth-floating-card-1">
+          <strong>Free</strong>
+          <span>Acesso imediato</span>
+        </div>
+
+        <div class="auth-floating-card auth-floating-card-2">
+          <strong>Premium</strong>
+          <span>Ative depois no painel</span>
+        </div>
+      </div>
+
+      <div class="auth-brand-content">
+        <span class="auth-tag">Plataforma Inteligente</span>
+
+        <h1>
+          TURMA DO<br />
+          <span>PRIMO</span>
+        </h1>
+
+        <p>
+          Crie sua conta gratuita, entre no dashboard e evolua para a Turma Premium
+          quando quiser. Estudos, ferramentas, provas e estratégias em um só painel.
+        </p>
+
+        <div class="auth-benefits">
+          <div class="auth-benefit-row">
+            <div class="auth-benefit-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2.5Z"></path>
+                <path d="M6 19h12"></path>
+              </svg>
+            </div>
+            <div>
+              <strong>Conta grátis imediata</strong>
+              <span>Cadastro rápido e acesso liberado ao dashboard free.</span>
+            </div>
+          </div>
+
+          <div class="auth-benefit-row">
+            <div class="auth-benefit-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 11l2 2 4-4"></path>
+                <path d="M5 4h14v16H5z"></path>
+              </svg>
+            </div>
+            <div>
+              <strong>Ativação Premium</strong>
+              <span>Depois do login, ative a Turma Premium pelo painel.</span>
+            </div>
+          </div>
+
+          <div class="auth-benefit-row">
+            <div class="auth-benefit-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 3v18M3 12h18M6 6l12 12M18 6 6 18"></path>
+              </svg>
+            </div>
+            <div>
+              <strong>Ferramentas exclusivas</strong>
+              <span>Race, roleta, minigames, provas e área de estudos.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <div class="auth-card-header">
+        <span class="eyebrow">Acesso à plataforma</span>
+        <h2 id="authTitulo">Entrar na plataforma</h2>
+        <p id="authDescricao">Informe seus dados para acessar sua conta.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" type="button">
+          Login
+        </button>
+
+        <button class="auth-tab" id="tabCadastro" type="button">
+          Criar conta grátis
+        </button>
+      </div>
+
+      <form id="formLogin" class="auth-form active">
+        <div class="input-group">
+          <label for="loginEmail">E-mail</label>
+          <input
+            type="email"
+            id="loginEmail"
+            placeholder="seuemail@exemplo.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="loginSenha">Senha</label>
+
+          <div class="password-field">
+            <input
+              type="password"
+              id="loginSenha"
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              required
+            />
+
+            <button
+              type="button"
+              class="toggle-password"
+              data-target="loginSenha"
+              aria-label="Mostrar ou ocultar senha"
+            >
+              👁
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="primary-btn auth-submit">
+          Entrar agora
+        </button>
+
+
+      </form>
+
+      <form id="formCadastro" class="auth-form">
+        <div class="input-group">
+          <label for="cadastroNome">Nome completo</label>
+          <input
+            type="text"
+            id="cadastroNome"
+            placeholder="Digite seu nome"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="cadastroEmail">E-mail</label>
+          <input
+            type="email"
+            id="cadastroEmail"
+            placeholder="seuemail@exemplo.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="cadastroTelefone">Número / WhatsApp</label>
+          <input
+            type="text"
+            id="cadastroTelefone"
+            placeholder="(00) 00000-0000"
+            autocomplete="tel"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="cadastroSenha">Senha</label>
+
+          <div class="password-field">
+            <input
+              type="password"
+              id="cadastroSenha"
+              placeholder="Crie uma senha"
+              autocomplete="new-password"
+              required
+            />
+
+            <button
+              type="button"
+              class="toggle-password"
+              data-target="cadastroSenha"
+              aria-label="Mostrar ou ocultar senha"
+            >
+              👁
+            </button>
+          </div>
+
+          <div class="senha-forca" id="senhaForcaIndicador">
+            <div class="senha-forca-barra">
+              <span></span>
+            </div>
+            <span class="senha-forca-texto" id="senhaForcaTexto"></span>
+          </div>
+        </div>
+
+        <div class="auth-info-box">
+          <span>🚀</span>
+          <div>
+            <strong>Conta gratuita instantânea</strong>
+            <p>
+              Ao criar sua conta, você entra no painel gratuito. A ativação Premium
+              será feita depois pelo botão “Ativar Turma Premium”.
+            </p>
+          </div>
+        </div>
+
+        <button type="submit" class="primary-btn auth-submit">
+          Criar conta grátis
+        </button>
+      </form>
+
+      <div class="auth-message" id="mensagem"></div>
+
+      <div class="auth-footer">
+        <p>PLATAFORMA 100% ONLINE E PROTEGIDA</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="authLoadingOverlay">
+    <div class="auth-loading-box">
+      <div class="auth-loading-ring-wrap">
+        <div class="auth-loading-center">
+          <img
+            src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1782012862/ChatGPT_Image_21_de_jun._de_2026_00_33_28_ebqj12.png"
+            alt="Turma do Primo"
+          />
+        </div>
+      </div>
+
+      <h3>Carregando Turma do <span>Primo</span></h3>
+      <p id="authLoadingTexto">Preparando seu acesso, aguarde um momento…</p>
+
+      <div class="auth-loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-choice-overlay" id="adminChoiceOverlay">
+    <div class="admin-choice-box">
+
+      <button class="admin-choice-close" id="fecharAdminChoice" type="button">
+        ×
+      </button>
+
+      <div class="admin-choice-top">
+        <div class="admin-choice-icon">👑</div>
+
+        <span class="admin-choice-tag">ACESSO ESPECIAL</span>
+
+        <h2>
+          Bem-vindo ao painel de
+          <span>administração</span>
+        </h2>
+
+        <p>
+          Escolha abaixo qual área deseja acessar agora.
+        </p>
+      </div>
+
+      <div class="admin-choice-grid">
+
+        <button class="admin-choice-card" type="button" data-go="dashboard.html">
+          <span class="admin-choice-card-icon">▦</span>
+          <strong>Dashboard</strong>
+          <small>Entrar na área principal da plataforma.</small>
+        </button>
+
+        <button class="admin-choice-card" type="button" data-go="admin.html">
+          <span class="admin-choice-card-icon">🛡️</span>
+          <strong>Painel Admin</strong>
+          <small>Relatórios, permissões e controle geral.</small>
+        </button>
+
+        <button class="admin-choice-card" type="button" data-go="painel-vendas.html">
+          <span class="admin-choice-card-icon">👥</span>
+          <strong>Painel de Vendas</strong>
+          <small>Cadastrar alunos, vendedores e acompanhar ranking.</small>
+        </button>
+
+      </div>
+
+      <div class="admin-choice-footer">
+        Apenas usuários autorizados conseguem visualizar essas opções.
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

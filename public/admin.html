@@ -1,0 +1,2648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Painel Administrativo | Turma do Primo</title>
+
+  <meta name="theme-color" content="#0b0614" />
+  <meta name="robots" content="noindex, nofollow" />
+
+
+<link rel="stylesheet" href="style.css?v=20260721-1" />
+<link rel="stylesheet" href="css/admin.css?v=20260721-1" />
+<script defer src="admin.js?v=20260721-1"></script>
+</head>
+
+<body class="admin-premium-body">
+
+  <!-- LOADING GERAL -->
+  <div
+    id="adminLoading"
+    class="admin-loading-overlay"
+    role="status"
+    aria-live="polite"
+    aria-hidden="true"
+    hidden
+  >
+    <div class="admin-loading-box">
+      <div class="admin-loading-spinner" aria-hidden="true"></div>
+
+      <strong id="adminLoadingTitulo">
+        Carregando painel
+      </strong>
+
+      <span id="adminLoadingTexto">
+        Conectando ao servidor...
+      </span>
+    </div>
+  </div>
+
+  <!-- MENU MOBILE -->
+  <button
+    class="admin-mobile-toggle"
+    id="btnAdminMenu"
+    type="button"
+    aria-label="Abrir menu administrativo"
+    aria-controls="adminSidebar"
+    aria-expanded="false"
+  >
+    ☰
+  </button>
+
+  <!-- Começa oculto para nunca bloquear os cliques -->
+  <div
+    class="admin-overlay"
+    id="adminOverlay"
+    aria-hidden="true"
+    hidden
+  ></div>
+
+  <!-- SIDEBAR -->
+  <aside
+    class="admin-sidebar"
+    id="adminSidebar"
+    aria-label="Menu administrativo"
+  >
+
+    <div class="admin-logo">
+      <img
+        src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1782012862/ChatGPT_Image_21_de_jun._de_2026_00_33_28_ebqj12.png"
+        alt="Turma do Primo"
+        width="88"
+        height="88"
+        loading="eager"
+      />
+
+      <span>TURMA DO</span>
+      <h2>PRIMO</h2>
+      <strong>PAINEL ADMIN</strong>
+      <small>Versão Premium 2.0</small>
+    </div>
+
+    <!-- PERFIL -->
+    <div class="admin-profile-card">
+
+      <div
+        class="admin-avatar"
+        id="adminAvatar"
+        aria-hidden="true"
+      >
+        TP
+      </div>
+
+      <div class="admin-profile-info">
+        <h3 id="adminNome">
+          Carregando...
+        </h3>
+
+        <span id="adminCargo">
+          Validando acesso
+        </span>
+
+        <small id="adminStatus">
+          🟡 Conectando...
+        </small>
+      </div>
+
+    </div>
+
+    <!-- MENU -->
+    <nav class="admin-menu" id="adminMenu">
+
+      <button
+        class="admin-menu-btn active"
+        data-admin-tab="visaoGeral"
+        data-permission="painelAdmin"
+        type="button"
+        aria-controls="visaoGeral"
+        aria-selected="true"
+      >
+        <span aria-hidden="true">📊</span>
+        Dashboard
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="usuarios"
+        data-permission="usuarios"
+        type="button"
+        aria-controls="usuarios"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">👥</span>
+        Usuários
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="aprovacoes"
+        data-permission="aprovacoes"
+        type="button"
+        aria-controls="aprovacoes"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">✅</span>
+        Aprovações
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="controleAlunos"
+        data-permission="controleAlunos"
+        type="button"
+        aria-controls="controleAlunos"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">📋</span>
+        Controle de Alunos
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="vendedores"
+        data-permission="painelVendas"
+        type="button"
+        aria-controls="vendedores"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">🏆</span>
+        Painel Comercial
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="relatorios"
+        data-permission="relatorios"
+        type="button"
+        aria-controls="relatorios"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">📈</span>
+        Relatórios
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="agendaPrimo"
+        data-permission="agenda"
+        type="button"
+        aria-controls="agendaPrimo"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">📅</span>
+        Agenda
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="notificacoes"
+        data-permission="notificacoes"
+        type="button"
+        aria-controls="notificacoes"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">🔔</span>
+        Notificações
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="suporte"
+        data-permission="suporte"
+        type="button"
+        aria-controls="suporte"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">🎧</span>
+        Suporte
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="provas"
+        data-permission="provas"
+        type="button"
+        aria-controls="provas"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">🧪</span>
+        Provas
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="adminControle"
+        data-permission="controleAdmin"
+        type="button"
+        aria-controls="adminControle"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">👑</span>
+        Controle Admin
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="seguranca"
+        data-permission="seguranca"
+        type="button"
+        aria-controls="seguranca"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">🛡️</span>
+        Segurança
+      </button>
+
+      <button
+        class="admin-menu-btn"
+        data-admin-tab="planos"
+        data-permission="planos"
+        type="button"
+        aria-controls="planos"
+        aria-selected="false"
+      >
+        <span aria-hidden="true">💳</span>
+        Planos
+      </button>
+
+      <button
+        class="admin-menu-btn sair"
+        id="btnSairAdmin"
+        type="button"
+      >
+        <span aria-hidden="true">↩</span>
+        Sair
+      </button>
+
+    </nav>
+
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="admin-main" id="adminMain">
+
+    <!-- HEADER -->
+    <header class="admin-top">
+
+      <div class="admin-header-left">
+        <small>Painel Administrativo</small>
+
+        <h1>
+          Bem-vindo,
+          <span id="adminNomeHeader">Admin</span>
+          👋
+        </h1>
+
+        <p>
+          Gerencie usuários, vendas, alunos, notificações e permissões
+          da Turma do Primo.
+        </p>
+      </div>
+
+      <div class="admin-header-right">
+
+        <div class="admin-search">
+          <label class="sr-only" for="adminPesquisaGlobal">
+            Pesquisar no painel
+          </label>
+
+          <input
+            type="search"
+            id="adminPesquisaGlobal"
+            placeholder="Pesquisar no painel..."
+            autocomplete="off"
+          />
+        </div>
+
+        <button
+          id="btnAtualizarAdmin"
+          type="button"
+          title="Atualizar dados"
+          aria-label="Atualizar dados"
+        >
+          🔄
+        </button>
+
+        <button
+          id="btnVerPlataforma"
+          type="button"
+          title="Voltar para a plataforma"
+          aria-label="Voltar para a plataforma"
+        >
+          🏠
+        </button>
+
+        <button
+          id="btnAbrirNotificacoesRapidas"
+          type="button"
+          title="Abrir notificações"
+          aria-label="Abrir notificações"
+        >
+          🔔
+
+          <span
+            id="adminNotificacaoBadge"
+            class="admin-notification-badge"
+          >
+            0
+          </span>
+        </button>
+
+        <div class="admin-sync">
+          Última sincronização
+
+          <strong id="ultimaSincronizacao">
+            Aguardando
+          </strong>
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- MENSAGEM -->
+    <div
+      id="mensagemAdmin"
+      class="mensagem"
+      role="alert"
+      aria-live="assertive"
+      hidden
+    ></div>
+
+    <!-- ==========================================
+         DASHBOARD
+    =========================================== -->
+    <section
+      id="visaoGeral"
+      class="admin-aba active"
+      data-admin-section
+      aria-labelledby="tituloVisaoGeral"
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloVisaoGeral">
+            Dashboard Geral
+          </h2>
+
+          <p>
+            Visão resumida e online da plataforma.
+          </p>
+        </div>
+
+        <div class="dashboard-meta">
+          <span id="statusBackendAdmin">
+            Conectando ao backend...
+          </span>
+        </div>
+
+      </div>
+
+      <!-- ESTATÍSTICAS -->
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card total">
+          <div>
+            <small>Total de usuários</small>
+            <strong id="adminTotalUsuarios">0</strong>
+          </div>
+
+          <span aria-hidden="true">👥</span>
+        </div>
+
+        <div class="admin-stat-card premium">
+          <div>
+            <small>Premium</small>
+            <strong id="adminTotalPremium">0</strong>
+          </div>
+
+          <span aria-hidden="true">👑</span>
+        </div>
+
+        <div class="admin-stat-card free">
+          <div>
+            <small>Free</small>
+            <strong id="adminTotalFree">0</strong>
+          </div>
+
+          <span aria-hidden="true">📚</span>
+        </div>
+
+        <div class="admin-stat-card vendas">
+          <div>
+            <small>Vendas do mês</small>
+            <strong id="adminTotalVendas">R$ 0,00</strong>
+          </div>
+
+          <span aria-hidden="true">💰</span>
+        </div>
+
+        <div class="admin-stat-card vendedor">
+          <div>
+            <small>Top vendedor</small>
+            <strong id="adminTopVendedor">-</strong>
+          </div>
+
+          <span aria-hidden="true">🏆</span>
+        </div>
+
+        <div class="admin-stat-card meta">
+          <div>
+            <small>Meta mensal</small>
+            <strong id="adminMetaMensal">0%</strong>
+          </div>
+
+          <span aria-hidden="true">🎯</span>
+        </div>
+
+      </div>
+
+      <!-- GRÁFICO E HISTÓRICO -->
+      <div class="admin-dashboard-grid">
+
+        <article class="admin-card dashboard-chart">
+
+          <div class="admin-card-head">
+
+            <div>
+              <h3>Crescimento da plataforma</h3>
+
+              <p>
+                Novos usuários nos últimos sete meses.
+              </p>
+            </div>
+
+            <button
+              id="btnAtualizarGrafico"
+              type="button"
+            >
+              Atualizar
+            </button>
+
+          </div>
+
+          <div
+            class="fake-chart"
+            id="graficoCrescimento"
+            aria-label="Gráfico de novos usuários"
+          >
+            <div style="height: 12%"></div>
+            <div style="height: 12%"></div>
+            <div style="height: 12%"></div>
+            <div style="height: 12%"></div>
+            <div style="height: 12%"></div>
+            <div style="height: 12%"></div>
+            <div style="height: 12%"></div>
+          </div>
+
+        </article>
+
+        <article class="admin-card">
+
+          <div class="admin-card-head">
+            <div>
+              <h3>Atividade recente</h3>
+              <p>Últimas ações registradas.</p>
+            </div>
+          </div>
+
+          <div
+            id="adminHistoricoSistema"
+            class="admin-history-list"
+          >
+            <div class="admin-empty">
+              <p>Carregando atividades...</p>
+            </div>
+          </div>
+
+        </article>
+
+      </div>
+
+      <!-- CADASTROS E RANKING -->
+      <div class="admin-dashboard-grid">
+
+        <article class="admin-card">
+
+          <div class="admin-card-head">
+
+            <div>
+              <h3>Últimos cadastros</h3>
+
+              <p>
+                Usuários registrados recentemente.
+              </p>
+            </div>
+
+            <button
+              id="btnAtualizarCadastros"
+              type="button"
+            >
+              Atualizar
+            </button>
+
+          </div>
+
+          <div
+            id="adminUltimosCadastros"
+            class="admin-users-list"
+          >
+            <div class="admin-empty">
+              <p>Carregando cadastros...</p>
+            </div>
+          </div>
+
+        </article>
+
+        <article class="admin-card">
+
+          <div class="admin-card-head">
+            <div>
+              <h3>Ranking comercial</h3>
+
+              <p>
+                Vendedores com melhor desempenho.
+              </p>
+            </div>
+          </div>
+
+          <div
+            id="rankingVendedoresAdmin"
+            class="admin-ranking-list"
+          >
+            <div class="admin-empty">
+              <p>Carregando ranking...</p>
+            </div>
+          </div>
+
+        </article>
+
+      </div>
+
+      <!-- AGENDA E ALERTAS -->
+      <div class="admin-dashboard-grid">
+
+        <article class="admin-card">
+
+          <div class="admin-card-head">
+
+            <div>
+              <h3>Agenda do Primo</h3>
+              <p>Próximos compromissos.</p>
+            </div>
+
+            <button
+              id="btnAbrirAgendaRapida"
+              type="button"
+            >
+              Abrir agenda
+            </button>
+
+          </div>
+
+          <div
+            id="dashboardAgenda"
+            class="admin-support-list"
+          >
+            <div class="admin-empty">
+              <p>Carregando agenda...</p>
+            </div>
+          </div>
+
+        </article>
+
+        <article class="admin-card">
+
+          <div class="admin-card-head">
+            <div>
+              <h3>Alertas do sistema</h3>
+
+              <p>
+                Itens que precisam de atenção.
+              </p>
+            </div>
+          </div>
+
+          <div
+            id="adminAlertasSeguranca"
+            class="admin-support-list"
+          >
+            <div class="admin-empty">
+              <p>Carregando alertas...</p>
+            </div>
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         USUÁRIOS
+    =========================================== -->
+    <section
+      id="usuarios"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloUsuarios"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloUsuarios">
+            Usuários
+          </h2>
+
+          <p>
+            Gerencie contas, planos, suspensão e acesso.
+          </p>
+        </div>
+
+        <div class="admin-filter-row">
+
+          <input
+            type="search"
+            id="buscaUsuariosAdmin"
+            placeholder="Nome, e-mail ou código..."
+            autocomplete="off"
+          />
+
+          <select id="filtroStatusAdmin">
+            <option value="todos">Todos os status</option>
+            <option value="ativo">Ativos</option>
+            <option value="pendente">Pendentes</option>
+            <option value="suspenso">Suspensos</option>
+            <option value="bloqueado">Bloqueados</option>
+          </select>
+
+          <button
+            id="btnAtualizarUsuarios"
+            type="button"
+          >
+            Atualizar
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Total</small>
+            <strong id="usuariosTotal">0</strong>
+          </div>
+
+          <span aria-hidden="true">👥</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Ativos</small>
+            <strong id="usuariosAtivos">0</strong>
+          </div>
+
+          <span aria-hidden="true">🟢</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Suspensos</small>
+            <strong id="usuariosSuspensos">0</strong>
+          </div>
+
+          <span aria-hidden="true">⛔</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Bloqueados</small>
+            <strong id="usuariosBloqueados">0</strong>
+          </div>
+
+          <span aria-hidden="true">🔒</span>
+        </div>
+
+      </div>
+
+      <div
+        class="admin-users-list"
+        id="listaUsuariosAdmin"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar os usuários.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         APROVAÇÕES PREMIUM
+    =========================================== -->
+    <section
+      id="aprovacoes"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloAprovacoes"
+      hidden
+    >
+
+      <div class="dashboard-title">
+        <div>
+          <h2 id="tituloAprovacoes">
+            Ativação Premium
+          </h2>
+
+          <p>
+            Aprove os códigos gerados pelo dashboard gratuito.
+          </p>
+        </div>
+      </div>
+
+      <div class="admin-card">
+
+        <div class="admin-filter-row">
+
+          <input
+            type="text"
+            id="codigoAprovacaoAdmin"
+            placeholder="Código Premium, exemplo TB-ABC-1234"
+            autocomplete="off"
+          />
+
+          <select id="planoAprovacaoAdmin">
+            <option value="black30">Black 30 dias</option>
+            <option value="black90">Black 90 dias</option>
+            <option value="black180">Black 180 dias</option>
+            <option value="black360">Black 360 dias</option>
+          </select>
+
+          <button
+            id="btnAprovarPorCodigo"
+            type="button"
+            class="primary-btn"
+          >
+            Aprovar código
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Solicitações pendentes</small>
+            <strong id="resumoPendentes">0</strong>
+          </div>
+
+          <span aria-hidden="true">⏳</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Contas ativas</small>
+            <strong id="resumoAprovados">0</strong>
+          </div>
+
+          <span aria-hidden="true">✅</span>
+        </div>
+
+      </div>
+
+      <div
+        id="listaPendentesAdmin"
+        class="admin-users-list"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar as solicitações.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         CONTROLE DE ALUNOS
+    =========================================== -->
+    <section
+      id="controleAlunos"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloControleAlunos"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloControleAlunos">
+            Controle de Alunos
+          </h2>
+
+          <p>
+            Gerencie vencimento, renovação e situação comercial.
+          </p>
+        </div>
+
+        <button
+          id="btnNovoAlunoControle"
+          class="primary-btn"
+          type="button"
+        >
+          + Novo aluno
+        </button>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Total</small>
+            <strong id="controleAlunosTotal">0</strong>
+          </div>
+
+          <span aria-hidden="true">👥</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Ativos</small>
+            <strong id="controleAlunosAtivos">0</strong>
+          </div>
+
+          <span aria-hidden="true">🟢</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Vencendo</small>
+            <strong id="controleAlunosVencendo">0</strong>
+          </div>
+
+          <span aria-hidden="true">🟡</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Vencidos</small>
+            <strong id="controleAlunosVencidos">0</strong>
+          </div>
+
+          <span aria-hidden="true">🔴</span>
+        </div>
+
+      </div>
+
+      <div class="admin-filter-row">
+
+        <input
+          type="search"
+          id="buscaControleAlunos"
+          placeholder="Pesquisar aluno..."
+          autocomplete="off"
+        />
+
+        <select id="filtroControleStatus">
+          <option value="todos">Todos</option>
+          <option value="ativo">Ativos</option>
+          <option value="pendente">Pendentes</option>
+          <option value="vencendo">Vencendo</option>
+          <option value="vencido">Vencidos</option>
+          <option value="cancelado">Cancelados</option>
+        </select>
+
+        <button
+          id="btnAtualizarControleAlunos"
+          type="button"
+        >
+          Atualizar
+        </button>
+
+      </div>
+
+      <div
+        id="listaControleAlunos"
+        class="admin-users-list"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar os alunos.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         PAINEL COMERCIAL
+    =========================================== -->
+    <section
+      id="vendedores"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloVendedores"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloVendedores">
+            Painel Comercial
+          </h2>
+
+          <p>
+            Resultados, ranking e comissão dos vendedores.
+          </p>
+        </div>
+
+        <div class="admin-filter-row">
+
+          <input
+            type="search"
+            id="buscaVendedoresAdmin"
+            placeholder="Pesquisar vendedor..."
+            autocomplete="off"
+          />
+
+          <button
+            id="btnNovoVendedor"
+            data-requires-permission="controleAdmin"
+            type="button"
+            hidden
+            disabled
+          >
+            + Novo vendedor
+          </button>
+
+          <button
+            id="btnAtualizarVendedores"
+            type="button"
+          >
+            Atualizar
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Total vendido</small>
+            <strong id="relatorioTotalVendido">R$ 0,00</strong>
+          </div>
+
+          <span aria-hidden="true">💰</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Vendas</small>
+            <strong id="relatorioTotalAlunos">0</strong>
+          </div>
+
+          <span aria-hidden="true">👥</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Top vendedor</small>
+            <strong id="relatorioTopVendedor">-</strong>
+          </div>
+
+          <span aria-hidden="true">🏆</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Meta geral</small>
+            <strong id="relatorioMeta">0%</strong>
+          </div>
+
+          <span aria-hidden="true">🎯</span>
+        </div>
+
+      </div>
+
+      <div
+        id="listaVendedoresAdmin"
+        class="admin-users-list"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar os vendedores.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         RELATÓRIOS
+    =========================================== -->
+    <section
+      id="relatorios"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloRelatorios"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloRelatorios">
+            Relatórios
+          </h2>
+
+          <p>
+            Resumo financeiro, vendas e desempenho.
+          </p>
+        </div>
+
+        <div class="admin-filter-row">
+
+          <select id="filtroPeriodoRelatorio">
+            <option value="mes">Este mês</option>
+            <option value="semana">Esta semana</option>
+            <option value="hoje">Hoje</option>
+            <option value="todos">Todos</option>
+          </select>
+
+          <button
+            id="btnAtualizarRelatorios"
+            type="button"
+          >
+            Atualizar
+          </button>
+
+          <button
+            id="btnExportarRelatorio"
+            type="button"
+          >
+            Exportar CSV
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Total vendido</small>
+
+            <strong id="relatorioFinanceiroTotal">
+              R$ 0,00
+            </strong>
+          </div>
+
+          <span aria-hidden="true">💰</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Comissões</small>
+
+            <strong id="relatorioComissoes">
+              R$ 0,00
+            </strong>
+          </div>
+
+          <span aria-hidden="true">💸</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Vendas pagas</small>
+
+            <strong id="relatorioVendasPagas">
+              0
+            </strong>
+          </div>
+
+          <span aria-hidden="true">✅</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Ticket médio</small>
+
+            <strong id="relatorioTicketMedio">
+              R$ 0,00
+            </strong>
+          </div>
+
+          <span aria-hidden="true">🎟️</span>
+        </div>
+
+      </div>
+
+      <article class="admin-card">
+
+        <div class="admin-card-head">
+
+          <div>
+            <h3>Vendas do período</h3>
+
+            <p>
+              Histórico financeiro mais recente.
+            </p>
+          </div>
+
+        </div>
+
+        <div
+          id="listaRelatorioVendas"
+          class="admin-users-list"
+        >
+          <div class="admin-empty">
+            <p>
+              Abra esta aba para carregar as vendas.
+            </p>
+          </div>
+        </div>
+
+      </article>
+
+    </section>
+
+    <!-- ==========================================
+         AGENDA
+    =========================================== -->
+    <section
+      id="agendaPrimo"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloAgenda"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloAgenda">
+            Agenda do Primo
+          </h2>
+
+          <p>
+            Organize eventos, lives e compromissos.
+          </p>
+        </div>
+
+        <div class="admin-filter-row">
+
+          <button
+            id="btnAtualizarAgenda"
+            type="button"
+          >
+            Atualizar
+          </button>
+
+          <button
+            id="btnAbrirModalAgenda"
+            class="primary-btn"
+            type="button"
+          >
+            + Novo evento
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Total</small>
+            <strong id="agendaTotal">0</strong>
+          </div>
+
+          <span aria-hidden="true">📅</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Agendados</small>
+            <strong id="agendaAgendados">0</strong>
+          </div>
+
+          <span aria-hidden="true">✔</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Concluídos</small>
+            <strong id="agendaConcluidos">0</strong>
+          </div>
+
+          <span aria-hidden="true">🟢</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Cancelados</small>
+            <strong id="agendaCancelados">0</strong>
+          </div>
+
+          <span aria-hidden="true">🔴</span>
+        </div>
+
+      </div>
+
+      <div
+        id="listaAgendaPrimo"
+        class="admin-table-premium"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar a agenda.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         NOTIFICAÇÕES
+    =========================================== -->
+    <section
+      id="notificacoes"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloNotificacoes"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloNotificacoes">
+            Central de Notificações
+          </h2>
+
+          <p>
+            Envie mensagens para todos, grupos ou um usuário específico.
+          </p>
+        </div>
+
+        <button
+          id="btnAtualizarNotificacoes"
+          type="button"
+        >
+          Atualizar
+        </button>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Total enviadas</small>
+            <strong id="notificacoesTotal">0</strong>
+          </div>
+
+          <span aria-hidden="true">🔔</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Ativas</small>
+            <strong id="notificacoesAtivas">0</strong>
+          </div>
+
+          <span aria-hidden="true">🟢</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Fixadas</small>
+            <strong id="notificacoesFixadas">0</strong>
+          </div>
+
+          <span aria-hidden="true">📌</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Urgentes</small>
+            <strong id="notificacoesUrgentes">0</strong>
+          </div>
+
+          <span aria-hidden="true">⚠️</span>
+        </div>
+
+      </div>
+
+      <div class="admin-grid">
+
+        <article class="admin-card">
+
+          <div class="admin-card-head">
+            <div>
+              <h3>Enviar notificação</h3>
+
+              <p>
+                A mensagem será salva e exibida aos destinatários.
+              </p>
+            </div>
+          </div>
+
+          <form id="formNotificacao" novalidate>
+
+            <div class="admin-form-grid">
+
+              <label>
+                <span>Título</span>
+
+                <input
+                  id="notificacaoTitulo"
+                  name="titulo"
+                  type="text"
+                  maxlength="120"
+                  placeholder="Ex.: Atualização disponível"
+                  required
+                />
+              </label>
+
+              <label>
+                <span>Tipo</span>
+
+                <select
+                  id="notificacaoTipo"
+                  name="tipo"
+                >
+                  <option value="geral">Geral</option>
+                  <option value="atualizacao">Atualização</option>
+                  <option value="manutencao">Manutenção</option>
+                  <option value="premium">Premium</option>
+                  <option value="seguranca">Segurança</option>
+                  <option value="venda">Venda</option>
+                  <option value="plano">Plano</option>
+                  <option value="agenda">Agenda</option>
+                  <option value="prova">Prova</option>
+                  <option value="suporte">Suporte</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Destino</span>
+
+                <select
+                  id="notificacaoDestino"
+                  name="destino"
+                >
+                  <option value="todos">Todos</option>
+                  <option value="premium">Premium</option>
+                  <option value="free">Free</option>
+                  <option value="admin">Admins</option>
+                  <option value="vendedores">Vendedores</option>
+                  <option value="suporte">Suporte</option>
+                  <option value="moderadores">Moderadores</option>
+                  <option value="superadmin">Super Admin</option>
+                  <option value="especifico">Usuário específico</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Prioridade</span>
+
+                <select
+                  id="notificacaoPrioridade"
+                  name="prioridade"
+                >
+                  <option value="normal">Normal</option>
+                  <option value="baixa">Baixa</option>
+                  <option value="alta">Alta</option>
+                  <option value="urgente">Urgente</option>
+                </select>
+              </label>
+
+            </div>
+
+            <label
+              class="admin-full-label"
+              id="campoNotificacaoEmail"
+              hidden
+            >
+              <span>E-mail específico</span>
+
+              <input
+                id="notificacaoEmail"
+                name="email"
+                type="email"
+                placeholder="usuario@exemplo.com"
+                autocomplete="off"
+              />
+            </label>
+
+            <label class="admin-full-label">
+              <span>Link opcional</span>
+
+              <input
+                id="notificacaoLink"
+                name="link"
+                type="text"
+                maxlength="300"
+                placeholder="Ex.: dashboard.html ou provas.html"
+              />
+            </label>
+
+            <label class="admin-full-label">
+              <span>Mensagem</span>
+
+              <textarea
+                id="notificacaoMensagem"
+                name="mensagem"
+                maxlength="1500"
+                placeholder="Digite a mensagem..."
+                required
+              ></textarea>
+            </label>
+
+            <label class="admin-checkbox-line">
+              <input
+                id="notificacaoFixada"
+                name="fixada"
+                type="checkbox"
+              />
+
+              <span>
+                Fixar notificação no topo
+              </span>
+            </label>
+
+            <div class="modal-actions">
+
+              <button
+                id="btnLimparNotificacao"
+                class="secondary-btn"
+                type="reset"
+              >
+                Limpar
+              </button>
+
+              <button
+                id="btnEnviarNotificacao"
+                class="primary-btn"
+                type="submit"
+              >
+                Enviar notificação
+              </button>
+
+            </div>
+
+          </form>
+
+        </article>
+
+        <article class="admin-card">
+
+          <div class="admin-card-head">
+            <div>
+              <h3>Histórico</h3>
+              <p>Últimas notificações enviadas.</p>
+            </div>
+          </div>
+
+          <div
+            id="listaNotificacoesAdmin"
+            class="admin-history-list"
+          >
+            <div class="admin-empty">
+              <p>
+                Abra esta aba para carregar as notificações.
+              </p>
+            </div>
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         SUPORTE
+    =========================================== -->
+    <section
+      id="suporte"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloSuporte"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloSuporte">
+            Suporte
+          </h2>
+
+          <p>
+            Gerencie os chamados enviados pelos usuários.
+          </p>
+        </div>
+
+        <div class="admin-filter-row">
+
+          <select id="filtroSuporteStatus">
+            <option value="todos">Todos</option>
+            <option value="aberto">Abertos</option>
+            <option value="em_atendimento">Em atendimento</option>
+            <option value="respondido">Respondidos</option>
+            <option value="resolvido">Resolvidos</option>
+            <option value="fechado">Fechados</option>
+          </select>
+
+          <button
+            id="btnAtualizarSuporte"
+            type="button"
+          >
+            Atualizar
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Abertos</small>
+            <strong id="suporteAbertos">0</strong>
+          </div>
+
+          <span aria-hidden="true">📩</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Em atendimento</small>
+            <strong id="suporteAtendimento">0</strong>
+          </div>
+
+          <span aria-hidden="true">🎧</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Resolvidos</small>
+            <strong id="suporteResolvidos">0</strong>
+          </div>
+
+          <span aria-hidden="true">✅</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Urgentes</small>
+            <strong id="suporteUrgentes">0</strong>
+          </div>
+
+          <span aria-hidden="true">⚠️</span>
+        </div>
+
+      </div>
+
+      <div
+        id="listaSuporteAdmin"
+        class="admin-users-list"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar os chamados.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         PROVAS
+    =========================================== -->
+    <section
+      id="provas"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloProvas"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloProvas">
+            Provas
+          </h2>
+
+          <p>
+            Consulte provas, resultados e desempenho dos alunos.
+          </p>
+        </div>
+
+        <button
+          id="btnAtualizarProvas"
+          type="button"
+        >
+          Atualizar
+        </button>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Provas feitas</small>
+            <strong id="totalProvasFeitas">0</strong>
+          </div>
+
+          <span aria-hidden="true">🧪</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Média geral</small>
+            <strong id="mediaGeralProvas">0%</strong>
+          </div>
+
+          <span aria-hidden="true">📈</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Melhor nota</small>
+            <strong id="melhorNotaProvas">0%</strong>
+          </div>
+
+          <span aria-hidden="true">🏆</span>
+        </div>
+
+      </div>
+
+      <div
+        id="listaProvasAdmin"
+        class="admin-users-list"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar os resultados.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         CONTROLE ADMIN
+    =========================================== -->
+    <section
+      id="adminControle"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloAdminControle"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloAdminControle">
+            Controle Administrativo
+          </h2>
+
+          <p>
+            Gerencie administradores, cargos e vendedores.
+          </p>
+        </div>
+
+        <div class="admin-filter-row">
+
+          <button
+            id="btnSincronizarVendedores"
+            data-requires-permission="controleAdmin"
+            type="button"
+            hidden
+            disabled
+          >
+            Sincronizar vendedores
+          </button>
+
+          <button
+            id="btnAbrirModalAdmin"
+            class="primary-btn"
+            data-requires-permission="controleAdmin"
+            type="button"
+            hidden
+            disabled
+          >
+            + Novo administrador
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="admin-stats-grid">
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Super Admins</small>
+            <strong id="superAdminsAtivos">0</strong>
+          </div>
+
+          <span aria-hidden="true">👑</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Admins</small>
+            <strong id="adminsAtivos">0</strong>
+          </div>
+
+          <span aria-hidden="true">🟣</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Moderadores</small>
+            <strong id="moderadoresAtivos">0</strong>
+          </div>
+
+          <span aria-hidden="true">🟢</span>
+        </div>
+
+        <div class="admin-stat-card">
+          <div>
+            <small>Suportes</small>
+            <strong id="suportesAtivos">0</strong>
+          </div>
+
+          <span aria-hidden="true">🔵</span>
+        </div>
+
+      </div>
+
+      <div
+        id="listaAdminsSistema"
+        class="admin-users-list"
+      >
+        <div class="admin-empty">
+          <p>
+            Abra esta aba para carregar a equipe.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         SEGURANÇA
+    =========================================== -->
+    <section
+      id="seguranca"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloSeguranca"
+      hidden
+    >
+
+      <div class="dashboard-title">
+        <div>
+          <h2 id="tituloSeguranca">
+            Segurança
+          </h2>
+
+          <p>
+            Configurações de acesso e proteção de conteúdo.
+          </p>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+
+        <article class="admin-card">
+
+          <h3>Configurações</h3>
+
+          <form id="formSeguranca">
+
+            <label class="admin-full-label">
+              <span>Limite de dispositivos</span>
+
+              <input
+                id="limiteDispositivos"
+                type="number"
+                min="1"
+                max="10"
+                value="1"
+              />
+            </label>
+
+            <label class="admin-full-label">
+              <span>Modo de segurança</span>
+
+              <select id="modoSegurancaConteudo">
+                <option value="ativo">Ativo para alunos</option>
+                <option value="moderado">Moderado</option>
+                <option value="desativado">Desativado</option>
+              </select>
+            </label>
+
+            <label class="admin-full-label">
+              <span>Bloquear contas pendentes</span>
+
+              <select id="bloquearPendente">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </label>
+
+            <button
+              id="btnSalvarSeguranca"
+              class="primary-btn"
+              type="submit"
+            >
+              Salvar configurações
+            </button>
+
+          </form>
+
+        </article>
+
+        <article class="admin-card">
+
+          <h3>Status da proteção</h3>
+
+          <div
+            id="listaDispositivosAdmin"
+            class="admin-users-list"
+          >
+            <div class="admin-empty">
+              <p>Carregando configurações...</p>
+            </div>
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         PLANOS
+    =========================================== -->
+    <section
+      id="planos"
+      class="admin-aba"
+      data-admin-section
+      aria-labelledby="tituloPlanos"
+      hidden
+    >
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2 id="tituloPlanos">
+            Planos
+          </h2>
+
+          <p>
+            Consulte e atualize as configurações comerciais.
+          </p>
+        </div>
+
+        <button
+          id="btnAtualizarPlanos"
+          type="button"
+        >
+          Atualizar
+        </button>
+
+      </div>
+
+      <form id="formPlanos">
+
+        <div class="admin-plan-info admin-plan-info-grid">
+
+          <label>
+            <strong>Free</strong>
+            <small>Acesso gratuito limitado.</small>
+
+            <input
+              id="planoFreeValor"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+            />
+          </label>
+
+          <label>
+            <strong>Black 30</strong>
+            <small>30 dias de acesso premium.</small>
+
+            <input
+              id="planoBlack30Valor"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+          </label>
+
+          <label>
+            <strong>Black 90</strong>
+            <small>90 dias de acesso premium.</small>
+
+            <input
+              id="planoBlack90Valor"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+          </label>
+
+          <label>
+            <strong>Black 180</strong>
+            <small>180 dias de acesso premium.</small>
+
+            <input
+              id="planoBlack180Valor"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+          </label>
+
+          <label>
+            <strong>Black 360</strong>
+            <small>360 dias de acesso premium.</small>
+
+            <input
+              id="planoBlack360Valor"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+          </label>
+
+          <label>
+            <strong>Comissão padrão</strong>
+            <small>Percentual pago aos vendedores.</small>
+
+            <input
+              id="comissaoPadrao"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value="20"
+            />
+          </label>
+
+        </div>
+
+        <div class="modal-actions">
+          <button
+            id="btnSalvarPlanos"
+            class="primary-btn"
+            type="submit"
+          >
+            Salvar planos
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODAL DE CONFIRMAÇÃO
+  =========================================== -->
+  <div
+    id="modalAdminConfirm"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalAdminTitulo"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div class="modal-box">
+
+      <button
+        class="modal-close"
+        type="button"
+        data-close-modal="modalAdminConfirm"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+      <h2 id="modalAdminTitulo">
+        Confirmar ação
+      </h2>
+
+      <p id="modalAdminTexto">
+        Deseja continuar?
+      </p>
+
+      <div class="modal-actions">
+
+        <button
+          id="btnCancelarAdminModal"
+          class="secondary-btn"
+          type="button"
+        >
+          Cancelar
+        </button>
+
+        <button
+          id="btnConfirmarAdminModal"
+          class="danger-btn"
+          type="button"
+        >
+          Confirmar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       MODAL NOVO ADMIN / VENDEDOR
+  =========================================== -->
+  <div
+    id="modalNovoAdmin"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tituloModalNovoAdmin"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div class="modal-box modal-wide">
+
+      <button
+        class="modal-close"
+        type="button"
+        data-close-modal="modalNovoAdmin"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+      <h2 id="tituloModalNovoAdmin">
+        Novo administrador
+      </h2>
+
+      <form id="formNovoAdmin" novalidate>
+
+        <div class="admin-form-grid">
+
+          <label>
+            <span>Nome</span>
+
+            <input
+              id="novoAdminNome"
+              type="text"
+              autocomplete="name"
+              required
+            />
+          </label>
+
+          <label>
+            <span>E-mail</span>
+
+            <input
+              id="novoAdminEmail"
+              type="email"
+              autocomplete="off"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Telefone</span>
+
+            <input
+              id="novoAdminTelefone"
+              type="tel"
+              autocomplete="tel"
+            />
+          </label>
+
+          <label>
+            <span>Senha temporária</span>
+
+            <input
+              id="novoAdminSenha"
+              type="password"
+              minlength="6"
+              autocomplete="new-password"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Cargo</span>
+
+            <select id="novoAdminCargo">
+              <option value="admin">🟣 Admin</option>
+              <option value="moderador">🟢 Moderador</option>
+              <option value="suporte">🔵 Suporte</option>
+              <option value="vendedor">🏆 Vendedor</option>
+              <option value="superadmin">👑 Super Admin</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Comissão (%)</span>
+
+            <input
+              id="novoAdminComissao"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value="20"
+            />
+          </label>
+
+        </div>
+
+        <label class="admin-checkbox-line">
+          <input
+            id="novoAdminEhVendedor"
+            type="checkbox"
+          />
+
+          <span>
+            Também incluir no painel de vendedores
+          </span>
+        </label>
+
+        <div class="modal-actions">
+
+          <button
+            id="btnCancelarNovoAdmin"
+            class="secondary-btn"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            id="btnSalvarNovoAdmin"
+            class="primary-btn"
+            type="submit"
+          >
+            Salvar
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       MODAL AGENDA
+  =========================================== -->
+  <div
+    id="modalAgendaAdmin"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tituloModalAgenda"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div class="modal-box modal-wide">
+
+      <button
+        class="modal-close"
+        type="button"
+        data-close-modal="modalAgendaAdmin"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+      <h2 id="tituloModalAgenda">
+        Novo evento
+      </h2>
+
+      <form id="formAgendaAdmin" novalidate>
+
+        <div class="admin-form-grid">
+
+          <label>
+            <span>Título</span>
+
+            <input
+              id="agendaTituloInput"
+              type="text"
+              maxlength="120"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Data</span>
+
+            <input
+              id="agendaDataInput"
+              type="date"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Hora inicial</span>
+
+            <input
+              id="agendaHoraInput"
+              type="time"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Hora final</span>
+
+            <input
+              id="agendaHoraFinalInput"
+              type="time"
+            />
+          </label>
+
+          <label>
+            <span>Tipo</span>
+
+            <select id="agendaTipoInput">
+              <option value="live">Live</option>
+              <option value="aula">Aula</option>
+              <option value="reuniao">Reunião</option>
+              <option value="evento">Evento</option>
+              <option value="manutencao">Manutenção</option>
+              <option value="outro">Outro</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Status</span>
+
+            <select id="agendaStatusInput">
+              <option value="Agendar">Agendar</option>
+              <option value="Agendado">Agendado</option>
+              <option value="Concluído">Concluído</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="Remarcar">Remarcar</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Link</span>
+
+            <input
+              id="agendaLinkInput"
+              type="url"
+              placeholder="https://..."
+            />
+          </label>
+
+          <label>
+            <span>Local</span>
+
+            <input
+              id="agendaLocalInput"
+              type="text"
+              placeholder="Online ou endereço"
+            />
+          </label>
+
+        </div>
+
+        <label class="admin-full-label">
+          <span>Descrição</span>
+
+          <textarea
+            id="agendaDescricaoInput"
+            maxlength="1500"
+          ></textarea>
+        </label>
+
+        <div class="modal-actions">
+
+          <button
+            id="btnCancelarAgenda"
+            class="secondary-btn"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            id="btnSalvarAgenda"
+            class="primary-btn"
+            type="submit"
+          >
+            Salvar evento
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       MODAL NOVO / EDITAR ALUNO
+  =========================================== -->
+  <div
+    id="modalAlunoControle"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tituloModalAlunoControle"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div class="modal-box modal-wide">
+
+      <button
+        class="modal-close"
+        type="button"
+        data-close-modal="modalAlunoControle"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+      <h2 id="tituloModalAlunoControle">
+        Novo aluno
+      </h2>
+
+      <form id="formAlunoControle" novalidate>
+
+        <input
+          id="alunoControleId"
+          type="hidden"
+        />
+
+        <div class="admin-form-grid">
+
+          <label>
+            <span>Nome</span>
+
+            <input
+              id="alunoControleNome"
+              type="text"
+              required
+            />
+          </label>
+
+          <label>
+            <span>E-mail</span>
+
+            <input
+              id="alunoControleEmail"
+              type="email"
+            />
+          </label>
+
+          <label>
+            <span>Telefone</span>
+
+            <input
+              id="alunoControleTelefone"
+              type="tel"
+            />
+          </label>
+
+          <label>
+            <span>Plano</span>
+
+            <select id="alunoControlePlano">
+              <option value="black30">Black 30</option>
+              <option value="black90">Black 90</option>
+              <option value="black180">Black 180</option>
+              <option value="black360">Black 360</option>
+              <option value="particular">Particular</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Valor</span>
+
+            <input
+              id="alunoControleValor"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+          </label>
+
+          <label>
+            <span>Forma de pagamento</span>
+
+            <select id="alunoControlePagamento">
+              <option value="PIX">PIX</option>
+              <option value="Cartão Crédito">Cartão de crédito</option>
+              <option value="Cartão Débito">Cartão de débito</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Transferência">Transferência</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Status do pagamento</span>
+
+            <select id="alunoControleStatusPagamento">
+              <option value="pago">Pago</option>
+              <option value="pendente">Pendente</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Vencimento</span>
+
+            <input
+              id="alunoControleVencimento"
+              type="date"
+            />
+          </label>
+
+        </div>
+
+        <label class="admin-full-label">
+          <span>Observações</span>
+
+          <textarea
+            id="alunoControleObservacoes"
+            maxlength="1000"
+          ></textarea>
+        </label>
+
+        <div class="modal-actions">
+
+          <button
+            id="btnCancelarAlunoControle"
+            class="secondary-btn"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            id="btnSalvarAlunoControle"
+            class="primary-btn"
+            type="submit"
+          >
+            Salvar aluno
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       MODAL RESPONDER SUPORTE
+  =========================================== -->
+  <div
+    id="modalSuporteAdmin"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tituloModalSuporte"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div class="modal-box modal-wide">
+
+      <button
+        class="modal-close"
+        type="button"
+        data-close-modal="modalSuporteAdmin"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+      <h2 id="tituloModalSuporte">
+        Responder chamado
+      </h2>
+
+      <form id="formRespostaSuporte" novalidate>
+
+        <input
+          id="suporteChamadoId"
+          type="hidden"
+        />
+
+        <div
+          id="suporteChamadoResumo"
+          class="admin-card"
+        ></div>
+
+        <label class="admin-full-label">
+          <span>Status</span>
+
+          <select id="suporteNovoStatus">
+            <option value="em_atendimento">
+              Em atendimento
+            </option>
+
+            <option value="respondido">
+              Respondido
+            </option>
+
+            <option value="resolvido">
+              Resolvido
+            </option>
+
+            <option value="fechado">
+              Fechado
+            </option>
+          </select>
+        </label>
+
+        <label class="admin-full-label">
+          <span>Resposta</span>
+
+          <textarea
+            id="suporteRespostaMensagem"
+            maxlength="2000"
+            required
+          ></textarea>
+        </label>
+
+        <div class="modal-actions">
+
+          <button
+            id="btnCancelarRespostaSuporte"
+            class="secondary-btn"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            id="btnEnviarRespostaSuporte"
+            class="primary-btn"
+            type="submit"
+          >
+            Enviar resposta
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

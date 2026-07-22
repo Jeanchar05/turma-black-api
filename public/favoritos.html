@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Favoritos | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link
+    rel="icon"
+    type="image/png"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+  <link
+    rel="apple-touch-icon"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+
+  <script defer src="favoritos.js"></script>
+  <script defer src="js/seguranca.js"></script>
+</head>
+
+<body class="favoritos-body">
+
+  <div class="favoritos-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>TURMA <span>BLACK</span></h1>
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <button class="menu-item" data-page="dashboard.html">
+          <span>🏠</span> Dashboard
+        </button>
+
+        <button class="menu-item" data-page="perfil.html">
+          <span>👤</span> Perfil
+        </button>
+
+        <button class="menu-item" data-page="modulos.html">
+          <span>📚</span> Módulos
+        </button>
+
+        <button class="menu-item" data-page="estudo.html">
+          <span>🗂️</span> Estudo
+        </button>
+
+        <button class="menu-item" data-page="provas.html">
+          <span>📝</span> Provas
+        </button>
+
+        <button class="menu-item" data-page="notas.html">
+          <span>🧾</span> Anotações
+        </button>
+
+        <button class="menu-item active" data-page="favoritos.html">
+          <span>⭐</span> Favoritos
+        </button>
+
+        <button class="menu-item" data-page="minigames.html">
+          <span>🎮</span> Minigames
+        </button>
+
+        <button class="menu-item" data-page="roleta.html">
+          <span>🎰</span> Roleta
+        </button>
+<button class="menu-item" data-page="banca.html">
+  <span>💰</span> Gestão
+</button>
+        <button class="menu-item" data-page="suporte.html">
+          <span>💬</span> Suporte
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="btnSair">
+          🚪 Sair da conta
+        </button>
+      </div>
+
+    </aside>
+
+    <main class="favoritos-main">
+
+      <header class="dashboard-header">
+
+        <button class="mobile-menu-btn" id="btnMenu">
+          ☰
+        </button>
+
+        <div>
+          <h2>Favoritos ⭐</h2>
+          <p>Salve e acesse rapidamente seus conteúdos mais importantes.</p>
+        </div>
+
+        <div class="header-actions">
+
+          <div class="status-badge">
+            <span></span> Online
+          </div>
+
+          <button class="profile-shortcut" data-page="dashboard.html">
+            🏠
+          </button>
+
+        </div>
+
+      </header>
+
+      <section class="favoritos-hero">
+
+        <div>
+          <span class="favoritos-tag">ACESSO RÁPIDO</span>
+
+          <h1>Seus conteúdos favoritos organizados.</h1>
+
+          <p>
+            Encontre rapidamente módulos, provas, anotações, estratégias e ferramentas
+            que você marcou como importante.
+          </p>
+        </div>
+
+        <div class="favoritos-count-card">
+          <p>Total salvo</p>
+          <h2 id="totalFavoritosPage">0</h2>
+          <span id="tipoMaisSalvo">Nenhum item ainda</span>
+        </div>
+
+      </section>
+
+      <section class="favoritos-tools">
+
+        <div class="favoritos-panel">
+
+          <div class="panel-header">
+            <div>
+              <h2>Buscar favoritos</h2>
+              <p>Filtre por nome, descrição ou categoria.</p>
+            </div>
+          </div>
+
+          <div class="favoritos-filtros">
+
+            <div class="input-group">
+              <label>Pesquisar</label>
+              <input
+                type="text"
+                id="buscarFavorito"
+                placeholder="Buscar favorito..."
+              />
+            </div>
+
+            <div class="input-group">
+              <label>Tipo</label>
+              <select id="filtroFavorito">
+                <option value="Todos">Todos</option>
+                <option value="Estudo">Estudo</option>
+                <option value="Prova">Prova</option>
+                <option value="Nota">Anotação</option>
+                <option value="Ferramenta">Ferramenta</option>
+                <option value="Estratégia">Estratégia</option>
+              </select>
+            </div>
+
+            <button class="danger-btn" id="btnLimparFavoritos" type="button">
+              🧹 Limpar favoritos
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="favoritos-list-section">
+
+        <div class="section-title">
+          <h2>Itens favoritos</h2>
+          <p>Lista salva localmente neste navegador.</p>
+        </div>
+
+        <div class="favoritos-list" id="listaFavoritos">
+          <div class="empty-favoritos">
+            <span>⭐</span>
+            <p>Nenhum favorito salvo ainda.</p>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="modal-overlay" id="modalFavoritos">
+
+    <div class="modal-box">
+
+      <span class="modal-icon">⚠️</span>
+
+      <h3>Apagar favoritos?</h3>
+
+      <p>
+        Todos os favoritos salvos neste navegador serão removidos.
+      </p>
+
+      <div class="modal-actions">
+
+        <button class="secondary-btn" id="btnCancelarFavoritos" type="button">
+          Cancelar
+        </button>
+
+        <button class="danger-btn" id="btnConfirmarFavoritos" type="button">
+          Sim, apagar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Eclipse 0 | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/eclipse-0.js"></script>
+</head>
+
+<body class="eclipse-body">
+
+  <main class="eclipse-page">
+
+    <nav class="eclipse-nav">
+      <button type="button" data-page="../modulos.html">
+        ← Módulos
+      </button>
+
+      <button type="button" data-page="../dashboard.html">
+        🏠 Dashboard
+      </button>
+    </nav>
+
+    <header class="eclipse-header">
+      <div>
+        <span class="eclipse-tag">ESTRATÉGIA DE ESPERA</span>
+        <h1>🌑 Eclipse 0</h1>
+
+        <p>
+          O Eclipse 0 trabalha com repetição direta, pausa de 4 giros e entrada
+          somente se nenhum número do Terminal 0 com 2 vizinhos aparecer durante a espera.
+        </p>
+      </div>
+    </header>
+
+    <section class="eclipse-hero">
+
+      <article class="eclipse-hero-card">
+        <span class="eclipse-tag">REGRA PRINCIPAL</span>
+        <h2>Como funciona?</h2>
+
+        <p>
+          Quando um número repete de forma direta, exemplo <strong>12, 12</strong>,
+          a leitura é ativada. Depois disso, você aguarda exatamente
+          <strong>4 giros</strong>.
+        </p>
+
+        <p>
+          Durante esses 4 giros, não pode aparecer nenhum número próximo do
+          <strong>Terminal 0 com 2 vizinhos</strong>. Se aparecer, a leitura é cancelada.
+        </p>
+
+        <div class="eclipse-sequence" id="eclipseSequencia">
+          <span class="hot">12</span>
+          <span class="hot">12</span>
+          <span class="wait">16</span>
+          <span class="wait">4</span>
+          <span class="wait">27</span>
+          <span class="wait">9</span>
+          <strong>ENTRADA</strong>
+        </div>
+      </article>
+
+      <article class="eclipse-hero-card eclipse-entry-card">
+        <span class="eclipse-tag">ENTRADA OFICIAL</span>
+        <h2>Terminal 0 + 2 vizinhos</h2>
+
+        <div class="eclipse-terminal-grid">
+          <div class="eclipse-terminal">
+            <strong>0</strong>
+            <span>32, 15, 0, 26, 3</span>
+          </div>
+
+          <div class="eclipse-terminal">
+            <strong>10</strong>
+            <span>5, 24, 10, 23, 8</span>
+          </div>
+
+          <div class="eclipse-terminal">
+            <strong>20</strong>
+            <span>1, 33, 20, 14, 31</span>
+          </div>
+
+          <div class="eclipse-terminal">
+            <strong>30</strong>
+            <span>8, 23, 30, 11, 36</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <section class="eclipse-grid">
+
+      <article class="eclipse-card">
+        <h2>Passo a passo</h2>
+
+        <div class="eclipse-steps">
+          <div class="eclipse-step active">
+            <span>1</span>
+            <p>Identifique uma repetição direta na timeline.</p>
+          </div>
+
+          <div class="eclipse-step">
+            <span>2</span>
+            <p>Após a repetição, aguarde exatamente 4 giros.</p>
+          </div>
+
+          <div class="eclipse-step">
+            <span>3</span>
+            <p>Durante os 4 giros, nenhum número do Terminal 0 + 2 vizinhos pode aparecer.</p>
+          </div>
+
+          <div class="eclipse-step">
+            <span>4</span>
+            <p>Se a espera passar limpa, a 5ª jogada libera entrada no Terminal 0.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="eclipse-card">
+        <h2>Exemplo correto</h2>
+
+        <div class="eclipse-timeline" id="eclipseTimeline">
+          <div class="eclipse-ball repeat">12</div>
+          <div class="eclipse-ball repeat">12</div>
+          <div class="eclipse-ball wait">16</div>
+          <div class="eclipse-ball wait">4</div>
+          <div class="eclipse-ball wait">27</div>
+          <div class="eclipse-ball wait">9</div>
+          <div class="eclipse-ball entry">0</div>
+        </div>
+
+        <div class="eclipse-alert success">
+          ✅ Nenhum número do Terminal 0 + 2 vizinhos apareceu nos 4 giros.
+          Entrada liberada na próxima jogada.
+        </div>
+      </article>
+
+    </section>
+
+    <section class="eclipse-rules">
+
+      <article class="eclipse-rule-card">
+        <h2>Quando cancela?</h2>
+
+        <p>
+          Se durante os 4 giros aparecer qualquer número do Terminal 0 com 2 vizinhos,
+          a leitura é invalidada e você não entra.
+        </p>
+      </article>
+
+      <article class="eclipse-rule-card">
+        <h2>Proteção</h2>
+
+        <p>
+          Se a entrada não bater de primeira, pode fazer apenas mais uma proteção.
+          Se não vier novamente, encerre a estratégia.
+        </p>
+      </article>
+
+      <article class="eclipse-rule-card">
+        <h2>Quando voltar?</h2>
+
+        <p>
+          Depois de invalidar ou não bater, espere uma nova repetição direta para iniciar
+          outra leitura do Eclipse 0.
+        </p>
+      </article>
+
+    </section>
+
+    <footer class="eclipse-warning">
+      Nenhuma estratégia garante resultado. Use com gestão e responsabilidade.
+    </footer>
+
+  </main>
+
+</body>
+</html>

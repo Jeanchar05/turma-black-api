@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Zero For One | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/zero.js"></script>
+
+</head>
+
+<body class="zero-page-body">
+
+  <main class="zero-main">
+
+    <header class="zero-header-premium">
+
+      <div>
+        <span class="zero-tag">MINIGAME PREMIUM</span>
+
+        <h1>Zero For One 🎯</h1>
+
+        <p>
+          Treine a leitura dos setores ligados ao zero usando as bases
+          0, 10, 20 e 30 com dois vizinhos para cada lado.
+        </p>
+      </div>
+
+      <div class="zero-header-actions">
+
+        <button
+          type="button"
+          class="secondary-btn"
+          data-page="../minigames.html"
+        >
+          🎮 Minigames
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn"
+          data-page="../dashboard.html"
+        >
+          🏠 Dashboard
+        </button>
+
+      </div>
+
+    </header>
+
+    <section class="zero-layout">
+
+      <aside class="zero-panel">
+
+        <div class="zero-panel-top">
+          <span class="zero-mini-tag">SISTEMA 2 VIZINHOS</span>
+
+          <h2>Painel do Treino</h2>
+
+          <p>
+            Gire um número, observe a race e responda se ele pertence
+            ao Zero For One.
+          </p>
+        </div>
+
+        <button id="btnGirarZero" class="btn-zero" type="button">
+          🎰 Girar número
+        </button>
+
+        <div class="zero-card">
+          <span>🎯 Número atual</span>
+          <strong id="numeroAtualZero">--</strong>
+        </div>
+
+        <div class="zero-card">
+          <span>📊 Resultado</span>
+          <strong id="resultadoZero">Aguardando giro...</strong>
+        </div>
+
+        <div class="zero-stats-grid">
+
+          <div>
+            <span>✅</span>
+            <strong id="zeroAcertos">0</strong>
+            <small>Acertos</small>
+          </div>
+
+          <div>
+            <span>❌</span>
+            <strong id="zeroErros">0</strong>
+            <small>Erros</small>
+          </div>
+
+        </div>
+
+        <div class="zero-card zero-info-card">
+          <span>📌 Bases do Zero For One</span>
+          <p>0 • 10 • 20 • 30</p>
+        </div>
+
+        <button id="btnVoltarEstudoZero" class="btn-zero-outline" type="button">
+          ← Voltar aos Minigames
+        </button>
+
+      </aside>
+
+      <section class="zero-casino-area">
+
+        <div class="zero-casino-head">
+          <div>
+            <span>RACE TRAINING</span>
+
+            <h2>Leitura Zero For One</h2>
+
+            <p>
+              Observe o número gerado, veja a marcação na race
+              e responda se pertence ao sistema.
+            </p>
+          </div>
+        </div>
+
+        <section class="zero-race-wrapper">
+
+          <div class="race-zero-area">
+
+            <img
+              src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628296/race_gujiqx.png"
+              alt="Race Roleta"
+              class="zero-race-img"
+            >
+
+            <div id="marcadorNumeroZero" class="zero-race-marker">
+              <span id="marcadorNumeroTexto">--</span>
+            </div>
+
+          </div>
+
+          <div class="zero-question-card" id="respostaZeroBox">
+
+            <span class="zero-question-tag">PERGUNTA</span>
+
+            <h2 id="perguntaZero">
+              Esse número pertence ao Zero For One?
+            </h2>
+
+            <p id="dicaZero">
+              Gire um número para liberar as respostas.
+            </p>
+
+            <div class="zero-answer-actions">
+
+              <button type="button" id="btnSimZero">
+                ✅ Sim, pertence
+              </button>
+
+              <button type="button" id="btnNaoZero">
+                ❌ Não pertence
+              </button>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <section class="zero-rules-grid">
+
+          <article>
+            <span>0️⃣</span>
+            <strong>Base 0</strong>
+            <p>32 • 15 • 0 • 26 • 3</p>
+          </article>
+
+          <article>
+            <span>🔟</span>
+            <strong>Base 10</strong>
+            <p>5 • 24 • 10 • 23 • 8</p>
+          </article>
+
+          <article>
+            <span>2️⃣0️⃣</span>
+            <strong>Base 20</strong>
+            <p>1 • 33 • 20 • 14 • 31</p>
+          </article>
+
+          <article>
+            <span>3️⃣0️⃣</span>
+            <strong>Base 30</strong>
+            <p>8 • 23 • 30 • 11 • 36</p>
+          </article>
+
+        </section>
+
+        <section class="zero-history-section">
+
+          <div class="section-title">
+            <h2>Histórico do treino</h2>
+            <p>Acompanhe os últimos números analisados.</p>
+          </div>
+
+          <div id="historicoZero" class="zero-history-list">
+            <div class="zero-empty-history">
+              Nenhum número analisado ainda.
+            </div>
+          </div>
+
+        </section>
+
+      </section>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

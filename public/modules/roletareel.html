@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Roleta Reel | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/roletareel.js"></script>
+
+</head>
+
+<body class="roletareel-body">
+
+  <main class="roletareel-main">
+
+    <!-- HEADER -->
+
+    <header class="roletareel-header">
+
+      <div>
+
+        <span class="roletareel-tag">
+          MINIGAME PREMIUM
+        </span>
+
+        <h1>
+          Roleta Reel 🎡
+        </h1>
+
+        <p>
+          Simule giros, marque números na racetrack, acompanhe histórico,
+          estatísticas e use a IA para identificar possíveis padrões.
+        </p>
+
+      </div>
+
+      <div class="roletareel-actions">
+
+        <button
+          type="button"
+          data-page="../minigames.html"
+          class="secondary-btn"
+        >
+          🎮 Minigames
+        </button>
+
+        <button
+          type="button"
+          data-page="../dashboard.html"
+          class="primary-btn"
+        >
+          🏠 Dashboard
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- STATUS STRIP -->
+
+    <section class="roletareel-status-strip">
+
+      <div>
+        <span>🎰</span>
+        <strong>Status</strong>
+        <p id="roletaStatus">Pronto</p>
+      </div>
+
+      <div>
+        <span>✅</span>
+        <strong>Marcados</strong>
+        <p id="contadorMarcados">0 selecionados</p>
+      </div>
+
+      <div>
+        <span>📊</span>
+        <strong>Giros</strong>
+        <p id="statTotalGiros">0</p>
+      </div>
+
+      <div>
+        <span>🔥</span>
+        <strong>Sequência</strong>
+        <p id="statSequencia">--</p>
+      </div>
+
+    </section>
+
+    <!-- LAYOUT PRINCIPAL -->
+
+    <section class="roletareel-layout">
+
+      <!-- COLUNA PRINCIPAL -->
+
+      <div class="roletareel-left">
+
+        <!-- ROLETA -->
+
+        <section class="roletareel-card roletareel-wheel-card">
+
+          <div class="roletareel-card-head">
+
+            <div>
+
+              <h2>
+                Roleta Simulada
+              </h2>
+
+              <p>
+                Gire a roleta e confira se algum número marcado bateu.
+              </p>
+
+            </div>
+
+            <div class="roletareel-live-badge">
+              AO VIVO
+            </div>
+
+          </div>
+
+          <div class="cassino-wheel-area">
+
+            <div class="wheel-light"></div>
+
+            <div class="wheel-frame">
+
+              <img
+                src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777757465/roleta-real.png_upenvz.jpg"
+                alt="Roleta Real"
+                id="rouletteWheel"
+                class="roulette-wheel"
+              >
+
+              <div
+                id="rouletteBallTrack"
+                class="roulette-ball-track"
+              >
+                <div
+                  id="rouletteBall"
+                  class="roulette-ball"
+                ></div>
+              </div>
+
+              <div class="wheel-center-glow"></div>
+
+            </div>
+
+          </div>
+
+          <div class="roleta-actions">
+
+            <button
+              id="btnGirarRoleta"
+              class="btn-girar-roleta"
+              type="button"
+            >
+              ▶ Girar Roleta
+            </button>
+
+            <button
+              id="btnLimparMarcacoesRoleta"
+              class="btn-limpar-roleta"
+              type="button"
+            >
+              🧹 Limpar Marcações
+            </button>
+
+          </div>
+
+          <div class="marcados-box">
+
+            <div>
+
+              <h3>
+                Números Marcados
+              </h3>
+
+              <p>
+                Selecione números na race abaixo ou aplique sugestões da IA.
+              </p>
+
+            </div>
+
+            <div
+              id="numerosMarcadosLista"
+              class="numeros-marcados-lista"
+            ></div>
+
+          </div>
+
+        </section>
+
+        <!-- IA -->
+
+        <section class="roletareel-card ia-roleta-box">
+
+          <div class="ia-roleta-topo">
+
+            <div>
+
+              <span class="roletareel-mini-tag">
+                INTELIGÊNCIA
+              </span>
+
+              <h3>
+                🤖 IA da Roleta
+              </h3>
+
+              <p
+                id="iaStatusRoleta"
+                class="ia-status-roleta"
+              >
+                Aguardando histórico suficiente...
+              </p>
+
+            </div>
+
+            <button
+              id="btnAplicarIaRoleta"
+              class="btn-aplicar-ia-roleta"
+              type="button"
+            >
+              Aplicar IA na Race
+            </button>
+
+          </div>
+
+          <div class="ia-sugestoes">
+
+            <strong>
+              Números sugeridos:
+            </strong>
+
+            <div
+              id="iaNumerosSugeridos"
+              class="ia-numeros-sugeridos"
+            ></div>
+
+          </div>
+
+          <p
+            id="iaAnaliseTexto"
+            class="ia-analise-texto"
+          >
+            A IA irá observar repetições, imãs, espelhos, triangulação
+            e setores da race.
+          </p>
+
+        </section>
+
+        <!-- RACETRACK -->
+
+        <section class="roletareel-card race-roleta-card">
+
+          <div class="race-header">
+
+            <div>
+
+              <h2>
+                Racetrack
+              </h2>
+
+              <p>
+                Clique nos números para marcar com fichas pretas.
+              </p>
+
+            </div>
+
+            <button
+              id="btnAplicarRaceRoleta"
+              class="btn-aplicar-race"
+              type="button"
+            >
+              ✓ Atualizar Marcações
+            </button>
+
+          </div>
+
+          <div
+            class="race-roleta-area"
+            id="raceRoletaArea"
+          >
+
+            <img
+              src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628341/race-bg_euruvf.png"
+              alt="Race com nomes"
+              class="race-roleta-img"
+              id="raceRoletaImg"
+            >
+
+            <div
+              id="raceClickLayer"
+              class="race-click-layer"
+            ></div>
+
+            <div
+              id="raceFichasLayer"
+              class="race-fichas-layer"
+            ></div>
+
+            <div
+              id="raceResultadoLayer"
+              class="race-resultado-layer"
+            ></div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- SIDEBAR DIREITA -->
+
+      <aside class="roletareel-right">
+
+        <section class="roletareel-card resultado-box">
+
+          <h3>
+            Último Resultado
+          </h3>
+
+          <div
+            id="ultimoNumeroRoleta"
+            class="ultimo-numero-roleta"
+          >
+            --
+          </div>
+
+          <p
+            id="ultimaCorRoleta"
+            class="ultima-cor-roleta"
+          >
+            Aguardando giro
+          </p>
+
+          <span
+            id="resultadoDataRoleta"
+            class="resultado-data-roleta"
+          >
+            --
+          </span>
+
+        </section>
+
+        <section class="roletareel-card verificacao-box">
+
+          <h3>
+            Verificação
+          </h3>
+
+          <div
+            id="resultadoVerificacao"
+            class="resultado-verificacao neutro"
+          >
+            Marque números na race e gire a roleta.
+          </div>
+
+        </section>
+
+        <section class="roletareel-card historico-box">
+
+          <h3>
+            Histórico
+          </h3>
+
+          <div
+            id="historicoRoleta"
+            class="historico-roleta"
+          ></div>
+
+        </section>
+
+        <section class="roletareel-card estatisticas-box">
+
+          <h3>
+            Estatísticas
+          </h3>
+
+          <div class="stat-line">
+            <span>Total de Giros</span>
+            <strong id="statTotalGirosSide">0</strong>
+          </div>
+
+          <div class="stat-line">
+            <span>Acertos</span>
+            <strong id="statAcertos">0</strong>
+          </div>
+
+          <div class="stat-line">
+            <span>Erros</span>
+            <strong id="statErros">0</strong>
+          </div>
+
+          <div class="stat-line">
+            <span>Última Sequência</span>
+            <strong id="statSequenciaSide">--</strong>
+          </div>
+
+        </section>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+</body>
+</html>
