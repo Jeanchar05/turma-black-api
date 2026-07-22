@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Minigames | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png"
+  >
+
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+
+  <!-- JS PRINCIPAL -->
+  <script defer src="minigames.js"></script>
+
+  <!-- SEGURANÇA -->
+  <script defer src="js/seguranca.js"></script>
+
+</head>
+
+<body class="minigames-body">
+
+  <div class="dashboard-layout">
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>TURMA <span>BLACK</span></h1>
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <button class="menu-item" data-page="dashboard.html">
+          <span>🏠</span>
+          Dashboard
+        </button>
+
+        <button class="menu-item" data-page="perfil.html">
+          <span>👤</span>
+          Perfil
+        </button>
+
+        <button class="menu-item" data-page="modulos.html">
+          <span>📚</span>
+          Módulos
+        </button>
+
+        <button class="menu-item" data-page="estudo.html">
+          <span>🗂️</span>
+          Estudo
+        </button>
+
+        <button class="menu-item" data-page="provas.html">
+          <span>📝</span>
+          Provas
+        </button>
+
+        <button class="menu-item" data-page="favoritos.html">
+          <span>⭐</span>
+          Favoritos
+        </button>
+
+        <button class="menu-item" data-page="notas.html">
+          <span>🧾</span>
+          Anotações
+        </button>
+
+        <button class="menu-item active" data-page="minigames.html">
+          <span>🎮</span>
+          Minigames
+        </button>
+
+        <button class="menu-item" data-page="roleta.html">
+          <span>🎰</span>
+          Roleta
+        </button>
+        <button class="menu-item" data-page="banca.html">
+  <span>💰</span> Gestão
+</button>
+
+        <button class="menu-item" data-page="suporte.html">
+          <span>💬</span>
+          Suporte
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+
+        <button class="logout-btn" id="btnSair">
+          🚪 Sair da conta
+        </button>
+
+      </div>
+
+    </aside>
+
+    <!-- ======================================
+         MAIN
+    ======================================= -->
+
+    <main class="minigames-main">
+
+      <!-- HEADER -->
+
+      <header class="dashboard-header">
+
+        <button class="mobile-menu-btn" id="btnMenu">
+          ☰
+        </button>
+
+        <div>
+
+          <h2>
+            Minigames 🎮
+          </h2>
+
+          <p>
+            Ferramentas estratégicas premium da Turma Black.
+          </p>
+
+        </div>
+
+        <div class="header-actions">
+
+          <div class="status-badge">
+            <span></span>
+            Online
+          </div>
+
+          <button
+            class="profile-shortcut"
+            data-page="dashboard.html"
+          >
+            🏠
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- HERO -->
+
+      <section class="minigames-hero">
+
+        <div class="minigames-hero-content">
+
+          <span class="minigames-tag">
+            ÁREA OPERACIONAL
+          </span>
+
+          <h1>
+            Ferramentas premium para evolução estratégica.
+          </h1>
+
+          <p>
+            Utilize os minigames da Turma Black para desenvolver leitura,
+            análise, lógica operacional e tomada de decisão.
+          </p>
+
+          <div class="minigames-alert">
+
+            <span>⚠️</span>
+
+            <p>
+              Utilize os minigames com responsabilidade e foco na evolução.
+            </p>
+
+          </div>
+
+        </div>
+
+        <!-- SIDE CARD -->
+
+        <div class="minigames-side-card">
+
+          <div class="side-glow"></div>
+
+          <span class="side-tag">
+            PREMIUM
+          </span>
+
+          <h2>
+            3 Ferramentas disponíveis
+          </h2>
+
+          <p>
+            Roleta, Eclipse 0 e Zero For One disponíveis para acesso.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- GRID -->
+
+      <section class="minigames-grid">
+
+        <!-- ROLETA -->
+
+        <article class="minigame-card">
+
+          <div class="minigame-image">
+
+            <div class="minigame-icon">
+              🎰
+            </div>
+
+          </div>
+
+          <div class="minigame-content">
+
+            <span>
+              OPERACIONAL
+            </span>
+
+            <h3>
+              Roleta
+            </h3>
+
+            <p>
+              Plataforma operacional premium utilizada atualmente pela
+              Turma Black.
+            </p>
+
+            <button
+              class="primary-btn"
+              data-page="modules/roletareel.html"
+            >
+              Acessar
+            </button>
+
+          </div>
+
+        </article>
+
+        <!-- ECLIPSE -->
+
+        <article class="minigame-card">
+
+          <div class="minigame-image eclipse">
+
+            <div class="minigame-icon">
+              🌑
+            </div>
+
+          </div>
+
+          <div class="minigame-content">
+
+            <span>
+              AVANÇADO
+            </span>
+
+            <h3>
+              Eclipse 0
+            </h3>
+
+            <p>
+              Ferramenta avançada para leitura operacional e análise
+              estratégica premium.
+            </p>
+
+            <button
+              class="primary-btn"
+              data-page="modules/eclipse01.html"
+            >
+              Acessar
+            </button>
+
+          </div>
+
+        </article>
+
+        <!-- ZERO -->
+
+        <article class="minigame-card">
+
+          <div class="minigame-image zero">
+
+            <div class="minigame-icon">
+              ⚡
+            </div>
+
+          </div>
+
+          <div class="minigame-content">
+
+            <span>
+              ESTRATÉGICO
+            </span>
+
+            <h3>
+              Zero For One
+            </h3>
+
+            <p>
+              Sistema operacional focado em leitura rápida, lógica
+              e precisão estratégica.
+            </p>
+
+            <button
+              class="primary-btn"
+              data-page="modules/zero.html"
+            >
+              Acessar
+            </button>
+
+          </div>
+
+        </article>
+
+      </section>
+
+      <!-- INFO CARDS -->
+
+      <section class="minigames-info-grid">
+
+        <article class="minigames-info-card">
+
+          <span>🧠</span>
+
+          <h3>
+            Leitura estratégica
+          </h3>
+
+          <p>
+            Desenvolva tomada de decisão com mais precisão e controle.
+          </p>
+
+        </article>
+
+        <article class="minigames-info-card">
+
+          <span>📊</span>
+
+          <h3>
+            Evolução operacional
+          </h3>
+
+          <p>
+            Melhore leitura, gestão e adaptação operacional.
+          </p>
+
+        </article>
+
+        <article class="minigames-info-card">
+
+          <span>🔥</span>
+
+          <h3>
+            Controle emocional
+          </h3>
+
+          <p>
+            Trabalhe disciplina e consistência durante as operações.
+          </p>
+
+        </article>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+</body>
+</html>

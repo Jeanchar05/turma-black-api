@@ -72,7 +72,7 @@ const PERMISSOES_PADRAO = {
 
   suporte: {
     dashboard: true,
-    painelAdmin: false,
+    painelAdmin: true,
     painelVendas: true,
     usuarios: false,
     aprovacoes: false,

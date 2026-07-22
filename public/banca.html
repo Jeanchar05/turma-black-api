@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Gestão | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="js/seguranca.js"></script>
+  <script defer src="banca.js"></script>
+</head>
+
+<body class="banca-body">
+
+  <main id="banca" class="banca-page">
+
+    <div class="banca-premium">
+
+      <section class="banca-hero">
+        <div>
+          <span class="hero-tag">GESTÃO AUTOMÁTICA</span>
+
+          <h1>💰 Gestão de Banca</h1>
+
+          <p>
+            Controle sua evolução, registre resultados e acompanhe sua meta final
+            com cálculo automático.
+          </p>
+        </div>
+
+        <div class="banca-top-actions">
+          <button type="button" data-page="dashboard.html">
+            ⬅ Dashboard
+          </button>
+
+          <button type="button" id="btnSair">
+            🚪 Sair
+          </button>
+        </div>
+      </section>
+
+      <div class="banca-premium-grid">
+
+        <div class="banca-left">
+
+          <section class="banca-card-premium">
+            <h2>1. Configuração da Banca</h2>
+
+            <div class="banca-config-grid">
+              <div class="banca-input-card">
+                <span>💰</span>
+                <label for="bancaInicial">Banca Inicial</label>
+                <input type="number" id="bancaInicial" value="10000" min="0" />
+              </div>
+
+              <div class="banca-input-card">
+                <span>📅</span>
+                <label for="periodoDias">Período em dias</label>
+                <input type="number" id="periodoDias" value="20" min="1" />
+              </div>
+
+              <div class="banca-input-card">
+                <span>🎯</span>
+                <label for="metaFinal">Meta Final</label>
+                <input type="number" id="metaFinal" value="50000" min="0" />
+              </div>
+
+              <div class="banca-input-card">
+                <span>🛡️</span>
+                <label for="stopLoss">Stop Loss Diário (%)</label>
+                <input type="number" id="stopLoss" value="9" min="0" max="100" />
+              </div>
+            </div>
+
+            <div class="banca-info-line">
+              ⚙️ A meta por dia é calculada automaticamente pela diferença entre a banca inicial e a meta final.
+            </div>
+          </section>
+
+          <section class="banca-card-premium">
+            <div class="banca-card-title-row">
+              <h2>2. Projeção de Crescimento</h2>
+              <span class="banca-tag">Atualiza automático</span>
+            </div>
+
+            <div class="banca-chart-area">
+              <canvas id="graficoBancaPremium"></canvas>
+            </div>
+
+            <div class="banca-info-line">
+              Projeção comparando plano calculado com resultados reais lançados.
+            </div>
+          </section>
+
+          <section class="banca-card-premium">
+            <div class="banca-card-title-row">
+              <h2>3. Controle Diário</h2>
+
+              <div class="banca-controle-actions">
+                <button class="banca-btn-gold banca-btn-small" id="btnAdicionarResultado" type="button">
+                  ⊕ Adicionar Resultado
+                </button>
+
+                <button class="banca-btn-danger banca-btn-small" id="btnLimparControle" type="button">
+                  🗑️ Limpar Controle
+                </button>
+              </div>
+            </div>
+
+            <div class="banca-table-wrap">
+              <table class="banca-table">
+                <thead>
+                  <tr>
+                    <th>Dia</th>
+                    <th>Data</th>
+                    <th>Antes</th>
+                    <th>Atual</th>
+                    <th>Resultado</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+
+                <tbody id="tabelaControleBanca"></tbody>
+              </table>
+            </div>
+          </section>
+
+        </div>
+
+        <aside class="banca-right">
+
+          <section class="banca-card-premium">
+            <h2>Resultado do Plano</h2>
+
+            <div class="banca-result-grid">
+              <div>
+                <span>Precisa fazer por dia</span>
+                <strong id="precisaDia">R$ 0,00</strong>
+                <small id="precisaDiaPct">(0%)</small>
+              </div>
+
+              <div>
+                <span>Crescimento total</span>
+                <strong class="green" id="crescimentoTotal">0%</strong>
+              </div>
+
+              <div>
+                <span>Projeção final</span>
+                <strong class="gold" id="projecaoFinal">R$ 0,00</strong>
+              </div>
+
+              <div>
+                <span>Risco diário</span>
+                <strong class="red" id="riscoDiario">R$ 0,00</strong>
+              </div>
+            </div>
+
+            <div class="banca-alert">
+              ⚡ <span id="frasePlano">Configure sua banca para gerar o plano.</span>
+            </div>
+          </section>
+
+          <section class="banca-card-premium">
+            <h2>Status Atual</h2>
+
+            <div class="banca-status-center">
+              <div class="banca-circle">
+                <span id="statusPercent">0%</span>
+              </div>
+
+              <div class="banca-status-text">
+                <span>Banca Atual</span>
+                <strong id="evolucaoAtual">R$ 0,00</strong>
+
+                <span>Desempenho</span>
+                <strong class="green" id="desempenhoAtual">0%</strong>
+
+                <small id="diasRestantes">Faltam 0 dias para sua meta</small>
+              </div>
+            </div>
+
+            <div class="banca-mini-status">
+              <div>
+                <span>Sequência positiva</span>
+                <strong id="sequenciaPositiva">0</strong>
+                <small>dias</small>
+              </div>
+
+              <div>
+                <span>Dias positivos</span>
+                <strong class="green" id="diasPositivos">0</strong>
+                <small id="diasTotalPositivos">de 0</small>
+              </div>
+
+              <div>
+                <span>Dias negativos</span>
+                <strong class="red" id="diasNegativos">0</strong>
+                <small id="diasTotalNegativos">de 0</small>
+              </div>
+            </div>
+
+            <div class="banca-distance">
+              <span>Distância da meta</span>
+
+              <div>
+                <strong id="distanciaMeta">R$ 0,00</strong>
+                <b id="distanciaPercent">0%</b>
+              </div>
+
+              <div class="banca-progress">
+                <span id="barraMeta"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="banca-card-premium">
+            <h2>Resumo do Plano</h2>
+
+            <div class="banca-resumo">
+              <p><span>Banca Inicial</span><b id="resBancaInicial">R$ 0,00</b></p>
+              <p><span>Meta Final</span><b id="resMetaFinal">R$ 0,00</b></p>
+              <p><span>Período</span><b id="resPeriodo">0 dias</b></p>
+              <p><span>Meta por dia</span><b id="resMetaDia">R$ 0,00</b></p>
+              <p><span>Stop Loss</span><b id="resStop">0%</b></p>
+              <p><span>Método</span><b id="resMetodo">Meta fixa diária</b></p>
+              <p><span>Início</span><b id="resInicio">-</b></p>
+              <p><span>Término</span><b id="resFim">-</b></p>
+            </div>
+          </section>
+
+          <section class="banca-card-premium dica-primo">
+            <h2>👑 Dica do Primo</h2>
+            <p>
+              Gestão não é sobre ganhar sempre, é sobre nunca perder o controle.
+            </p>
+          </section>
+
+        </aside>
+
+      </div>
+
+      <section class="banca-footer-banner">
+        <div>🎯</div>
+
+        <div>
+          <h2>Disciplina + Gestão = Liberdade</h2>
+          <p>Siga seu plano, respeite seus limites e acompanhe sua evolução diariamente.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <div id="modalResultadoBanca" class="modal-banca">
+      <div class="modal-banca-box">
+        <h2>Adicionar Resultado</h2>
+
+        <div class="banca-atual-info">
+          <span>Banca antes do lançamento</span>
+          <strong id="bancaAntesModal">R$ 0,00</strong>
+        </div>
+
+        <label for="valorResultadoDia">Informe sua banca atual</label>
+        <input type="number" id="valorResultadoDia" placeholder="Ex: 12000" />
+
+        <small class="modal-ajuda">
+          O sistema calcula automaticamente lucro, prejuízo, porcentagem e status.
+        </small>
+
+        <div class="modal-banca-actions">
+          <button id="btnSalvarResultado" class="btn-confirmar" type="button">Salvar</button>
+          <button id="btnCancelarResultado" class="btn-cancelar" type="button">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

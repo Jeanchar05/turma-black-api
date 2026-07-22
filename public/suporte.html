@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Suporte | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+  <script defer src="suporte.js?v=20260721-1"></script>
+</head>
+
+<body class="suporte-body">
+
+  <div class="suporte-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>TURMA <span>BLACK</span></h1>
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <button class="menu-item" data-page="dashboard.html">
+          <span>🏠</span> Dashboard
+        </button>
+
+        <button class="menu-item" data-page="perfil.html">
+          <span>👤</span> Perfil
+        </button>
+
+        <button class="menu-item" data-page="modulos.html">
+          <span>📚</span> Módulos
+        </button>
+
+        <button class="menu-item" data-page="estudo.html">
+          <span>🗂️</span> Estudo
+        </button>
+
+        <button class="menu-item" data-page="provas.html">
+          <span>📝</span> Provas
+        </button>
+
+        <button class="menu-item" data-page="favoritos.html">
+          <span>⭐</span> Favoritos
+        </button>
+
+        <button class="menu-item" data-page="notas.html">
+          <span>🧾</span> Anotações
+        </button>
+
+        <button class="menu-item" data-page="minigames.html">
+          <span>🎮</span> Minigames
+        </button>
+
+        <button class="menu-item" data-page="roleta.html">
+          <span>🎰</span> Roleta
+        </button>
+        <button class="menu-item" data-page="banca.html">
+  <span>💰</span> Gestão
+</button>
+        <button class="menu-item active" data-page="suporte.html">
+          <span>💬</span> Suporte
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="btnSair">
+          🚪 Sair da conta
+        </button>
+      </div>
+
+    </aside>
+
+    <main class="suporte-main">
+
+      <header class="dashboard-header">
+
+        <button class="mobile-menu-btn" id="btnMenu">
+          ☰
+        </button>
+
+        <div>
+          <h2>Central de Suporte 💬</h2>
+          <p>Abra chamados, tire dúvidas e acompanhe suas solicitações.</p>
+        </div>
+
+        <div class="header-actions">
+          <div class="status-badge">
+            <span></span> Online
+          </div>
+
+          <button class="profile-shortcut" data-page="dashboard.html">
+            🏠
+          </button>
+        </div>
+
+      </header>
+
+      <section class="suporte-hero">
+
+        <div>
+          <span class="suporte-tag">ATENDIMENTO PREMIUM</span>
+
+          <h1>Precisa de ajuda?</h1>
+
+          <p>
+            Nossa central organiza suas dúvidas, problemas técnicos e solicitações
+            em um painel simples e profissional.
+          </p>
+        </div>
+
+        <div class="suporte-status-card">
+          <p>Status do suporte</p>
+          <h2>Disponível</h2>
+          <span>Tempo estimado: até 24h</span>
+        </div>
+
+      </section>
+
+      <section class="suporte-cards">
+
+        <article class="suporte-card">
+          <span>⚙️</span>
+          <h3>Problema técnico</h3>
+          <p>Erro no login, página travando ou função não carregando.</p>
+        </article>
+
+        <article class="suporte-card">
+          <span>📚</span>
+          <h3>Dúvida de conteúdo</h3>
+          <p>Ajuda com módulos, provas, estudo ou minigames.</p>
+        </article>
+
+        <article class="suporte-card">
+          <span>🔐</span>
+          <h3>Conta e acesso</h3>
+          <p>Problemas com senha, dispositivo, aprovação ou bloqueio.</p>
+        </article>
+
+      </section>
+
+      <section class="suporte-grid">
+
+        <div class="suporte-panel">
+
+          <div class="panel-header">
+            <div>
+              <h2>Abrir chamado</h2>
+              <p>Descreva seu problema com o máximo de detalhes.</p>
+            </div>
+          </div>
+
+          <form id="formSuporte" class="suporte-form">
+
+            <div class="input-group">
+              <label>Tipo de solicitação</label>
+              <select id="tipoSuporte" required>
+                <option value="">Selecione uma opção</option>
+                <option value="Problema técnico">Problema técnico</option>
+                <option value="Dúvida de conteúdo">Dúvida de conteúdo</option>
+                <option value="Conta e acesso">Conta e acesso</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Prioridade</label>
+              <select id="prioridadeSuporte" required>
+                <option value="Baixa">Baixa</option>
+                <option value="Média">Média</option>
+                <option value="Alta">Alta</option>
+                <option value="Urgente">Urgente</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Assunto</label>
+              <input
+                type="text"
+                id="assuntoSuporte"
+                placeholder="Ex: Não consigo acessar a prova"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label>Mensagem</label>
+              <textarea
+                id="mensagemSuporte"
+                placeholder="Explique o que aconteceu..."
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" class="primary-btn">
+              Enviar chamado
+            </button>
+
+          </form>
+
+        </div>
+
+        <div class="suporte-panel">
+
+          <div class="panel-header">
+            <div>
+              <h2>Chamados recentes</h2>
+              <p>Histórico online vinculado ao suporte administrativo.</p>
+            </div>
+          </div>
+
+          <div class="tickets-list" id="listaChamados">
+            <div class="empty-ticket">
+              <span>💬</span>
+              <p>Nenhum chamado aberto ainda.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="suporte-faq">
+
+        <div class="section-title">
+          <h2>Perguntas frequentes</h2>
+          <p>Respostas rápidas para dúvidas comuns.</p>
+        </div>
+
+        <div class="faq-list">
+
+          <details>
+            <summary>Não consigo acessar minha conta. O que fazer?</summary>
+            <p>
+              Verifique se o e-mail está correto. Caso continue, abra um chamado em “Conta e acesso”.
+            </p>
+          </details>
+
+          <details>
+            <summary>Meu acesso ainda não foi aprovado.</summary>
+            <p>
+              Envie seu código de aprovação ao suporte para liberação manual.
+            </p>
+          </details>
+
+          <details>
+            <summary>Encontrei um erro na plataforma.</summary>
+            <p>
+              Abra um chamado como “Problema técnico” e descreva o erro com detalhes.
+            </p>
+          </details>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <script src="js/seguranca.js"></script>
+
+</body>
+</html>

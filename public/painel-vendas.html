@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel de Vendas | Turma do Primo</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script defer src="painel-vendas.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="vendas-body">
+
+<div class="vendas-background"></div>
+
+<button
+class="mobile-menu-btn"
+id="btnAbrirMenu">
+
+☰
+
+</button>
+
+<div
+class="sidebar-overlay"
+id="sidebarOverlay">
+
+</div>
+
+<!-- ===================================== -->
+<!-- SIDEBAR -->
+<!-- ===================================== -->
+
+<aside
+class="vendas-sidebar"
+id="sidebar">
+
+<div class="sidebar-logo">
+
+<img
+src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+
+<h2>
+
+Turma do
+<span>Primo</span>
+
+</h2>
+
+<p>
+
+Painel Comercial
+
+</p>
+
+</div>
+
+<nav>
+
+<button
+class="menu-btn active"
+data-page="dashboard">
+
+🏠 Dashboard
+
+</button>
+
+<button
+class="menu-btn"
+data-page="cadastro">
+
+👤 Novo Aluno
+
+</button>
+
+<button
+class="menu-btn"
+data-page="historico">
+
+📋 Histórico
+
+</button>
+
+<button
+class="menu-btn"
+data-page="ranking">
+
+🏆 Ranking
+
+</button>
+
+<button
+class="menu-btn"
+data-page="relatorios">
+
+📈 Relatórios
+
+</button>
+
+<button
+class="menu-btn"
+data-page="config">
+
+⚙ Configurações
+
+</button>
+
+</nav>
+
+<div class="sidebar-user">
+
+<div class="user-avatar"
+
+id="fotoUsuario">
+
+JP
+
+</div>
+
+<div>
+
+<strong id="nomeUsuario">
+
+Carregando...
+
+</strong>
+
+<small id="cargoUsuario">
+
+Vendedor
+
+</small>
+
+</div>
+
+</div>
+
+</aside>
+
+<!-- ===================================== -->
+<!-- CONTEÚDO -->
+<!-- ===================================== -->
+
+<main class="vendas-main">
+
+<header class="top-header">
+
+<div>
+
+<h1>
+
+Painel Comercial
+
+</h1>
+
+<p>
+
+Gerencie alunos, vendas e acompanhe seu desempenho.
+
+</p>
+
+</div>
+
+<div class="header-right">
+
+<button
+id="btnAtualizar">
+
+🔄 Atualizar
+
+</button>
+
+<button
+id="btnDashboard">
+
+🏠 Plataforma
+
+</button>
+
+</div>
+
+</header>
+
+<!-- ===================================== -->
+<!-- DASHBOARD -->
+<!-- ===================================== -->
+
+<section
+id="dashboard"
+class="pagina active">
+
+<div class="cards-grid">
+
+<div class="card-stat glow-purple">
+
+<span>
+
+👥
+
+</span>
+
+<div>
+
+<small>
+
+Alunos
+
+</small>
+
+<strong
+id="totalAlunos">
+
+0
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="card-stat glow-blue">
+
+<span>
+
+💰
+
+</span>
+
+<div>
+
+<small>
+
+Vendido Hoje
+
+</small>
+
+<strong
+id="valorHoje">
+
+R$0
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="card-stat glow-green">
+
+<span>
+
+📈
+
+</span>
+
+<div>
+
+<small>
+
+Este mês
+
+</small>
+
+<strong
+id="valorMes">
+
+R$0
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="card-stat glow-gold">
+
+<span>
+
+🏆
+
+</span>
+
+<div>
+
+<small>
+
+Ranking
+
+</small>
+
+<strong
+id="rankingAtual">
+
+--
+
+</strong>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="dashboard-grid">
+
+<div class="card">
+
+<h3>
+
+Meta do mês
+
+</h3>
+
+<div class="meta-progress">
+
+<div
+id="barraMeta">
+
+</div>
+
+</div>
+
+<p>
+
+<strong id="metaPorcentagem">
+
+0%
+
+</strong>
+
+da meta atingida.
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Comissão
+
+</h3>
+
+<div class="comissao-box">
+
+<strong
+id="valorComissao">
+
+R$0,00
+
+</strong>
+
+<small>
+
+Estimativa deste mês
+
+</small>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Últimas vendas
+
+</h3>
+
+<div
+id="ultimasVendas">
+
+<div class="empty-state">
+
+Nenhuma venda registrada.
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<!-- ========================================================= -->
+<!-- NOVO ALUNO -->
+<!-- ========================================================= -->
+
+<section
+id="cadastro"
+class="pagina">
+
+<div class="page-header">
+
+<div>
+
+<h2>Novo Cadastro</h2>
+
+<p>
+Cadastre novos alunos e registre a venda automaticamente.
+</p>
+
+</div>
+
+<button
+class="primary-btn"
+id="btnLimparFormulario">
+
+🧹 Limpar formulário
+
+</button>
+
+</div>
+
+<div class="form-card">
+
+<div class="form-grid">
+
+<div class="input-group">
+
+<label>
+
+Nome Completo
+
+</label>
+
+<input
+type="text"
+id="alunoNome"
+placeholder="Digite o nome do aluno">
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+WhatsApp
+
+</label>
+
+<input
+type="text"
+id="alunoTelefone"
+placeholder="(99) 99999-9999">
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Cidade
+
+</label>
+
+<input
+type="text"
+id="alunoCidade"
+placeholder="Cidade">
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Estado
+
+</label>
+
+<input
+type="text"
+id="alunoEstado"
+placeholder="UF">
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Plano
+
+</label>
+
+<select id="alunoPlano">
+
+<option value="">
+
+Selecione
+
+</option>
+
+<option value="30">
+
+Black 30 dias
+
+</option>
+
+<option value="90">
+
+Black 90 dias
+
+</option>
+
+<option value="180">
+
+Black 180 dias
+
+</option>
+
+<option value="360">
+
+Black 360 dias
+
+</option>
+
+<option value="vitalicio">
+
+Black Vitalício
+
+</option>
+
+</select>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Valor
+
+</label>
+
+<input
+type="number"
+id="alunoValor"
+placeholder="0,00">
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Forma de Pagamento
+
+</label>
+
+<select id="formaPagamento">
+
+<option>
+
+PIX
+
+</option>
+
+<option>
+
+Cartão Crédito
+
+</option>
+
+<option>
+
+Cartão Débito
+
+</option>
+
+<option>
+
+Dinheiro
+
+</option>
+
+<option>
+
+Transferência
+
+</option>
+
+</select>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Status
+
+</label>
+
+<select id="statusVenda">
+
+<option value="pendente">
+
+🟡 Pendente
+
+</option>
+
+<option value="pago">
+
+🟢 Pago
+
+</option>
+
+<option value="cancelado">
+
+🔴 Cancelado
+
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Observações
+
+</label>
+
+<textarea
+id="observacoesAluno"
+rows="5"
+placeholder="Observações..."></textarea>
+
+</div>
+
+<div class="resumo-venda">
+
+<div>
+
+<small>
+
+Plano
+
+</small>
+
+<strong id="previewPlano">
+
+--
+
+</strong>
+
+</div>
+
+<div>
+
+<small>
+
+Valor
+
+</small>
+
+<strong id="previewValor">
+
+R$ 0,00
+
+</strong>
+
+</div>
+
+<div>
+
+<small>
+
+Vendedor
+
+</small>
+
+<strong id="previewVendedor">
+
+Carregando...
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="acoes-form">
+
+<button
+class="secondary-btn"
+type="button"
+id="btnCancelarCadastro">
+
+Cancelar
+
+</button>
+
+<button
+class="primary-btn glow-btn"
+type="button"
+id="btnSalvarVenda">
+
+💰 Salvar Venda
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- HISTÓRICO -->
+<!-- ========================================================= -->
+
+<section
+id="historico"
+class="pagina">
+
+<div class="page-header">
+
+<div>
+
+<h2>
+
+Histórico de Vendas
+
+</h2>
+
+<p>
+
+Todas as vendas realizadas.
+
+</p>
+
+</div>
+
+<div class="header-actions">
+
+<input
+type="text"
+id="pesquisaVenda"
+placeholder="Pesquisar...">
+
+<select id="filtroStatus">
+
+<option value="todos">
+
+Todos
+
+</option>
+
+<option value="pago">
+
+Pagos
+
+</option>
+
+<option value="pendente">
+
+Pendentes
+
+</option>
+
+<option value="cancelado">
+
+Cancelados
+
+</option>
+
+</select>
+
+<button
+class="primary-btn"
+id="btnExportarCSV">
+
+📄 Exportar
+
+</button>
+
+</div>
+
+</div>
+
+<div class="historico-card">
+
+<table class="tabela-vendas">
+
+<thead>
+
+<tr>
+
+<th>Aluno</th>
+
+<th>Plano</th>
+
+<th>Valor</th>
+
+<th>Status</th>
+
+<th>Data</th>
+
+<th>Ações</th>
+
+</tr>
+
+</thead>
+
+<tbody
+id="listaHistorico">
+
+<tr>
+
+<td
+colspan="6">
+
+Nenhuma venda cadastrada.
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+<!-- ========================================================= -->
+<!-- RANKING -->
+<!-- ========================================================= -->
+
+<section id="ranking" class="pagina">
+
+    <div class="page-header">
+
+        <div>
+            <h2>Ranking dos Vendedores</h2>
+            <p>Desempenho atualizado em tempo real.</p>
+        </div>
+
+        <button class="primary-btn" id="btnAtualizarRanking">
+            🔄 Atualizar Ranking
+        </button>
+
+    </div>
+
+    <div class="ranking-grid">
+
+        <div class="ranking-card ouro">
+
+            <span class="medalha">🥇</span>
+
+            <div>
+
+                <strong id="top1Nome">
+                    --
+                </strong>
+
+                <small>
+                    0 vendas
+                </small>
+
+            </div>
+
+            <span id="top1Valor">
+                R$0,00
+            </span>
+
+        </div>
+
+        <div class="ranking-card prata">
+
+            <span class="medalha">🥈</span>
+
+            <div>
+
+                <strong id="top2Nome">
+                    --
+                </strong>
+
+                <small>
+                    0 vendas
+                </small>
+
+            </div>
+
+            <span id="top2Valor">
+                R$0,00
+            </span>
+
+        </div>
+
+        <div class="ranking-card bronze">
+
+            <span class="medalha">🥉</span>
+
+            <div>
+
+                <strong id="top3Nome">
+                    --
+                </strong>
+
+                <small>
+                    0 vendas
+                </small>
+
+            </div>
+
+            <span id="top3Valor">
+                R$0,00
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Todos os vendedores</h3>
+
+        <div id="listaRankingCompleto">
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- RELATÓRIOS -->
+<!-- ========================================================= -->
+
+<section id="relatorios" class="pagina">
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>Relatórios</h2>
+
+            <p>
+                Estatísticas gerais do painel comercial.
+            </p>
+
+        </div>
+
+        <button class="primary-btn" id="btnExportarRelatorio">
+
+            📊 Exportar Relatório
+
+        </button>
+
+    </div>
+
+    <div class="cards-grid">
+
+        <div class="card-stat">
+
+            <span>💰</span>
+
+            <div>
+
+                <small>Total vendido</small>
+
+                <strong id="relatorioTotal">
+
+                    R$0,00
+
+                </strong>
+
+            </div>
+
+        </div>
+
+        <div class="card-stat">
+
+            <span>👥</span>
+
+            <div>
+
+                <small>Novos alunos</small>
+
+                <strong id="relatorioAlunos">
+
+                    0
+
+                </strong>
+
+            </div>
+
+        </div>
+
+        <div class="card-stat">
+
+            <span>📈</span>
+
+            <div>
+
+                <small>Meta atingida</small>
+
+                <strong id="relatorioMeta">
+
+                    0%
+
+                </strong>
+
+            </div>
+
+        </div>
+
+        <div class="card-stat">
+
+            <span>🏆</span>
+
+            <div>
+
+                <small>Melhor vendedor</small>
+
+                <strong id="relatorioMelhor">
+
+                    --
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Resumo Mensal</h3>
+
+        <canvas id="graficoVendas"></canvas>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- CONFIGURAÇÕES -->
+<!-- ========================================================= -->
+
+<section id="config" class="pagina">
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>Configurações</h2>
+
+            <p>
+                Ajustes do painel comercial.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="config-grid">
+
+        <div class="card">
+
+            <h3>Meta Mensal</h3>
+
+            <input
+            id="metaMensal"
+            type="number"
+            placeholder="Ex: 10000">
+
+        </div>
+
+        <div class="card">
+
+            <h3>Comissão (%)</h3>
+
+            <input
+            id="comissao"
+            type="number"
+            placeholder="10">
+
+        </div>
+
+        <div class="card">
+
+            <h3>Bônus</h3>
+
+            <input
+            id="bonus"
+            type="number"
+            placeholder="500">
+
+        </div>
+
+        <div class="card">
+
+            <button
+            class="primary-btn"
+            id="btnSalvarConfig">
+
+                💾 Salvar Configurações
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+<!-- ========================================================= -->
+<!-- MODAL EDITAR VENDA -->
+<!-- ========================================================= -->
+
+<div class="modal-overlay" id="modalEditar">
+
+    <div class="modal-box">
+
+        <h2>
+
+            Editar Venda
+
+        </h2>
+
+        <input
+        id="editarNome"
+        placeholder="Nome">
+
+        <input
+        id="editarTelefone"
+        placeholder="Telefone">
+
+        <input
+        id="editarCidade"
+        placeholder="Cidade">
+
+        <input
+        id="editarValor"
+        placeholder="Valor">
+
+        <div class="modal-actions">
+
+            <button
+            class="secondary-btn"
+            id="btnCancelarEditar">
+
+                Cancelar
+
+            </button>
+
+            <button
+            class="primary-btn"
+            id="btnSalvarEditar">
+
+                Salvar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL EXCLUIR -->
+<!-- ========================================================= -->
+
+<div class="modal-overlay" id="modalExcluir">
+
+    <div class="modal-box">
+
+        <h2>
+
+            Excluir Venda
+
+        </h2>
+
+        <p>
+
+            Deseja realmente excluir esta venda?
+
+        </p>
+
+        <div class="modal-actions">
+
+            <button
+            class="secondary-btn"
+            id="btnCancelarExcluir">
+
+                Cancelar
+
+            </button>
+
+            <button
+            class="danger-btn"
+            id="btnConfirmarExcluir">
+
+                Excluir
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ========================================================= -->
+<!-- TOAST -->
+<!-- ========================================================= -->
+
+<div id="toast">
+
+    <span id="toastTexto">
+
+    </span>
+
+</div>
+
+</body>
+
+</html>

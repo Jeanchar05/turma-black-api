@@ -404,7 +404,7 @@ const configuracaoSchema = new mongoose.Schema(
         type: permissaoSchema,
         default: () => ({
           dashboard: true,
-          painelAdmin: false,
+          painelAdmin: true,
           painelVendas: true,
           usuarios: false,
           aprovacoes: false,

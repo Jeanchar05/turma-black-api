@@ -7,6 +7,7 @@ const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 const {
   requirePermission,
   requireSuperAdmin,
+  requireCargo,
   getPermissoes
 } = require("../middleware/permissions");
 
@@ -418,7 +419,7 @@ router.post("/usuario/plano", auth, requirePermission("planos"), async (req, res
    POST /suspender
 =============================== */
 
-router.post("/suspender", auth, requirePermission("usuarios"), async (req, res) => {
+router.post("/suspender", auth, requirePermission("usuarios"), requireCargo("admin"), async (req, res) => {
   try {
     const { email, id, codigo, motivo } = req.body;
 
@@ -465,7 +466,7 @@ router.post("/suspender", auth, requirePermission("usuarios"), async (req, res) 
    POST /reativar
 =============================== */
 
-router.post("/reativar", auth, requirePermission("usuarios"), async (req, res) => {
+router.post("/reativar", auth, requirePermission("usuarios"), requireCargo("admin"), async (req, res) => {
   try {
     const { email, id, codigo } = req.body;
 
@@ -507,7 +508,7 @@ router.post("/reativar", auth, requirePermission("usuarios"), async (req, res) =
    POST /usuario/bloquear
 =============================== */
 
-router.post("/usuario/bloquear", auth, requirePermission("usuarios"), async (req, res) => {
+router.post("/usuario/bloquear", auth, requirePermission("usuarios"), requireCargo("admin"), async (req, res) => {
   try {
     const { email, id, codigo } = req.body;
 
@@ -550,7 +551,7 @@ router.post("/usuario/bloquear", auth, requirePermission("usuarios"), async (req
    PUT /usuario/:identificador
 =============================== */
 
-router.put("/usuario/:identificador", auth, requirePermission("usuarios"), async (req, res) => {
+router.put("/usuario/:identificador", auth, requirePermission("usuarios"), requireCargo("admin"), async (req, res) => {
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.params.identificador);
 

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Provas | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+  <script defer src="provas.js"></script>
+  <script defer src="js/seguranca.js"></script>
+</head>
+
+<body class="prova-body">
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>TURMA <span>BLACK</span></h1>
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <button class="menu-item" data-page="dashboard.html">
+          <span>🏠</span> Dashboard
+        </button>
+
+        <button class="menu-item" data-page="perfil.html">
+          <span>👤</span> Perfil
+        </button>
+
+        <button class="menu-item" data-page="modulos.html">
+          <span>📚</span> Módulos
+        </button>
+
+        <button class="menu-item" data-page="estudo.html">
+          <span>🗂️</span> Estudo
+        </button>
+
+        <button class="menu-item active" data-page="provas.html">
+          <span>📝</span> Provas
+        </button>
+
+        <button class="menu-item" data-page="favoritos.html">
+          <span>⭐</span> Favoritos
+        </button>
+
+        <button class="menu-item" data-page="notas.html">
+          <span>🧾</span> Anotações
+        </button>
+
+        <button class="menu-item" data-page="minigames.html">
+          <span>🎮</span> Minigames
+        </button>
+
+        <button class="menu-item" data-page="roleta.html">
+          <span>🎰</span> Roleta
+        </button>
+        <button class="menu-item" data-page="banca.html">
+  <span>💰</span> Gestão
+</button>
+
+        <button class="menu-item" data-page="suporte.html">
+          <span>💬</span> Suporte
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="btnSair">
+          🚪 Sair da conta
+        </button>
+      </div>
+
+    </aside>
+
+    <main class="prova-main">
+
+      <header class="dashboard-header">
+
+        <button class="mobile-menu-btn" id="btnMenu" type="button">
+          ☰
+        </button>
+
+        <div>
+          <h2>Central de Provas 🧪</h2>
+          <p>Teste seus conhecimentos e acompanhe sua evolução.</p>
+        </div>
+
+        <div class="header-actions">
+
+          <div class="status-badge">
+            <span></span> Online
+          </div>
+
+          <button class="profile-shortcut" data-page="dashboard.html" type="button">
+            🏠
+          </button>
+
+        </div>
+
+      </header>
+
+      <section id="prova" class="aba-conteudo prova-container">
+
+        <nav class="menu-provas">
+
+          <button class="prova-menu-btn active" data-menu-prova="inicio" type="button">
+            🏠 Início
+          </button>
+
+          <button class="prova-menu-btn" data-menu-prova="aleatoria" type="button">
+            📚 Aleatória
+          </button>
+
+          <button class="prova-menu-btn" data-menu-prova="semanal" type="button">
+            🏆 Semanal
+          </button>
+
+          <button class="prova-menu-btn" data-menu-prova="historico" type="button">
+            📁 Histórico
+          </button>
+
+          <button class="prova-menu-btn" data-menu-prova="regras" type="button">
+            📜 Regras
+          </button>
+
+        </nav>
+
+        <section id="menuProvaInicio" class="prova-menu-area active">
+
+          <header class="prova-header">
+
+            <div>
+              <span class="prova-tag">MODO AVALIAÇÃO</span>
+
+              <h2>🧪 Central de Provas</h2>
+
+              <p>
+                Teste seu conhecimento com provas automáticas baseadas nos módulos:
+                Reflexivos, Gatilhos, Camaleões, Eclipse 0, Magnetismo,
+                Fibonacci e Pitágoras.
+              </p>
+            </div>
+
+            <div class="prova-status-card">
+              <span id="provaDiaSemana">Carregando...</span>
+              <strong id="provaStatusDia">Verificando acesso</strong>
+              <small id="provaInfoAcesso">Aguarde...</small>
+            </div>
+
+          </header>
+
+          <div class="prova-grid">
+
+            <article class="prova-card prova-card-principal">
+              <div class="prova-icon">📚</div>
+
+              <h3>Prova Aleatória</h3>
+
+              <p>
+                De segunda a sábado, o sistema escolhe automaticamente uma prova diferente.
+              </p>
+
+              <ul class="prova-lista-info">
+                <li>✅ Provas diferentes</li>
+                <li>✅ Questões misturadas</li>
+                <li>✅ Conteúdo dos módulos</li>
+                <li>✅ Resultado automático</li>
+              </ul>
+
+              <button id="btnIniciarProvaNormal" class="btn-prova" type="button">
+                Iniciar Prova Aleatória
+              </button>
+            </article>
+
+            <article class="prova-card prova-card-semanal">
+              <div class="prova-icon">🏆</div>
+
+              <h3>Prova Semanal</h3>
+
+              <p>
+                Liberada somente aos domingos. Uma prova mais completa para medir sua evolução.
+              </p>
+
+              <ul class="prova-lista-info">
+                <li>🔥 Nível mais difícil</li>
+                <li>🔥 Conteúdo geral</li>
+                <li>🔥 Avaliação semanal</li>
+                <li>🔥 Histórico pessoal</li>
+              </ul>
+
+              <button id="btnIniciarProvaSemanal" class="btn-prova semanal" type="button">
+                Iniciar Prova Semanal
+              </button>
+            </article>
+
+          </div>
+
+        </section>
+
+        <section id="menuProvaAleatoria" class="prova-menu-area">
+          <article class="prova-card prova-card-principal">
+            <h3>📚 Prova Aleatória</h3>
+            <p>Disponível de segunda a sábado.</p>
+
+            <button id="btnIniciarProvaNormal2" class="btn-prova" type="button">
+              Iniciar Prova Aleatória
+            </button>
+          </article>
+        </section>
+
+        <section id="menuProvaSemanal" class="prova-menu-area">
+          <article class="prova-card prova-card-semanal">
+            <h3>🏆 Prova Semanal</h3>
+            <p>Disponível somente aos domingos.</p>
+
+            <button id="btnIniciarProvaSemanal2" class="btn-prova semanal" type="button">
+              Iniciar Prova Semanal
+            </button>
+          </article>
+        </section>
+
+        <section id="areaProva" class="area-prova oculto">
+
+          <div class="prova-topo-execucao">
+            <div>
+              <span id="tipoProvaAtual">Prova</span>
+              <h3 id="tituloProvaAtual">Prova em andamento</h3>
+            </div>
+
+            <div class="timer-prova">
+              ⏱️ <span id="tempoProva">00:00</span>
+            </div>
+          </div>
+
+          <div class="progresso-prova">
+            <div id="barraProgressoProva"></div>
+          </div>
+
+          <div class="questao-box">
+            <span id="contadorQuestao">Questão 1 de 10</span>
+            <h3 id="textoQuestao">Carregando questão...</h3>
+            <div id="alternativasProva" class="alternativas-prova"></div>
+          </div>
+
+          <div class="prova-acoes">
+            <button id="btnAnteriorQuestao" class="btn-secundario" type="button">
+              Voltar
+            </button>
+
+            <button id="btnProximaQuestao" class="btn-prova" type="button">
+              Próxima
+            </button>
+
+            <button id="btnFinalizarProva" class="btn-finalizar oculto" type="button">
+              Finalizar Prova
+            </button>
+          </div>
+
+        </section>
+
+        <section id="resultadoProva" class="resultado-prova oculto">
+
+          <div class="resultado-card">
+            <span class="resultado-icon">📊</span>
+
+            <h3>Resultado da Prova</h3>
+
+            <div class="resultado-numero">
+              <strong id="notaFinalProva">0%</strong>
+              <span id="mensagemResultadoProva">Resultado calculado</span>
+            </div>
+
+            <div class="resultado-detalhes">
+              <div>
+                <small>Acertos</small>
+                <strong id="totalAcertosProva">0</strong>
+              </div>
+
+              <div>
+                <small>Erros</small>
+                <strong id="totalErrosProva">0</strong>
+              </div>
+
+              <div>
+                <small>Tempo</small>
+                <strong id="tempoFinalProva">00:00</strong>
+              </div>
+            </div>
+
+            <button id="btnNovaProva" class="btn-prova" type="button">
+              Fazer outra prova
+            </button>
+          </div>
+
+        </section>
+
+        <section id="menuProvaHistorico" class="historico-provas prova-menu-area">
+
+          <div class="historico-header">
+            <h3>📁 Histórico de Provas</h3>
+            <button id="btnLimparHistoricoProvas" type="button">
+              Limpar
+            </button>
+          </div>
+
+          <div id="listaHistoricoProvas" class="lista-historico">
+            <p class="vazio">Nenhuma prova realizada ainda.</p>
+          </div>
+
+        </section>
+
+        <section id="menuProvaRegras" class="prova-regras prova-menu-area">
+
+          <h3>📜 Regras das Provas</h3>
+
+          <div class="regra-card">
+            <strong>📚 Prova Aleatória</strong>
+            <p>Disponível de segunda a sábado. O sistema escolhe automaticamente uma prova diferente.</p>
+          </div>
+
+          <div class="regra-card">
+            <strong>🏆 Prova Semanal</strong>
+            <p>Disponível somente aos domingos. É uma avaliação mais completa.</p>
+          </div>
+
+          <div class="regra-card">
+            <strong>⏱️ Timer</strong>
+            <p>O tempo começa assim que a prova é iniciada e fica salvo no histórico.</p>
+          </div>
+
+          <div class="regra-card">
+            <strong>📊 Resultado</strong>
+            <p>A nota é calculada automaticamente com base nos acertos e erros.</p>
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Reflexivos | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="..css/seguranca.css" />
+<link rel="stylesheet" href="..css/premium-upgrade.css" />
+
+  <script defer src="../js/seguranca.js"></script>
+  <script defer src="../js/reflexivos.js"></script>
+</head>
+
+<body class="reflexivos-body">
+
+  <main class="reflexivos-page">
+
+    <nav class="reflexivos-nav">
+      <button type="button" data-page="../modulos.html">
+        ← Módulos
+      </button>
+
+      <button type="button" data-page="../dashboard.html">
+        🏠 Dashboard
+      </button>
+
+      <button type="button" data-page="./gatilhos.html">
+        🚨 Gatilhos
+      </button>
+    </nav>
+
+    <header class="reflexivos-header">
+      <div>
+        <span class="reflexivos-tag">SISTEMA DE ESPELHOS</span>
+
+        <h1>🧠 Reflexivos</h1>
+
+        <p>
+          Selecione um reflexivo para visualizar automaticamente seus números
+          correspondentes na race e estudar as conexões do padrão.
+        </p>
+      </div>
+
+      <button class="reflexivos-clear-btn" id="btnLimparReflexivos" type="button">
+        🗑️ Limpar marcações
+      </button>
+    </header>
+
+    <section class="reflexivos-layout">
+
+      <section class="reflexivos-race-card">
+
+        <div class="reflexivos-race-header">
+          <div>
+            <h2>Mapa Reflexivos</h2>
+            <span>Marcação visual na race</span>
+          </div>
+        </div>
+
+        <div class="reflexivos-race-box">
+          <img
+            src="https://res.cloudinary.com/dfesh6s7i/image/upload/v1777628296/race_gujiqx.png"
+            class="reflexivos-race-img"
+            alt="Race da roleta"
+          >
+
+          <div id="raceMarkers" class="reflexivos-markers"></div>
+        </div>
+
+      </section>
+
+      <aside class="reflexivos-panel">
+
+        <div class="reflexivos-card">
+          <div class="reflexivos-subtitle">
+            <span></span>
+            <h2>Escolha o Reflexivo</h2>
+            <span></span>
+          </div>
+
+          <div id="espelhosOptions" class="reflexivos-grid"></div>
+        </div>
+
+        <div id="espelhoSelecionadoInfo" class="reflexivo-selecionado-info">
+          <strong>Reflexivo selecionado</strong>
+          <span>Nenhum</span>
+          <small>Escolha uma opção acima para marcar os números na race.</small>
+        </div>
+
+        <div class="reflexivos-info-card">
+          <h3>💎 Leitura Reflexiva</h3>
+
+          <p>
+            Use os reflexivos como apoio visual. O ideal é comparar a marcação
+            com histórico, contexto e gestão antes de qualquer decisão.
+          </p>
+        </div>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Módulos | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+  <script defer src="modulos.js"></script>
+  <script defer src="js/seguranca.js"></script>
+</head>
+
+<body class="estudo-body">
+
+  <div class="estudo-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>TURMA <span>BLACK</span></h1>
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <button class="menu-item" data-page="dashboard.html">
+          <span>🏠</span> Dashboard
+        </button>
+
+        <button class="menu-item" data-page="perfil.html">
+          <span>👤</span> Perfil
+        </button>
+
+        <button class="menu-item active" data-page="modulos.html">
+          <span>📚</span> Módulos
+        </button>
+
+        <button class="menu-item" data-page="estudo.html">
+          <span>🗂️</span> Estudo
+        </button>
+
+        <button class="menu-item" data-page="provas.html">
+          <span>📝</span> Provas
+        </button>
+
+        <button class="menu-item" data-page="favoritos.html">
+          <span>⭐</span> Favoritos
+        </button>
+
+        <button class="menu-item" data-page="notas.html">
+          <span>🧾</span> Anotações
+        </button>
+
+        <button class="menu-item" data-page="minigames.html">
+          <span>🎮</span> Minigames
+        </button>
+
+        <button class="menu-item" data-page="roleta.html">
+          <span>🎰</span> Roleta
+        </button>
+        <button class="menu-item" data-page="banca.html">
+  <span>💰</span> Gestão
+</button>
+
+        <button class="menu-item" data-page="suporte.html">
+          <span>💬</span> Suporte
+        </button>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="btnSair">
+          🚪 Sair da conta
+        </button>
+      </div>
+
+    </aside>
+
+    <main class="estudo-main">
+
+      <header class="dashboard-header compacto-header">
+<link rel="stylesheet" href="css/modulo-loader.css" />
+        <button class="mobile-menu-btn" id="btnMenu" type="button">
+          ☰
+        </button>
+
+        <div>
+          <h2>Módulos <span class="emoji-normal">📚</span></h2>
+          <p>Escolha um módulo e revise suas estratégias.</p>
+        </div>
+
+        <div class="header-actions">
+          <div class="status-badge">
+            <span></span> Online
+          </div>
+
+          <button class="profile-shortcut" data-page="dashboard.html" type="button">
+            🏠
+          </button>
+        </div>
+
+      </header>
+
+      <section class="estudo-premium-hero estudo-hero-compacto">
+
+        <div>
+          <span class="estudo-tag">TURMA BLACK PREMIUM</span>
+
+          <h1>Todos os módulos em um só lugar.</h1>
+
+          <p>
+            Acesse os módulos principais da plataforma, revise estratégias
+            e evolua sua leitura operacional.
+          </p>
+
+          <div class="estudo-hero-actions">
+            <button class="primary-btn" data-page="provas.html" type="button">
+              🏆 Provas
+            </button>
+
+            <button class="secondary-btn" data-page="estudo.html" type="button">
+              📁 Estudo
+            </button>
+          </div>
+        </div>
+
+        <div class="estudo-progress-card">
+          <p>Progresso</p>
+
+          <h2 id="progressoEstudo">0%</h2>
+
+          <div class="progress-bar">
+            <div id="barraEstudo"></div>
+          </div>
+
+          <span id="totalModulosEstudo">0 módulos disponíveis</span>
+        </div>
+
+      </section>
+
+      <section class="estudo-filtros">
+
+        <div class="input-group">
+          <label>Pesquisar módulo</label>
+
+          <input
+            type="text"
+            id="buscarModuloEstudo"
+            placeholder="Buscar módulo..."
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Categoria</label>
+
+          <select id="filtroModuloEstudo">
+            <option value="todos">Todos</option>
+            <option value="pitagoras">Pitágoras</option>
+            <option value="reflexivos">Reflexivos</option>
+            <option value="gatilhos">Gatilhos</option>
+            <option value="camaleoes">Camaleões</option>
+            <option value="eclipse-0">Eclipse 0</option>
+            <option value="magnetismo">Magnetismo</option>
+            <option value="fibonacci">Fibonacci</option>
+          </select>
+        </div>
+
+      </section>
+
+      <section class="estudo-atalhos estudo-atalhos-compacto">
+
+        <button class="atalho-estudo" data-module="pitagoras" type="button">
+          📐 Pitágoras
+        </button>
+
+        <button class="atalho-estudo" data-module="reflexivos" type="button">
+          🧠 Reflexivos
+        </button>
+
+        <button class="atalho-estudo" data-module="gatilhos" type="button">
+          🚨 Gatilhos
+        </button>
+
+        <button class="atalho-estudo" data-module="camaleoes" type="button">
+          🦎 Camaleões
+        </button>
+
+        <button class="atalho-estudo" data-module="magnetismo" type="button">
+          🧲 Magnetismo
+        </button>
+
+        <button class="atalho-estudo" data-module="fibonacci" type="button">
+          🔢 Fibonacci
+        </button>
+
+      </section>
+
+      <section class="estudo-section-title">
+        <div>
+          <span>MÓDULOS</span>
+          <h2>Escolha o que deseja estudar</h2>
+          <p>Todos conectados à pasta <strong>modules</strong>.</p>
+        </div>
+      </section>
+
+      <section class="estudo-modulos-grid estudo-grid-compacto" id="listaModulosEstudo">
+
+        <article class="estudo-modulo-card" data-module="pitagoras">
+          <button class="btn-favorito-modulo" data-fav="pitagoras" type="button">⭐</button>
+
+          <div class="modulo-icon">
+            <span class="emoji-normal">📐</span>
+          </div>
+
+          <span>PITÁGORAS</span>
+
+          <h3>Pitágoras</h3>
+
+          <p>
+            Conexões geométricas na race com linhas e triângulos inteligentes.
+          </p>
+
+          <button class="primary-btn btn-abrir-modulo" data-module="pitagoras" type="button">
+            Acessar
+          </button>
+        </article>
+
+        <article class="estudo-modulo-card" data-module="reflexivos">
+          <button class="btn-favorito-modulo" data-fav="reflexivos" type="button">⭐</button>
+
+          <div class="modulo-icon">
+            <span class="emoji-normal">🧠</span>
+          </div>
+
+          <span>REFLEXIVOS</span>
+
+          <h3>Reflexivos</h3>
+
+          <p>
+            Leitura de espelhos, respostas e reflexos estratégicos dentro da roleta.
+          </p>
+
+          <button class="primary-btn btn-abrir-modulo" data-module="reflexivos" type="button">
+            Acessar
+          </button>
+        </article>
+
+        <article class="estudo-modulo-card" data-module="gatilhos">
+          <button class="btn-favorito-modulo" data-fav="gatilhos" type="button">⭐</button>
+
+          <div class="modulo-icon">
+            <span class="emoji-normal">🚨</span>
+          </div>
+
+          <span>GATILHOS</span>
+
+          <h3>Gatilhos</h3>
+
+          <p>
+            Alertas rápidos de números que chamam outros com leitura contextual.
+          </p>
+
+          <button class="primary-btn btn-abrir-modulo" data-module="gatilhos" type="button">
+            Acessar
+          </button>
+        </article>
+
+        <article class="estudo-modulo-card" data-module="camaleoes">
+          <button class="btn-favorito-modulo" data-fav="camaleoes" type="button">⭐</button>
+
+          <div class="modulo-icon">
+            <span class="emoji-normal">🦎</span>
+          </div>
+
+          <span>CAMALEÕES</span>
+
+          <h3>Camaleões</h3>
+
+          <p>
+            Números camuflados, conexões escondidas e adaptação de leitura.
+          </p>
+
+          <button class="primary-btn btn-abrir-modulo" data-module="camaleoes" type="button">
+            Acessar
+          </button>
+        </article>
+
+        <article class="estudo-modulo-card" data-module="eclipse-0">
+          <button class="btn-favorito-modulo" data-fav="eclipse-0" type="button">⭐</button>
+
+          <div class="modulo-icon">
+            <span class="emoji-normal">🌑</span>
+          </div>
+
+          <span>ECLIPSE 0</span>
+
+          <h3>Eclipse 0</h3>
+
+          <p>
+            Repetição, ciclos recentes, região do zero e números insistentes.
+          </p>
+
+          <button class="primary-btn btn-abrir-modulo" data-module="eclipse-0" type="button">
+            Acessar
+          </button>
+        </article>
+
+        <article class="estudo-modulo-card" data-module="magnetismo">
+          <button class="btn-favorito-modulo" data-fav="magnetismo" type="button">⭐</button>
+
+          <div class="modulo-icon">
+            <span class="emoji-normal">🧲</span>
+          </div>
+
+          <span>MAGNETISMO</span>
+
+          <h3>Magnetismo</h3>
+
+          <p>
+            Conexões puxadas por número principal e regiões de atração.
+          </p>
+
+          <button class="primary-btn btn-abrir-modulo" data-module="magnetismo" type="button">
+            Acessar
+          </button>
+        </article>
+
+        <article class="estudo-modulo-card" data-module="fibonacci">
+          <button class="btn-favorito-modulo" data-fav="fibonacci" type="button">⭐</button>
+
+          <div class="modulo-icon">
+            <span class="emoji-normal">🔢</span>
+          </div>
+
+          <span>FIBONACCI</span>
+
+          <h3>Fibonacci</h3>
+
+          <p>
+            Sequências, soma, subtração e leitura matemática aplicada à race.
+          </p>
+
+          <button class="primary-btn btn-abrir-modulo" data-module="fibonacci" type="button">
+            Acessar
+          </button>
+        </article>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+</body>
+</html>

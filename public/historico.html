@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+<meta name="theme-color" content="#0b0614">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico de Acessos | Turma Black do Primo</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+</head>
+
+<body class="dashboard-v2-body">
+
+  <aside class="dash-v2-sidebar">
+    <div class="dash-v2-logo">
+      <h2>TURMA <span>BLACK</span></h2>
+      <p>DO PRIMO</p>
+      <small>ESTRATÉGIA • GESTÃO • RESULTADO</small>
+    </div>
+
+    <nav class="dash-v2-menu">
+      <button class="menu-btn" data-page="dashboard.html" onclick="irPara('dashboard.html')">
+        <span class="ico">⌂</span>
+        <span>Dashboard</span>
+      </button>
+
+      <button class="menu-btn" data-page="perfil.html" onclick="irPara('perfil.html')">
+        <span class="ico">👤</span>
+        <span>Meu Perfil</span>
+      </button>
+
+      <button class="menu-btn" data-page="assinatura.html" onclick="irPara('assinatura.html')">
+        <span class="ico">★</span>
+        <span>Plano e Assinatura</span>
+      </button>
+
+      <button class="menu-btn" data-page="configuracoes.html" onclick="irPara('configuracoes.html')">
+        <span class="ico">⚙</span>
+        <span>Configurações</span>
+      </button>
+
+      <button class="menu-btn active" data-page="historico.html" onclick="irPara('historico.html')">
+        <span class="ico">↺</span>
+        <span>Histórico de Acessos</span>
+      </button>
+    </nav>
+
+    <div class="dash-v2-banner">
+      <h3>HISTÓRICO</h3>
+      <p>Acompanhe seus acessos dentro da plataforma.</p>
+    </div>
+  </aside>
+
+  <main class="dash-v2-main">
+
+    <header class="dash-v2-top">
+      <div>
+        <small>Minha atividade</small>
+        <h1>Histórico de Acessos <span>Membro Black</span></h1>
+      </div>
+
+      <div class="dash-v2-plan">
+        <span>↺</span>
+        <div>
+          <small>Total de acessos</small>
+          <strong id="totalAcessosHistorico">0</strong>
+        </div>
+      </div>
+
+      <div class="dash-v2-avatar" id="avatarTopo">P</div>
+    </header>
+
+    <section class="historico-layout">
+
+      <div class="historico-stats card-v2">
+        <div>
+          <small>Total de acessos</small>
+          <strong id="histTotal">0</strong>
+        </div>
+
+        <div>
+          <small>Último login</small>
+          <strong id="histUltimo">--</strong>
+        </div>
+
+        <div>
+          <small>Status da conta</small>
+          <strong class="green" id="histStatus">Ativa</strong>
+        </div>
+      </div>
+
+      <div class="historico-card card-v2">
+        <div class="historico-topo">
+          <div>
+            <h3>Lista de acessos</h3>
+            <p>Registros salvos automaticamente ao entrar na plataforma.</p>
+          </div>
+
+          <button onclick="limparHistoricoAcessos()">Limpar histórico</button>
+        </div>
+
+        <div id="listaHistorico" class="lista-historico"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="historico.js"></script>
+  <script src="js/seguranca.js"></script>
+</body>
+</html>

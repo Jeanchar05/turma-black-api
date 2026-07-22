@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Estudo | Turma Black</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dfesh6s7i/image/upload/v1779144407/logo_app_ztbuvf.png">
+  <meta name="theme-color" content="#0b0614">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/seguranca.css" />
+<link rel="stylesheet" href="css/premium-upgrade.css" />
+
+  <script defer src="estudo.js"></script>
+  <script defer src="js/seguranca.js"></script>
+</head>
+
+<body class="arquivos-body">
+
+  <div class="arquivos-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h1>TURMA <span>BLACK</span></h1>
+        <p>Painel Premium</p>
+      </div>
+
+      <nav class="sidebar-menu">
+        <button class="menu-item" data-page="dashboard.html"><span>🏠</span> Dashboard</button>
+        <button class="menu-item" data-page="perfil.html"><span>👤</span> Perfil</button>
+        <button class="menu-item" data-page="modulos.html"><span>📚</span> Módulos</button>
+        <button class="menu-item active" data-page="estudo.html"><span>🗂️</span> Estudo</button>
+        <button class="menu-item" data-page="provas.html"><span>📝</span> Provas</button>
+        <button class="menu-item" data-page="favoritos.html"><span>⭐</span> Favoritos</button>
+        <button class="menu-item" data-page="notas.html"><span>🧾</span> Anotações</button>
+        <button class="menu-item" data-page="minigames.html"><span>🎮</span> Minigames</button>
+        <button class="menu-item" data-page="roleta.html"><span>🎰</span> Roleta</button>
+        <button class="menu-item" data-page="banca.html">
+  <span>💰</span> Gestão
+</button>
+        <button class="menu-item" data-page="suporte.html"><span>💬</span> Suporte</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="btnSair">🚪 Sair da conta</button>
+      </div>
+    </aside>
+
+    <main class="arquivos-main">
+
+      <header class="dashboard-header">
+        <button class="mobile-menu-btn" id="btnMenu">☰</button>
+
+        <div>
+          <h2>Estudo 🗂️</h2>
+          <p>Biblioteca premium com textos, aulas e conteúdos da Turma Black.</p>
+        </div>
+
+        <div class="header-actions">
+          <div class="status-badge"><span></span> Online</div>
+          <button class="profile-shortcut" data-page="dashboard.html">🏠</button>
+        </div>
+      </header>
+
+      <section class="arquivos-hero">
+        <div>
+          <span class="arquivos-tag">BIBLIOTECA BLACK</span>
+
+          <h1>Arquivos de Estudo</h1>
+
+          <p>
+            Aprenda cada módulo da plataforma com textos explicativos,
+            vídeo aulas organizadas e progresso salvo automaticamente.
+          </p>
+        </div>
+
+        <div class="arquivos-progress-card">
+          <span>Seu progresso</span>
+          <strong id="progressoArquivos">0%</strong>
+          <p>Conteúdos concluídos</p>
+        </div>
+      </section>
+
+      <section class="arquivos-control-panel">
+
+        <div class="arquivos-tabs">
+          <button class="arquivo-tab active" data-tab="textos" type="button">
+            📖 Textos
+          </button>
+
+          <button class="arquivo-tab" data-tab="videos" type="button">
+            🎬 Vídeo Aulas
+          </button>
+        </div>
+
+        <div class="arquivos-search-box">
+          <input
+            type="text"
+            id="buscarArquivo"
+            placeholder="🔎 Pesquisar módulo, estratégia ou conteúdo..."
+          />
+        </div>
+
+        <div class="arquivos-filtros">
+          <button class="arquivo-filtro active" data-categoria="todos" type="button">Todos</button>
+          <button class="arquivo-filtro" data-categoria="basico" type="button">Básico</button>
+          <button class="arquivo-filtro" data-categoria="intermediario" type="button">Intermediário</button>
+          <button class="arquivo-filtro" data-categoria="avancado" type="button">Avançado</button>
+          <button class="arquivo-filtro" data-categoria="mentalidade" type="button">Mentalidade</button>
+        </div>
+
+      </section>
+
+      <section class="arquivos-content-layout">
+
+        <aside class="arquivos-lista" id="listaArquivos"></aside>
+
+        <article class="arquivo-leitor" id="arquivoLeitor">
+          <div class="leitor-badge">📂 Arquivo selecionado</div>
+
+          <h2>Bem-vindo à Biblioteca Black</h2>
+
+          <p>
+            Escolha um conteúdo ao lado para estudar por texto ou vídeo aula.
+            Cada material foi separado para ajudar você a evoluir com clareza.
+          </p>
+
+          <div class="leitor-destaque">
+            💡 Comece por Roleta, Banca e Race antes de avançar para Alertas, Vizinhos e IA.
+          </div>
+        </article>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+</body>
+</html>

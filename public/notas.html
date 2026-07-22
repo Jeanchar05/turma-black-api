@@ -1,0 +1,303 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+  if (!usuario) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const $ = (id) => document.getElementById(id);
+
+  let notas = JSON.parse(localStorage.getItem("notasAluno")) || [];
+
+  // ================= MENU / NAVEGAÇÃO =================
+
+  function abrirMenu() {
+    $("sidebar")?.classList.add("active");
+    $("sidebarOverlay")?.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function fecharMenu() {
+    $("sidebar")?.classList.remove("active");
+    $("sidebarOverlay")?.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  document.querySelectorAll("[data-page]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const page = btn.dataset.page;
+      if (page) window.location.href = page;
+    });
+  });
+
+  $("btnMenu")?.addEventListener("click", () => {
+    $("sidebar")?.classList.contains("active") ? fecharMenu() : abrirMenu();
+  });
+
+  $("sidebarOverlay")?.addEventListener("click", fecharMenu);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") fecharMenu();
+  });
+
+  $("btnSair")?.addEventListener("click", () => {
+    localStorage.removeItem("usuarioLogado");
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
+  });
+
+  // ================= NOTAS =================
+
+  function salvarNotas() {
+    localStorage.setItem("notasAluno", JSON.stringify(notas));
+  }
+
+  function renderizarNotas() {
+    const lista = $("listaNotas");
+    if (!lista) return;
+
+    const busca = ($("buscarNota")?.value || "").toLowerCase().trim();
+    const categoria = $("filtroCategoria")?.value || "Todas";
+
+    let notasFiltradas = notas.filter((nota) => {
+      const bateBusca =
+        nota.titulo.toLowerCase().includes(busca) ||
+        nota.conteudo.toLowerCase().includes(busca);
+
+      const bateCategoria =
+        categoria === "Todas" || nota.categoria === categoria;
+
+      return bateBusca && bateCategoria;
+    });
+
+    atualizarContadores();
+
+    if (!notasFiltradas.length) {
+      lista.innerHTML = `
+        <div class="empty-notas">
+          <span>🧾</span>
+          <p>Nenhuma nota encontrada.</p>
+        </div>
+      `;
+      return;
+    }
+
+    lista.innerHTML = notasFiltradas
+      .map(
+        (nota) => `
+        <article class="nota-card ${nota.importante ? "importante" : ""}">
+          <div class="nota-top">
+            <h3>${escapeHTML(nota.titulo)}</h3>
+            ${nota.importante ? `<span class="nota-star">⭐</span>` : ""}
+          </div>
+
+          <div class="nota-categoria">${escapeHTML(nota.categoria)}</div>
+
+          <p>${escapeHTML(nota.conteudo)}</p>
+
+          <div class="nota-data">${escapeHTML(nota.data)}</div>
+
+          <div class="nota-actions">
+            <button class="btn-editar-nota" data-editar="${nota.id}">
+              Editar
+            </button>
+
+            <button class="btn-excluir-nota" data-excluir="${nota.id}">
+              Excluir
+            </button>
+          </div>
+        </article>
+      `
+      )
+      .join("");
+
+    ativarBotoesNotas();
+  }
+
+  function atualizarContadores() {
+    const total = notas.length;
+    const favoritas = notas.filter((nota) => nota.importante).length;
+
+    if ($("totalNotas")) $("totalNotas").textContent = total;
+    if ($("notasFavoritas")) {
+      $("notasFavoritas").textContent = `${favoritas} favoritas`;
+    }
+  }
+
+  function ativarBotoesNotas() {
+    document.querySelectorAll("[data-excluir]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.excluir);
+        excluirNota(id);
+      });
+    });
+
+    document.querySelectorAll("[data-editar]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.editar);
+        editarNota(id);
+      });
+    });
+  }
+
+  function excluirNota(id) {
+    const confirmar = confirm("Deseja excluir esta nota?");
+    if (!confirmar) return;
+
+    notas = notas.filter((nota) => nota.id !== id);
+    salvarNotas();
+    renderizarNotas();
+
+    registrarAtividade({
+      icone: "🧾",
+      titulo: "Nota excluída",
+      descricao: "Uma anotação foi removida.",
+    });
+  }
+
+  function editarNota(id) {
+    const nota = notas.find((item) => item.id === id);
+    if (!nota) return;
+
+    $("notaEditandoId").value = nota.id;
+    $("notaTitulo").value = nota.titulo;
+    $("notaCategoria").value = nota.categoria;
+    $("notaConteudo").value = nota.conteudo;
+    $("notaImportante").checked = nota.importante;
+
+    $("btnSalvarNota").textContent = "Atualizar nota";
+    $("btnCancelarEdicao").style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  $("formNota")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const idEditando = $("notaEditandoId")?.value;
+
+    const titulo = $("notaTitulo")?.value.trim();
+    const categoria = $("notaCategoria")?.value;
+    const conteudo = $("notaConteudo")?.value.trim();
+    const importante = $("notaImportante")?.checked || false;
+
+    if (!titulo || !categoria || !conteudo) {
+      alert("Preencha todos os campos da nota.");
+      return;
+    }
+
+    const dataAtual = new Date().toLocaleString("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    });
+
+    if (idEditando) {
+      notas = notas.map((nota) => {
+        if (nota.id === Number(idEditando)) {
+          return {
+            ...nota,
+            titulo,
+            categoria,
+            conteudo,
+            importante,
+            data: `Atualizada em ${dataAtual}`,
+          };
+        }
+
+        return nota;
+      });
+
+      registrarAtividade({
+        icone: "🧾",
+        titulo: "Nota atualizada",
+        descricao: titulo,
+      });
+    } else {
+      const novaNota = {
+        id: Date.now(),
+        titulo,
+        categoria,
+        conteudo,
+        importante,
+        data: `Criada em ${dataAtual}`,
+      };
+
+      notas.unshift(novaNota);
+
+      registrarAtividade({
+        icone: "🧾",
+        titulo: "Nova nota criada",
+        descricao: titulo,
+      });
+    }
+
+    salvarNotas();
+    limparFormulario();
+    renderizarNotas();
+  });
+
+  $("btnCancelarEdicao")?.addEventListener("click", () => {
+    limparFormulario();
+  });
+
+  $("buscarNota")?.addEventListener("input", renderizarNotas);
+  $("filtroCategoria")?.addEventListener("change", renderizarNotas);
+const modal = $("modalConfirmar");
+
+$("btnLimparNotas")?.addEventListener("click", () => {
+  if (!notas.length) {
+    alert("Você ainda não possui notas.");
+    return;
+  }
+
+  modal?.classList.add("active");
+});
+
+$("btnCancelarModal")?.addEventListener("click", () => {
+  modal?.classList.remove("active");
+});
+
+$("btnConfirmarModal")?.addEventListener("click", () => {
+  notas = [];
+  salvarNotas();
+  limparFormulario();
+  renderizarNotas();
+
+  modal?.classList.remove("active");
+
+  registrarAtividade({
+    icone: "🧹",
+    titulo: "Notas apagadas",
+    descricao: "Todas as notas foram removidas.",
+  });
+});
+
+  function limparFormulario() {
+    $("formNota")?.reset();
+
+    if ($("notaEditandoId")) $("notaEditandoId").value = "";
+    if ($("btnSalvarNota")) $("btnSalvarNota").textContent = "Salvar nota";
+    if ($("btnCancelarEdicao")) $("btnCancelarEdicao").style.display = "none";
+  }
+
+  function registrarAtividade(atividade) {
+    const atividades = JSON.parse(localStorage.getItem("atividadesRecentes")) || [];
+    atividades.unshift(atividade);
+    localStorage.setItem("atividadesRecentes", JSON.stringify(atividades.slice(0, 20)));
+  }
+
+  function escapeHTML(texto) {
+    return String(texto || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  renderizarNotas();
+});
