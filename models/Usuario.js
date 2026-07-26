@@ -2,10 +2,7 @@ const mongoose = require("mongoose");
 
 const usuarioSchema = new mongoose.Schema(
   {
-    nome: {
-      type: String,
-      default: ""
-    },
+    nome: { type: String, default: "" },
 
     email: {
       type: String,
@@ -15,10 +12,7 @@ const usuarioSchema = new mongoose.Schema(
       trim: true
     },
 
-    senha: {
-      type: String,
-      required: true
-    },
+    senha: { type: String, required: true },
 
     tipo: {
       type: String,
@@ -28,29 +22,35 @@ const usuarioSchema = new mongoose.Schema(
 
     cargo: {
       type: String,
-      enum: ["aluno", "vendedor", "suporte", "moderador", "admin", "superadmin"],
+      enum: [
+        "aluno",
+        "vendedor",
+        "financeiro",
+        "admin",
+        "dono",
+        "dev",
+        "suporte",
+        "moderador",
+        "superadmin"
+      ],
       default: "aluno"
     },
 
-    vendedor: {
+    contaDev: {
       type: Boolean,
-      default: false
+      default: false,
+      index: true
     },
 
-    comissao: {
-      type: Number,
-      default: 20
+    permissoesPersonalizadas: {
+      type: mongoose.Schema.Types.Mixed,
+      default: () => ({})
     },
 
-    aprovado: {
-      type: Boolean,
-      default: false
-    },
-
-    suspenso: {
-      type: Boolean,
-      default: false
-    },
+    vendedor: { type: Boolean, default: false },
+    comissao: { type: Number, default: 20 },
+    aprovado: { type: Boolean, default: false },
+    suspenso: { type: Boolean, default: false },
 
     status: {
       type: String,
@@ -58,10 +58,7 @@ const usuarioSchema = new mongoose.Schema(
       default: "pendente"
     },
 
-    codigo: {
-      type: String,
-      default: ""
-    },
+    codigo: { type: String, default: "" },
 
     plano: {
       type: String,
@@ -69,52 +66,17 @@ const usuarioSchema = new mongoose.Schema(
       default: "free"
     },
 
-    dataExpiracao: {
-      type: String,
-      default: ""
-    },
-
-    telefone: {
-      type: String,
-      default: ""
-    },
-
-    foto: {
-      type: String,
-      default: ""
-    },
-
-    acessos: {
-      type: Number,
-      default: 0
-    },
-
-    dispositivos: {
-      type: Array,
-      default: []
-    },
-
-    ultimoLogin: {
-      type: String,
-      default: ""
-    },
-
-    aprovadoEm: {
-      type: String,
-      default: ""
-    },
-
-    criadoPor: {
-      type: String,
-      default: ""
-    },
-
-    atualizadoPor: {
-      type: String,
-      default: ""
-    }
+    dataExpiracao: { type: String, default: "" },
+    telefone: { type: String, default: "" },
+    foto: { type: String, default: "" },
+    acessos: { type: Number, default: 0 },
+    dispositivos: { type: Array, default: [] },
+    ultimoLogin: { type: String, default: "" },
+    aprovadoEm: { type: String, default: "" },
+    criadoPor: { type: String, default: "" },
+    atualizadoPor: { type: String, default: "" }
   },
-  { timestamps: true }
+  { timestamps: true, minimize: false }
 );
 
-module.exports = mongoose.model("Usuario", usuarioSchema); 
+module.exports = mongoose.model("Usuario", usuarioSchema);
