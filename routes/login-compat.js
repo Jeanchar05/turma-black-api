@@ -2,7 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Usuario = require("../models/Usuario");
 const { gerarToken, montarUsuarioSeguro } = require("../middleware/auth");
-const { getPermissoes } = require("../middleware/permissions");
+const {
+  getPermissoesEfetivas,
+  getCargo
+} = require("../middleware/permissions");
 
 const router = express.Router();
 
@@ -10,7 +13,9 @@ function normalizarEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
 
-function normalizarCargo(valor, tipo) {
+function normalizarCargo(valor, tipo, contaDev = false) {
+  if (contaDev) return "dev";
+
   const cargo = String(valor || "")
     .trim()
     .toLowerCase()
@@ -20,13 +25,26 @@ function normalizarCargo(valor, tipo) {
   const mapa = {
     "super-admin": "superadmin",
     administrador: "admin",
-    administrator: "admin",
+    proprietario: "dono",
+    owner: "dono",
+    developer: "dev",
+    finance: "financeiro",
     seller: "vendedor",
     support: "suporte"
   };
 
   const normalizado = mapa[cargo] || cargo;
-  const permitidos = ["aluno", "vendedor", "suporte", "moderador", "admin", "superadmin"];
+  const permitidos = [
+    "aluno",
+    "vendedor",
+    "financeiro",
+    "admin",
+    "dono",
+    "dev",
+    "suporte",
+    "moderador",
+    "superadmin"
+  ];
 
   if (permitidos.includes(normalizado)) return normalizado;
   return String(tipo || "").toLowerCase() === "admin" ? "admin" : "aluno";
@@ -38,7 +56,18 @@ function normalizarPlano(valor, cargo) {
     .toLowerCase()
     .replace(/\s+/g, "");
 
-  if (["superadmin", "admin", "moderador", "suporte", "vendedor"].includes(cargo)) {
+  if (
+    [
+      "dev",
+      "dono",
+      "superadmin",
+      "admin",
+      "moderador",
+      "suporte",
+      "financeiro",
+      "vendedor"
+    ].includes(cargo)
+  ) {
     return "admin";
   }
 
@@ -58,36 +87,41 @@ function normalizarPlano(valor, cargo) {
 }
 
 function montarCompatibilidade(usuario) {
-  const cargo = normalizarCargo(usuario.cargo, usuario.tipo);
+  const cargo = normalizarCargo(usuario.cargo, usuario.tipo, usuario.contaDev);
   const plano = normalizarPlano(usuario.plano, cargo);
-  const tipo = ["admin", "superadmin", "moderador", "suporte", "vendedor"].includes(cargo)
-    ? "admin"
-    : "aluno";
+  const administrativo = cargo !== "aluno";
 
   return {
     ...usuario,
-    tipo,
+    tipo: administrativo ? "admin" : "aluno",
     cargo,
+    contaDev: Boolean(usuario.contaDev || cargo === "dev"),
     plano,
     status: usuario.status || "ativo",
     aprovado: usuario.aprovado !== false || plano === "free",
     suspenso: Boolean(usuario.suspenso),
-    vendedor: Boolean(usuario.vendedor || cargo === "vendedor" || cargo === "superadmin")
+    vendedor: Boolean(
+      usuario.vendedor ||
+      ["dev", "dono", "superadmin", "admin", "financeiro", "vendedor"].includes(cargo)
+    )
   };
 }
 
-function respostaUsuario(usuario) {
+async function respostaUsuario(usuario) {
   const seguro = montarUsuarioSeguro(usuario);
-  const permissoes = getPermissoes(seguro);
+  const permissoes = await getPermissoesEfetivas(usuario);
 
   return {
     ...seguro,
+    cargo: getCargo(usuario),
     permissoes,
     acessosRapidos: {
-      dashboard: true,
+      dashboard: Boolean(permissoes.dashboard),
       painelAdmin: Boolean(permissoes.painelAdmin),
       painelVendas: Boolean(permissoes.painelVendas),
-      suporte: Boolean(permissoes.suporte)
+      financas: Boolean(permissoes.financas),
+      suporte: Boolean(permissoes.suporte),
+      permissoesSistema: Boolean(permissoes.permissoesSistema)
     }
   };
 }
@@ -124,7 +158,7 @@ async function loginCompativel(req, res) {
       return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
     }
 
-    if (!usuario.aprovado && usuario.cargo !== "superadmin") {
+    if (!usuario.aprovado && usuario.cargo !== "dev") {
       return res.status(403).json({
         erro: "Sua conta ainda está pendente de aprovação.",
         status: "pendente",
@@ -133,27 +167,22 @@ async function loginCompativel(req, res) {
     }
 
     const agora = new Date().toISOString();
-    const atualizacoes = { ultimoLogin: agora };
-
-    if (!encontrado.status || encontrado.status === "pendente") atualizacoes.status = "ativo";
-    if (encontrado.aprovado === false && usuario.plano === "free" && usuario.cargo === "aluno") {
-      atualizacoes.aprovado = true;
-      atualizacoes.aprovadoEm = encontrado.aprovadoEm || agora;
-    }
 
     await Usuario.updateOne(
       { _id: encontrado._id },
       {
         $inc: { acessos: 1 },
-        $set: atualizacoes
+        $set: {
+          ultimoLogin: agora,
+          status: usuario.status === "pendente" ? "ativo" : usuario.status
+        }
       },
       { runValidators: false }
     );
 
     usuario.acessos = Number(encontrado.acessos || 0) + 1;
     usuario.ultimoLogin = agora;
-    if (atualizacoes.status) usuario.status = atualizacoes.status;
-    if (atualizacoes.aprovado) usuario.aprovado = true;
+    usuario.status = usuario.status === "pendente" ? "ativo" : usuario.status;
 
     const token = gerarToken(usuario);
 
@@ -161,7 +190,7 @@ async function loginCompativel(req, res) {
       sucesso: true,
       mensagem: "Login realizado com sucesso.",
       token,
-      usuario: respostaUsuario(usuario)
+      usuario: await respostaUsuario(usuario)
     });
   } catch (error) {
     console.error("Erro no login compatível:", error);
