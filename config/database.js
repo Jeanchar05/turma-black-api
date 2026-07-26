@@ -4,6 +4,7 @@ const mysql = require("mysql2/promise");
 
 let pool = null;
 let conectado = false;
+let hostAtivo = "";
 
 function obrigatoria(nome) {
   const valor = String(process.env[nome] || "").trim();
@@ -11,6 +12,18 @@ function obrigatoria(nome) {
     throw new Error(`${nome} não configurada.`);
   }
   return valor;
+}
+
+function normalizarHost(valor) {
+  const host = String(valor || "").trim();
+
+  // Na hospedagem Node.js da Hostinger, "localhost" pode resolver para ::1.
+  // O usuário MySQL normalmente é autorizado em IPv4 local, portanto forçamos 127.0.0.1.
+  if (!host || host.toLowerCase() === "localhost" || host === "::1") {
+    return "127.0.0.1";
+  }
+
+  return host;
 }
 
 function getPool() {
@@ -84,51 +97,94 @@ async function garantirEstrutura() {
   `);
 }
 
+function traduzirErroConexao(error, dados) {
+  const codigo = String(error?.code || "");
+
+  if (codigo === "ER_ACCESS_DENIED_ERROR") {
+    return new Error(
+      `MySQL recusou o usuário '${dados.user}' no host '${dados.host}'. ` +
+      "Confirme a senha, atribua o banco ao site no hPanel e garanta que esse usuário tenha acesso ao banco DB_NAME."
+    );
+  }
+
+  if (codigo === "ER_BAD_DB_ERROR") {
+    return new Error(
+      `O banco MySQL '${dados.database}' não foi encontrado. Confira DB_NAME exatamente como aparece no hPanel.`
+    );
+  }
+
+  if (["ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND"].includes(codigo)) {
+    return new Error(
+      `Não foi possível alcançar o MySQL em ${dados.host}:${dados.port}. Confira DB_HOST e DB_PORT.`
+    );
+  }
+
+  return error;
+}
+
 async function connectDatabase() {
-  const host = obrigatoria("DB_HOST");
+  const host = normalizarHost(obrigatoria("DB_HOST"));
   const user = obrigatoria("DB_USER");
   const password = obrigatoria("DB_PASSWORD");
   const database = obrigatoria("DB_NAME");
   const port = Number(process.env.DB_PORT || 3306);
 
-  pool = mysql.createPool({
-    host,
-    port,
-    user,
-    password,
-    database,
-    waitForConnections: true,
-    connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
-    queueLimit: 0,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 0,
-    charset: "utf8mb4",
-    timezone: "Z",
-    dateStrings: true,
-    decimalNumbers: true
-  });
+  hostAtivo = host;
 
-  const conexao = await pool.getConnection();
+  const dadosPublicos = { host, port, user, database };
 
   try {
-    await conexao.ping();
-  } finally {
-    conexao.release();
+    pool = mysql.createPool({
+      host,
+      port,
+      user,
+      password,
+      database,
+      waitForConnections: true,
+      connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
+      charset: "utf8mb4",
+      timezone: "Z",
+      dateStrings: true,
+      decimalNumbers: true
+    });
+
+    const conexao = await pool.getConnection();
+
+    try {
+      await conexao.ping();
+    } finally {
+      conexao.release();
+    }
+
+    conectado = true;
+    await garantirEstrutura();
+
+    const bootstrapDevAccount = require("../services/bootstrap-dev");
+    await bootstrapDevAccount();
+
+    console.log(`MySQL conectado com sucesso em ${host}:${port}`);
+    return pool;
+  } catch (error) {
+    conectado = false;
+
+    if (pool) {
+      try {
+        await pool.end();
+      } catch (_) {}
+      pool = null;
+    }
+
+    throw traduzirErroConexao(error, dadosPublicos);
   }
-
-  conectado = true;
-  await garantirEstrutura();
-
-  const bootstrapDevAccount = require("../services/bootstrap-dev");
-  await bootstrapDevAccount();
-
-  console.log("MySQL conectado com sucesso");
-  return pool;
 }
 
 connectDatabase.getPool = getPool;
 connectDatabase.query = query;
 connectDatabase.isConnected = () => conectado;
+connectDatabase.getHost = () => hostAtivo;
 connectDatabase.close = async () => {
   if (pool) {
     await pool.end();
