@@ -65,9 +65,7 @@ function desenharSeta(doc, x, y, cor = "#a855f7") {
 }
 
 function cabecalho(doc, resultado) {
-  doc
-    .rect(0, 0, doc.page.width, 112)
-    .fill("#09030f");
+  doc.rect(0, 0, doc.page.width, 112).fill("#09030f");
 
   doc
     .fillColor("#f4b942")
@@ -90,7 +88,11 @@ function cabecalho(doc, resultado) {
   doc.y = 134;
 
   const aprovado = Boolean(resultado.aprovado);
-  const statusCor = aprovado ? "#16a34a" : "#dc2626";
+  const statusCor = resultado.status === "em_analise"
+    ? "#d08b18"
+    : aprovado
+      ? "#16a34a"
+      : "#dc2626";
   const statusTexto = resultado.status === "em_analise"
     ? "EM ANALISE"
     : aprovado
@@ -203,37 +205,39 @@ router.get(
 
       respostas.forEach((item, indice) => {
         const pergunta = perguntas.get(String(item.perguntaId));
+        const textual = item.tipo === "texto";
         const correta = Boolean(item.correta);
-        const gabarito = respostaCorreta(pergunta);
+        const gabarito = texto(item.respostaCorreta, respostaCorreta(pergunta));
         const respostaAluno = texto(item.resposta, "Nao respondida");
-        const explicacao = texto(
-          pergunta?.explicacao || item.comentario,
-          ""
-        );
+        const explicacao = texto(pergunta?.explicacao || item.comentario, "");
+
+        const mostrarCorreta = !textual && !correta;
+        const mostrarReferencia = textual && gabarito && gabarito !== "Resposta textual sujeita a analise";
 
         const alturaEstimada = 118
           + doc.heightOfString(texto(item.enunciado, `Questao ${indice + 1}`), { width: 475 })
           + doc.heightOfString(respostaAluno, { width: 450 })
-          + (!correta ? doc.heightOfString(gabarito, { width: 430 }) : 0)
+          + ((mostrarCorreta || mostrarReferencia) ? doc.heightOfString(gabarito, { width: 430 }) : 0)
           + (explicacao ? doc.heightOfString(explicacao, { width: 450 }) : 0);
 
         garantirEspaco(doc, Math.min(alturaEstimada, 270));
 
         const inicioY = doc.y;
-        doc
-          .roundedRect(46, inicioY, 503, 24, 6)
-          .fill(correta ? "#eaf8ef" : "#fff0f0");
+        const fundo = textual ? "#fff7e8" : correta ? "#eaf8ef" : "#fff0f0";
+        const cor = textual ? "#9a6108" : correta ? "#137333" : "#b42318";
+        const titulo = textual
+          ? "RESPOSTA TEXTUAL - ANALISE"
+          : correta
+            ? "RESPOSTA CORRETA"
+            : "RESPOSTA INCORRETA";
+
+        doc.roundedRect(46, inicioY, 503, 24, 6).fill(fundo);
 
         doc
-          .fillColor(correta ? "#137333" : "#b42318")
+          .fillColor(cor)
           .font("Helvetica-Bold")
           .fontSize(9)
-          .text(
-            `${indice + 1}. ${correta ? "RESPOSTA CORRETA" : "RESPOSTA INCORRETA"}`,
-            58,
-            inicioY + 7,
-            { width: 470 }
-          );
+          .text(`${indice + 1}. ${titulo}`, 58, inicioY + 7, { width: 470 });
 
         doc.y = inicioY + 36;
         doc
@@ -258,7 +262,7 @@ router.get(
           .fontSize(10)
           .text(respostaAluno, 58, doc.y + 3, { width: 475, lineGap: 2 });
 
-        if (!correta) {
+        if (mostrarCorreta) {
           doc.moveDown(0.8);
           const setaY = doc.y + 7;
           desenharSeta(doc, 60, setaY);
@@ -273,6 +277,20 @@ router.get(
             .font("Helvetica")
             .fontSize(10)
             .text(gabarito, 82, doc.y + 3, { width: 450, lineGap: 2 });
+        }
+
+        if (mostrarReferencia) {
+          doc.moveDown(0.8);
+          doc
+            .fillColor("#9a6108")
+            .font("Helvetica-Bold")
+            .fontSize(9)
+            .text("Referencia para analise:", 58, doc.y, { width: 475 });
+          doc
+            .fillColor("#5f4a28")
+            .font("Helvetica")
+            .fontSize(10)
+            .text(gabarito, 58, doc.y + 3, { width: 475, lineGap: 2 });
         }
 
         if (explicacao) {
@@ -321,7 +339,7 @@ router.get(
 
       const totalPaginas = doc.bufferedPageRange();
       for (let pagina = 0; pagina < totalPaginas.count; pagina++) {
-        doc.switchToPage(pagina);
+        doc.switchToPage(pagina + totalPaginas.start);
         doc
           .fillColor("#9689a0")
           .font("Helvetica")
@@ -330,7 +348,7 @@ router.get(
             `Turma do Primo - Pagina ${pagina + 1} de ${totalPaginas.count}`,
             46,
             doc.page.height - 30,
-            { width: 503, align: "center" }
+            { width: 503, align: "center", lineBreak: false }
           );
       }
 
