@@ -9,9 +9,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20260726-dev-1" />
+  <link rel="stylesheet" href="style.css?v=20260726-admin-4" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
-  <script defer src="protected.js?v=20260726-dev-1"></script>
+  <script defer src="protected.js?v=20260726-admin-4"></script>
+  <script defer src="dashboard-free.js?v=20260726-admin-4"></script>
 </head>
 <body class="legal-body" data-required-access="dashboard">
   <main class="legal-shell">
@@ -27,20 +28,63 @@
       <div class="legal-icon" aria-hidden="true">✦</div>
       <span class="legal-kicker">PLANO GRATUITO</span>
       <h1>Bem-vindo, <span data-user-name>Aluno</span>!</h1>
-      <p>Sua conta gratuita está ativa e protegida. O novo dashboard Free será construído nesta área.</p>
+      <p>Sua conta gratuita está ativa. Após realizar o pagamento da Turma Premium, gere o código abaixo e aguarde a aprovação da equipe.</p>
       <span class="legal-updated">Plano atual: Free</span>
     </section>
 
     <div class="legal-content">
       <section class="legal-card legal-highlight">
-        <h2>Conta criada com sucesso</h2>
-        <p>Você já pode entrar normalmente. Os módulos gratuitos e a ativação Premium serão integrados nas próximas etapas.</p>
+        <h2>Ativar Turma Premium</h2>
+        <p>Selecione o período adquirido e informe a referência do pagamento. O sistema criará um código único para análise de Dev, Dono ou Admin.</p>
+
+        <form id="premiumRequestForm" class="admin-form">
+          <div class="admin-form-grid">
+            <label>
+              <span>Plano adquirido</span>
+              <select id="premiumPlan" required>
+                <option value="black30" data-value="97">Turma Premium — 30 dias — R$ 97,00</option>
+                <option value="black90" data-value="197">Turma Premium — 90 dias — R$ 197,00</option>
+                <option value="black180" data-value="297">Turma Premium — 180 dias — R$ 297,00</option>
+                <option value="black360" data-value="497">Turma Premium — 360 dias — R$ 497,00</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Referência do pagamento</span>
+              <input id="paymentReference" type="text" placeholder="ID, nome do pagador ou observação" required />
+            </label>
+          </div>
+
+          <div class="admin-modal-actions">
+            <button class="admin-primary-btn" type="submit" id="generatePremiumCode">Já paguei — gerar código</button>
+          </div>
+        </form>
+
+        <div id="premiumRequestMessage" class="auth-message" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="legal-card">
+        <h2>Minhas solicitações</h2>
+        <p>Acompanhe o código, plano e situação da análise.</p>
+        <div class="admin-list" id="premiumRequestsList">
+          <div class="admin-empty-state">Carregando solicitações…</div>
+        </div>
+      </section>
+
+      <section class="legal-card">
+        <h2>Como funciona</h2>
+        <ul>
+          <li>Realize o pagamento pelo canal oficial informado pela equipe.</li>
+          <li>Gere o código nesta página após o pagamento.</li>
+          <li>Dev, Dono ou Admin confere e aprova a solicitação.</li>
+          <li>O plano Premium e a data de validade são ativados automaticamente.</li>
+        </ul>
       </section>
     </div>
 
     <footer class="legal-footer">
       <span>© 2026 Turma do Primo.</span>
-      <span>Sessão protegida e validada no servidor.</span>
+      <span>Sessão protegida e código validado no servidor.</span>
     </footer>
   </main>
 </body>
