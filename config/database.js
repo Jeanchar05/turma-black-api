@@ -15,15 +15,8 @@ function obrigatoria(nome) {
 }
 
 function normalizarHost(valor) {
-  const host = String(valor || "").trim();
-
-  // Na hospedagem Node.js da Hostinger, "localhost" pode resolver para ::1.
-  // O usuário MySQL normalmente é autorizado em IPv4 local, portanto forçamos 127.0.0.1.
-  if (!host || host.toLowerCase() === "localhost" || host === "::1") {
-    return "127.0.0.1";
-  }
-
-  return host;
+  const host = String(valor || "localhost").trim();
+  return host || "localhost";
 }
 
 function getPool() {
@@ -123,7 +116,7 @@ function traduzirErroConexao(error, dados) {
 }
 
 async function connectDatabase() {
-  const host = normalizarHost(obrigatoria("DB_HOST"));
+  const host = normalizarHost(process.env.DB_HOST || "localhost");
   const user = obrigatoria("DB_USER");
   const password = obrigatoria("DB_PASSWORD");
   const database = obrigatoria("DB_NAME");
