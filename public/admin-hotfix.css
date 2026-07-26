@@ -1,0 +1,111 @@
+/* =========================================================
+   HOTFIX 4.1.5 — PROVAS, SELECTS E AÇÕES DEV
+========================================================= */
+
+.admin-app-body select,
+.admin-card-heading select,
+.admin-section-head select,
+.admin-filterbar select,
+.admin-form select,
+select.admin-secondary-btn,
+#overviewChartPeriod,
+#financePeriod {
+  color: #f8f3ff !important;
+  -webkit-text-fill-color: #f8f3ff !important;
+  color-scheme: dark !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  min-height: 42px !important;
+  padding: 0 42px 0 14px !important;
+  border: 1px solid rgba(181, 103, 255, 0.28) !important;
+  border-radius: 12px !important;
+  outline: 0 !important;
+  background-color: #12091d !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #c276ff 50%),
+    linear-gradient(135deg, #c276ff 50%, transparent 50%),
+    linear-gradient(145deg, rgba(35, 16, 53, 0.98), rgba(13, 7, 22, 0.98)) !important;
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%,
+    0 0 !important;
+  background-size: 6px 6px, 6px 6px, 100% 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035) !important;
+}
+
+.admin-app-body select:hover,
+.admin-card-heading select:hover,
+.admin-section-head select:hover,
+.admin-filterbar select:hover,
+.admin-form select:hover,
+#overviewChartPeriod:hover,
+#financePeriod:hover {
+  border-color: rgba(197, 126, 255, 0.48) !important;
+}
+
+.admin-app-body select:focus,
+.admin-card-heading select:focus,
+.admin-section-head select:focus,
+.admin-filterbar select:focus,
+.admin-form select:focus,
+#overviewChartPeriod:focus,
+#financePeriod:focus {
+  border-color: rgba(205, 135, 255, 0.72) !important;
+  box-shadow: 0 0 0 3px rgba(149, 55, 255, 0.13) !important;
+}
+
+.admin-app-body select option,
+.admin-app-body select optgroup,
+.admin-card-heading select option,
+.admin-filterbar select option {
+  color: #ffffff !important;
+  background: #12091d !important;
+}
+
+#newExamButton,
+#examModal,
+[data-open-modal="exam"] {
+  display: none !important;
+}
+
+.admin-dev-delete-btn {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 72, 100, 0.28) !important;
+  border-radius: 9px;
+  color: #ff9aaa !important;
+  font-size: 9px;
+  font-weight: 900;
+  background: linear-gradient(145deg, rgba(116, 19, 35, 0.34), rgba(54, 8, 18, 0.5)) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+  transition: 0.18s ease;
+}
+
+.admin-dev-delete-btn:hover {
+  color: #ffffff !important;
+  border-color: rgba(255, 91, 116, 0.58) !important;
+  background: linear-gradient(145deg, rgba(190, 28, 55, 0.56), rgba(102, 13, 31, 0.72)) !important;
+  transform: translateY(-1px);
+}
+
+.admin-dev-delete-btn:disabled {
+  opacity: 0.58;
+  cursor: wait;
+  transform: none;
+}
+
+@media (max-width: 760px) {
+  .admin-card-heading select,
+  .admin-section-head select,
+  .admin-filterbar select,
+  #overviewChartPeriod,
+  #financePeriod {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .admin-dev-delete-btn {
+    flex: 1 1 100%;
+  }
+}
