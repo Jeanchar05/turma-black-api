@@ -15,10 +15,6 @@ app.use(cors({ origin: "*" }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-/* ===============================
-   FRONTEND
-=============================== */
-
 if (fs.existsSync(publicDir)) {
   app.use(
     express.static(publicDir, {
@@ -38,19 +34,13 @@ function servirPagina(nomeArquivo) {
   return (req, res, next) => {
     const arquivo = path.join(publicDir, nomeArquivo);
 
-    if (!fs.existsSync(arquivo)) {
-      return next();
-    }
+    if (!fs.existsSync(arquivo)) return next();
 
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     return res.sendFile(arquivo);
   };
 }
 
-/*
-  Rotas visuais precisam ser registradas antes das rotas de API.
-  Isso impede que o navegador mostre JSON de autenticação ao abrir páginas.
-*/
 app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
 app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
 app.get(["/dashboard-free", "/dashboard-free.html"], servirPagina("dashboard-free.html"));
@@ -59,10 +49,6 @@ app.get(
   ["/painel-vendas", "/painel-vendas.html"],
   servirPagina("painel-vendas.html")
 );
-
-/* ===============================
-   STATUS DA APLICAÇÃO
-=============================== */
 
 app.get("/api/status", (req, res) => {
   const estadosBanco = {
@@ -75,17 +61,13 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "3.2.0",
+    versao: "4.0.0",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
     estrutura: "frontend e API no mesmo serviço"
   });
 });
-
-/* ===============================
-   CARREGADOR DE ROTAS
-=============================== */
 
 function carregarRota(caminhoBase, arquivo) {
   const caminhoArquivo = path.join(__dirname, "routes", arquivo);
@@ -99,13 +81,11 @@ function carregarRota(caminhoBase, arquivo) {
   console.log(`Rota carregada: ${caminhoBase} -> routes/${arquivo}`);
 }
 
-/* ===============================
-   ROTAS DA API
-=============================== */
-
 carregarRota("/", "login-compat.js");
 carregarRota("/", "auth.js");
 carregarRota("/", "usuarios.js");
+carregarRota("/", "liberacoes.js");
+carregarRota("/admin", "admin-panel.js");
 carregarRota("/admin", "admin.js");
 carregarRota("/", "alunos.js");
 carregarRota("/", "vendas.js");
@@ -115,20 +95,12 @@ carregarRota("/", "notificacoes.js");
 carregarRota("/", "suporte.js");
 carregarRota("/", "provas.js");
 
-/* ===============================
-   ROTA 404
-=============================== */
-
 app.use((req, res) => {
   res.status(404).json({
     erro: "Rota não encontrada.",
     rota: req.originalUrl
   });
 });
-
-/* ===============================
-   START
-=============================== */
 
 async function iniciarServidor() {
   await connectDatabase();
