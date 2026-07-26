@@ -1,21 +1,20 @@
 "use strict";
 
 (() => {
-  const API_URL = window.location.origin;
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   const $ = (id) => document.getElementById(id);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
-  document.addEventListener("DOMContentLoaded", iniciar, { once: true });
+  document.addEventListener("DOMContentLoaded", init, { once: true });
 
-  function iniciar() {
-    limparDadosAntigos();
-    registrarEventos();
-    ativarLogin();
+  function init() {
+    clearLegacyStorage();
+    bindEvents();
+    showLogin();
   }
 
-  function limparDadosAntigos() {
-    const antigas = [
+  function clearLegacyStorage() {
+    [
       ...TOKEN_KEYS,
       "usuario",
       "usuarioLogado",
@@ -24,293 +23,144 @@
       "perfil",
       "cargo",
       "plano"
-    ];
-
-    antigas.forEach((chave) => {
-      try {
-        localStorage.removeItem(chave);
-      } catch (_) {}
+    ].forEach((key) => {
+      try { localStorage.removeItem(key); } catch (_) {}
     });
   }
 
-  function salvarToken(token) {
-    TOKEN_KEYS.forEach((chave) => {
-      try {
-        sessionStorage.removeItem(chave);
-      } catch (_) {}
+  function saveToken(token) {
+    TOKEN_KEYS.forEach((key) => {
+      try { sessionStorage.removeItem(key); } catch (_) {}
     });
-
-    if (token) {
-      sessionStorage.setItem("token", token);
-    }
+    if (token) sessionStorage.setItem("token", token);
   }
 
-  function pegarToken() {
-    for (const chave of TOKEN_KEYS) {
+  function getToken() {
+    for (const key of TOKEN_KEYS) {
       try {
-        const token = sessionStorage.getItem(chave);
+        const token = sessionStorage.getItem(key);
         if (token) return token;
       } catch (_) {}
     }
-
     return "";
   }
 
-  function limparSessao() {
-    TOKEN_KEYS.forEach((chave) => {
-      try {
-        sessionStorage.removeItem(chave);
-      } catch (_) {}
+  function clearSession() {
+    TOKEN_KEYS.forEach((key) => {
+      try { sessionStorage.removeItem(key); } catch (_) {}
     });
   }
 
   async function api(endpoint, options = {}) {
-    const {
-      method = "GET",
-      body = null,
-      auth = false,
-      timeout = 18000
-    } = options;
-
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
+    const timer = setTimeout(() => controller.abort(), options.timeout || 18000);
     const headers = { Accept: "application/json" };
 
-    if (body !== null) {
-      headers["Content-Type"] = "application/json";
-    }
-
-    if (auth) {
-      const token = pegarToken();
-
-      if (!token) {
-        throw new Error("Sua sessão não foi encontrada. Faça login novamente.");
-      }
-
+    if (options.body !== undefined) headers["Content-Type"] = "application/json";
+    if (options.auth) {
+      const token = getToken();
+      if (!token) throw new Error("Sua sessão não foi encontrada.");
       headers.Authorization = `Bearer ${token}`;
     }
 
     try {
-      const resposta = await fetch(`${API_URL}${endpoint}`, {
-        method,
+      const response = await fetch(`${window.location.origin}${endpoint}`, {
+        method: options.method || "GET",
         headers,
         signal: controller.signal,
-        body: body !== null ? JSON.stringify(body) : undefined
+        body: options.body !== undefined ? JSON.stringify(options.body) : undefined
       });
 
-      const texto = await resposta.text();
-      let dados = {};
+      const text = await response.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; }
+      catch (_) { data = { mensagem: text || "Resposta inválida do servidor." }; }
 
-      try {
-        dados = texto ? JSON.parse(texto) : {};
-      } catch (_) {
-        dados = { mensagem: texto || "Resposta inválida do servidor." };
+      if (!response.ok || data.erro) {
+        throw new Error(data.erro || data.mensagem || `Erro ${response.status}.`);
       }
 
-      if (!resposta.ok || dados?.erro) {
-        throw new Error(
-          dados?.erro ||
-          dados?.mensagem ||
-          dados?.message ||
-          `Erro ${resposta.status}.`
-        );
-      }
-
-      return dados;
-    } catch (erro) {
-      if (erro.name === "AbortError") {
-        throw new Error("O servidor demorou para responder. Tente novamente.");
-      }
-
-      if (erro instanceof TypeError) {
-        throw new Error("Não foi possível conectar ao servidor.");
-      }
-
-      throw erro;
+      return data;
+    } catch (error) {
+      if (error.name === "AbortError") throw new Error("O servidor demorou para responder.");
+      if (error instanceof TypeError) throw new Error("Não foi possível conectar ao servidor.");
+      throw error;
     } finally {
       clearTimeout(timer);
     }
   }
 
-  function emailNormalizado(email) {
-    return String(email || "").trim().toLowerCase();
+  function normalizeEmail(value) {
+    return String(value || "").trim().toLowerCase();
   }
 
-  function emailValido(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  function validEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
-  function mascaraTelefone(valor) {
-    const numero = String(valor || "").replace(/\D/g, "").slice(0, 11);
-
-    if (numero.length <= 10) {
-      return numero
-        .replace(/^(\d{2})(\d)/, "($1) $2")
-        .replace(/(\d{4})(\d)/, "$1-$2");
-    }
-
-    return numero
-      .replace(/^(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d)/, "$1-$2");
-  }
-
-  function normalizarCargo(usuario) {
-    return String(
-      usuario?.cargo ||
-      usuario?.tipo ||
-      usuario?.role ||
-      usuario?.perfil ||
-      ""
-    )
+  function normalizeRole(user) {
+    return String(user?.cargo || user?.tipo || "aluno")
       .trim()
       .toLowerCase()
-      .replaceAll("_", "-")
-      .replace(/\s+/g, "-");
+      .replaceAll("_", "-");
   }
 
-  function ehAcessoEspecial(usuario) {
-    const cargo = normalizarCargo(usuario);
-    const acessos = usuario?.acessosRapidos || {};
+  function maskPhone(value) {
+    const digits = String(value || "").replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 10) {
+      return digits.replace(/^(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2");
+    }
+    return digits.replace(/^(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+  }
 
-    return (
-      [
-        "admin",
-        "superadmin",
-        "super-admin",
-        "moderador",
-        "suporte",
-        "vendedor"
-      ].includes(cargo) ||
-      usuario?.vendedor === true ||
-      acessos.painelAdmin === true ||
-      acessos.painelVendas === true
+  function firstName(user) {
+    return String(user?.nome || "Dev").trim().split(/\s+/)[0] || "Dev";
+  }
+
+  function hasSpecialAccess(user) {
+    const permissions = user?.permissoes || user?.acessosRapidos || {};
+    const role = normalizeRole(user);
+    return Boolean(
+      user?.contaDev ||
+      ["dev", "dono", "superadmin", "admin", "financeiro", "vendedor", "moderador", "suporte"].includes(role) ||
+      permissions.painelAdmin ||
+      permissions.painelVendas
     );
   }
 
-  function possuiPlanoAtivo(usuario) {
-    if (!usuario) return false;
+  function hasPremiumAccess(user) {
+    const role = normalizeRole(user);
+    if (["dev", "dono", "superadmin", "admin", "financeiro", "vendedor", "moderador", "suporte"].includes(role)) return true;
+    if (user?.suspenso || ["suspenso", "bloqueado"].includes(user?.status) || user?.aprovado === false) return false;
 
-    const cargo = normalizarCargo(usuario);
+    const plan = String(user?.plano || "free").toLowerCase();
+    if (!["premium", "black", "black30", "black90", "black180", "black360", "admin"].includes(plan)) return false;
+    if (!user?.dataExpiracao) return true;
 
-    if (
-      [
-        "admin",
-        "superadmin",
-        "super-admin",
-        "moderador",
-        "suporte",
-        "vendedor"
-      ].includes(cargo)
-    ) {
-      return true;
-    }
-
-    if (
-      usuario.suspenso ||
-      ["suspenso", "bloqueado"].includes(usuario.status) ||
-      usuario.aprovado === false
-    ) {
-      return false;
-    }
-
-    const plano = String(usuario.plano || "free").trim().toLowerCase();
-
-    if (
-      ![
-        "premium",
-        "black",
-        "black30",
-        "black90",
-        "black180",
-        "black360",
-        "admin"
-      ].includes(plano)
-    ) {
-      return false;
-    }
-
-    if (!usuario.dataExpiracao) return true;
-
-    const expiracao = new Date(usuario.dataExpiracao);
-    expiracao.setHours(23, 59, 59, 999);
-
-    return Date.now() <= expiracao.getTime();
+    const expiration = new Date(user.dataExpiracao);
+    expiration.setHours(23, 59, 59, 999);
+    return Date.now() <= expiration.getTime();
   }
 
-  function primeiroNome(usuario) {
-    return String(usuario?.nome || "Dev").trim().split(/\s+/)[0] || "Dev";
-  }
-
-  function configurarCards(usuario) {
-    const cargo = normalizarCargo(usuario);
-    const acessos = usuario?.acessosRapidos || {};
-    const vendedor = usuario?.vendedor === true || cargo === "vendedor";
+  function configureCards(user) {
+    const permissions = user?.permissoes || user?.acessosRapidos || {};
+    const role = normalizeRole(user);
 
     const dashboard = document.querySelector('[data-go="dashboard.html"]');
     const admin = document.querySelector('[data-go="admin.html"]');
-    const vendas = document.querySelector('[data-go="painel-vendas.html"]');
+    const sales = document.querySelector('[data-go="painel-vendas.html"]');
 
-    if (dashboard) dashboard.hidden = false;
-
+    if (dashboard) dashboard.hidden = permissions.dashboard === false;
     if (admin) {
-      admin.hidden = !(
-        acessos.painelAdmin === true ||
-        ["superadmin", "super-admin", "admin", "moderador"].includes(cargo)
-      );
+      admin.hidden = !(permissions.painelAdmin === true || ["dev", "dono", "superadmin", "admin", "moderador"].includes(role));
     }
-
-    if (vendas) {
-      vendas.hidden = !(
-        acessos.painelVendas === true ||
-        vendedor ||
-        ["superadmin", "super-admin", "admin", "suporte"].includes(cargo)
-      );
+    if (sales) {
+      sales.hidden = !(permissions.painelVendas === true || ["dev", "dono", "superadmin", "admin", "financeiro", "vendedor"].includes(role));
     }
   }
 
-  function abrirEscolha(usuario) {
-    const overlay = $("adminChoiceOverlay");
-    const titulo = $("adminChoiceTitle");
-    const descricao = document.querySelector(".admin-choice-top > p");
-
-    if (!overlay) return;
-
-    configurarCards(usuario);
-
-    if (titulo) {
-      titulo.innerHTML = `Bem-vindo, <span>${escapeHTML(primeiroNome(usuario))}!</span> 👑`;
-    }
-
-    if (descricao) {
-      descricao.textContent = "Selecione o painel que deseja acessar agora.";
-    }
-
-    overlay.hidden = false;
-    overlay.setAttribute("aria-hidden", "false");
-    document.body.classList.add("admin-choice-open");
-
-    requestAnimationFrame(() => {
-      overlay.classList.add("active", "open");
-    });
-  }
-
-  function fecharEscolha() {
-    const overlay = $("adminChoiceOverlay");
-    if (!overlay) return;
-
-    overlay.classList.remove("active", "open");
-    overlay.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("admin-choice-open");
-
-    setTimeout(() => {
-      if (!overlay.classList.contains("active")) {
-        overlay.hidden = true;
-      }
-    }, 180);
-  }
-
-  function escapeHTML(valor) {
-    return String(valor || "")
+  function escapeHTML(value) {
+    return String(value || "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
@@ -318,336 +168,227 @@
       .replaceAll("'", "&#039;");
   }
 
-  function redirecionar(usuario) {
-    if (!usuario) {
-      limparSessao();
-      ocultarLoading();
-      mostrarMensagem("Não foi possível validar sua conta.");
-      return;
-    }
-
-    if (ehAcessoEspecial(usuario)) {
-      ocultarLoading();
-      abrirEscolha(usuario);
-      return;
-    }
-
-    window.location.assign(
-      possuiPlanoAtivo(usuario) ? "dashboard.html" : "dashboard-free.html"
-    );
-  }
-
-  function mostrarMensagem(texto, tipo = "erro") {
-    const box = $("mensagem");
-    if (!box) return;
-
-    box.textContent = String(texto || "");
-    box.className = `auth-message ${tipo} active`;
-
-    clearTimeout(box._timer);
-    box._timer = setTimeout(() => box.classList.remove("active"), 5200);
-  }
-
-  function mostrarLoading(texto = "Preparando seu acesso…") {
-    const overlay = $("authLoadingOverlay");
+  function openChoice(user) {
+    const overlay = $("adminChoiceOverlay");
     if (!overlay) return;
 
-    const label = $("authLoadingTexto");
-    if (label) label.textContent = texto;
+    configureCards(user);
+    const title = $("adminChoiceTitle");
+    if (title) title.innerHTML = `Bem-vindo, <span>${escapeHTML(firstName(user))}!</span> 👑`;
 
     overlay.hidden = false;
     overlay.setAttribute("aria-hidden", "false");
-
-    requestAnimationFrame(() => {
-      overlay.classList.add("ativo", "active", "open");
-    });
+    document.body.classList.add("admin-choice-open");
+    requestAnimationFrame(() => overlay.classList.add("active", "open"));
   }
 
-  function ocultarLoading() {
-    const overlay = $("authLoadingOverlay");
+  function closeChoice() {
+    const overlay = $("adminChoiceOverlay");
     if (!overlay) return;
-
-    overlay.classList.remove("ativo", "active", "open");
+    overlay.classList.remove("active", "open");
     overlay.setAttribute("aria-hidden", "true");
-
-    setTimeout(() => {
-      if (!overlay.classList.contains("active")) {
-        overlay.hidden = true;
-      }
-    }, 180);
+    document.body.classList.remove("admin-choice-open");
+    setTimeout(() => { if (!overlay.classList.contains("active")) overlay.hidden = true; }, 180);
   }
 
-  function botaoCarregando(botao, ativo) {
-    if (!botao) return;
-
-    if (ativo) {
-      botao.dataset.original = botao.innerHTML;
-      botao.disabled = true;
-      botao.classList.add("carregando");
-      botao.innerHTML = "<span>Aguarde…</span><span>◌</span>";
+  function redirectUser(user) {
+    if (!user) {
+      clearSession();
+      hideLoading();
+      showMessage("Não foi possível validar sua conta.");
       return;
     }
 
-    botao.disabled = false;
-    botao.classList.remove("carregando");
-
-    if (botao.dataset.original) {
-      botao.innerHTML = botao.dataset.original;
+    if (hasSpecialAccess(user)) {
+      hideLoading();
+      openChoice(user);
+      return;
     }
+
+    window.location.assign(hasPremiumAccess(user) ? "dashboard.html" : "dashboard-free.html");
   }
 
-  function ativarLogin() {
+  function showMessage(message, type = "erro") {
+    const box = $("mensagem");
+    if (!box) return;
+    box.textContent = String(message || "");
+    box.className = `auth-message ${type} active`;
+    clearTimeout(box._timer);
+    box._timer = setTimeout(() => box.classList.remove("active"), 5000);
+  }
+
+  function showLoading(text = "Preparando seu acesso…") {
+    const overlay = $("authLoadingOverlay");
+    if (!overlay) return;
+    if ($("authLoadingTexto")) $("authLoadingTexto").textContent = text;
+    overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => overlay.classList.add("active", "open"));
+  }
+
+  function hideLoading() {
+    const overlay = $("authLoadingOverlay");
+    if (!overlay) return;
+    overlay.classList.remove("active", "open");
+    overlay.setAttribute("aria-hidden", "true");
+    setTimeout(() => { if (!overlay.classList.contains("active")) overlay.hidden = true; }, 180);
+  }
+
+  function setButtonLoading(button, active) {
+    if (!button) return;
+    if (active) {
+      button.dataset.original = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = "<span>Aguarde…</span><span>◌</span>";
+      return;
+    }
+    button.disabled = false;
+    if (button.dataset.original) button.innerHTML = button.dataset.original;
+  }
+
+  function showLogin() {
     $("tabLogin")?.classList.add("active");
     $("tabCadastro")?.classList.remove("active");
     $("tabLogin")?.setAttribute("aria-selected", "true");
     $("tabCadastro")?.setAttribute("aria-selected", "false");
-
-    if ($("formLogin")) {
-      $("formLogin").hidden = false;
-      $("formLogin").classList.add("active");
-    }
-
-    if ($("formCadastro")) {
-      $("formCadastro").hidden = true;
-      $("formCadastro").classList.remove("active");
-    }
-
+    if ($("formLogin")) { $("formLogin").hidden = false; $("formLogin").classList.add("active"); }
+    if ($("formCadastro")) { $("formCadastro").hidden = true; $("formCadastro").classList.remove("active"); }
     if ($("authTitulo")) $("authTitulo").textContent = "Bem-vindo(a) de volta!";
-    if ($("authDescricao")) {
-      $("authDescricao").textContent = "Acesse sua conta e continue sua jornada.";
-    }
+    if ($("authDescricao")) $("authDescricao").textContent = "Acesse sua conta e continue sua jornada.";
   }
 
-  function ativarCadastro() {
+  function showRegister() {
     $("tabCadastro")?.classList.add("active");
     $("tabLogin")?.classList.remove("active");
     $("tabCadastro")?.setAttribute("aria-selected", "true");
     $("tabLogin")?.setAttribute("aria-selected", "false");
-
-    if ($("formCadastro")) {
-      $("formCadastro").hidden = false;
-      $("formCadastro").classList.add("active");
-    }
-
-    if ($("formLogin")) {
-      $("formLogin").hidden = true;
-      $("formLogin").classList.remove("active");
-    }
-
+    if ($("formCadastro")) { $("formCadastro").hidden = false; $("formCadastro").classList.add("active"); }
+    if ($("formLogin")) { $("formLogin").hidden = true; $("formLogin").classList.remove("active"); }
     if ($("authTitulo")) $("authTitulo").textContent = "Crie sua conta grátis";
-    if ($("authDescricao")) {
-      $("authDescricao").textContent = "Comece agora no dashboard gratuito da Turma do Primo.";
-    }
+    if ($("authDescricao")) $("authDescricao").textContent = "Comece agora no dashboard gratuito da Turma do Primo.";
   }
 
-  function forcaSenha(senha) {
-    let pontos = 0;
-
-    if (senha.length >= 6) pontos++;
-    if (senha.length >= 10) pontos++;
-    if (/[a-z]/.test(senha) && /[A-Z]/.test(senha)) pontos++;
-    if (/\d/.test(senha)) pontos++;
-    if (/[^A-Za-z0-9]/.test(senha)) pontos++;
-
-    if (pontos <= 1) return ["fraca", "Fraca"];
-    if (pontos <= 3) return ["media", "Média"];
+  function passwordStrength(password) {
+    let points = 0;
+    if (password.length >= 6) points++;
+    if (password.length >= 10) points++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) points++;
+    if (/\d/.test(password)) points++;
+    if (/[^A-Za-z0-9]/.test(password)) points++;
+    if (points <= 1) return ["fraca", "Fraca"];
+    if (points <= 3) return ["media", "Média"];
     return ["forte", "Forte"];
   }
 
-  function atualizarForca() {
+  function updateStrength() {
     const input = $("cadastroSenha");
-    const indicador = $("senhaForcaIndicador");
-    const texto = $("senhaForcaTexto");
+    const indicator = $("senhaForcaIndicador");
+    const text = $("senhaForcaTexto");
+    if (!input || !indicator || !text) return;
 
-    if (!input || !indicador || !texto) return;
-
-    indicador.classList.remove("fraca", "media", "forte", "visivel");
-
+    indicator.classList.remove("fraca", "media", "forte", "visivel");
     if (!input.value) {
-      texto.textContent = "Digite uma senha";
+      text.textContent = "Digite uma senha";
       return;
     }
 
-    const [nivel, label] = forcaSenha(input.value);
-    indicador.classList.add("visivel", nivel);
-    texto.textContent = label;
+    const [level, label] = passwordStrength(input.value);
+    indicator.classList.add("visivel", level);
+    text.textContent = label;
   }
 
-  async function realizarLogin(evento) {
-    evento.preventDefault();
+  async function login(event) {
+    event.preventDefault();
+    const email = normalizeEmail($("loginEmail")?.value);
+    const password = $("loginSenha")?.value || "";
+    const button = event.currentTarget.querySelector(".auth-submit");
 
-    const email = emailNormalizado($("loginEmail")?.value);
-    const senha = $("loginSenha")?.value || "";
-    const botao = evento.currentTarget.querySelector(".auth-submit");
+    if (!validEmail(email)) return showMessage("Digite um e-mail válido.");
+    if (password.length < 4) return showMessage("A senha precisa ter pelo menos 4 caracteres.");
 
-    if (!emailValido(email)) {
-      mostrarMensagem("Digite um e-mail válido.");
-      $("loginEmail")?.focus();
-      return;
-    }
-
-    if (senha.length < 4) {
-      mostrarMensagem("A senha precisa ter pelo menos 4 caracteres.");
-      $("loginSenha")?.focus();
-      return;
-    }
-
-    botaoCarregando(botao, true);
-    mostrarLoading("Verificando suas credenciais…");
+    setButtonLoading(button, true);
+    showLoading("Verificando suas credenciais…");
 
     try {
-      const resposta = await api("/login", {
-        method: "POST",
-        body: { email, senha }
-      });
-
-      if (!resposta?.token) {
-        throw new Error("O servidor não retornou um token de acesso.");
-      }
-
-      salvarToken(resposta.token);
-
-      if ($("authLoadingTexto")) {
-        $("authLoadingTexto").textContent = "Validando suas permissões…";
-      }
-
+      const response = await api("/login", { method: "POST", body: { email, senha: password } });
+      if (!response?.token) throw new Error("O servidor não retornou um token de acesso.");
+      saveToken(response.token);
+      if ($("authLoadingTexto")) $("authLoadingTexto").textContent = "Carregando suas permissões…";
       const me = await api("/me", { auth: true });
-
-      if (!me?.usuario) {
-        throw new Error("Não foi possível validar sua conta.");
-      }
-
-      if ($("authLoadingTexto")) {
-        $("authLoadingTexto").textContent = "Tudo pronto. Entrando…";
-      }
-
-      setTimeout(() => redirecionar(me.usuario), 350);
-    } catch (erro) {
-      limparSessao();
-      ocultarLoading();
-      mostrarMensagem(erro.message || "Não foi possível fazer login.");
+      if (!me?.usuario) throw new Error("Não foi possível validar sua conta.");
+      setTimeout(() => redirectUser(me.usuario), 300);
+    } catch (error) {
+      clearSession();
+      hideLoading();
+      showMessage(error.message || "Não foi possível fazer login.");
     } finally {
-      botaoCarregando(botao, false);
+      setButtonLoading(button, false);
     }
   }
 
-  async function criarConta(evento) {
-    evento.preventDefault();
+  async function register(event) {
+    event.preventDefault();
+    const name = String($("cadastroNome")?.value || "").trim();
+    const email = normalizeEmail($("cadastroEmail")?.value);
+    const phone = String($("cadastroTelefone")?.value || "").trim();
+    const password = $("cadastroSenha")?.value || "";
+    const button = event.currentTarget.querySelector(".auth-submit");
 
-    const nome = String($("cadastroNome")?.value || "").trim();
-    const email = emailNormalizado($("cadastroEmail")?.value);
-    const telefone = String($("cadastroTelefone")?.value || "").trim();
-    const senha = $("cadastroSenha")?.value || "";
-    const botao = evento.currentTarget.querySelector(".auth-submit");
+    if (name.length < 3) return showMessage("Digite seu nome completo.");
+    if (!validEmail(email)) return showMessage("Digite um e-mail válido.");
+    if (phone.replace(/\D/g, "") && phone.replace(/\D/g, "").length < 10) return showMessage("Digite o WhatsApp corretamente.");
+    if (password.length < 6) return showMessage("A senha precisa ter pelo menos 6 caracteres.");
 
-    if (nome.length < 3) {
-      mostrarMensagem("Digite seu nome completo.");
-      $("cadastroNome")?.focus();
-      return;
-    }
-
-    if (!emailValido(email)) {
-      mostrarMensagem("Digite um e-mail válido.");
-      $("cadastroEmail")?.focus();
-      return;
-    }
-
-    if (telefone.replace(/\D/g, "") && telefone.replace(/\D/g, "").length < 10) {
-      mostrarMensagem("Digite o WhatsApp corretamente.");
-      $("cadastroTelefone")?.focus();
-      return;
-    }
-
-    if (senha.length < 6) {
-      mostrarMensagem("A senha precisa ter pelo menos 6 caracteres.");
-      $("cadastroSenha")?.focus();
-      return;
-    }
-
-    botaoCarregando(botao, true);
-    mostrarLoading("Criando sua conta gratuita…");
+    setButtonLoading(button, true);
+    showLoading("Criando sua conta gratuita…");
 
     try {
-      const resposta = await api("/criar", {
-        method: "POST",
-        body: { nome, email, telefone, senha }
-      });
-
-      if (!resposta?.sucesso) {
-        throw new Error(resposta?.mensagem || "Não foi possível criar a conta.");
-      }
-
-      ocultarLoading();
-      evento.currentTarget.reset();
-      atualizarForca();
-      ativarLogin();
-
+      const response = await api("/criar", { method: "POST", body: { nome: name, email, telefone: phone, senha: password } });
+      if (!response?.sucesso) throw new Error(response?.mensagem || "Não foi possível criar a conta.");
+      hideLoading();
+      event.currentTarget.reset();
+      updateStrength();
+      showLogin();
       if ($("loginEmail")) $("loginEmail").value = email;
-
-      mostrarMensagem(
-        "Conta criada com sucesso. Agora faça seu login.",
-        "sucesso"
-      );
-
-      setTimeout(() => $("loginSenha")?.focus(), 120);
-    } catch (erro) {
-      ocultarLoading();
-      mostrarMensagem(erro.message || "Não foi possível criar a conta.");
+      showMessage("Conta criada com sucesso. Agora faça seu login.", "sucesso");
+    } catch (error) {
+      hideLoading();
+      showMessage(error.message || "Não foi possível criar a conta.");
     } finally {
-      botaoCarregando(botao, false);
+      setButtonLoading(button, false);
     }
   }
 
-  function alternarSenha(botao) {
-    const input = $(botao.dataset.target);
+  function togglePassword(button) {
+    const input = $(button.dataset.target);
     if (!input) return;
-
-    const mostrar = input.type === "password";
-    input.type = mostrar ? "text" : "password";
-    botao.setAttribute("aria-pressed", String(mostrar));
-    botao.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
-    botao.textContent = mostrar ? "◌" : "◉";
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    button.setAttribute("aria-pressed", String(show));
+    button.setAttribute("aria-label", show ? "Ocultar senha" : "Mostrar senha");
+    button.textContent = show ? "◌" : "◉";
   }
 
-  function abrirDestino(botao) {
-    if (botao.hidden || botao.disabled) return;
+  function bindEvents() {
+    $("tabLogin")?.addEventListener("click", showLogin);
+    $("tabCadastro")?.addEventListener("click", showRegister);
+    $("formLogin")?.addEventListener("submit", login);
+    $("formCadastro")?.addEventListener("submit", register);
+    $("cadastroSenha")?.addEventListener("input", updateStrength);
+    $("cadastroTelefone")?.addEventListener("input", (event) => { event.target.value = maskPhone(event.target.value); });
 
-    if (!pegarToken()) {
-      fecharEscolha();
-      mostrarMensagem("Sua sessão expirou. Faça login novamente.");
-      return;
-    }
+    $$(".toggle-password").forEach((button) => button.addEventListener("click", () => togglePassword(button)));
+    $$('[data-go]').forEach((button) => button.addEventListener("click", () => {
+      if (!button.hidden && !button.disabled && getToken()) window.location.assign(button.dataset.go);
+    }));
 
-    window.location.assign(botao.dataset.go);
-  }
-
-  function registrarEventos() {
-    $("tabLogin")?.addEventListener("click", ativarLogin);
-    $("tabCadastro")?.addEventListener("click", ativarCadastro);
-    $("formLogin")?.addEventListener("submit", realizarLogin);
-    $("formCadastro")?.addEventListener("submit", criarConta);
-    $("cadastroSenha")?.addEventListener("input", atualizarForca);
-
-    $("cadastroTelefone")?.addEventListener("input", (evento) => {
-      evento.target.value = mascaraTelefone(evento.target.value);
+    $("fecharAdminChoice")?.addEventListener("click", closeChoice);
+    $("adminChoiceOverlay")?.addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeChoice();
     });
 
-    $$(".toggle-password").forEach((botao) => {
-      botao.addEventListener("click", () => alternarSenha(botao));
-    });
-
-    $$('[data-go]').forEach((botao) => {
-      botao.addEventListener("click", () => abrirDestino(botao));
-    });
-
-    $("fecharAdminChoice")?.addEventListener("click", fecharEscolha);
-
-    $("adminChoiceOverlay")?.addEventListener("click", (evento) => {
-      if (evento.target === evento.currentTarget) fecharEscolha();
-    });
-
-    document.addEventListener("keydown", (evento) => {
-      if (evento.key === "Escape") fecharEscolha();
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeChoice();
     });
   }
 })();
