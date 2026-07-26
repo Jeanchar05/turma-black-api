@@ -10,25 +10,42 @@ let ultimoDiagnostico = {
   host: "",
   port: 3306,
   passwordSource: "DB_PASSWORD",
+  passwordRawLength: 0,
   passwordLength: 0,
+  passwordInvisibleCharsRemoved: 0,
   passwordHadOuterQuotes: false,
   passwordHadEdgeWhitespace: false,
   lastErrorCode: "",
   lastErrorMessage: ""
 };
 
+const CARACTERES_INVISIVEIS = /[\u200B-\u200D\u2060\uFEFF]/g;
+
+function removerCaracteresInvisiveis(valor) {
+  const original = String(valor ?? "");
+  const encontrados = original.match(CARACTERES_INVISIVEIS) || [];
+
+  return {
+    valor: original.replace(CARACTERES_INVISIVEIS, ""),
+    removidos: encontrados.length
+  };
+}
+
 function obrigatoria(nome) {
-  const valor = String(process.env[nome] || "").trim();
-  if (!valor) {
+  const bruto = String(process.env[nome] || "");
+  const limpo = removerCaracteresInvisiveis(bruto).valor.trim();
+
+  if (!limpo) {
     const error = new Error(`${nome} não configurada.`);
     error.code = "ENV_MISSING";
     throw error;
   }
-  return valor;
+
+  return limpo;
 }
 
 function normalizarHost(valor) {
-  const host = String(valor || "localhost").trim();
+  const host = removerCaracteresInvisiveis(valor || "localhost").valor.trim();
   return host || "localhost";
 }
 
@@ -47,30 +64,35 @@ function removerAspasExternas(valor) {
 }
 
 function lerSenha() {
-  const base64 = String(process.env.DB_PASSWORD_BASE64 || "").trim();
+  const base64Bruto = String(process.env.DB_PASSWORD_BASE64 || "");
+  const base64Limpo = removerCaracteresInvisiveis(base64Bruto).valor.trim();
 
-  if (base64) {
+  if (base64Limpo) {
     let senha;
 
     try {
-      senha = Buffer.from(base64, "base64").toString("utf8");
+      senha = Buffer.from(base64Limpo, "base64").toString("utf8");
     } catch (_) {
       const error = new Error("DB_PASSWORD_BASE64 inválida.");
       error.code = "ENV_INVALID";
       throw error;
     }
 
-    if (!senha) {
+    const normalizada = removerCaracteresInvisiveis(senha);
+
+    if (!normalizada.valor) {
       const error = new Error("DB_PASSWORD_BASE64 resultou em uma senha vazia.");
       error.code = "ENV_INVALID";
       throw error;
     }
 
     return {
-      password: senha,
+      password: normalizada.valor,
       source: "DB_PASSWORD_BASE64",
+      rawLength: senha.length,
+      invisibleCharsRemoved: normalizada.removidos,
       hadOuterQuotes: false,
-      hadEdgeWhitespace: /^\s|\s$/.test(senha)
+      hadEdgeWhitespace: /^\s|\s$/.test(normalizada.valor)
     };
   }
 
@@ -83,8 +105,9 @@ function lerSenha() {
   }
 
   const original = String(bruto);
-  const hadEdgeWhitespace = /^\s|\s$/.test(original);
-  const semEspacosExternos = original.trim();
+  const semInvisiveis = removerCaracteresInvisiveis(original);
+  const hadEdgeWhitespace = /^\s|\s$/.test(semInvisiveis.valor);
+  const semEspacosExternos = semInvisiveis.valor.trim();
   const resultadoAspas = removerAspasExternas(semEspacosExternos);
 
   if (!resultadoAspas.valor) {
@@ -96,6 +119,8 @@ function lerSenha() {
   return {
     password: resultadoAspas.valor,
     source: "DB_PASSWORD",
+    rawLength: original.length,
+    invisibleCharsRemoved: semInvisiveis.removidos,
     hadOuterQuotes: resultadoAspas.removidas,
     hadEdgeWhitespace
   };
@@ -210,7 +235,9 @@ async function connectDatabase() {
     host,
     port,
     passwordSource: senhaInfo.source,
+    passwordRawLength: senhaInfo.rawLength,
     passwordLength: password.length,
+    passwordInvisibleCharsRemoved: senhaInfo.invisibleCharsRemoved,
     passwordHadOuterQuotes: senhaInfo.hadOuterQuotes,
     passwordHadEdgeWhitespace: senhaInfo.hadEdgeWhitespace,
     lastErrorCode: "",
@@ -234,7 +261,8 @@ async function connectDatabase() {
       charset: "utf8mb4",
       timezone: "Z",
       dateStrings: true,
-      decimalNumbers: true
+      decimalNumbers: true,
+      connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT || 10000)
     });
 
     const conexao = await pool.getConnection();
