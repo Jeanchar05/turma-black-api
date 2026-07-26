@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Usuario = require("../models/Usuario");
+const PermissaoSistema = require("../models/PermissaoSistema");
 
 const MIGRATION_ID = "reset-contas-dev-2026-07-26-v1";
 const DEV_EMAIL = String(process.env.DEV_EMAIL || "dev@turmablack.com")
@@ -33,31 +34,26 @@ function montarUsuarioDev(senhaDev) {
   };
 }
 
-async function garantirPerfilDev(senhaDev = "") {
-  const existente = await Usuario.findOne({ email: DEV_EMAIL });
+async function garantirMatrizOperacional() {
+  const registro = await PermissaoSistema.obter();
+  const matrizAtual = registro.matriz && typeof registro.matriz === "object"
+    ? registro.matriz
+    : {};
 
-  if (!existente) {
-    if (!senhaDev) {
-      throw new Error("Conta Dev não encontrada e nenhuma senha inicial foi informada.");
+  registro.matriz = {
+    ...matrizAtual,
+    financeiro: {
+      ...(matrizAtual.financeiro || {}),
+      dashboard: true,
+      painelAdmin: true,
+      painelVendas: true,
+      financas: true,
+      relatorios: true
     }
-
-    await Usuario.create(montarUsuarioDev(senhaDev));
-    return;
-  }
-
-  existente.tipo = "admin";
-  existente.cargo = "dev";
-  existente.contaDev = true;
-  existente.vendedor = true;
-  existente.aprovado = true;
-  existente.suspenso = false;
-  existente.status = "ativo";
-  existente.plano = "admin";
-  existente.codigo = existente.codigo || "TB-DEV-2026";
-  existente.permissoesPersonalizadas = {};
-  existente.atualizadoPor = "bootstrap-dev";
-
-  await existente.save({ validateModifiedOnly: true });
+  };
+  registro.atualizadoPor = "bootstrap-permissoes-v4.1";
+  registro.markModified("matriz");
+  await registro.save();
 }
 
 async function executarReset({ migrations, senhaDev, session = null }) {
@@ -81,19 +77,37 @@ async function executarReset({ migrations, senhaDev, session = null }) {
 }
 
 async function bootstrapDevAccount() {
+  await garantirMatrizOperacional();
+
   const migrations = mongoose.connection.collection("system_migrations");
   const executada = await migrations.findOne({ _id: MIGRATION_ID });
+
+  if (executada) {
+    await Usuario.updateOne(
+      { email: DEV_EMAIL },
+      {
+        $set: {
+          cargo: "dev",
+          tipo: "admin",
+          contaDev: true,
+          aprovado: true,
+          suspenso: false,
+          status: "ativo",
+          plano: "admin",
+          vendedor: true,
+          atualizadoPor: "bootstrap-dev-v4"
+        }
+      }
+    );
+    console.log(`Bootstrap Dev já executado: ${DEV_EMAIL}`);
+    return;
+  }
+
   const senhaDev = String(
     process.env.DEV_PASSWORD ||
     process.env.SETUP_SECRET ||
     ""
   );
-
-  if (executada) {
-    await garantirPerfilDev(senhaDev);
-    console.log(`Conta Dev garantida: ${DEV_EMAIL}`);
-    return;
-  }
 
   if (!senhaDev) {
     throw new Error(
@@ -119,14 +133,10 @@ async function bootstrapDevAccount() {
       if (!semTransacao) throw error;
 
       console.warn("Cluster sem transação. Executando reset Dev em modo compatível.");
-
       const jaExecutada = await migrations.findOne({ _id: MIGRATION_ID });
-      if (!jaExecutada) {
-        await executarReset({ migrations, senhaDev });
-      }
+      if (!jaExecutada) await executarReset({ migrations, senhaDev });
     }
 
-    await garantirPerfilDev(senhaDev);
     console.log(`Contas redefinidas. Login Dev criado: ${DEV_EMAIL}`);
   } finally {
     await session.endSession();
