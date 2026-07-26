@@ -39,6 +39,11 @@
   background: #12091d;
 }
 
+#newExamButton,
+#examModal {
+  display: none !important;
+}
+
 .admin-results-help {
   display: flex;
   align-items: center;
