@@ -4,10 +4,6 @@ const Usuario = require("../models/Usuario");
 
 const SECRET = process.env.JWT_SECRET || "turma_black_secret_dev";
 
-/* ===============================
-   PEGAR TOKEN
-=============================== */
-
 function extrairToken(req) {
   const authHeader = req.headers.authorization || "";
 
@@ -26,21 +22,11 @@ function extrairToken(req) {
   return null;
 }
 
-/* ===============================
-   NORMALIZAR USUÁRIO
-=============================== */
-
 function normalizarCargo(usuario) {
   if (!usuario) return "aluno";
-
-  if (usuario.cargo) {
-    return usuario.cargo;
-  }
-
-  if (usuario.tipo === "admin") {
-    return "admin";
-  }
-
+  if (usuario.contaDev === true) return "dev";
+  if (usuario.cargo) return usuario.cargo;
+  if (usuario.tipo === "admin") return "admin";
   return "aluno";
 }
 
@@ -54,6 +40,8 @@ function montarUsuarioSeguro(usuario) {
     email: usuario.email || "",
     tipo: usuario.tipo || "aluno",
     cargo,
+    contaDev: Boolean(usuario.contaDev || cargo === "dev"),
+    permissoesPersonalizadas: usuario.permissoesPersonalizadas || {},
     vendedor: Boolean(usuario.vendedor || cargo === "vendedor"),
     comissao: Number(usuario.comissao || 20),
     aprovado: Boolean(usuario.aprovado),
@@ -66,9 +54,31 @@ function montarUsuarioSeguro(usuario) {
   };
 }
 
-/* ===============================
-   AUTH OBRIGATÓRIO
-=============================== */
+async function localizarUsuarioPorToken(token) {
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, SECRET);
+  } catch (_) {
+    return { erro: "TOKEN_INVALIDO" };
+  }
+
+  const payload = decoded.usuario || decoded.user || decoded;
+  const id = payload.id || payload._id || payload.usuarioId || "";
+  const email = String(payload.email || "").toLowerCase().trim();
+
+  let usuario = null;
+
+  if (id && mongoose.Types.ObjectId.isValid(id)) {
+    usuario = await Usuario.findById(id);
+  }
+
+  if (!usuario && email) {
+    usuario = await Usuario.findOne({ email });
+  }
+
+  return { usuario };
+}
 
 async function auth(req, res, next) {
   try {
@@ -81,31 +91,16 @@ async function auth(req, res, next) {
       });
     }
 
-    let decoded;
+    const resultado = await localizarUsuarioPorToken(token);
 
-    try {
-      decoded = jwt.verify(token, SECRET);
-    } catch (error) {
+    if (resultado.erro) {
       return res.status(401).json({
         erro: "Token inválido ou expirado.",
-        codigo: "TOKEN_INVALIDO"
+        codigo: resultado.erro
       });
     }
 
-    const payload = decoded.usuario || decoded.user || decoded;
-
-    const id = payload.id || payload._id || payload.usuarioId || "";
-    const email = String(payload.email || "").toLowerCase().trim();
-
-    let usuario = null;
-
-    if (id && mongoose.Types.ObjectId.isValid(id)) {
-      usuario = await Usuario.findById(id);
-    }
-
-    if (!usuario && email) {
-      usuario = await Usuario.findOne({ email });
-    }
+    const usuario = resultado.usuario;
 
     if (!usuario) {
       return res.status(401).json({
@@ -130,20 +125,12 @@ async function auth(req, res, next) {
 
     req.usuarioDoc = usuario;
     req.usuario = montarUsuarioSeguro(usuario);
-
     next();
   } catch (error) {
     console.error("Erro no middleware auth:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno de autenticação."
-    });
+    return res.status(500).json({ erro: "Erro interno de autenticação." });
   }
 }
-
-/* ===============================
-   AUTH OPCIONAL
-=============================== */
 
 async function authOpcional(req, res, next) {
   try {
@@ -155,30 +142,8 @@ async function authOpcional(req, res, next) {
       return next();
     }
 
-    let decoded;
-
-    try {
-      decoded = jwt.verify(token, SECRET);
-    } catch (error) {
-      req.usuario = null;
-      req.usuarioDoc = null;
-      return next();
-    }
-
-    const payload = decoded.usuario || decoded.user || decoded;
-
-    const id = payload.id || payload._id || payload.usuarioId || "";
-    const email = String(payload.email || "").toLowerCase().trim();
-
-    let usuario = null;
-
-    if (id && mongoose.Types.ObjectId.isValid(id)) {
-      usuario = await Usuario.findById(id);
-    }
-
-    if (!usuario && email) {
-      usuario = await Usuario.findOne({ email });
-    }
+    const resultado = await localizarUsuarioPorToken(token);
+    const usuario = resultado.usuario;
 
     if (!usuario) {
       req.usuario = null;
@@ -188,18 +153,13 @@ async function authOpcional(req, res, next) {
 
     req.usuarioDoc = usuario;
     req.usuario = montarUsuarioSeguro(usuario);
-
     next();
-  } catch (error) {
+  } catch (_) {
     req.usuario = null;
     req.usuarioDoc = null;
     next();
   }
 }
-
-/* ===============================
-   GERAR TOKEN
-=============================== */
 
 function gerarToken(usuario) {
   const cargo = normalizarCargo(usuario);
@@ -211,13 +171,12 @@ function gerarToken(usuario) {
       nome: usuario.nome || "",
       tipo: usuario.tipo || "aluno",
       cargo,
+      contaDev: Boolean(usuario.contaDev || cargo === "dev"),
       vendedor: Boolean(usuario.vendedor || cargo === "vendedor"),
       plano: usuario.plano || "free"
     },
     SECRET,
-    {
-      expiresIn: "7d"
-    }
+    { expiresIn: "7d" }
   );
 }
 
