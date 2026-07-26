@@ -68,10 +68,7 @@
 
   function avisar(mensagem, tipo = "success") {
     const pilha = $("adminToastStack");
-    if (!pilha) {
-      window.alert(mensagem);
-      return;
-    }
+    if (!pilha) return;
 
     const item = document.createElement("div");
     item.className = `admin-toast ${tipo}`;
@@ -84,18 +81,81 @@
     }, 3800);
   }
 
-  function removerControlesAntigos() {
-    document
-      .querySelectorAll(
-        '#newExamButton, #examModal, [data-open-modal="exam"], [data-exam-action], [data-section="exams"]'
-      )
-      .forEach((elemento) => elemento.remove());
+  function markupResultados() {
+    return `
+      <div class="admin-section-head">
+        <div>
+          <span class="admin-kicker">MÓDULOS DE ESTUDO</span>
+          <h2>Resultados dos alunos</h2>
+          <p>Consulte as tentativas por módulo e baixe o PDF corrigido com as respostas do aluno e o gabarito nas questões erradas.</p>
+        </div>
+        <button class="admin-primary-btn" type="button" id="refreshExamResults">↻ Atualizar</button>
+      </div>
 
-    const botaoAtual = document.querySelector('[data-section="exam-results"]');
-    if (botaoAtual) {
-      const texto = botaoAtual.querySelector("span:last-of-type");
-      if (texto) texto.textContent = "Relatórios de Provas";
+      <div class="admin-mini-stat-grid">
+        <article><small>Resultados</small><strong id="examResultTotal">0</strong></article>
+        <article><small>Aprovados</small><strong id="examResultApproved">0</strong></article>
+        <article><small>Reprovados</small><strong id="examResultFailed">0</strong></article>
+        <article><small>Em análise</small><strong id="examResultReview">0</strong></article>
+      </div>
+
+      <div class="admin-panel-card">
+        <div class="admin-filterbar">
+          <div class="admin-search">
+            <span>⌕</span>
+            <input id="examResultSearch" type="search" placeholder="Buscar aluno, módulo, e-mail ou prova" />
+          </div>
+          <select id="examResultStatus">
+            <option value="">Todos os resultados</option>
+            <option value="aprovado">Aprovados</option>
+            <option value="reprovado">Reprovados</option>
+            <option value="em_analise">Em análise</option>
+            <option value="pendente">Pendentes</option>
+          </select>
+        </div>
+
+        <div class="admin-results-help">
+          <span>PDF</span>
+          <div>
+            <strong>Relatório corrigido automaticamente</strong>
+            <p>As provas são vinculadas aos módulos de estudo. Questões erradas recebem uma seta indicando a resposta correta.</p>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table admin-results-table">
+            <thead>
+              <tr>
+                <th>Aluno</th><th>Módulo</th><th>Prova</th><th>Nota</th>
+                <th>Acertos / erros</th><th>Status</th><th>Data</th><th>Relatório</th>
+              </tr>
+            </thead>
+            <tbody id="examResultsTableBody">
+              <tr><td colspan="8"><div class="admin-empty-state">Carregando resultados…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  function prepararInterface() {
+    const botaoAntigo = document.querySelector('[data-section="exams"]');
+    if (botaoAntigo) {
+      botaoAntigo.dataset.section = "exam-results";
+      const rotulo = botaoAntigo.querySelector("span:last-of-type");
+      if (rotulo) rotulo.textContent = "Relatórios de Provas";
     }
+
+    const secaoAntiga = $("section-exams");
+    if (secaoAntiga) {
+      secaoAntiga.id = "section-exam-results";
+      secaoAntiga.dataset.title = "Relatórios de Provas";
+      secaoAntiga.innerHTML = markupResultados();
+    }
+
+    document
+      .querySelectorAll('#newExamButton, #examModal, [data-open-modal="exam"], [data-exam-action]')
+      .forEach((elemento) => elemento.remove());
   }
 
   async function carregar() {
@@ -103,7 +163,6 @@
     if (!corpo) return;
 
     corpo.innerHTML = '<tr><td colspan="8"><div class="admin-empty-state">Carregando resultados…</div></td></tr>';
-
     const busca = encodeURIComponent($("examResultSearch")?.value.trim() || "");
     const status = encodeURIComponent($("examResultStatus")?.value || "");
 
@@ -152,8 +211,7 @@
           <td data-label="Status"><span class="admin-result-status ${escapar(status)}">${escapar(rotuloStatus(status))}</span></td>
           <td data-label="Data">${escapar(data(item.finalizadoEm || item.createdAt))}</td>
           <td data-label="Relatório"><button class="admin-primary-btn admin-pdf-button" type="button" data-download-result="${escapar(id)}">Baixar PDF</button></td>
-        </tr>
-      `;
+        </tr>`;
     }).join("");
   }
 
@@ -181,13 +239,10 @@
       }
 
       const blob = await resposta.blob();
-      const disposicao = resposta.headers.get("content-disposition") || "";
-      const encontrado = disposicao.match(/filename="?([^";]+)"?/i);
-      const arquivo = encontrado?.[1] || `resultado-${id}.pdf`;
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = arquivo;
+      link.download = `resultado-${id}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -201,35 +256,27 @@
     }
   }
 
-  function registrarEventos() {
+  function iniciar() {
+    prepararInterface();
+
     document.addEventListener("click", (evento) => {
       const secao = evento.target.closest('[data-section="exam-results"]');
-      if (secao) setTimeout(() => carregar(), 0);
+      if (secao) setTimeout(carregar, 0);
 
-      const atualizar = evento.target.closest("#refreshExamResults");
-      if (atualizar) carregar();
+      if (evento.target.closest("#refreshExamResults")) carregar();
 
-      const baixarBotao = evento.target.closest("[data-download-result]");
-      if (baixarBotao) baixar(baixarBotao.dataset.downloadResult, baixarBotao);
+      const botao = evento.target.closest("[data-download-result]");
+      if (botao) baixar(botao.dataset.downloadResult, botao);
     });
 
     document.addEventListener("input", (evento) => {
       if (evento.target.id !== "examResultSearch") return;
       clearTimeout(state.timer);
-      state.timer = setTimeout(() => carregar(), 350);
+      state.timer = setTimeout(carregar, 350);
     });
 
     document.addEventListener("change", (evento) => {
       if (evento.target.id === "examResultStatus") carregar();
     });
-  }
-
-  function iniciar() {
-    removerControlesAntigos();
-    registrarEventos();
-
-    const observador = new MutationObserver(removerControlesAntigos);
-    observador.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => observador.disconnect(), 6000);
   }
 })();
