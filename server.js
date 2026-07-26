@@ -9,7 +9,6 @@ const connectDatabase = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const ADMIN_RELEASE = "20260726-admin-v7";
 
 app.disable("x-powered-by");
 app.use(cors({ origin: "*" }));
@@ -27,130 +26,35 @@ function servirBundle(arquivos, tipo) {
 
     res.setHeader("Content-Type", `${tipo}; charset=utf-8`);
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     return res.send(conteudo);
   };
 }
 
 app.get(
   "/admin-enhanced.js",
-  servirBundle(["admin-enhanced.js"], "application/javascript")
+  servirBundle(["admin-enhanced.js", "admin-results.js"], "application/javascript")
 );
+
 app.get(
   "/admin-enhanced.css",
-  servirBundle(["admin-enhanced.css"], "text/css")
+  servirBundle(["admin-enhanced.css", "admin-results.css"], "text/css")
 );
-
-function secaoRelatoriosProvas() {
-  return `
-      <section class="admin-section" id="section-exam-results" data-title="Relatórios de Provas" data-permission="provas">
-        <div class="admin-section-head">
-          <div>
-            <span class="admin-kicker">MÓDULOS DE ESTUDO</span>
-            <h2>Resultados dos alunos</h2>
-            <p>Consulte as tentativas por módulo e baixe o PDF corrigido com as respostas do aluno e o gabarito indicado nas questões erradas.</p>
-          </div>
-          <button class="admin-primary-btn" type="button" id="refreshExamResults">↻ Atualizar</button>
-        </div>
-
-        <div class="admin-mini-stat-grid">
-          <article><small>Resultados</small><strong id="examResultTotal">0</strong></article>
-          <article><small>Aprovados</small><strong id="examResultApproved">0</strong></article>
-          <article><small>Reprovados</small><strong id="examResultFailed">0</strong></article>
-          <article><small>Em análise</small><strong id="examResultReview">0</strong></article>
-        </div>
-
-        <div class="admin-panel-card">
-          <div class="admin-filterbar">
-            <div class="admin-search">
-              <span>⌕</span>
-              <input id="examResultSearch" type="search" placeholder="Buscar aluno, módulo, e-mail ou prova" />
-            </div>
-            <select id="examResultStatus">
-              <option value="">Todos os resultados</option>
-              <option value="aprovado">Aprovados</option>
-              <option value="reprovado">Reprovados</option>
-              <option value="em_analise">Em análise</option>
-              <option value="pendente">Pendentes</option>
-            </select>
-          </div>
-
-          <div class="admin-results-help">
-            <span>PDF</span>
-            <div>
-              <strong>Relatório corrigido automaticamente</strong>
-              <p>As provas são vinculadas aos módulos de estudo. Questões erradas recebem uma seta indicando a resposta correta.</p>
-            </div>
-          </div>
-
-          <div class="admin-table-wrap">
-            <table class="admin-table admin-results-table">
-              <thead>
-                <tr>
-                  <th>Aluno</th>
-                  <th>Módulo</th>
-                  <th>Prova</th>
-                  <th>Nota</th>
-                  <th>Acertos / erros</th>
-                  <th>Status</th>
-                  <th>Data</th>
-                  <th>Relatório</th>
-                </tr>
-              </thead>
-              <tbody id="examResultsTableBody">
-                <tr><td colspan="8"><div class="admin-empty-state">Carregando resultados…</div></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>`;
-}
-
-function servirAdminAtualizado(req, res, next) {
-  const arquivo = path.join(publicDir, "admin.html");
-  if (!fs.existsSync(arquivo)) return next();
-
-  let html = fs.readFileSync(arquivo, "utf8");
-
-  html = html
-    .replace(/style\.css\?v=[^"]+/g, `style.css?v=${ADMIN_RELEASE}`)
-    .replace(/admin-enhanced\.css\?v=[^"]+/g, `admin-enhanced.css?v=${ADMIN_RELEASE}`)
-    .replace(/admin\.js\?v=[^"]+/g, `admin.js?v=${ADMIN_RELEASE}`)
-    .replace(/admin-enhanced\.js\?v=[^"]+/g, `admin-enhanced.js?v=${ADMIN_RELEASE}`)
-    .replace(
-      "</head>",
-      `  <link rel="stylesheet" href="admin-results.css?v=${ADMIN_RELEASE}" />\n  <script defer src="admin-results.js?v=${ADMIN_RELEASE}"></script>\n</head>`
-    )
-    .replace(
-      /<button class="admin-nav-item" type="button" data-section="exams" data-permission="provas">[\s\S]*?<\/button>/,
-      '<button class="admin-nav-item" type="button" data-section="exam-results" data-permission="provas"><span class="admin-nav-icon">□</span><span>Relatórios de Provas</span></button>'
-    )
-    .replace(
-      /<section class="admin-section" id="section-exams"[\s\S]*?<\/section>/,
-      secaoRelatoriosProvas()
-    )
-    .replace(
-      '<select id="overviewChartPeriod">',
-      '<select id="overviewChartPeriod" style="color:#f7f1ff!important;background-color:#12091d!important;border:1px solid rgba(179,103,255,.28)!important;border-radius:12px!important;min-height:42px;padding:0 42px 0 14px!important;color-scheme:dark!important;-webkit-appearance:none;appearance:none;">'
-    );
-
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
-  return res.send(html);
-}
-
-app.get(["/admin", "/admin.html"], servirAdminAtualizado);
 
 if (fs.existsSync(publicDir)) {
   app.use(
     express.static(publicDir, {
       extensions: ["html"],
       index: "index.html",
-      maxAge: process.env.NODE_ENV === "production" ? "1h" : 0,
+      maxAge: 0,
+      etag: false,
+      lastModified: false,
       setHeaders(res, filePath) {
         if (/\.(html|js|css)$/i.test(filePath)) {
           res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+          res.setHeader("Pragma", "no-cache");
+          res.setHeader("Expires", "0");
         }
       }
     })
@@ -164,6 +68,8 @@ function servirPagina(nomeArquivo) {
     if (!fs.existsSync(arquivo)) return next();
 
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     return res.sendFile(arquivo);
   };
 }
@@ -171,6 +77,7 @@ function servirPagina(nomeArquivo) {
 app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
 app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
 app.get(["/dashboard-free", "/dashboard-free.html"], servirPagina("dashboard-free.html"));
+app.get(["/admin", "/admin.html"], servirPagina("admin.html"));
 app.get(
   ["/painel-vendas", "/painel-vendas.html"],
   servirPagina("painel-vendas.html")
@@ -187,8 +94,8 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.1.3",
-    release: "admin-provas-resultados-cache-fix",
+    versao: "4.1.4",
+    release: "admin-black-screen-recovery",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
