@@ -1,6 +1,8 @@
+"use strict";
+
 const express = require("express");
-const mongoose = require("mongoose");
 const Usuario = require("../models/Usuario");
+const database = require("../config/database");
 const { gerarToken, montarUsuarioSeguro } = require("../middleware/auth");
 const {
   getPermissoesEfetivas,
@@ -87,21 +89,25 @@ function normalizarPlano(valor, cargo) {
 }
 
 function montarCompatibilidade(usuario) {
-  const cargo = normalizarCargo(usuario.cargo, usuario.tipo, usuario.contaDev);
-  const plano = normalizarPlano(usuario.plano, cargo);
+  const base = typeof usuario?.toObject === "function"
+    ? usuario.toObject()
+    : { ...usuario };
+
+  const cargo = normalizarCargo(base.cargo, base.tipo, base.contaDev);
+  const plano = normalizarPlano(base.plano, cargo);
   const administrativo = cargo !== "aluno";
 
   return {
-    ...usuario,
+    ...base,
     tipo: administrativo ? "admin" : "aluno",
     cargo,
-    contaDev: Boolean(usuario.contaDev || cargo === "dev"),
+    contaDev: Boolean(base.contaDev || cargo === "dev"),
     plano,
-    status: usuario.status || "ativo",
-    aprovado: usuario.aprovado !== false || plano === "free",
-    suspenso: Boolean(usuario.suspenso),
+    status: base.status || "ativo",
+    aprovado: base.aprovado !== false || plano === "free",
+    suspenso: Boolean(base.suspenso),
     vendedor: Boolean(
-      usuario.vendedor ||
+      base.vendedor ||
       ["dev", "dono", "superadmin", "admin", "financeiro", "vendedor"].includes(cargo)
     )
   };
@@ -135,14 +141,14 @@ async function loginCompativel(req, res) {
       return res.status(400).json({ erro: "E-mail e senha são obrigatórios." });
     }
 
-    if (mongoose.connection.readyState !== 1) {
+    if (!database.isConnected()) {
       return res.status(503).json({
-        erro: "O banco de dados ainda está conectando. Aguarde alguns segundos e tente novamente.",
+        erro: "O banco MySQL ainda está conectando. Aguarde alguns segundos e tente novamente.",
         codigo: "BANCO_INDISPONIVEL"
       });
     }
 
-    const encontrado = await Usuario.findOne({ email }).lean();
+    const encontrado = await Usuario.findOne({ email });
 
     if (!encontrado || String(encontrado.senha) !== senha) {
       return res.status(401).json({ erro: "E-mail ou senha incorretos." });
@@ -176,8 +182,7 @@ async function loginCompativel(req, res) {
           ultimoLogin: agora,
           status: usuario.status === "pendente" ? "ativo" : usuario.status
         }
-      },
-      { runValidators: false }
+      }
     );
 
     usuario.acessos = Number(encontrado.acessos || 0) + 1;
@@ -193,7 +198,7 @@ async function loginCompativel(req, res) {
       usuario: await respostaUsuario(usuario)
     });
   } catch (error) {
-    console.error("Erro no login compatível:", error);
+    console.error("Erro no login MySQL:", error);
 
     return res.status(500).json({
       erro: "Não foi possível concluir o login. Tente novamente em alguns instantes.",
