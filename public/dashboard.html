@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Dashboard | Turma do Primo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=20260726-dev-1" />
+  <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
+  <script defer src="protected.js?v=20260726-dev-1"></script>
+</head>
+<body class="legal-body" data-required-access="dashboard">
+  <main class="legal-shell">
+    <header class="legal-topbar">
+      <a class="legal-brand" href="dashboard.html">
+        <img src="assets/turma-primo-logo.svg" alt="" />
+        <span><small>TURMA DO</small><strong>PRIMO</strong></span>
+      </a>
+      <button class="legal-back" type="button" data-logout>Sair</button>
+    </header>
+
+    <section class="legal-hero">
+      <div class="legal-icon" aria-hidden="true">▦</div>
+      <span class="legal-kicker">ÁREA PRINCIPAL</span>
+      <h1>Bem-vindo, <span data-user-name>Dev</span>!</h1>
+      <p>Sua sessão está protegida. Escolha a área que deseja acessar para continuar o desenvolvimento da plataforma.</p>
+      <span class="legal-updated">Conta: <strong data-user-role>Super Admin</strong></span>
+    </section>
+
+    <div class="legal-content">
+      <section class="legal-card legal-highlight">
+        <h2>Central de acesso</h2>
+        <p>Este dashboard substitui a antiga resposta em JSON e mantém sua sessão validada antes de abrir qualquer área administrativa.</p>
+      </section>
+
+      <section class="legal-card">
+        <h2>Painel Administrativo</h2>
+        <p>Usuários, permissões, aprovações, notificações, agenda, suporte, provas e configurações.</p>
+        <p><a class="legal-back" href="admin.html">Acessar Painel Administrativo →</a></p>
+      </section>
+
+      <section class="legal-card">
+        <h2>Painel de Vendas</h2>
+        <p>Vendas, vendedores, comissões, metas, ranking e acompanhamento comercial.</p>
+        <p><a class="legal-back" href="painel-vendas.html">Acessar Painel de Vendas →</a></p>
+      </section>
+    </div>
+
+    <nav class="legal-links" aria-label="Navegação principal">
+      <a href="dashboard.html" aria-current="page">Dashboard</a>
+      <a href="admin.html">Painel Admin</a>
+      <a href="painel-vendas.html">Painel de Vendas</a>
+    </nav>
+
+    <footer class="legal-footer">
+      <span>© 2026 Turma do Primo.</span>
+      <span>Sessão protegida e validada no servidor.</span>
+    </footer>
+  </main>
+</body>
+</html>
