@@ -13,7 +13,9 @@ function montarUsuarioDev(senhaDev) {
     senha: senhaDev,
     telefone: "",
     tipo: "admin",
-    cargo: "superadmin",
+    cargo: "dev",
+    contaDev: true,
+    permissoesPersonalizadas: {},
     vendedor: true,
     comissao: 20,
     aprovado: true,
@@ -29,6 +31,33 @@ function montarUsuarioDev(senhaDev) {
     criadoPor: "bootstrap-dev",
     atualizadoPor: "bootstrap-dev"
   };
+}
+
+async function garantirPerfilDev(senhaDev = "") {
+  const existente = await Usuario.findOne({ email: DEV_EMAIL });
+
+  if (!existente) {
+    if (!senhaDev) {
+      throw new Error("Conta Dev não encontrada e nenhuma senha inicial foi informada.");
+    }
+
+    await Usuario.create(montarUsuarioDev(senhaDev));
+    return;
+  }
+
+  existente.tipo = "admin";
+  existente.cargo = "dev";
+  existente.contaDev = true;
+  existente.vendedor = true;
+  existente.aprovado = true;
+  existente.suspenso = false;
+  existente.status = "ativo";
+  existente.plano = "admin";
+  existente.codigo = existente.codigo || "TB-DEV-2026";
+  existente.permissoesPersonalizadas = {};
+  existente.atualizadoPor = "bootstrap-dev";
+
+  await existente.save({ validateModifiedOnly: true });
 }
 
 async function executarReset({ migrations, senhaDev, session = null }) {
@@ -54,17 +83,17 @@ async function executarReset({ migrations, senhaDev, session = null }) {
 async function bootstrapDevAccount() {
   const migrations = mongoose.connection.collection("system_migrations");
   const executada = await migrations.findOne({ _id: MIGRATION_ID });
-
-  if (executada) {
-    console.log(`Bootstrap Dev já executado: ${DEV_EMAIL}`);
-    return;
-  }
-
   const senhaDev = String(
     process.env.DEV_PASSWORD ||
     process.env.SETUP_SECRET ||
     ""
   );
+
+  if (executada) {
+    await garantirPerfilDev(senhaDev);
+    console.log(`Conta Dev garantida: ${DEV_EMAIL}`);
+    return;
+  }
 
   if (!senhaDev) {
     throw new Error(
@@ -87,9 +116,7 @@ async function bootstrapDevAccount() {
           mensagem
         );
 
-      if (!semTransacao) {
-        throw error;
-      }
+      if (!semTransacao) throw error;
 
       console.warn("Cluster sem transação. Executando reset Dev em modo compatível.");
 
@@ -99,6 +126,7 @@ async function bootstrapDevAccount() {
       }
     }
 
+    await garantirPerfilDev(senhaDev);
     console.log(`Contas redefinidas. Login Dev criado: ${DEV_EMAIL}`);
   } finally {
     await session.endSession();
