@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
+const mongoose = require("mongoose");
 
 const connectDatabase = require("./config/database");
 
@@ -44,13 +45,20 @@ if (fs.existsSync(publicDir)) {
 =============================== */
 
 app.get("/api/status", (req, res) => {
+  const estadosBanco = {
+    0: "desconectado",
+    1: "conectado",
+    2: "conectando",
+    3: "desconectando"
+  };
+
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "3.0.0",
+    versao: "3.1.0",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
-    banco: "MongoDB",
+    banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
     estrutura: "frontend e API no mesmo serviço"
   });
 });
@@ -75,6 +83,7 @@ function carregarRota(caminhoBase, arquivo) {
    ROTAS DA API
 =============================== */
 
+carregarRota("/", "login-compat.js");
 carregarRota("/", "auth.js");
 carregarRota("/", "usuarios.js");
 carregarRota("/admin", "admin.js");
