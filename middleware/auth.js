@@ -1,5 +1,6 @@
+"use strict";
+
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 const Usuario = require("../models/Usuario");
 
 const SECRET = process.env.JWT_SECRET || "turma_black_secret_dev";
@@ -30,12 +31,17 @@ function normalizarCargo(usuario) {
   return "aluno";
 }
 
+function obterId(usuario) {
+  return String(usuario?._id || usuario?.id || "");
+}
+
 function montarUsuarioSeguro(usuario) {
   const cargo = normalizarCargo(usuario);
+  const id = obterId(usuario);
 
   return {
-    id: String(usuario._id),
-    _id: usuario._id,
+    id,
+    _id: id,
     nome: usuario.nome || "",
     email: usuario.email || "",
     tipo: usuario.tipo || "aluno",
@@ -64,12 +70,12 @@ async function localizarUsuarioPorToken(token) {
   }
 
   const payload = decoded.usuario || decoded.user || decoded;
-  const id = payload.id || payload._id || payload.usuarioId || "";
+  const id = String(payload.id || payload._id || payload.usuarioId || "").trim();
   const email = String(payload.email || "").toLowerCase().trim();
 
   let usuario = null;
 
-  if (id && mongoose.Types.ObjectId.isValid(id)) {
+  if (id) {
     usuario = await Usuario.findById(id);
   }
 
@@ -125,7 +131,7 @@ async function auth(req, res, next) {
 
     req.usuarioDoc = usuario;
     req.usuario = montarUsuarioSeguro(usuario);
-    next();
+    return next();
   } catch (error) {
     console.error("Erro no middleware auth:", error);
     return res.status(500).json({ erro: "Erro interno de autenticação." });
@@ -153,20 +159,21 @@ async function authOpcional(req, res, next) {
 
     req.usuarioDoc = usuario;
     req.usuario = montarUsuarioSeguro(usuario);
-    next();
+    return next();
   } catch (_) {
     req.usuario = null;
     req.usuarioDoc = null;
-    next();
+    return next();
   }
 }
 
 function gerarToken(usuario) {
   const cargo = normalizarCargo(usuario);
+  const id = obterId(usuario);
 
   return jwt.sign(
     {
-      id: String(usuario._id),
+      id,
       email: usuario.email,
       nome: usuario.nome || "",
       tipo: usuario.tipo || "aluno",
