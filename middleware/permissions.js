@@ -1,22 +1,61 @@
-/* ===============================
-   CARGOS
-=============================== */
+const PermissaoSistema = require("../models/PermissaoSistema");
 
 const CARGOS = {
-  SUPERADMIN: "superadmin",
+  DEV: "dev",
+  DONO: "dono",
   ADMIN: "admin",
-  MODERADOR: "moderador",
-  SUPORTE: "suporte",
+  FINANCEIRO: "financeiro",
   VENDEDOR: "vendedor",
+  SUPORTE: "suporte",
+  MODERADOR: "moderador",
+  SUPERADMIN: "superadmin",
   ALUNO: "aluno"
 };
 
-/* ===============================
-   PERMISSÕES PADRÃO
-=============================== */
+const CHAVES_PERMISSAO = [
+  "dashboard",
+  "painelAdmin",
+  "painelVendas",
+  "financas",
+  "usuarios",
+  "aprovacoes",
+  "controleAlunos",
+  "relatorios",
+  "vendedores",
+  "equipe",
+  "agendaPrimo",
+  "notificacoes",
+  "controleAdmin",
+  "seguranca",
+  "planos",
+  "provas",
+  "suporte",
+  "configuracoes",
+  "permissoesSistema"
+];
+
+function todas(valor = false) {
+  return CHAVES_PERMISSAO.reduce((acc, chave) => {
+    acc[chave] = Boolean(valor);
+    return acc;
+  }, {});
+}
 
 const PERMISSOES_PADRAO = {
+  dev: todas(true),
+
+  dono: {
+    ...todas(true),
+    permissoesSistema: false
+  },
+
   superadmin: {
+    ...todas(true),
+    permissoesSistema: false
+  },
+
+  admin: {
+    ...todas(false),
     dashboard: true,
     painelAdmin: true,
     painelVendas: true,
@@ -25,186 +64,170 @@ const PERMISSOES_PADRAO = {
     controleAlunos: true,
     relatorios: true,
     vendedores: true,
-    agendaPrimo: true,
+    equipe: true,
     notificacoes: true,
-    controleAdmin: true,
-    seguranca: true,
-    planos: true,
     provas: true,
     suporte: true
   },
 
-  admin: {
+  financeiro: {
+    ...todas(false),
     dashboard: true,
-    painelAdmin: true,
     painelVendas: true,
-    usuarios: true,
-    aprovacoes: true,
-    controleAlunos: true,
-    relatorios: false,
-    vendedores: true,
-    agendaPrimo: false,
-    notificacoes: true,
-    controleAdmin: false,
-    seguranca: false,
-    planos: true,
-    provas: true,
-    suporte: true
+    financas: true,
+    relatorios: true
+  },
+
+  vendedor: {
+    ...todas(false),
+    dashboard: true,
+    painelVendas: true
   },
 
   moderador: {
+    ...todas(false),
     dashboard: true,
     painelAdmin: true,
-    painelVendas: false,
     usuarios: true,
     aprovacoes: true,
-    controleAlunos: false,
-    relatorios: false,
-    vendedores: false,
-    agendaPrimo: false,
-    notificacoes: false,
-    controleAdmin: false,
-    seguranca: false,
-    planos: false,
     provas: true,
     suporte: true
   },
 
   suporte: {
+    ...todas(false),
     dashboard: true,
-    painelAdmin: false,
-    painelVendas: true,
-    usuarios: false,
-    aprovacoes: false,
-    controleAlunos: false,
-    relatorios: false,
-    vendedores: false,
-    agendaPrimo: false,
-    notificacoes: false,
-    controleAdmin: false,
-    seguranca: false,
-    planos: false,
-    provas: false,
     suporte: true
   },
 
-  vendedor: {
-    dashboard: true,
-    painelAdmin: false,
-    painelVendas: true,
-    usuarios: false,
-    aprovacoes: false,
-    controleAlunos: false,
-    relatorios: false,
-    vendedores: false,
-    agendaPrimo: false,
-    notificacoes: false,
-    controleAdmin: false,
-    seguranca: false,
-    planos: false,
-    provas: false,
-    suporte: false
-  },
-
   aluno: {
+    ...todas(false),
     dashboard: true,
-    painelAdmin: false,
-    painelVendas: false,
-    usuarios: false,
-    aprovacoes: false,
-    controleAlunos: false,
-    relatorios: false,
-    vendedores: false,
-    agendaPrimo: false,
-    notificacoes: false,
-    controleAdmin: false,
-    seguranca: false,
-    planos: false,
-    provas: false,
     suporte: true
   }
 };
 
-/* ===============================
-   HELPERS
-=============================== */
+function normalizarCargo(valor) {
+  const cargo = String(valor || "aluno")
+    .trim()
+    .toLowerCase()
+    .replaceAll("_", "-");
+
+  const mapa = {
+    "super-admin": "superadmin",
+    proprietario: "dono",
+    owner: "dono",
+    developer: "dev",
+    finance: "financeiro"
+  };
+
+  return mapa[cargo] || cargo;
+}
 
 function getCargo(usuario) {
   if (!usuario) return CARGOS.ALUNO;
+  if (usuario.contaDev === true) return CARGOS.DEV;
 
-  if (usuario.cargo) {
-    return usuario.cargo;
-  }
+  const cargo = normalizarCargo(usuario.cargo || usuario.tipo);
+  return PERMISSOES_PADRAO[cargo] ? cargo : CARGOS.ALUNO;
+}
 
-  if (usuario.tipo === "admin") {
-    return CARGOS.ADMIN;
-  }
-
-  return CARGOS.ALUNO;
+function sanitizarPermissoes(valor = {}) {
+  return CHAVES_PERMISSAO.reduce((acc, chave) => {
+    if (typeof valor?.[chave] === "boolean") {
+      acc[chave] = valor[chave];
+    }
+    return acc;
+  }, {});
 }
 
 function getPermissoes(usuario) {
   const cargo = getCargo(usuario);
+  const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
+  const personalizadas = sanitizarPermissoes(usuario?.permissoesPersonalizadas || {});
 
-  return PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
+  if (cargo === CARGOS.DEV) {
+    return { ...PERMISSOES_PADRAO.dev };
+  }
+
+  return { ...base, ...personalizadas };
+}
+
+async function getPermissoesEfetivas(usuario) {
+  const cargo = getCargo(usuario);
+
+  if (cargo === CARGOS.DEV) {
+    return { ...PERMISSOES_PADRAO.dev };
+  }
+
+  const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
+  let configuradas = {};
+
+  try {
+    const registro = await PermissaoSistema.obter();
+    configuradas = sanitizarPermissoes(registro?.matriz?.[cargo] || {});
+  } catch (error) {
+    console.warn("Falha ao carregar matriz dinâmica de permissões:", error.message);
+  }
+
+  const personalizadas = sanitizarPermissoes(usuario?.permissoesPersonalizadas || {});
+
+  return {
+    ...base,
+    ...configuradas,
+    ...personalizadas
+  };
 }
 
 function temPermissao(usuario, permissao) {
   if (!usuario || !permissao) return false;
+  if (getCargo(usuario) === CARGOS.DEV) return true;
+  return Boolean(getPermissoes(usuario)[permissao]);
+}
 
-  const cargo = getCargo(usuario);
-
-  if (cargo === CARGOS.SUPERADMIN) {
-    return true;
-  }
-
-  const permissoes = getPermissoes(usuario);
-
+async function temPermissaoEfetiva(usuario, permissao) {
+  if (!usuario || !permissao) return false;
+  if (getCargo(usuario) === CARGOS.DEV) return true;
+  const permissoes = await getPermissoesEfetivas(usuario);
   return Boolean(permissoes[permissao]);
 }
 
 function temCargo(usuario, cargosPermitidos = []) {
   if (!usuario) return false;
-
   const cargo = getCargo(usuario);
-
-  if (cargo === CARGOS.SUPERADMIN) {
-    return true;
-  }
-
-  return cargosPermitidos.includes(cargo);
+  if (cargo === CARGOS.DEV) return true;
+  return cargosPermitidos.map(normalizarCargo).includes(cargo);
 }
 
-/* ===============================
-   MIDDLEWARES
-=============================== */
-
 function requirePermission(permissao) {
-  return function (req, res, next) {
-    if (!req.usuario) {
-      return res.status(401).json({
-        erro: "Usuário não autenticado."
-      });
-    }
+  return async function (req, res, next) {
+    try {
+      if (!req.usuario) {
+        return res.status(401).json({ erro: "Usuário não autenticado." });
+      }
 
-    if (!temPermissao(req.usuario, permissao)) {
-      return res.status(403).json({
-        erro: "Você não tem permissão para acessar esta área.",
-        permissaoNecessaria: permissao,
-        cargoAtual: getCargo(req.usuario)
-      });
-    }
+      const permitido = await temPermissaoEfetiva(req.usuarioDoc || req.usuario, permissao);
 
-    next();
+      if (!permitido) {
+        return res.status(403).json({
+          erro: "Você não tem permissão para acessar esta área.",
+          permissaoNecessaria: permissao,
+          cargoAtual: getCargo(req.usuario)
+        });
+      }
+
+      next();
+    } catch (error) {
+      console.error("Erro ao validar permissão:", error);
+      return res.status(500).json({ erro: "Erro interno ao validar permissão." });
+    }
   };
 }
 
 function requireCargo(...cargosPermitidos) {
   return function (req, res, next) {
     if (!req.usuario) {
-      return res.status(401).json({
-        erro: "Usuário não autenticado."
-      });
+      return res.status(401).json({ erro: "Usuário não autenticado." });
     }
 
     if (!temCargo(req.usuario, cargosPermitidos)) {
@@ -219,103 +242,63 @@ function requireCargo(...cargosPermitidos) {
   };
 }
 
-function requireAdmin(req, res, next) {
+function requireDev(req, res, next) {
   if (!req.usuario) {
-    return res.status(401).json({
-      erro: "Usuário não autenticado."
-    });
+    return res.status(401).json({ erro: "Usuário não autenticado." });
   }
 
-  const permitido = temCargo(req.usuario, [
-    CARGOS.ADMIN,
-    CARGOS.MODERADOR,
-    CARGOS.SUPORTE
-  ]);
+  const cargo = getCargo(req.usuarioDoc || req.usuario);
+  const emailDev = String(process.env.DEV_EMAIL || "dev@turmablack.com").toLowerCase();
+  const emailAtual = String(req.usuario.email || "").toLowerCase();
 
-  if (!permitido) {
-    return res.status(403).json({
-      erro: "Acesso permitido apenas para equipe administrativa.",
-      cargoAtual: getCargo(req.usuario)
-    });
+  if (cargo !== CARGOS.DEV && emailAtual !== emailDev) {
+    return res.status(403).json({ erro: "Área exclusiva da conta Dev." });
   }
 
   next();
+}
+
+function requireAdmin(req, res, next) {
+  return requireCargo(CARGOS.DONO, CARGOS.ADMIN, CARGOS.MODERADOR)(req, res, next);
 }
 
 function requireSuperAdmin(req, res, next) {
-  if (!req.usuario) {
-    return res.status(401).json({
-      erro: "Usuário não autenticado."
-    });
-  }
-
-  if (getCargo(req.usuario) !== CARGOS.SUPERADMIN) {
-    return res.status(403).json({
-      erro: "Acesso permitido apenas para Super Admin.",
-      cargoAtual: getCargo(req.usuario)
-    });
-  }
-
-  next();
+  return requireCargo(CARGOS.DONO, CARGOS.SUPERADMIN)(req, res, next);
 }
 
 function requireVendedor(req, res, next) {
-  if (!req.usuario) {
-    return res.status(401).json({
-      erro: "Usuário não autenticado."
-    });
-  }
-
-  const cargo = getCargo(req.usuario);
-
-  const permitido =
-    cargo === CARGOS.SUPERADMIN ||
-    cargo === CARGOS.ADMIN ||
-    cargo === CARGOS.VENDEDOR ||
-    req.usuario.vendedor === true;
-
-  if (!permitido) {
-    return res.status(403).json({
-      erro: "Acesso permitido apenas para vendedores.",
-      cargoAtual: cargo
-    });
-  }
-
-  next();
+  return requireCargo(
+    CARGOS.DONO,
+    CARGOS.ADMIN,
+    CARGOS.FINANCEIRO,
+    CARGOS.VENDEDOR
+  )(req, res, next);
 }
 
 function requireSuporte(req, res, next) {
-  if (!req.usuario) {
-    return res.status(401).json({
-      erro: "Usuário não autenticado."
-    });
-  }
-
-  const permitido = temCargo(req.usuario, [
-    CARGOS.SUPORTE,
+  return requireCargo(
+    CARGOS.DONO,
     CARGOS.ADMIN,
-    CARGOS.MODERADOR
-  ]);
-
-  if (!permitido) {
-    return res.status(403).json({
-      erro: "Acesso permitido apenas para suporte.",
-      cargoAtual: getCargo(req.usuario)
-    });
-  }
-
-  next();
+    CARGOS.MODERADOR,
+    CARGOS.SUPORTE
+  )(req, res, next);
 }
 
 module.exports = {
   CARGOS,
+  CHAVES_PERMISSAO,
   PERMISSOES_PADRAO,
+  normalizarCargo,
+  sanitizarPermissoes,
   getCargo,
   getPermissoes,
+  getPermissoesEfetivas,
   temPermissao,
+  temPermissaoEfetiva,
   temCargo,
   requirePermission,
   requireCargo,
+  requireDev,
   requireAdmin,
   requireSuperAdmin,
   requireVendedor,
