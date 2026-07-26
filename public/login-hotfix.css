@@ -1,0 +1,125 @@
+/* =========================================================
+   LOGIN 4.1.5 — ENQUADRAMENTO DA IMAGEM
+========================================================= */
+
+.auth-portrait-wrap {
+  inset: 34px 0 0 40%;
+  overflow: visible;
+}
+
+.auth-portrait {
+  right: 1.5%;
+  bottom: -3%;
+  width: min(66%, 620px);
+  height: auto;
+  max-height: 96%;
+  object-fit: contain;
+  object-position: center bottom;
+  mask-image: linear-gradient(#000 0 86%, transparent 100%);
+  -webkit-mask-image: linear-gradient(#000 0 86%, transparent 100%);
+}
+
+.auth-portrait-orbit {
+  left: 20%;
+  top: 18%;
+  width: 64%;
+}
+
+.auth-portrait-glow {
+  left: 20%;
+  top: 22%;
+  width: 62%;
+  height: 58%;
+}
+
+@media (max-width: 1240px) and (min-width: 701px) {
+  .auth-shell {
+    width: min(920px, calc(100% - 28px));
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding-top: 14px;
+  }
+
+  .auth-hero {
+    min-height: 680px;
+  }
+
+  .auth-hero-copy {
+    width: min(470px, 55%);
+    margin-top: 50px;
+  }
+
+  .auth-feature-list {
+    width: min(390px, 100%);
+  }
+
+  .auth-portrait-wrap {
+    inset: 18px -10px 0 38%;
+  }
+
+  .auth-portrait {
+    right: 0;
+    bottom: -2%;
+    width: min(68%, 600px);
+    max-height: 97%;
+  }
+
+  .auth-portrait-caption {
+    left: 35%;
+    bottom: 6%;
+  }
+
+  .auth-panel {
+    min-height: 650px;
+  }
+
+  .auth-site-footer {
+    width: min(920px, calc(100% - 28px));
+  }
+}
+
+@media (max-width: 700px) {
+  .auth-hero {
+    min-height: 220px;
+    overflow: hidden;
+  }
+
+  .auth-portrait-wrap {
+    inset: 2px -4% -8px 46%;
+  }
+
+  .auth-portrait-orbit {
+    left: 3%;
+    top: 18%;
+    width: 88%;
+  }
+
+  .auth-portrait-glow {
+    left: 5%;
+    top: 17%;
+    width: 86%;
+    height: 72%;
+  }
+
+  .auth-portrait {
+    right: 0;
+    bottom: -4%;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+    object-position: center bottom;
+    mask-image: linear-gradient(#000 0 78%, transparent 100%);
+    -webkit-mask-image: linear-gradient(#000 0 78%, transparent 100%);
+  }
+}
+
+@media (max-width: 390px) {
+  .auth-hero {
+    min-height: 205px;
+  }
+
+  .auth-portrait-wrap {
+    inset: 5px -8% -10px 42%;
+  }
+}
