@@ -1,21 +1,22 @@
 const mongoose = require("mongoose");
+const bootstrapDevAccount = require("../services/bootstrap-dev");
 
 async function connectDatabase() {
   const MONGO_URL = process.env.MONGO_URL;
 
   if (!MONGO_URL) {
-    console.error("ERRO: MONGO_URL não configurada.");
-    process.exit(1);
+    throw new Error("MONGO_URL não configurada.");
   }
 
-  try {
-    await mongoose.connect(MONGO_URL);
+  await mongoose.connect(MONGO_URL, {
+    serverSelectionTimeoutMS: 15000,
+    connectTimeoutMS: 15000,
+    socketTimeoutMS: 45000
+  });
 
-    console.log("MongoDB conectado com sucesso");
-  } catch (error) {
-    console.error("Erro ao conectar no MongoDB:", error.message);
-    process.exit(1);
-  }
+  console.log("MongoDB conectado com sucesso");
+
+  await bootstrapDevAccount();
 }
 
 module.exports = connectDatabase;
