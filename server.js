@@ -10,7 +10,13 @@ const connectDatabase = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260726-420-mysql-hostinger";
+const CACHE_VERSION = "20260726-421-mysql-resilient";
+const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
+
+let tentativaBancoEmAndamento = false;
+let temporizadorReconexao = null;
+let ultimoErroBanco = "";
+let ultimaTentativaBanco = "";
 
 app.disable("x-powered-by");
 app.use(cors({ origin: "*" }));
@@ -175,6 +181,10 @@ app.get("/api/status", async (req, res) => {
     if (connectDatabase.isConnected()) {
       await connectDatabase.query("SELECT 1 AS ok");
       banco = "conectado";
+    } else if (tentativaBancoEmAndamento) {
+      banco = "conectando";
+    } else if (ultimoErroBanco) {
+      banco = "indisponivel";
     }
   } catch (_) {
     banco = "erro";
@@ -184,13 +194,15 @@ app.get("/api/status", async (req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.2.0",
-    release: "hostinger-mysql-core",
+    versao: "4.2.1",
+    release: "hostinger-mysql-resilient-startup",
     cacheVersion: CACHE_VERSION,
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco,
     bancoTipo: "MySQL",
+    ultimaTentativaBanco,
+    detalheBanco: ultimoErroBanco ? "Credenciais ou vínculo do MySQL precisam ser corrigidos no hPanel." : "",
     estrutura: "frontend, API e banco na Hostinger"
   });
 });
@@ -235,15 +247,48 @@ app.use((req, res) => {
   });
 });
 
-async function iniciarServidor() {
-  await connectDatabase();
+function agendarNovaTentativa() {
+  if (temporizadorReconexao || connectDatabase.isConnected()) return;
 
-  app.listen(PORT, () => {
-    console.log(`Turma do Primo com MySQL rodando na porta ${PORT}`);
+  temporizadorReconexao = setTimeout(() => {
+    temporizadorReconexao = null;
+    tentarConectarBanco();
+  }, DB_RETRY_MS);
+
+  if (typeof temporizadorReconexao.unref === "function") {
+    temporizadorReconexao.unref();
+  }
+}
+
+async function tentarConectarBanco() {
+  if (tentativaBancoEmAndamento || connectDatabase.isConnected()) return;
+
+  tentativaBancoEmAndamento = true;
+  ultimaTentativaBanco = new Date().toISOString();
+
+  try {
+    await connectDatabase();
+    ultimoErroBanco = "";
+    console.log("Banco MySQL disponível para a aplicação.");
+  } catch (error) {
+    ultimoErroBanco = String(error?.message || "Falha ao conectar ao MySQL.");
+    console.error("Banco MySQL indisponível:", ultimoErroBanco);
+    agendarNovaTentativa();
+  } finally {
+    tentativaBancoEmAndamento = false;
+  }
+}
+
+function iniciarServidor() {
+  const servidor = app.listen(PORT, () => {
+    console.log(`Turma do Primo rodando na porta ${PORT}`);
+    tentarConectarBanco();
+  });
+
+  servidor.on("error", (error) => {
+    console.error("Falha ao iniciar o servidor HTTP:", error);
+    process.exit(1);
   });
 }
 
-iniciarServidor().catch((error) => {
-  console.error("Falha ao iniciar a aplicação:", error);
-  process.exit(1);
-});
+iniciarServidor();
