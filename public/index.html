@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20260726-mobile-2" />
-  <script defer src="script.js?v=20260726-mobile-2"></script>
+  <link rel="stylesheet" href="style.css?v=20260726-popup-icons-1" />
+  <script defer src="script.js?v=20260726-popup-icons-1"></script>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
@@ -228,33 +228,65 @@
   <div class="admin-choice-overlay" id="adminChoiceOverlay" aria-hidden="true" hidden>
     <div class="admin-choice-box" role="dialog" aria-modal="true" aria-labelledby="adminChoiceTitle">
       <button class="admin-choice-close" id="fecharAdminChoice" type="button" aria-label="Fechar seleção">×</button>
+
       <div class="admin-choice-top">
-        <div class="admin-choice-icon" aria-hidden="true">♛</div>
+        <img class="admin-choice-logo" src="assets/turma-primo-logo.svg" alt="Turma do Primo" />
+        <span class="admin-choice-brand-name">TURMA DO <strong>PRIMO</strong></span>
         <span class="admin-choice-tag">ACESSO ESPECIAL</span>
         <h2 id="adminChoiceTitle">Escolha sua área de <span>acesso</span></h2>
-        <p>Entre diretamente no ambiente que deseja gerenciar agora.</p>
+        <p>Selecione o painel que deseja acessar agora.</p>
       </div>
 
       <div class="admin-choice-grid">
-        <button class="admin-choice-card" type="button" data-go="dashboard.html">
-          <span class="admin-choice-card-icon" aria-hidden="true">▦</span>
+        <button class="admin-choice-card admin-card-dashboard" type="button" data-go="dashboard.html">
+          <span class="admin-choice-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" focusable="false">
+              <rect x="13" y="13" width="16" height="16" rx="4"></rect>
+              <rect x="35" y="13" width="16" height="16" rx="4"></rect>
+              <rect x="13" y="35" width="16" height="16" rx="4"></rect>
+              <rect x="35" y="35" width="16" height="16" rx="4"></rect>
+            </svg>
+          </span>
           <strong>Dashboard</strong>
-          <small>Área principal da plataforma e módulos.</small>
-          <span class="admin-choice-arrow" aria-hidden="true">→</span>
+          <small>Visão geral da plataforma, módulos e desempenho.</small>
+          <span class="admin-choice-access">Acessar <b aria-hidden="true">→</b></span>
         </button>
-        <button class="admin-choice-card" type="button" data-go="admin.html">
-          <span class="admin-choice-card-icon" aria-hidden="true">◇</span>
-          <strong>Painel Admin</strong>
-          <small>Usuários, permissões, relatórios e controle.</small>
-          <span class="admin-choice-arrow" aria-hidden="true">→</span>
+
+        <button class="admin-choice-card admin-card-admin" type="button" data-go="admin.html">
+          <span class="admin-choice-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" focusable="false">
+              <path d="M32 8 50 15v14c0 12-7.4 22.5-18 27-10.6-4.5-18-15-18-27V15l18-7Z"></path>
+              <path d="M26 30.5 30.5 35 39 25.5"></path>
+              <path d="M27 17.5h10"></path>
+            </svg>
+          </span>
+          <strong>Painel Administrativo</strong>
+          <small>Gerencie usuários, permissões, relatórios e configurações.</small>
+          <span class="admin-choice-access">Acessar <b aria-hidden="true">→</b></span>
         </button>
-        <button class="admin-choice-card" type="button" data-go="painel-vendas.html">
-          <span class="admin-choice-card-icon" aria-hidden="true">↗</span>
+
+        <button class="admin-choice-card admin-card-vendas" type="button" data-go="painel-vendas.html">
+          <span class="admin-choice-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" focusable="false">
+              <circle cx="32" cy="32" r="21"></circle>
+              <path d="M39 23.5c-1.9-1.4-4.3-2.2-7-2.2-4.9 0-8.2 2.5-8.2 6.2 0 3.7 3 5.3 8 6.4 4 .9 5.3 1.7 5.3 3.6 0 2-1.9 3.2-5.3 3.2-3 0-5.8-1-8.2-2.8"></path>
+              <path d="M32 17v30"></path>
+            </svg>
+          </span>
           <strong>Painel de Vendas</strong>
-          <small>Vendas, ranking, comissão e alunos.</small>
-          <span class="admin-choice-arrow" aria-hidden="true">→</span>
+          <small>Acompanhe vendas, comissões, metas e desempenho da equipe.</small>
+          <span class="admin-choice-access">Acessar <b aria-hidden="true">→</b></span>
         </button>
       </div>
+
+      <div class="admin-choice-security">
+        <div>
+          <span class="admin-choice-security-icon" aria-hidden="true">◈</span>
+          <p><strong>Acesso seguro e exclusivo</strong><small>Somente perfis autorizados visualizam este menu.</small></p>
+        </div>
+        <span class="admin-choice-session"><b aria-hidden="true">▣</b> Sessão protegida</span>
+      </div>
+
       <div class="admin-choice-footer">As opções são exibidas conforme as permissões da sua conta.</div>
     </div>
   </div>
