@@ -1,0 +1,242 @@
+/* Correção dos selects no painel administrativo */
+.admin-app-body select,
+.admin-card-heading select,
+.admin-section-head select,
+.admin-filterbar select,
+.admin-form select,
+.admin-secondary-btn:is(select) {
+  color: #f7f1ff !important;
+  background-color: #12091d !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #b86cff 50%),
+    linear-gradient(135deg, #b86cff 50%, transparent 50%) !important;
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50% !important;
+  background-size: 6px 6px, 6px 6px !important;
+  background-repeat: no-repeat !important;
+  border: 1px solid rgba(179, 103, 255, 0.25) !important;
+  border-radius: 12px !important;
+  min-height: 42px;
+  padding: 0 42px 0 14px !important;
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: dark;
+  outline: none;
+}
+
+.admin-app-body select:focus,
+.admin-card-heading select:focus,
+.admin-section-head select:focus,
+.admin-filterbar select:focus,
+.admin-form select:focus {
+  border-color: rgba(190, 112, 255, 0.7) !important;
+  box-shadow: 0 0 0 3px rgba(150, 55, 255, 0.12) !important;
+}
+
+.admin-app-body select option {
+  color: #ffffff;
+  background: #12091d;
+}
+
+.admin-results-help {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 18px;
+  padding: 15px 17px;
+  border: 1px solid rgba(175, 102, 255, 0.17);
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(104, 34, 176, 0.14), rgba(22, 10, 34, 0.72));
+}
+
+.admin-results-help > span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 14px;
+  color: #e7c7ff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: linear-gradient(145deg, rgba(169, 74, 255, 0.35), rgba(91, 26, 146, 0.38));
+  border: 1px solid rgba(202, 139, 255, 0.2);
+}
+
+.admin-results-help strong {
+  display: block;
+  color: #fff;
+  margin-bottom: 4px;
+  font-size: 0.96rem;
+}
+
+.admin-results-help p {
+  margin: 0;
+  color: rgba(231, 220, 240, 0.65);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.admin-result-person {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 170px;
+}
+
+.admin-result-person b {
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.admin-result-person small {
+  color: rgba(228, 216, 238, 0.55);
+  font-size: 0.75rem;
+}
+
+.admin-result-score {
+  display: inline-grid;
+  place-items: center;
+  min-width: 58px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.88rem;
+}
+
+.admin-result-score.approved {
+  color: #8ef1ad;
+  background: rgba(28, 164, 76, 0.12);
+  border: 1px solid rgba(46, 207, 103, 0.18);
+}
+
+.admin-result-score.failed {
+  color: #ff9b9b;
+  background: rgba(205, 44, 44, 0.12);
+  border: 1px solid rgba(255, 92, 92, 0.18);
+}
+
+.admin-result-count {
+  display: block;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.admin-result-count.good { color: #76df9b; }
+.admin-result-count.bad { color: #ff8f8f; }
+
+.admin-result-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+  border: 1px solid transparent;
+}
+
+.admin-result-status.aprovado {
+  color: #76e99b;
+  background: rgba(31, 160, 75, 0.12);
+  border-color: rgba(77, 223, 128, 0.16);
+}
+
+.admin-result-status.reprovado {
+  color: #ff9292;
+  background: rgba(205, 45, 45, 0.12);
+  border-color: rgba(255, 94, 94, 0.16);
+}
+
+.admin-result-status.em_analise,
+.admin-result-status.pendente {
+  color: #ffd47b;
+  background: rgba(202, 131, 22, 0.12);
+  border-color: rgba(255, 187, 59, 0.16);
+}
+
+.admin-pdf-button {
+  min-height: 36px !important;
+  padding: 0 13px !important;
+  border-radius: 10px !important;
+  white-space: nowrap;
+  font-size: 0.76rem !important;
+}
+
+.admin-pdf-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+@media (max-width: 760px) {
+  .admin-card-heading {
+    align-items: stretch;
+  }
+
+  .admin-card-heading select,
+  #overviewChartPeriod {
+    width: 100% !important;
+    max-width: none !important;
+    font-size: 0.9rem !important;
+  }
+
+  .admin-results-help {
+    align-items: flex-start;
+  }
+
+  .admin-results-table thead {
+    display: none;
+  }
+
+  .admin-results-table,
+  .admin-results-table tbody,
+  .admin-results-table tr,
+  .admin-results-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-results-table tr {
+    margin-bottom: 14px;
+    padding: 14px;
+    border: 1px solid rgba(175, 102, 255, 0.14);
+    border-radius: 15px;
+    background: rgba(14, 7, 23, 0.68);
+  }
+
+  .admin-results-table td {
+    display: grid;
+    grid-template-columns: minmax(100px, 0.42fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0 !important;
+    border: 0 !important;
+    text-align: right;
+  }
+
+  .admin-results-table td::before {
+    content: attr(data-label);
+    color: rgba(225, 211, 237, 0.5);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .admin-result-person {
+    min-width: 0;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .admin-pdf-button {
+    width: 100%;
+  }
+}
