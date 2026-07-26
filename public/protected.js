@@ -38,7 +38,7 @@
     if (required === "painelAdmin") {
       return Boolean(
         permissions.painelAdmin ||
-        ["dev", "dono", "superadmin", "admin", "moderador"].includes(role)
+        ["dev", "dono", "superadmin", "admin", "financeiro", "moderador"].includes(role)
       );
     }
 
