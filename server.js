@@ -16,12 +16,6 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 /* ===============================
-   BANCO DE DADOS
-=============================== */
-
-connectDatabase();
-
-/* ===============================
    FRONTEND
 =============================== */
 
@@ -55,7 +49,7 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "3.1.0",
+    versao: "3.1.1",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
@@ -128,6 +122,15 @@ app.use((req, res) => {
    START
 =============================== */
 
-app.listen(PORT, () => {
-  console.log(`Turma do Primo rodando na porta ${PORT}`);
+async function iniciarServidor() {
+  await connectDatabase();
+
+  app.listen(PORT, () => {
+    console.log(`Turma do Primo rodando na porta ${PORT}`);
+  });
+}
+
+iniciarServidor().catch((error) => {
+  console.error("Falha ao iniciar a aplicação:", error);
+  process.exit(1);
 });
