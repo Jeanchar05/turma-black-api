@@ -10,7 +10,7 @@ const connectDatabase = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260726-422-mysql-diagnostics";
+const CACHE_VERSION = "20260726-430-admin-final-ui";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -58,12 +58,36 @@ function aplicarVersaoNosAssets(html) {
   );
 }
 
+function aplicarExtrasAdmin(html) {
+  let resultado = String(html);
+
+  if (!resultado.includes("admin-final-ui.css")) {
+    resultado = resultado.replace(
+      "</head>",
+      `  <link rel="stylesheet" href="admin-final-ui.css" />\n</head>`
+    );
+  }
+
+  if (!resultado.includes("admin-final-ui.js")) {
+    resultado = resultado.replace(
+      "</body>",
+      `  <script defer src="admin-final-ui.js"></script>\n</body>`
+    );
+  }
+
+  return resultado;
+}
+
 function servirPagina(nomeArquivo) {
   return (req, res, next) => {
     const arquivo = path.join(publicDir, nomeArquivo);
     if (!fs.existsSync(arquivo)) return next();
 
-    const html = aplicarVersaoNosAssets(fs.readFileSync(arquivo, "utf8"));
+    let html = fs.readFileSync(arquivo, "utf8");
+    if (nomeArquivo === "admin.html") {
+      html = aplicarExtrasAdmin(html);
+    }
+    html = aplicarVersaoNosAssets(html);
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
@@ -116,8 +140,8 @@ app.get("/limpar-cache", (req, res) => {
 <body>
   <main class="box">
     <div class="ring"></div>
-    <h1>Carregando a versão MySQL…</h1>
-    <p>Removendo arquivos antigos e abrindo a aplicação atualizada na Hostinger.</p>
+    <h1>Carregando a nova versão…</h1>
+    <p>Removendo arquivos antigos e atualizando o painel administrativo.</p>
     <small>Versão ${CACHE_VERSION}</small>
   </main>
   <script>
@@ -137,7 +161,7 @@ app.get("/limpar-cache", (req, res) => {
       }
 
       setTimeout(
-        () => window.location.replace("/index.html?fresh=${CACHE_VERSION}&t=" + Date.now()),
+        () => window.location.replace("/admin?fresh=${CACHE_VERSION}&t=" + Date.now()),
         700
       );
     })();
@@ -199,8 +223,8 @@ app.get("/api/status", async (req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.2.2",
-    release: "hostinger-mysql-safe-diagnostics",
+    versao: "4.3.0",
+    release: "admin-final-provas-periodo",
     cacheVersion: CACHE_VERSION,
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
@@ -239,6 +263,11 @@ carregarRota("/", "auth.js");
 carregarRota("/", "aluno-action-guard.js");
 carregarRota("/", "usuarios.js");
 carregarRota("/", "liberacoes.js");
+
+// Rotas MySQL prioritárias: precisam vir antes das versões legadas.
+carregarRota("/admin", "admin-mysql-core.js");
+carregarRota("/admin", "admin-provas-mysql.js");
+
 carregarRota("/admin", "admin-dashboard.js");
 carregarRota("/admin", "admin-panel.js");
 carregarRota("/admin", "dev-delete.js");
