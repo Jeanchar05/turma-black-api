@@ -61,7 +61,7 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.0.0",
+    versao: "4.0.1",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
@@ -86,6 +86,7 @@ carregarRota("/", "auth.js");
 carregarRota("/", "usuarios.js");
 carregarRota("/", "liberacoes.js");
 carregarRota("/admin", "admin-panel.js");
+carregarRota("/admin", "admin-alunos.js");
 carregarRota("/admin", "admin.js");
 carregarRota("/", "alunos.js");
 carregarRota("/", "vendas.js");
