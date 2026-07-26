@@ -177,6 +177,7 @@ router.get(
       const doc = new PDFDocument({
         size: "A4",
         margin: 46,
+        bufferPages: true,
         info: {
           Title: `Resultado - ${texto(resultado.provaTitulo, "Prova")}`,
           Author: "Turma do Primo",
@@ -188,6 +189,17 @@ router.get(
       cabecalho(doc, resultado);
 
       const respostas = Array.isArray(resultado.respostas) ? resultado.respostas : [];
+
+      if (!respostas.length) {
+        doc
+          .fillColor("#675a70")
+          .font("Helvetica")
+          .fontSize(11)
+          .text("Este resultado nao possui respostas registradas.", 46, doc.y, {
+            width: 503,
+            align: "center"
+          });
+      }
 
       respostas.forEach((item, indice) => {
         const pergunta = perguntas.get(String(item.perguntaId));
@@ -287,20 +299,21 @@ router.get(
 
       if (resultado.feedback) {
         garantirEspaco(doc, 90);
+        const feedbackY = doc.y;
         doc
           .fillColor("#f4eef9")
-          .roundedRect(46, doc.y, 503, 70, 8)
+          .roundedRect(46, feedbackY, 503, 70, 8)
           .fill();
         doc
           .fillColor("#4c2b62")
           .font("Helvetica-Bold")
           .fontSize(10)
-          .text("Feedback da avaliacao", 60, doc.y + 14);
+          .text("Feedback da avaliacao", 60, feedbackY + 14);
         doc
           .fillColor("#4e4058")
           .font("Helvetica")
           .fontSize(9)
-          .text(texto(resultado.feedback), 60, doc.y + 31, {
+          .text(texto(resultado.feedback), 60, feedbackY + 31, {
             width: 475,
             height: 34
           });
