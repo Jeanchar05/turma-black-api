@@ -2,63 +2,66 @@
 
 (() => {
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
-  const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
-  document.addEventListener("DOMContentLoaded", validarPagina, { once: true });
+  document.addEventListener("DOMContentLoaded", validatePage, { once: true });
 
-  function pegarToken() {
-    for (const chave of TOKEN_KEYS) {
+  function getToken() {
+    for (const key of TOKEN_KEYS) {
       try {
-        const token = sessionStorage.getItem(chave);
+        const token = sessionStorage.getItem(key);
         if (token) return token;
       } catch (_) {}
     }
-
     return "";
   }
 
-  function limparSessao() {
-    TOKEN_KEYS.forEach((chave) => {
-      try {
-        sessionStorage.removeItem(chave);
-      } catch (_) {}
+  function clearSession() {
+    TOKEN_KEYS.forEach((key) => {
+      try { sessionStorage.removeItem(key); } catch (_) {}
     });
   }
 
-  function normalizarCargo(usuario) {
-    return String(usuario?.cargo || usuario?.tipo || "aluno")
+  function normalizeRole(user) {
+    return String(user?.cargo || user?.tipo || "aluno")
       .trim()
       .toLowerCase()
       .replaceAll("_", "-");
   }
 
-  function temAcesso(usuario, acesso) {
-    if (!acesso || acesso === "dashboard") return true;
+  function hasAccess(user, required) {
+    if (!required || required === "dashboard") return true;
 
-    const cargo = normalizarCargo(usuario);
-    const acessos = usuario?.acessosRapidos || {};
+    const permissions = user?.permissoes || user?.acessosRapidos || {};
+    const role = normalizeRole(user);
 
-    if (acesso === "painelAdmin") {
-      return (
-        acessos.painelAdmin === true ||
-        ["superadmin", "super-admin", "admin", "moderador"].includes(cargo)
+    if (required === "painelAdmin") {
+      return Boolean(
+        permissions.painelAdmin ||
+        ["dev", "dono", "superadmin", "admin", "moderador"].includes(role)
       );
     }
 
-    if (acesso === "painelVendas") {
-      return (
-        acessos.painelVendas === true ||
-        usuario?.vendedor === true ||
-        ["superadmin", "super-admin", "admin", "suporte", "vendedor"].includes(cargo)
+    if (required === "painelVendas") {
+      return Boolean(
+        permissions.painelVendas ||
+        user?.vendedor ||
+        ["dev", "dono", "superadmin", "admin", "financeiro", "vendedor"].includes(role)
       );
     }
 
-    return false;
+    if (required === "financas") {
+      return Boolean(
+        permissions.financas ||
+        ["dev", "dono", "superadmin", "financeiro"].includes(role)
+      );
+    }
+
+    return Boolean(permissions[required]);
   }
 
-  async function validarPagina() {
-    const token = pegarToken();
+  async function validatePage() {
+    const token = getToken();
 
     if (!token) {
       window.location.replace("index.html");
@@ -66,55 +69,62 @@
     }
 
     try {
-      const resposta = await fetch(`${window.location.origin}/me`, {
+      const response = await fetch(`${window.location.origin}/me`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`
         }
       });
 
-      const dados = await resposta.json().catch(() => ({}));
+      const data = await response.json().catch(() => ({}));
 
-      if (!resposta.ok || !dados?.usuario) {
-        throw new Error(dados?.erro || "Sessão inválida.");
+      if (!response.ok || !data?.usuario) {
+        throw new Error(data?.erro || "Sessão inválida.");
       }
 
-      const usuario = dados.usuario;
-      const necessario = document.body.dataset.requiredAccess || "dashboard";
+      const user = data.usuario;
+      const required = document.body.dataset.requiredAccess || "dashboard";
 
-      if (!temAcesso(usuario, necessario)) {
+      if (!hasAccess(user, required)) {
         window.location.replace("dashboard.html");
         return;
       }
 
-      preencherUsuario(usuario);
+      fillUser(user);
       document.body.classList.add("protected-ready");
     } catch (_) {
-      limparSessao();
+      clearSession();
       window.location.replace("index.html");
     }
   }
 
-  function preencherUsuario(usuario) {
-    const nome = String(usuario?.nome || "Dev Turma do Primo");
-    const primeiroNome = nome.trim().split(/\s+/)[0] || "Dev";
-    const cargo = normalizarCargo(usuario);
+  function roleLabel(role) {
+    const labels = {
+      dev: "Dev",
+      dono: "Dono",
+      superadmin: "Dono",
+      admin: "Admin",
+      financeiro: "Financeiro",
+      vendedor: "Vendedor",
+      moderador: "Moderador",
+      suporte: "Suporte",
+      aluno: "Aluno"
+    };
+    return labels[role] || "Usuário";
+  }
 
-    $$('[data-user-name]').forEach((elemento) => {
-      elemento.textContent = primeiroNome;
-    });
+  function fillUser(user) {
+    const name = String(user?.nome || "Usuário");
+    const firstName = name.trim().split(/\s+/)[0] || "Usuário";
+    const role = normalizeRole(user);
 
-    $$('[data-user-fullname]').forEach((elemento) => {
-      elemento.textContent = nome;
-    });
+    $$('[data-user-name]').forEach((element) => { element.textContent = firstName; });
+    $$('[data-user-fullname]').forEach((element) => { element.textContent = name; });
+    $$('[data-user-role]').forEach((element) => { element.textContent = roleLabel(role); });
 
-    $$('[data-user-role]').forEach((elemento) => {
-      elemento.textContent = cargo === "superadmin" ? "Super Admin" : cargo;
-    });
-
-    $$('[data-logout]').forEach((botao) => {
-      botao.addEventListener("click", () => {
-        limparSessao();
+    $$('[data-logout]').forEach((button) => {
+      button.addEventListener("click", () => {
+        clearSession();
         window.location.replace("index.html");
       });
     });
