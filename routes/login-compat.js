@@ -210,4 +210,8 @@ async function loginCompativel(req, res) {
 router.post("/login", loginCompativel);
 router.post("/auth/login", loginCompativel);
 
+// Carregado antes das rotas administrativas legadas no server.js.
+// Assim, contexto e visão geral usam MySQL e não caem nos modelos antigos do MongoDB.
+router.use("/admin", require("./admin-mysql-core"));
+
 module.exports = router;
