@@ -15,6 +15,30 @@ app.use(cors({ origin: "*" }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+function servirBundle(arquivos, tipo) {
+  return (req, res, next) => {
+    const caminhos = arquivos.map((arquivo) => path.join(publicDir, arquivo));
+    if (caminhos.some((arquivo) => !fs.existsSync(arquivo))) return next();
+
+    const conteudo = caminhos
+      .map((arquivo) => fs.readFileSync(arquivo, "utf8"))
+      .join(tipo === "application/javascript" ? "\n;\n" : "\n\n");
+
+    res.setHeader("Content-Type", `${tipo}; charset=utf-8`);
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    return res.send(conteudo);
+  };
+}
+
+app.get(
+  "/admin-enhanced.js",
+  servirBundle(["admin-enhanced.js", "admin-results.js"], "application/javascript")
+);
+app.get(
+  "/admin-enhanced.css",
+  servirBundle(["admin-enhanced.css", "admin-results.css"], "text/css")
+);
+
 if (fs.existsSync(publicDir)) {
   app.use(
     express.static(publicDir, {
@@ -97,6 +121,7 @@ carregarRota("/", "agenda.js");
 carregarRota("/", "notificacoes-compat.js");
 carregarRota("/", "notificacoes.js");
 carregarRota("/", "suporte.js");
+carregarRota("/", "provas-relatorios.js");
 carregarRota("/", "provas.js");
 
 app.use((req, res) => {
