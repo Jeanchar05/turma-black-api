@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Painel Administrativo | Turma do Primo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=20260726-dev-1" />
+  <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
+  <script defer src="protected.js?v=20260726-dev-1"></script>
+</head>
+<body class="legal-body" data-required-access="painelAdmin">
+  <main class="legal-shell">
+    <header class="legal-topbar">
+      <a class="legal-brand" href="dashboard.html">
+        <img src="assets/turma-primo-logo.svg" alt="" />
+        <span><small>TURMA DO</small><strong>PRIMO</strong></span>
+      </a>
+      <button class="legal-back" type="button" data-logout>Sair</button>
+    </header>
+
+    <section class="legal-hero">
+      <div class="legal-icon" aria-hidden="true">♛</div>
+      <span class="legal-kicker">ACESSO ADMINISTRATIVO</span>
+      <h1>Painel Administrativo</h1>
+      <p>Olá, <span data-user-name>Dev</span>. Esta área já está protegida e pronta para receber a reformulação completa dos módulos administrativos.</p>
+      <span class="legal-updated">Perfil atual: <strong data-user-role>Super Admin</strong></span>
+    </section>
+
+    <div class="legal-content">
+      <section class="legal-card legal-highlight">
+        <h2>Acesso validado</h2>
+        <p>A rota agora abre como página real, exige token válido e não expõe mais mensagens JSON diretamente no navegador.</p>
+      </section>
+
+      <section class="legal-card">
+        <h2>Próxima reformulação</h2>
+        <ul>
+          <li>Visão geral executiva e indicadores.</li>
+          <li>Usuários, aprovações e controle de alunos.</li>
+          <li>Equipe administrativa e permissões por cargo.</li>
+          <li>Notificações, suporte, provas, agenda e segurança.</li>
+          <li>Carregamento por aba para reduzir travamentos.</li>
+        </ul>
+      </section>
+    </div>
+
+    <nav class="legal-links" aria-label="Navegação principal">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="admin.html" aria-current="page">Painel Admin</a>
+      <a href="painel-vendas.html">Painel de Vendas</a>
+    </nav>
+
+    <footer class="legal-footer">
+      <span>© 2026 Turma do Primo.</span>
+      <span>Acesso restrito à equipe autorizada.</span>
+    </footer>
+  </main>
+</body>
+</html>
