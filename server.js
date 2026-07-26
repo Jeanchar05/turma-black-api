@@ -33,13 +33,24 @@ function servirBundle(arquivos, tipo) {
 }
 
 app.get(
+  "/style.css",
+  servirBundle(["style.css", "login-hotfix.css"], "text/css")
+);
+
+app.get(
   "/admin-enhanced.js",
-  servirBundle(["admin-enhanced.js", "admin-results.js"], "application/javascript")
+  servirBundle(
+    ["admin-enhanced.js", "admin-results.js", "admin-hotfix.js"],
+    "application/javascript"
+  )
 );
 
 app.get(
   "/admin-enhanced.css",
-  servirBundle(["admin-enhanced.css", "admin-results.css"], "text/css")
+  servirBundle(
+    ["admin-enhanced.css", "admin-results.css", "admin-hotfix.css"],
+    "text/css"
+  )
 );
 
 if (fs.existsSync(publicDir)) {
@@ -94,8 +105,8 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.1.4",
-    release: "admin-black-screen-recovery",
+    versao: "4.1.5",
+    release: "admin-results-login-dev-delete-hotfix",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
@@ -122,6 +133,7 @@ carregarRota("/", "usuarios.js");
 carregarRota("/", "liberacoes.js");
 carregarRota("/admin", "admin-dashboard.js");
 carregarRota("/admin", "admin-panel.js");
+carregarRota("/admin", "dev-delete.js");
 carregarRota("/admin", "admin-alunos.js");
 carregarRota("/admin", "admin.js");
 carregarRota("/", "alunos.js");
