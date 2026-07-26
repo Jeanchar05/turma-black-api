@@ -6,11 +6,13 @@ const path = require("path");
 const connectDatabase = require("./config/database");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+const publicDir = path.join(__dirname, "public");
 
+app.disable("x-powered-by");
 app.use(cors({ origin: "*" }));
 app.use(express.json({ limit: "10mb" }));
-
-const PORT = process.env.PORT || 3000;
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 /* ===============================
    BANCO DE DADOS
@@ -19,29 +21,37 @@ const PORT = process.env.PORT || 3000;
 connectDatabase();
 
 /* ===============================
-   ROTA PRINCIPAL
+   FRONTEND
 =============================== */
 
-app.get("/", (req, res) => {
+if (fs.existsSync(publicDir)) {
+  app.use(
+    express.static(publicDir, {
+      extensions: ["html"],
+      index: "index.html",
+      maxAge: process.env.NODE_ENV === "production" ? "1h" : 0,
+      setHeaders(res, filePath) {
+        if (/\.(html|js|css)$/i.test(filePath)) {
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+      }
+    })
+  );
+}
+
+/* ===============================
+   STATUS DA APLICAÇÃO
+=============================== */
+
+app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
-    nome: "Turma do Primo API",
-    versao: "2.0.0",
-    mensagem: "Backend modular rodando com sucesso",
+    nome: "Turma do Primo",
+    versao: "3.0.0",
+    frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
+    backend: "Node.js + Express",
     banco: "MongoDB",
-    estrutura: "modular",
-    rotas: {
-      auth: "routes/auth.js",
-      usuarios: "routes/usuarios.js",
-      admin: "routes/admin.js",
-      alunos: "routes/alunos.js",
-      vendas: "routes/vendas.js",
-      dashboard: "routes/dashboard.js",
-      agenda: "routes/agenda.js",
-      notificacoes: "routes/notificacoes.js",
-      suporte: "routes/suporte.js",
-      provas: "routes/provas.js"
-    }
+    estrutura: "frontend e API no mesmo serviço"
   });
 });
 
@@ -62,7 +72,7 @@ function carregarRota(caminhoBase, arquivo) {
 }
 
 /* ===============================
-   ROTAS
+   ROTAS DA API
 =============================== */
 
 carregarRota("/", "auth.js");
@@ -75,6 +85,24 @@ carregarRota("/", "agenda.js");
 carregarRota("/", "notificacoes.js");
 carregarRota("/", "suporte.js");
 carregarRota("/", "provas.js");
+
+/* ===============================
+   ROTA INICIAL / FALLBACK
+=============================== */
+
+app.get("/", (req, res) => {
+  const indexPath = path.join(publicDir, "index.html");
+
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+
+  return res.json({
+    status: "online",
+    nome: "Turma do Primo API",
+    mensagem: "Backend online; frontend ainda não foi publicado."
+  });
+});
 
 /* ===============================
    ROTA 404
@@ -92,5 +120,5 @@ app.use((req, res) => {
 =============================== */
 
 app.listen(PORT, () => {
-  console.log(`API Turma do Primo rodando na porta ${PORT}`);
+  console.log(`Turma do Primo rodando na porta ${PORT}`);
 });
