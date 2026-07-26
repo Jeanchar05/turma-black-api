@@ -27,6 +27,11 @@ const respostaSchema = new mongoose.Schema(
       default: ""
     },
 
+    respostaCorreta: {
+      type: String,
+      default: ""
+    },
+
     alternativaId: {
       type: String,
       default: ""
@@ -166,6 +171,42 @@ const provaResultadoSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+provaResultadoSchema.pre("save", async function preservarGabarito() {
+  if (!this.isNew || !this.provaId || !Array.isArray(this.respostas) || !this.respostas.length) {
+    return;
+  }
+
+  try {
+    const Prova = mongoose.model("Prova");
+    const prova = await Prova.findById(this.provaId).lean();
+    if (!prova || !Array.isArray(prova.perguntas)) return;
+
+    const perguntas = new Map(
+      prova.perguntas.map((pergunta) => [String(pergunta._id), pergunta])
+    );
+
+    this.respostas.forEach((resposta) => {
+      if (resposta.respostaCorreta) return;
+      const pergunta = perguntas.get(String(resposta.perguntaId));
+      if (!pergunta) return;
+
+      if (pergunta.tipo === "texto") {
+        resposta.respostaCorreta =
+          pergunta.respostaTextoEsperada || pergunta.explicacao || "";
+        return;
+      }
+
+      const alternativa = Array.isArray(pergunta.alternativas)
+        ? pergunta.alternativas.find((item) => item.correta)
+        : null;
+
+      resposta.respostaCorreta = alternativa?.texto || "";
+    });
+  } catch (error) {
+    console.warn("Nao foi possivel preservar o gabarito da tentativa:", error.message);
+  }
+});
 
 provaResultadoSchema.index({ provaId: 1 });
 provaResultadoSchema.index({ usuarioId: 1 });
