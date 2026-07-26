@@ -5,60 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#07030d" />
   <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Painel administrativo da Turma do Primo." />
   <title>Painel Administrativo | Turma do Primo</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20260726-dev-1" />
+  <link rel="stylesheet" href="style.css?v=20260726-admin-4" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
-  <script defer src="protected.js?v=20260726-dev-1"></script>
+  <script defer src="admin.js?v=20260726-admin-4"></script>
 </head>
-<body class="legal-body" data-required-access="painelAdmin">
-  <main class="legal-shell">
-    <header class="legal-topbar">
-      <a class="legal-brand" href="dashboard.html">
-        <img src="assets/turma-primo-logo.svg" alt="" />
-        <span><small>TURMA DO</small><strong>PRIMO</strong></span>
-      </a>
-      <button class="legal-back" type="button" data-logout>Sair</button>
-    </header>
 
-    <section class="legal-hero">
-      <div class="legal-icon" aria-hidden="true">♛</div>
-      <span class="legal-kicker">ACESSO ADMINISTRATIVO</span>
-      <h1>Painel Administrativo</h1>
-      <p>Olá, <span data-user-name>Dev</span>. Esta área já está protegida e pronta para receber a reformulação completa dos módulos administrativos.</p>
-      <span class="legal-updated">Perfil atual: <strong data-user-role>Super Admin</strong></span>
-    </section>
+<body class="admin-app-body">
+  <div class="admin-bg-orb admin-bg-orb-one" aria-hidden="true"></div>
+  <div class="admin-bg-orb admin-bg-orb-two" aria-hidden="true"></div>
 
-    <div class="legal-content">
-      <section class="legal-card legal-highlight">
-        <h2>Acesso validado</h2>
-        <p>A rota agora abre como página real, exige token válido e não expõe mais mensagens JSON diretamente no navegador.</p>
-      </section>
+  <div class="admin-app-loading" id="adminAppLoading" role="status" aria-live="polite">
+    <img src="assets/turma-primo-logo.svg" alt="" />
+    <div><strong>Preparando o painel</strong><span id="adminLoadingText">Validando sua sessão…</span></div>
+  </div>
 
-      <section class="legal-card">
-        <h2>Próxima reformulação</h2>
-        <ul>
-          <li>Visão geral executiva e indicadores.</li>
-          <li>Usuários, aprovações e controle de alunos.</li>
-          <li>Equipe administrativa e permissões por cargo.</li>
-          <li>Notificações, suporte, provas, agenda e segurança.</li>
-          <li>Carregamento por aba para reduzir travamentos.</li>
-        </ul>
-      </section>
+  <div class="admin-mobile-overlay" id="adminMobileOverlay" hidden></div>
+
+  <aside class="admin-sidebar" id="adminSidebar" aria-label="Navegação administrativa">
+    <div class="admin-sidebar-brand">
+      <img src="assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
+      <div><small>TURMA DO</small><strong>PRIMO</strong><span>PAINEL DE CONTROLE</span></div>
+      <button class="admin-sidebar-close" id="adminSidebarClose" type="button" aria-label="Fechar menu">×</button>
     </div>
 
-    <nav class="legal-links" aria-label="Navegação principal">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="admin.html" aria-current="page">Painel Admin</a>
-      <a href="painel-vendas.html">Painel de Vendas</a>
+    <nav class="admin-nav" id="adminNav">
+      <span class="admin-nav-label">VISÃO GERAL</span>
+      <button class="admin-nav-item active" type="button" data-section="overview" data-permission="painelAdmin"><span class="admin-nav-icon">▦</span><span>Visão Geral</span></button>
+
+      <span class="admin-nav-label">GESTÃO</span>
+      <button class="admin-nav-item" type="button" data-section="approvals" data-permission="aprovacoes"><span class="admin-nav-icon">✓</span><span>Aprovação de Códigos</span><b class="admin-nav-badge" id="approvalMenuBadge" hidden>0</b></button>
+      <button class="admin-nav-item" type="button" data-section="students" data-permission="controleAlunos"><span class="admin-nav-icon">♙</span><span>Controle de Alunos</span></button>
+      <button class="admin-nav-item" type="button" data-section="team" data-permission="equipe"><span class="admin-nav-icon">♜</span><span>Equipe e Cargos</span></button>
+      <button class="admin-nav-item" type="button" data-section="reports" data-permission="relatorios"><span class="admin-nav-icon">↗</span><span>Relatórios</span></button>
+      <button class="admin-nav-item" type="button" data-section="notifications" data-permission="notificacoes"><span class="admin-nav-icon">◉</span><span>Notificações</span></button>
+
+      <span class="admin-nav-label">ACESSOS RÁPIDOS</span>
+      <a class="admin-nav-item" href="dashboard.html" data-permission="dashboard"><span class="admin-nav-icon">▶</span><span>Dashboard de Aulas</span></a>
+      <a class="admin-nav-item" href="painel-vendas.html" data-permission="painelVendas"><span class="admin-nav-icon">$</span><span>Painel de Vendas</span></a>
+
+      <button class="admin-nav-item admin-dev-nav" type="button" data-section="dev" data-dev-only hidden><span class="admin-nav-icon">⌘</span><span>Central Dev</span><b>OCULTA</b></button>
     </nav>
 
-    <footer class="legal-footer">
-      <span>© 2026 Turma do Primo.</span>
-      <span>Acesso restrito à equipe autorizada.</span>
-    </footer>
+    <div class="admin-sidebar-profile">
+      <div class="admin-profile-avatar" data-user-initial>D</div>
+      <div><strong data-user-name>Dev</strong><span data-user-role>Dev</span></div>
+      <button type="button" data-logout aria-label="Sair">↪</button>
+    </div>
+  </aside>
+
+  <main class="admin-main" id="adminMain">
+    <header class="admin-topbar">
+      <div class="admin-topbar-left">
+        <button class="admin-menu-toggle" id="adminMenuToggle" type="button" aria-label="Abrir menu">☰</button>
+        <div><span class="admin-breadcrumb">Painel Administrativo</span><h1 id="adminPageTitle">Visão Geral</h1></div>
+      </div>
+      <div class="admin-topbar-actions">
+        <div class="admin-status-pill"><i></i> Sistema online</div>
+        <button class="admin-icon-btn" type="button" data-section-trigger="approvals" aria-label="Abrir aprovações">◉<b id="adminTopBadge" hidden>0</b></button>
+        <div class="admin-top-user"><div class="admin-profile-avatar" data-user-initial>D</div><div><strong data-user-name>Dev</strong><span data-user-role>Dev</span></div></div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <section class="admin-section active" id="section-overview" data-title="Visão Geral">
+        <div class="admin-welcome-card">
+          <div><span class="admin-kicker">CENTRAL DE OPERAÇÕES</span><h2>Bem-vindo, <span data-user-name>Dev</span>!</h2><p>Acompanhe usuários, códigos Premium, equipe e os principais movimentos da plataforma.</p></div>
+          <div class="admin-welcome-seal"><img src="assets/turma-primo-logo.svg" alt="" /><span>ACESSO<br /><strong data-user-role>DEV</strong></span></div>
+        </div>
+
+        <div class="admin-stat-grid">
+          <article class="admin-stat-card purple"><span class="admin-stat-icon">♙</span><div><small>Total de usuários</small><strong id="statTotalUsers">—</strong><em>contas cadastradas</em></div></article>
+          <article class="admin-stat-card blue"><span class="admin-stat-icon">✓</span><div><small>Alunos ativos</small><strong id="statActiveStudents">—</strong><em>acessos liberados</em></div></article>
+          <article class="admin-stat-card gold"><span class="admin-stat-icon">#</span><div><small>Códigos pendentes</small><strong id="statPendingCodes">—</strong><em>aguardando análise</em></div></article>
+          <article class="admin-stat-card green"><span class="admin-stat-icon">♜</span><div><small>Equipe ativa</small><strong id="statActiveTeam">—</strong><em>contas operacionais</em></div></article>
+        </div>
+
+        <div class="admin-dashboard-grid">
+          <article class="admin-panel-card admin-activity-card">
+            <div class="admin-card-heading"><div><span>ATIVIDADE RECENTE</span><h3>Últimos usuários</h3></div><button type="button" data-section-trigger="students">Ver todos →</button></div>
+            <div class="admin-list" id="overviewUsersList"><div class="admin-empty-state">Carregando usuários…</div></div>
+          </article>
+          <article class="admin-panel-card admin-quick-card">
+            <div class="admin-card-heading"><div><span>ATALHOS</span><h3>Ações rápidas</h3></div></div>
+            <div class="admin-quick-grid">
+              <button type="button" data-section-trigger="approvals" data-permission="aprovacoes"><b>✓</b><span>Aprovar código</span></button>
+              <button type="button" data-section-trigger="students" data-permission="controleAlunos"><b>♙</b><span>Buscar aluno</span></button>
+              <button type="button" data-open-modal="team" data-permission="equipe"><b>＋</b><span>Criar membro</span></button>
+              <a href="painel-vendas.html" data-permission="painelVendas"><b>$</b><span>Abrir vendas</span></a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="admin-section" id="section-approvals" data-title="Aprovação de Códigos" data-permission="aprovacoes">
+        <div class="admin-section-head"><div><span class="admin-kicker">TURMA PREMIUM</span><h2>Aprovação de Códigos</h2><p>Confira pagamentos e libere automaticamente o plano Premium do aluno.</p></div><button class="admin-primary-btn" type="button" id="refreshApprovals">↻ Atualizar</button></div>
+        <div class="admin-mini-stat-grid"><article><small>Pendentes</small><strong id="approvalPending">0</strong></article><article><small>Aprovados</small><strong id="approvalApproved">0</strong></article><article><small>Recusados</small><strong id="approvalRejected">0</strong></article><article><small>Total</small><strong id="approvalTotal">0</strong></article></div>
+        <div class="admin-panel-card">
+          <div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="approvalSearch" type="search" placeholder="Buscar por código, nome ou e-mail" /></div><select id="approvalStatus"><option value="">Todos os status</option><option value="pendente">Pendentes</option><option value="aprovado">Aprovados</option><option value="recusado">Recusados</option></select></div>
+          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Código</th><th>Aluno</th><th>Plano</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="approvalTableBody"><tr><td colspan="6"><div class="admin-empty-state">Carregando solicitações…</div></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="admin-section" id="section-students" data-title="Controle de Alunos" data-permission="controleAlunos">
+        <div class="admin-section-head"><div><span class="admin-kicker">BASE DE ALUNOS</span><h2>Controle de Alunos</h2><p>Pesquise, suspenda, reative e acompanhe plano e validade de cada aluno.</p></div><button class="admin-primary-btn" type="button" id="refreshStudents">↻ Atualizar</button></div>
+        <div class="admin-mini-stat-grid"><article><small>Total</small><strong id="studentTotal">0</strong></article><article><small>Aprovados</small><strong id="studentApproved">0</strong></article><article><small>Pendentes</small><strong id="studentPending">0</strong></article><article><small>Suspensos</small><strong id="studentSuspended">0</strong></article></div>
+        <div class="admin-panel-card">
+          <div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="studentSearch" type="search" placeholder="Nome, e-mail, telefone ou código" /></div><select id="studentStatus"><option value="">Todos os status</option><option value="ativo">Ativos</option><option value="pendente">Pendentes</option><option value="suspenso">Suspensos</option><option value="bloqueado">Bloqueados</option></select><select id="studentPlan"><option value="">Todos os planos</option><option value="free">Free</option><option value="black30">Black 30</option><option value="black90">Black 90</option><option value="black180">Black 180</option><option value="black360">Black 360</option></select></div>
+          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Aluno</th><th>Código</th><th>Plano</th><th>Status</th><th>Validade</th><th>Ações</th></tr></thead><tbody id="studentsTableBody"><tr><td colspan="6"><div class="admin-empty-state">Carregando alunos…</div></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="admin-section" id="section-team" data-title="Equipe e Cargos" data-permission="equipe">
+        <div class="admin-section-head"><div><span class="admin-kicker">CONTROLE DE ACESSO</span><h2>Equipe e Cargos</h2><p>Crie contas para Dono, Admin, Financeiro e Vendedor conforme sua permissão.</p></div><button class="admin-primary-btn" type="button" data-open-modal="team">＋ Novo membro</button></div>
+        <div class="admin-panel-card"><div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="teamSearch" type="search" placeholder="Buscar membro da equipe" /></div><button class="admin-secondary-btn" type="button" id="refreshTeam">↻ Atualizar</button></div><div class="admin-team-grid" id="teamGrid"><div class="admin-empty-state">Carregando equipe…</div></div></div>
+      </section>
+
+      <section class="admin-section" id="section-reports" data-title="Relatórios" data-permission="relatorios">
+        <div class="admin-section-head"><div><span class="admin-kicker">ANÁLISE</span><h2>Relatórios</h2><p>Visão consolidada da operação e atalhos para os relatórios comerciais.</p></div><a class="admin-primary-btn" href="painel-vendas.html">Abrir painel de vendas →</a></div>
+        <div class="admin-stat-grid"><article class="admin-stat-card purple"><span class="admin-stat-icon">♙</span><div><small>Usuários</small><strong id="reportUsers">—</strong><em>base total</em></div></article><article class="admin-stat-card blue"><span class="admin-stat-icon">$</span><div><small>Vendas registradas</small><strong id="reportSales">—</strong><em>histórico comercial</em></div></article><article class="admin-stat-card gold"><span class="admin-stat-icon">#</span><div><small>Conversões pendentes</small><strong id="reportPending">—</strong><em>códigos aguardando</em></div></article><article class="admin-stat-card green"><span class="admin-stat-icon">♜</span><div><small>Equipe</small><strong id="reportTeam">—</strong><em>contas ativas</em></div></article></div>
+      </section>
+
+      <section class="admin-section" id="section-notifications" data-title="Notificações" data-permission="notificacoes">
+        <div class="admin-section-head"><div><span class="admin-kicker">COMUNICAÇÃO</span><h2>Notificações</h2><p>O módulo visual está preparado para a próxima integração com o histórico de envios.</p></div></div>
+        <div class="admin-panel-card admin-coming-card"><span>◉</span><h3>Central de notificações</h3><p>A estrutura de permissão já está ativa. O envio segmentado será conectado ao módulo existente na próxima etapa.</p></div>
+      </section>
+
+      <section class="admin-section" id="section-dev" data-title="Central Dev" data-dev-only hidden>
+        <div class="admin-section-head"><div><span class="admin-kicker">ÁREA OCULTA</span><h2>Central Dev — Permissões e Sistema</h2><p>Esta área só existe para a conta técnica Dev e não aparece para nenhum outro cargo.</p></div><button class="admin-primary-btn" type="button" id="refreshDev">↻ Recarregar</button></div>
+        <div class="admin-dev-warning"><span>⌘</span><div><strong>Controle técnico máximo</strong><p>As alterações abaixo afetam o menu, o frontend e a autorização real das APIs.</p></div></div>
+        <div class="admin-panel-card">
+          <div class="admin-card-heading"><div><span>MATRIZ POR CARGO</span><h3>Permissões padrão</h3></div></div>
+          <div class="admin-dev-tabs" id="devRoleTabs"><button class="active" type="button" data-dev-role="dono">Dono</button><button type="button" data-dev-role="admin">Admin</button><button type="button" data-dev-role="financeiro">Financeiro</button><button type="button" data-dev-role="vendedor">Vendedor</button></div>
+          <div class="admin-permission-grid" id="devPermissionGrid"><div class="admin-empty-state">Carregando matriz…</div></div>
+          <div class="admin-card-actions"><button class="admin-primary-btn" type="button" id="saveDevRolePermissions">Salvar permissões do cargo</button></div>
+        </div>
+        <div class="admin-panel-card">
+          <div class="admin-card-heading"><div><span>EXCEÇÕES INDIVIDUAIS</span><h3>Permissões por conta</h3></div></div>
+          <div class="admin-filterbar"><select id="devUserSelect"><option value="">Selecione uma conta</option></select></div>
+          <div class="admin-permission-grid" id="devUserPermissionGrid"><div class="admin-empty-state">Selecione uma conta para personalizar.</div></div>
+          <div class="admin-card-actions"><button class="admin-primary-btn" type="button" id="saveDevUserPermissions" disabled>Salvar permissões individuais</button></div>
+        </div>
+      </section>
+    </div>
   </main>
+
+  <div class="admin-toast-stack" id="adminToastStack" aria-live="polite"></div>
+
+  <div class="admin-modal" id="teamModal" aria-hidden="true" hidden>
+    <div class="admin-modal-card" role="dialog" aria-modal="true" aria-labelledby="teamModalTitle">
+      <button class="admin-modal-close" type="button" data-close-modal="team" aria-label="Fechar">×</button>
+      <span class="admin-kicker">EQUIPE</span><h2 id="teamModalTitle">Criar novo membro</h2><p>Cadastre uma conta operacional e defina o cargo inicial.</p>
+      <form id="teamForm" class="admin-form">
+        <input type="hidden" id="teamId" />
+        <div class="admin-form-grid">
+          <label><span>Nome completo</span><input id="teamName" type="text" required placeholder="Nome do membro" /></label>
+          <label><span>E-mail</span><input id="teamEmail" type="email" required placeholder="email@empresa.com" /></label>
+          <label><span>Telefone</span><input id="teamPhone" type="tel" placeholder="(00) 00000-0000" /></label>
+          <label><span>Cargo</span><select id="teamRole" required><option value="vendedor">Vendedor</option><option value="financeiro">Financeiro</option><option value="admin">Admin</option><option value="dono">Dono</option></select></label>
+          <label><span>Senha</span><input id="teamPassword" type="password" minlength="6" placeholder="Mínimo de 6 caracteres" /></label>
+          <label><span>Comissão (%)</span><input id="teamCommission" type="number" min="0" max="100" step="0.1" value="20" /></label>
+        </div>
+        <div class="admin-modal-actions"><button class="admin-secondary-btn" type="button" data-close-modal="team">Cancelar</button><button class="admin-primary-btn" type="submit" id="teamSubmit">Salvar membro</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="admin-confirm" id="adminConfirm" aria-hidden="true" hidden>
+    <div class="admin-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <span id="confirmIcon">!</span><h2 id="confirmTitle">Confirmar ação</h2><p id="confirmText">Tem certeza?</p>
+      <div><button class="admin-secondary-btn" type="button" id="confirmCancel">Cancelar</button><button class="admin-primary-btn" type="button" id="confirmAccept">Confirmar</button></div>
+    </div>
+  </div>
 </body>
 </html>
