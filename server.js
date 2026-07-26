@@ -34,6 +34,32 @@ if (fs.existsSync(publicDir)) {
   );
 }
 
+function servirPagina(nomeArquivo) {
+  return (req, res, next) => {
+    const arquivo = path.join(publicDir, nomeArquivo);
+
+    if (!fs.existsSync(arquivo)) {
+      return next();
+    }
+
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    return res.sendFile(arquivo);
+  };
+}
+
+/*
+  Rotas visuais precisam ser registradas antes das rotas de API.
+  Isso impede que o navegador mostre JSON de autenticação ao abrir páginas.
+*/
+app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
+app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
+app.get(["/dashboard-free", "/dashboard-free.html"], servirPagina("dashboard-free.html"));
+app.get(["/admin", "/admin.html"], servirPagina("admin.html"));
+app.get(
+  ["/painel-vendas", "/painel-vendas.html"],
+  servirPagina("painel-vendas.html")
+);
+
 /* ===============================
    STATUS DA APLICAÇÃO
 =============================== */
@@ -49,7 +75,7 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "3.1.1",
+    versao: "3.2.0",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
@@ -88,24 +114,6 @@ carregarRota("/", "agenda.js");
 carregarRota("/", "notificacoes.js");
 carregarRota("/", "suporte.js");
 carregarRota("/", "provas.js");
-
-/* ===============================
-   ROTA INICIAL / FALLBACK
-=============================== */
-
-app.get("/", (req, res) => {
-  const indexPath = path.join(publicDir, "index.html");
-
-  if (fs.existsSync(indexPath)) {
-    return res.sendFile(indexPath);
-  }
-
-  return res.json({
-    status: "online",
-    nome: "Turma do Primo API",
-    mensagem: "Backend online; frontend ainda não foi publicado."
-  });
-});
 
 /* ===============================
    ROTA 404
