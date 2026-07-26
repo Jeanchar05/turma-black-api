@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 144" role="img" aria-labelledby="title desc">
+  <title id="title">Turma do Primo</title>
+  <desc id="desc">Monograma dourado com a letra P e uma coroa.</desc>
+  <defs>
+    <linearGradient id="gold" x1="18" y1="10" x2="104" y2="134" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff1b0"/>
+      <stop offset="0.34" stop-color="#f6c84d"/>
+      <stop offset="0.7" stop-color="#d89816"/>
+      <stop offset="1" stop-color="#8e5500"/>
+    </linearGradient>
+    <linearGradient id="deepGold" x1="36" y1="35" x2="88" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5f3300"/>
+      <stop offset="1" stop-color="#170a00"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)">
+    <path d="M31 23 19 9l21 8L51 2l13 15L77 2l10 15 22-8-12 14H31Z" fill="url(#gold)"/>
+    <circle cx="19" cy="9" r="4" fill="#ffd86a"/>
+    <circle cx="51" cy="2" r="4" fill="#ffe89b"/>
+    <circle cx="77" cy="2" r="4" fill="#ffe89b"/>
+    <circle cx="109" cy="9" r="4" fill="#ffd86a"/>
+  </g>
+  <path d="M24 31h80a10 10 0 0 1 10 10v55c0 14-7 25-19 33l-31 15-31-15C21 121 14 110 14 96V41a10 10 0 0 1 10-10Z" fill="url(#gold)"/>
+  <path d="M28 43h72v50c0 10-5 18-14 24l-22 11-22-11c-9-6-14-14-14-24V43Z" fill="url(#deepGold)" opacity=".96"/>
+  <path d="M43 57h27c19 0 30 9 30 25 0 15-11 24-29 24H61v16H43V57Zm18 15v20h10c7 0 11-3 11-10s-4-10-11-10H61Z" fill="url(#gold)"/>
+  <path d="M34 43h60" stroke="#fff2b3" stroke-width="2" stroke-linecap="round" opacity=".72"/>
+</svg>
