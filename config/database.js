@@ -5,11 +5,24 @@ const mysql = require("mysql2/promise");
 let pool = null;
 let conectado = false;
 let hostAtivo = "";
+let ultimoDiagnostico = {
+  carregadoEm: "",
+  host: "",
+  port: 3306,
+  passwordSource: "DB_PASSWORD",
+  passwordLength: 0,
+  passwordHadOuterQuotes: false,
+  passwordHadEdgeWhitespace: false,
+  lastErrorCode: "",
+  lastErrorMessage: ""
+};
 
 function obrigatoria(nome) {
   const valor = String(process.env[nome] || "").trim();
   if (!valor) {
-    throw new Error(`${nome} não configurada.`);
+    const error = new Error(`${nome} não configurada.`);
+    error.code = "ENV_MISSING";
+    throw error;
   }
   return valor;
 }
@@ -17,6 +30,75 @@ function obrigatoria(nome) {
 function normalizarHost(valor) {
   const host = String(valor || "localhost").trim();
   return host || "localhost";
+}
+
+function removerAspasExternas(valor) {
+  if (valor.length < 2) return { valor, removidas: false };
+
+  const primeira = valor[0];
+  const ultima = valor[valor.length - 1];
+  const parValido =
+    (primeira === '"' && ultima === '"') ||
+    (primeira === "'" && ultima === "'");
+
+  return parValido
+    ? { valor: valor.slice(1, -1), removidas: true }
+    : { valor, removidas: false };
+}
+
+function lerSenha() {
+  const base64 = String(process.env.DB_PASSWORD_BASE64 || "").trim();
+
+  if (base64) {
+    let senha;
+
+    try {
+      senha = Buffer.from(base64, "base64").toString("utf8");
+    } catch (_) {
+      const error = new Error("DB_PASSWORD_BASE64 inválida.");
+      error.code = "ENV_INVALID";
+      throw error;
+    }
+
+    if (!senha) {
+      const error = new Error("DB_PASSWORD_BASE64 resultou em uma senha vazia.");
+      error.code = "ENV_INVALID";
+      throw error;
+    }
+
+    return {
+      password: senha,
+      source: "DB_PASSWORD_BASE64",
+      hadOuterQuotes: false,
+      hadEdgeWhitespace: /^\s|\s$/.test(senha)
+    };
+  }
+
+  const bruto = process.env.DB_PASSWORD;
+
+  if (bruto === undefined || bruto === null || String(bruto).length === 0) {
+    const error = new Error("DB_PASSWORD não configurada.");
+    error.code = "ENV_MISSING";
+    throw error;
+  }
+
+  const original = String(bruto);
+  const hadEdgeWhitespace = /^\s|\s$/.test(original);
+  const semEspacosExternos = original.trim();
+  const resultadoAspas = removerAspasExternas(semEspacosExternos);
+
+  if (!resultadoAspas.valor) {
+    const error = new Error("DB_PASSWORD ficou vazia após a normalização.");
+    error.code = "ENV_INVALID";
+    throw error;
+  }
+
+  return {
+    password: resultadoAspas.valor,
+    source: "DB_PASSWORD",
+    hadOuterQuotes: resultadoAspas.removidas,
+    hadEdgeWhitespace
+  };
 }
 
 function getPool() {
@@ -91,38 +173,49 @@ async function garantirEstrutura() {
 }
 
 function traduzirErroConexao(error, dados) {
-  const codigo = String(error?.code || "");
+  const codigo = String(error?.code || "MYSQL_UNKNOWN");
+  let traduzido = error;
 
   if (codigo === "ER_ACCESS_DENIED_ERROR") {
-    return new Error(
+    traduzido = new Error(
       `MySQL recusou o usuário '${dados.user}' no host '${dados.host}'. ` +
-      "Confirme a senha, atribua o banco ao site no hPanel e garanta que esse usuário tenha acesso ao banco DB_NAME."
+      "A aplicação carregou as variáveis, mas a combinação usuário/senha não foi aceita."
     );
-  }
-
-  if (codigo === "ER_BAD_DB_ERROR") {
-    return new Error(
+  } else if (codigo === "ER_BAD_DB_ERROR") {
+    traduzido = new Error(
       `O banco MySQL '${dados.database}' não foi encontrado. Confira DB_NAME exatamente como aparece no hPanel.`
     );
-  }
-
-  if (["ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND"].includes(codigo)) {
-    return new Error(
+  } else if (["ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND"].includes(codigo)) {
+    traduzido = new Error(
       `Não foi possível alcançar o MySQL em ${dados.host}:${dados.port}. Confira DB_HOST e DB_PORT.`
     );
   }
 
-  return error;
+  traduzido.code = codigo;
+  traduzido.originalMessage = String(error?.message || "");
+  return traduzido;
 }
 
 async function connectDatabase() {
   const host = normalizarHost(process.env.DB_HOST || "localhost");
   const user = obrigatoria("DB_USER");
-  const password = obrigatoria("DB_PASSWORD");
+  const senhaInfo = lerSenha();
+  const password = senhaInfo.password;
   const database = obrigatoria("DB_NAME");
   const port = Number(process.env.DB_PORT || 3306);
 
   hostAtivo = host;
+  ultimoDiagnostico = {
+    carregadoEm: new Date().toISOString(),
+    host,
+    port,
+    passwordSource: senhaInfo.source,
+    passwordLength: password.length,
+    passwordHadOuterQuotes: senhaInfo.hadOuterQuotes,
+    passwordHadEdgeWhitespace: senhaInfo.hadEdgeWhitespace,
+    lastErrorCode: "",
+    lastErrorMessage: ""
+  };
 
   const dadosPublicos = { host, port, user, database };
 
@@ -170,7 +263,10 @@ async function connectDatabase() {
       pool = null;
     }
 
-    throw traduzirErroConexao(error, dadosPublicos);
+    const traduzido = traduzirErroConexao(error, dadosPublicos);
+    ultimoDiagnostico.lastErrorCode = traduzido.code || "MYSQL_UNKNOWN";
+    ultimoDiagnostico.lastErrorMessage = traduzido.message;
+    throw traduzido;
   }
 }
 
@@ -178,6 +274,7 @@ connectDatabase.getPool = getPool;
 connectDatabase.query = query;
 connectDatabase.isConnected = () => conectado;
 connectDatabase.getHost = () => hostAtivo;
+connectDatabase.getDiagnostics = () => ({ ...ultimoDiagnostico });
 connectDatabase.close = async () => {
   if (pool) {
     await pool.end();
