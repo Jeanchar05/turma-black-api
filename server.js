@@ -10,7 +10,7 @@ const connectDatabase = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260726-421-mysql-resilient";
+const CACHE_VERSION = "20260726-422-mysql-diagnostics";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -190,19 +190,34 @@ app.get("/api/status", async (req, res) => {
     banco = "erro";
   }
 
+  const diagnostico =
+    typeof connectDatabase.getDiagnostics === "function"
+      ? connectDatabase.getDiagnostics()
+      : {};
+
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.2.1",
-    release: "hostinger-mysql-resilient-startup",
+    versao: "4.2.2",
+    release: "hostinger-mysql-safe-diagnostics",
     cacheVersion: CACHE_VERSION,
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco,
     bancoTipo: "MySQL",
     ultimaTentativaBanco,
-    detalheBanco: ultimoErroBanco ? "Credenciais ou vínculo do MySQL precisam ser corrigidos no hPanel." : "",
+    detalheBanco: ultimoErroBanco || "",
+    diagnosticoBanco: {
+      carregadoEm: diagnostico.carregadoEm || "",
+      host: diagnostico.host || "",
+      porta: diagnostico.port || 3306,
+      fonteSenha: diagnostico.passwordSource || "",
+      tamanhoSenhaCarregada: Number(diagnostico.passwordLength || 0),
+      senhaComAspasExternas: Boolean(diagnostico.passwordHadOuterQuotes),
+      senhaComEspacoNasPontas: Boolean(diagnostico.passwordHadEdgeWhitespace),
+      codigoErro: diagnostico.lastErrorCode || ""
+    },
     estrutura: "frontend, API e banco na Hostinger"
   });
 });
