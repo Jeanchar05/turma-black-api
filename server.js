@@ -1,15 +1,16 @@
+"use strict";
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-const mongoose = require("mongoose");
 
 const connectDatabase = require("./config/database");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260726-416-cache-reset-2";
+const CACHE_VERSION = "20260726-420-mysql-hostinger";
 
 app.disable("x-powered-by");
 app.use(cors({ origin: "*" }));
@@ -40,8 +41,6 @@ function servirBundle(arquivos, tipo) {
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
-    res.setHeader("Surrogate-Control", "no-store");
-    res.setHeader("CDN-Cache-Control", "no-store");
     return res.send(conteudo);
   };
 }
@@ -56,7 +55,6 @@ function aplicarVersaoNosAssets(html) {
 function servirPagina(nomeArquivo) {
   return (req, res, next) => {
     const arquivo = path.join(publicDir, nomeArquivo);
-
     if (!fs.existsSync(arquivo)) return next();
 
     const html = aplicarVersaoNosAssets(fs.readFileSync(arquivo, "utf8"));
@@ -65,8 +63,6 @@ function servirPagina(nomeArquivo) {
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
-    res.setHeader("Surrogate-Control", "no-store");
-    res.setHeader("CDN-Cache-Control", "no-store");
     res.setHeader("X-Cache-Version", CACHE_VERSION);
     return res.send(html);
   };
@@ -96,8 +92,6 @@ app.get(
 app.get("/limpar-cache", (req, res) => {
   res.setHeader("Clear-Site-Data", '"cache"');
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
   res.setHeader("Content-Type", "text/html; charset=utf-8");
 
   return res.send(`<!DOCTYPE html>
@@ -105,9 +99,6 @@ app.get("/limpar-cache", (req, res) => {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <title>Atualizando Turma do Primo</title>
   <style>
     *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;color:#fff;font-family:Arial,sans-serif;background:radial-gradient(circle at 50% 20%,#37105b,#08030f 48%,#020104)}
@@ -119,8 +110,8 @@ app.get("/limpar-cache", (req, res) => {
 <body>
   <main class="box">
     <div class="ring"></div>
-    <h1>Limpando a versão antiga…</h1>
-    <p>Estamos removendo o cache salvo no aparelho e carregando a atualização mais recente.</p>
+    <h1>Carregando a versão MySQL…</h1>
+    <p>Removendo arquivos antigos e abrindo a aplicação atualizada na Hostinger.</p>
     <small>Versão ${CACHE_VERSION}</small>
   </main>
   <script>
@@ -139,8 +130,10 @@ app.get("/limpar-cache", (req, res) => {
         console.warn("Não foi possível limpar todo o cache:", erro);
       }
 
-      const destino = "/index.html?fresh=${CACHE_VERSION}&t=" + Date.now();
-      setTimeout(() => window.location.replace(destino), 700);
+      setTimeout(
+        () => window.location.replace("/index.html?fresh=${CACHE_VERSION}&t=" + Date.now()),
+        700
+      );
     })();
   </script>
 </body>
@@ -169,33 +162,36 @@ if (fs.existsSync(publicDir)) {
           res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
           res.setHeader("Pragma", "no-cache");
           res.setHeader("Expires", "0");
-          res.setHeader("Surrogate-Control", "no-store");
-          res.setHeader("CDN-Cache-Control", "no-store");
         }
       }
     })
   );
 }
 
-app.get("/api/status", (req, res) => {
-  const estadosBanco = {
-    0: "desconectado",
-    1: "conectado",
-    2: "conectando",
-    3: "desconectando"
-  };
+app.get("/api/status", async (req, res) => {
+  let banco = "desconectado";
+
+  try {
+    if (connectDatabase.isConnected()) {
+      await connectDatabase.query("SELECT 1 AS ok");
+      banco = "conectado";
+    }
+  } catch (_) {
+    banco = "erro";
+  }
 
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
-  res.json({
+  return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.1.6",
-    release: "forced-cache-reset-assets-versioning",
+    versao: "4.2.0",
+    release: "hostinger-mysql-core",
     cacheVersion: CACHE_VERSION,
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
-    banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
-    estrutura: "frontend e API no mesmo serviço"
+    banco,
+    bancoTipo: "MySQL",
+    estrutura: "frontend, API e banco na Hostinger"
   });
 });
 
@@ -243,7 +239,7 @@ async function iniciarServidor() {
   await connectDatabase();
 
   app.listen(PORT, () => {
-    console.log(`Turma do Primo rodando na porta ${PORT}`);
+    console.log(`Turma do Primo com MySQL rodando na porta ${PORT}`);
   });
 }
 
