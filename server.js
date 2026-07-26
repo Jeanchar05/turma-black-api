@@ -85,7 +85,8 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.1.1",
+    versao: "4.1.2",
+    release: "provas-modulos-pdf-v2",
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
     banco: estadosBanco[mongoose.connection.readyState] || "desconhecido",
