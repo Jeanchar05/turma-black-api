@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#07030d" />
   <meta name="robots" content="noindex, nofollow" />
-  <meta name="description" content="Painel administrativo da Turma do Primo." />
+  <meta name="description" content="Painel administrativo completo da Turma do Primo." />
   <title>Painel Administrativo | Turma do Primo</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20260726-admin-4" />
+  <link rel="stylesheet" href="style.css?v=20260726-admin-5" />
+  <link rel="stylesheet" href="admin-enhanced.css?v=20260726-admin-5" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
-  <script defer src="admin.js?v=20260726-admin-4"></script>
+  <script defer src="admin.js?v=20260726-admin-5"></script>
+  <script defer src="admin-enhanced.js?v=20260726-admin-5"></script>
 </head>
 
 <body class="admin-app-body">
@@ -42,8 +44,15 @@
       <button class="admin-nav-item" type="button" data-section="approvals" data-permission="aprovacoes"><span class="admin-nav-icon">✓</span><span>Aprovação de Códigos</span><b class="admin-nav-badge" id="approvalMenuBadge" hidden>0</b></button>
       <button class="admin-nav-item" type="button" data-section="students" data-permission="controleAlunos"><span class="admin-nav-icon">♙</span><span>Controle de Alunos</span></button>
       <button class="admin-nav-item" type="button" data-section="team" data-permission="equipe"><span class="admin-nav-icon">♜</span><span>Equipe e Cargos</span></button>
+      <button class="admin-nav-item" type="button" data-section="finance" data-permission="financas"><span class="admin-nav-icon">$</span><span>Financeiro</span></button>
+      <button class="admin-nav-item" type="button" data-section="notifications" data-permission="notificacoes"><span class="admin-nav-icon">◉</span><span>Notificações</span><b class="admin-nav-badge" id="notificationMenuBadge" hidden>0</b></button>
+      <button class="admin-nav-item" type="button" data-section="support" data-permission="suporte"><span class="admin-nav-icon">☏</span><span>Suporte</span><b class="admin-nav-badge" id="supportMenuBadge" hidden>0</b></button>
+      <button class="admin-nav-item" type="button" data-section="exams" data-permission="provas"><span class="admin-nav-icon">□</span><span>Provas</span></button>
+
+      <span class="admin-nav-label">ANÁLISE E SISTEMA</span>
       <button class="admin-nav-item" type="button" data-section="reports" data-permission="relatorios"><span class="admin-nav-icon">↗</span><span>Relatórios</span></button>
-      <button class="admin-nav-item" type="button" data-section="notifications" data-permission="notificacoes"><span class="admin-nav-icon">◉</span><span>Notificações</span></button>
+      <button class="admin-nav-item" type="button" data-section="settings" data-permission="configuracoes"><span class="admin-nav-icon">⚙</span><span>Configurações</span></button>
+      <button class="admin-nav-item" type="button" data-section="logs" data-permission="seguranca"><span class="admin-nav-icon">≡</span><span>Logs do Sistema</span></button>
 
       <span class="admin-nav-label">ACESSOS RÁPIDOS</span>
       <a class="admin-nav-item" href="dashboard.html" data-permission="dashboard"><span class="admin-nav-icon">▶</span><span>Dashboard de Aulas</span></a>
@@ -65,9 +74,12 @@
         <button class="admin-menu-toggle" id="adminMenuToggle" type="button" aria-label="Abrir menu">☰</button>
         <div><span class="admin-breadcrumb">Painel Administrativo</span><h1 id="adminPageTitle">Visão Geral</h1></div>
       </div>
+      <div class="admin-topbar-center">
+        <div class="admin-global-search"><span>⌕</span><input id="adminGlobalSearch" type="search" placeholder="Buscar módulo ou ação…" /><kbd>CTRL K</kbd></div>
+      </div>
       <div class="admin-topbar-actions">
         <div class="admin-status-pill"><i></i> Sistema online</div>
-        <button class="admin-icon-btn" type="button" data-section-trigger="approvals" aria-label="Abrir aprovações">◉<b id="adminTopBadge" hidden>0</b></button>
+        <button class="admin-icon-btn" type="button" data-section-trigger="notifications" aria-label="Abrir notificações">◉<b id="adminTopBadge" hidden>0</b></button>
         <div class="admin-top-user"><div class="admin-profile-avatar" data-user-initial>D</div><div><strong data-user-name>Dev</strong><span data-user-role>Dev</span></div></div>
       </div>
     </header>
@@ -75,30 +87,46 @@
     <div class="admin-content">
       <section class="admin-section active" id="section-overview" data-title="Visão Geral">
         <div class="admin-welcome-card">
-          <div><span class="admin-kicker">CENTRAL DE OPERAÇÕES</span><h2>Bem-vindo, <span data-user-name>Dev</span>!</h2><p>Acompanhe usuários, códigos Premium, equipe e os principais movimentos da plataforma.</p></div>
+          <div><span class="admin-kicker">CENTRAL DE OPERAÇÕES</span><h2>Bem-vindo, <span data-user-name>Dev</span>!</h2><p>Acompanhe usuários, vendas, receita, conversão, equipe e alertas em tempo real.</p></div>
           <div class="admin-welcome-seal"><img src="assets/turma-primo-logo.svg" alt="" /><span>ACESSO<br /><strong data-user-role>DEV</strong></span></div>
         </div>
 
-        <div class="admin-stat-grid">
-          <article class="admin-stat-card purple"><span class="admin-stat-icon">♙</span><div><small>Total de usuários</small><strong id="statTotalUsers">—</strong><em>contas cadastradas</em></div></article>
-          <article class="admin-stat-card blue"><span class="admin-stat-icon">✓</span><div><small>Alunos ativos</small><strong id="statActiveStudents">—</strong><em>acessos liberados</em></div></article>
-          <article class="admin-stat-card gold"><span class="admin-stat-icon">#</span><div><small>Códigos pendentes</small><strong id="statPendingCodes">—</strong><em>aguardando análise</em></div></article>
-          <article class="admin-stat-card green"><span class="admin-stat-icon">♜</span><div><small>Equipe ativa</small><strong id="statActiveTeam">—</strong><em>contas operacionais</em></div></article>
+        <div class="admin-stat-grid admin-stat-grid-six">
+          <article class="admin-stat-card purple"><span class="admin-stat-icon">♙</span><div><small>Usuários</small><strong id="statTotalUsers">—</strong><em id="statUsersGrowth">base cadastrada</em></div></article>
+          <article class="admin-stat-card green"><span class="admin-stat-icon">$</span><div><small>Vendas no mês</small><strong id="statSalesMonth">—</strong><em id="statSalesGrowth">vendas pagas</em></div></article>
+          <article class="admin-stat-card blue"><span class="admin-stat-icon">↗</span><div><small>Receita no mês</small><strong id="statRevenueMonth">—</strong><em id="statRevenueGrowth">faturamento confirmado</em></div></article>
+          <article class="admin-stat-card gold"><span class="admin-stat-icon">◎</span><div><small>Conversão</small><strong id="statConversion">—</strong><em>Free para Premium</em></div></article>
+          <article class="admin-stat-card red"><span class="admin-stat-icon">#</span><div><small>Códigos pendentes</small><strong id="statPendingCodes">—</strong><em>aguardando análise</em></div></article>
+          <article class="admin-stat-card cyan"><span class="admin-stat-icon">☏</span><div><small>Chamados abertos</small><strong id="statOpenTickets">—</strong><em>suporte ativo</em></div></article>
         </div>
 
-        <div class="admin-dashboard-grid">
-          <article class="admin-panel-card admin-activity-card">
-            <div class="admin-card-heading"><div><span>ATIVIDADE RECENTE</span><h3>Últimos usuários</h3></div><button type="button" data-section-trigger="students">Ver todos →</button></div>
-            <div class="admin-list" id="overviewUsersList"><div class="admin-empty-state">Carregando usuários…</div></div>
+        <div class="admin-executive-grid">
+          <article class="admin-panel-card admin-chart-card">
+            <div class="admin-card-heading"><div><span>DESEMPENHO</span><h3>Vendas e faturamento</h3></div><select id="overviewChartPeriod"><option value="7">Últimos 7 dias</option><option value="14">Últimos 14 dias</option><option value="30">Últimos 30 dias</option></select></div>
+            <div class="admin-chart-wrap"><canvas id="overviewSalesChart" aria-label="Gráfico de vendas"></canvas><div class="admin-chart-tooltip" id="overviewChartTooltip" hidden></div></div>
+            <div class="admin-chart-legend"><span><i class="purple"></i> Faturamento</span><span><i class="green"></i> Número de vendas</span></div>
           </article>
-          <article class="admin-panel-card admin-quick-card">
-            <div class="admin-card-heading"><div><span>ATALHOS</span><h3>Ações rápidas</h3></div></div>
-            <div class="admin-quick-grid">
-              <button type="button" data-section-trigger="approvals" data-permission="aprovacoes"><b>✓</b><span>Aprovar código</span></button>
-              <button type="button" data-section-trigger="students" data-permission="controleAlunos"><b>♙</b><span>Buscar aluno</span></button>
-              <button type="button" data-open-modal="team" data-permission="equipe"><b>＋</b><span>Criar membro</span></button>
-              <a href="painel-vendas.html" data-permission="painelVendas"><b>$</b><span>Abrir vendas</span></a>
-            </div>
+
+          <article class="admin-panel-card admin-activity-card">
+            <div class="admin-card-heading"><div><span>TEMPO REAL</span><h3>Atividades recentes</h3></div><button type="button" id="refreshOverview">Atualizar ↻</button></div>
+            <div class="admin-list admin-activity-feed" id="overviewActivityList"><div class="admin-empty-state">Carregando atividades…</div></div>
+          </article>
+        </div>
+
+        <div class="admin-executive-bottom-grid">
+          <article class="admin-panel-card">
+            <div class="admin-card-heading"><div><span>PRODUTOS</span><h3>Planos com maior receita</h3></div></div>
+            <div class="admin-ranking-list" id="overviewTopPlans"><div class="admin-empty-state">Carregando planos…</div></div>
+          </article>
+
+          <article class="admin-panel-card">
+            <div class="admin-card-heading"><div><span>CONVERSÃO</span><h3>Funil de alunos</h3></div></div>
+            <div class="admin-funnel-list" id="overviewFunnel"><div class="admin-empty-state">Carregando funil…</div></div>
+          </article>
+
+          <article class="admin-panel-card admin-alerts-card">
+            <div class="admin-card-heading"><div><span>ATENÇÃO</span><h3>Alertas importantes</h3></div></div>
+            <div class="admin-alert-list" id="overviewAlertsList"><div class="admin-empty-state">Nenhum alerta importante.</div></div>
           </article>
         </div>
       </section>
@@ -106,19 +134,13 @@
       <section class="admin-section" id="section-approvals" data-title="Aprovação de Códigos" data-permission="aprovacoes">
         <div class="admin-section-head"><div><span class="admin-kicker">TURMA PREMIUM</span><h2>Aprovação de Códigos</h2><p>Confira pagamentos e libere automaticamente o plano Premium do aluno.</p></div><button class="admin-primary-btn" type="button" id="refreshApprovals">↻ Atualizar</button></div>
         <div class="admin-mini-stat-grid"><article><small>Pendentes</small><strong id="approvalPending">0</strong></article><article><small>Aprovados</small><strong id="approvalApproved">0</strong></article><article><small>Recusados</small><strong id="approvalRejected">0</strong></article><article><small>Total</small><strong id="approvalTotal">0</strong></article></div>
-        <div class="admin-panel-card">
-          <div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="approvalSearch" type="search" placeholder="Buscar por código, nome ou e-mail" /></div><select id="approvalStatus"><option value="">Todos os status</option><option value="pendente">Pendentes</option><option value="aprovado">Aprovados</option><option value="recusado">Recusados</option></select></div>
-          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Código</th><th>Aluno</th><th>Plano</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="approvalTableBody"><tr><td colspan="6"><div class="admin-empty-state">Carregando solicitações…</div></td></tr></tbody></table></div>
-        </div>
+        <div class="admin-panel-card"><div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="approvalSearch" type="search" placeholder="Buscar por código, nome ou e-mail" /></div><select id="approvalStatus"><option value="">Todos os status</option><option value="pendente">Pendentes</option><option value="aprovado">Aprovados</option><option value="recusado">Recusados</option></select></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Código</th><th>Aluno</th><th>Plano</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="approvalTableBody"><tr><td colspan="6"><div class="admin-empty-state">Carregando solicitações…</div></td></tr></tbody></table></div></div>
       </section>
 
       <section class="admin-section" id="section-students" data-title="Controle de Alunos" data-permission="controleAlunos">
         <div class="admin-section-head"><div><span class="admin-kicker">BASE DE ALUNOS</span><h2>Controle de Alunos</h2><p>Pesquise, suspenda, reative e acompanhe plano e validade de cada aluno.</p></div><button class="admin-primary-btn" type="button" id="refreshStudents">↻ Atualizar</button></div>
         <div class="admin-mini-stat-grid"><article><small>Total</small><strong id="studentTotal">0</strong></article><article><small>Aprovados</small><strong id="studentApproved">0</strong></article><article><small>Pendentes</small><strong id="studentPending">0</strong></article><article><small>Suspensos</small><strong id="studentSuspended">0</strong></article></div>
-        <div class="admin-panel-card">
-          <div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="studentSearch" type="search" placeholder="Nome, e-mail, telefone ou código" /></div><select id="studentStatus"><option value="">Todos os status</option><option value="ativo">Ativos</option><option value="pendente">Pendentes</option><option value="suspenso">Suspensos</option><option value="bloqueado">Bloqueados</option></select><select id="studentPlan"><option value="">Todos os planos</option><option value="free">Free</option><option value="black30">Black 30</option><option value="black90">Black 90</option><option value="black180">Black 180</option><option value="black360">Black 360</option></select></div>
-          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Aluno</th><th>Código</th><th>Plano</th><th>Status</th><th>Validade</th><th>Ações</th></tr></thead><tbody id="studentsTableBody"><tr><td colspan="6"><div class="admin-empty-state">Carregando alunos…</div></td></tr></tbody></table></div>
-        </div>
+        <div class="admin-panel-card"><div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="studentSearch" type="search" placeholder="Nome, e-mail, telefone ou código" /></div><select id="studentStatus"><option value="">Todos os status</option><option value="ativo">Ativos</option><option value="pendente">Pendentes</option><option value="suspenso">Suspensos</option><option value="bloqueado">Bloqueados</option></select><select id="studentPlan"><option value="">Todos os planos</option><option value="free">Free</option><option value="black30">Black 30</option><option value="black90">Black 90</option><option value="black180">Black 180</option><option value="black360">Black 360</option></select></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Aluno</th><th>Código</th><th>Plano</th><th>Status</th><th>Validade</th><th>Ações</th></tr></thead><tbody id="studentsTableBody"><tr><td colspan="6"><div class="admin-empty-state">Carregando alunos…</div></td></tr></tbody></table></div></div>
       </section>
 
       <section class="admin-section" id="section-team" data-title="Equipe e Cargos" data-permission="equipe">
@@ -126,61 +148,71 @@
         <div class="admin-panel-card"><div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="teamSearch" type="search" placeholder="Buscar membro da equipe" /></div><button class="admin-secondary-btn" type="button" id="refreshTeam">↻ Atualizar</button></div><div class="admin-team-grid" id="teamGrid"><div class="admin-empty-state">Carregando equipe…</div></div></div>
       </section>
 
-      <section class="admin-section" id="section-reports" data-title="Relatórios" data-permission="relatorios">
-        <div class="admin-section-head"><div><span class="admin-kicker">ANÁLISE</span><h2>Relatórios</h2><p>Visão consolidada da operação e atalhos para os relatórios comerciais.</p></div><a class="admin-primary-btn" href="painel-vendas.html">Abrir painel de vendas →</a></div>
-        <div class="admin-stat-grid"><article class="admin-stat-card purple"><span class="admin-stat-icon">♙</span><div><small>Usuários</small><strong id="reportUsers">—</strong><em>base total</em></div></article><article class="admin-stat-card blue"><span class="admin-stat-icon">$</span><div><small>Vendas registradas</small><strong id="reportSales">—</strong><em>histórico comercial</em></div></article><article class="admin-stat-card gold"><span class="admin-stat-icon">#</span><div><small>Conversões pendentes</small><strong id="reportPending">—</strong><em>códigos aguardando</em></div></article><article class="admin-stat-card green"><span class="admin-stat-icon">♜</span><div><small>Equipe</small><strong id="reportTeam">—</strong><em>contas ativas</em></div></article></div>
+      <section class="admin-section" id="section-finance" data-title="Financeiro" data-permission="financas">
+        <div class="admin-section-head"><div><span class="admin-kicker">FINANCEIRO</span><h2>Receita, vendas e comissões</h2><p>Acompanhe faturamento confirmado, ticket médio, pendências e desempenho da equipe.</p></div><select id="financePeriod" class="admin-secondary-btn"><option value="30">Últimos 30 dias</option><option value="60">Últimos 60 dias</option><option value="90">Últimos 90 dias</option></select></div>
+        <div class="admin-stat-grid"><article class="admin-stat-card green"><span class="admin-stat-icon">$</span><div><small>Faturamento</small><strong id="financeRevenue">—</strong><em>vendas pagas</em></div></article><article class="admin-stat-card purple"><span class="admin-stat-icon">✓</span><div><small>Vendas pagas</small><strong id="financePaid">—</strong><em>confirmadas</em></div></article><article class="admin-stat-card gold"><span class="admin-stat-icon">⌛</span><div><small>Pendentes</small><strong id="financePending">—</strong><em>aguardando</em></div></article><article class="admin-stat-card blue"><span class="admin-stat-icon">◎</span><div><small>Ticket médio</small><strong id="financeTicket">—</strong><em>por venda</em></div></article></div>
+        <div class="admin-dashboard-grid"><article class="admin-panel-card"><div class="admin-card-heading"><div><span>RANKING</span><h3>Desempenho de vendedores</h3></div></div><div class="admin-ranking-list" id="financeRanking"><div class="admin-empty-state">Carregando ranking…</div></div></article><article class="admin-panel-card"><div class="admin-card-heading"><div><span>ÚLTIMAS VENDAS</span><h3>Movimentações recentes</h3></div></div><div class="admin-list" id="financeSalesList"><div class="admin-empty-state">Carregando vendas…</div></div></article></div>
       </section>
 
       <section class="admin-section" id="section-notifications" data-title="Notificações" data-permission="notificacoes">
-        <div class="admin-section-head"><div><span class="admin-kicker">COMUNICAÇÃO</span><h2>Notificações</h2><p>O módulo visual está preparado para a próxima integração com o histórico de envios.</p></div></div>
-        <div class="admin-panel-card admin-coming-card"><span>◉</span><h3>Central de notificações</h3><p>A estrutura de permissão já está ativa. O envio segmentado será conectado ao módulo existente na próxima etapa.</p></div>
+        <div class="admin-section-head"><div><span class="admin-kicker">COMUNICAÇÃO</span><h2>Central de Notificações</h2><p>Envie avisos segmentados, fixe comunicados e acompanhe o histórico.</p></div><button class="admin-primary-btn" type="button" id="newNotificationButton">＋ Nova notificação</button></div>
+        <div class="admin-mini-stat-grid"><article><small>Total</small><strong id="notificationTotal">0</strong></article><article><small>Ativas</small><strong id="notificationActive">0</strong></article><article><small>Fixadas</small><strong id="notificationPinned">0</strong></article><article><small>Urgentes</small><strong id="notificationUrgent">0</strong></article></div>
+        <div class="admin-panel-card" id="notificationComposer" hidden>
+          <div class="admin-card-heading"><div><span>NOVO ENVIO</span><h3>Criar notificação</h3></div><button type="button" id="closeNotificationComposer">×</button></div>
+          <form id="notificationForm" class="admin-form">
+            <div class="admin-form-grid"><label><span>Título</span><input id="notificationTitle" required maxlength="120" /></label><label><span>Destino</span><select id="notificationDestination"><option value="todos">Todos</option><option value="premium">Premium</option><option value="free">Free</option><option value="admin">Equipe administrativa</option><option value="vendedores">Vendedores</option><option value="especifico">Usuário específico</option></select></label><label><span>Tipo</span><select id="notificationType"><option value="geral">Geral</option><option value="atualizacao">Atualização</option><option value="manutencao">Manutenção</option><option value="premium">Premium</option><option value="seguranca">Segurança</option><option value="venda">Venda</option><option value="prova">Prova</option><option value="suporte">Suporte</option></select></label><label><span>Prioridade</span><select id="notificationPriority"><option value="normal">Normal</option><option value="baixa">Baixa</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></label><label id="notificationEmailField" hidden><span>E-mail específico</span><input id="notificationEmail" type="email" /></label><label><span>Expira em</span><input id="notificationExpires" type="datetime-local" /></label></div>
+            <label><span>Mensagem</span><textarea id="notificationMessage" required rows="5" maxlength="1500"></textarea></label>
+            <div class="admin-inline-options"><label><input id="notificationPinnedInput" type="checkbox" /> Fixar no topo</label><label><span>Link opcional</span><input id="notificationLink" placeholder="/dashboard" /></label></div>
+            <div class="admin-card-actions"><button class="admin-primary-btn" type="submit" id="notificationSubmit">Enviar notificação</button></div>
+          </form>
+        </div>
+        <div class="admin-panel-card"><div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="notificationSearch" type="search" placeholder="Buscar notificação" /></div><select id="notificationFilterDestination"><option value="">Todos os destinos</option><option value="todos">Todos</option><option value="premium">Premium</option><option value="free">Free</option><option value="admin">Admin</option><option value="vendedores">Vendedores</option><option value="especifico">Específico</option></select><select id="notificationFilterStatus"><option value="">Ativas e inativas</option><option value="true">Ativas</option><option value="false">Inativas</option></select><button class="admin-secondary-btn" type="button" id="refreshNotifications">↻ Atualizar</button></div><div class="admin-notification-list" id="notificationList"><div class="admin-empty-state">Carregando notificações…</div></div></div>
+      </section>
+
+      <section class="admin-section" id="section-support" data-title="Suporte" data-permission="suporte">
+        <div class="admin-section-head"><div><span class="admin-kicker">ATENDIMENTO</span><h2>Suporte e Chamados</h2><p>Responda usuários, altere prioridades e acompanhe chamados urgentes.</p></div><button class="admin-primary-btn" type="button" id="refreshSupport">↻ Atualizar</button></div>
+        <div class="admin-mini-stat-grid"><article><small>Abertos</small><strong id="supportOpen">0</strong></article><article><small>Em atendimento</small><strong id="supportInProgress">0</strong></article><article><small>Respondidos</small><strong id="supportAnswered">0</strong></article><article><small>Urgentes</small><strong id="supportUrgent">0</strong></article></div>
+        <div class="admin-panel-card"><div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="supportSearch" type="search" placeholder="Nome, e-mail ou assunto" /></div><select id="supportStatus"><option value="">Todos os status</option><option value="aberto">Abertos</option><option value="em_atendimento">Em atendimento</option><option value="respondido">Respondidos</option><option value="resolvido">Resolvidos</option><option value="fechado">Fechados</option></select><select id="supportPriority"><option value="">Todas as prioridades</option><option value="urgente">Urgente</option><option value="alta">Alta</option><option value="normal">Normal</option><option value="baixa">Baixa</option></select></div><div class="admin-ticket-list" id="supportList"><div class="admin-empty-state">Carregando chamados…</div></div></div>
+      </section>
+
+      <section class="admin-section" id="section-exams" data-title="Provas" data-permission="provas">
+        <div class="admin-section-head"><div><span class="admin-kicker">AVALIAÇÕES</span><h2>Provas e Resultados</h2><p>Crie avaliações, publique para os alunos e acompanhe resultados.</p></div><button class="admin-primary-btn" type="button" id="newExamButton">＋ Nova prova</button></div>
+        <div class="admin-mini-stat-grid"><article><small>Total</small><strong id="examTotal">0</strong></article><article><small>Ativas</small><strong id="examActive">0</strong></article><article><small>Rascunhos</small><strong id="examDraft">0</strong></article><article><small>Em análise</small><strong id="examReview">0</strong></article></div>
+        <div class="admin-panel-card"><div class="admin-filterbar"><div class="admin-search"><span>⌕</span><input id="examSearch" type="search" placeholder="Buscar prova" /></div><select id="examStatus"><option value="">Todos os status</option><option value="ativa">Ativas</option><option value="rascunho">Rascunhos</option><option value="inativa">Inativas</option><option value="arquivada">Arquivadas</option></select><button class="admin-secondary-btn" type="button" id="refreshExams">↻ Atualizar</button></div><div class="admin-exam-grid" id="examGrid"><div class="admin-empty-state">Carregando provas…</div></div></div>
+      </section>
+
+      <section class="admin-section" id="section-reports" data-title="Relatórios" data-permission="relatorios">
+        <div class="admin-section-head"><div><span class="admin-kicker">ANÁLISE</span><h2>Relatórios</h2><p>Visão consolidada da operação e atalhos para relatórios comerciais.</p></div><a class="admin-primary-btn" href="painel-vendas.html">Abrir painel de vendas →</a></div>
+        <div class="admin-stat-grid"><article class="admin-stat-card purple"><span class="admin-stat-icon">♙</span><div><small>Usuários</small><strong id="reportUsers">—</strong><em>base total</em></div></article><article class="admin-stat-card blue"><span class="admin-stat-icon">$</span><div><small>Vendas registradas</small><strong id="reportSales">—</strong><em>histórico comercial</em></div></article><article class="admin-stat-card gold"><span class="admin-stat-icon">#</span><div><small>Conversões pendentes</small><strong id="reportPending">—</strong><em>códigos aguardando</em></div></article><article class="admin-stat-card green"><span class="admin-stat-icon">♜</span><div><small>Equipe</small><strong id="reportTeam">—</strong><em>contas ativas</em></div></article></div>
+      </section>
+
+      <section class="admin-section" id="section-settings" data-title="Configurações" data-permission="configuracoes">
+        <div class="admin-section-head"><div><span class="admin-kicker">SISTEMA</span><h2>Configurações Operacionais</h2><p>Altere nomes, comissão, links oficiais e modo de manutenção.</p></div><button class="admin-primary-btn" type="submit" form="settingsForm">Salvar alterações</button></div>
+        <div class="admin-panel-card"><form id="settingsForm" class="admin-form"><div class="admin-form-grid"><label><span>Nome do sistema</span><input id="settingsSystemName" /></label><label><span>Nome do plano Premium</span><input id="settingsPremiumName" /></label><label><span>Comissão padrão (%)</span><input id="settingsCommission" type="number" min="0" max="100" step="0.1" /></label><label><span>Tema padrão</span><select id="settingsTheme"><option value="dark">Escuro</option><option value="light">Claro</option></select></label><label><span>WhatsApp de suporte</span><input id="settingsWhatsappSupport" /></label><label><span>WhatsApp de vendas</span><input id="settingsWhatsappSales" /></label><label><span>Instagram</span><input id="settingsInstagram" /></label><label class="admin-toggle-field"><input id="settingsMaintenance" type="checkbox" /><span>Ativar modo manutenção</span></label></div><label><span>Título da manutenção</span><input id="settingsMaintenanceTitle" /></label><label><span>Mensagem da manutenção</span><textarea id="settingsMaintenanceMessage" rows="4"></textarea></label></form></div>
+      </section>
+
+      <section class="admin-section" id="section-logs" data-title="Logs do Sistema" data-permission="seguranca">
+        <div class="admin-section-head"><div><span class="admin-kicker">AUDITORIA</span><h2>Logs e Atividades</h2><p>Acompanhe alterações e eventos recentes dos principais módulos.</p></div><button class="admin-primary-btn" type="button" id="refreshLogs">↻ Atualizar</button></div>
+        <div class="admin-panel-card"><div class="admin-log-list" id="systemLogList"><div class="admin-empty-state">Carregando logs…</div></div></div>
       </section>
 
       <section class="admin-section" id="section-dev" data-title="Central Dev" data-dev-only hidden>
         <div class="admin-section-head"><div><span class="admin-kicker">ÁREA OCULTA</span><h2>Central Dev — Permissões e Sistema</h2><p>Esta área só existe para a conta técnica Dev e não aparece para nenhum outro cargo.</p></div><button class="admin-primary-btn" type="button" id="refreshDev">↻ Recarregar</button></div>
         <div class="admin-dev-warning"><span>⌘</span><div><strong>Controle técnico máximo</strong><p>As alterações abaixo afetam o menu, o frontend e a autorização real das APIs.</p></div></div>
-        <div class="admin-panel-card">
-          <div class="admin-card-heading"><div><span>MATRIZ POR CARGO</span><h3>Permissões padrão</h3></div></div>
-          <div class="admin-dev-tabs" id="devRoleTabs"><button class="active" type="button" data-dev-role="dono">Dono</button><button type="button" data-dev-role="admin">Admin</button><button type="button" data-dev-role="financeiro">Financeiro</button><button type="button" data-dev-role="vendedor">Vendedor</button></div>
-          <div class="admin-permission-grid" id="devPermissionGrid"><div class="admin-empty-state">Carregando matriz…</div></div>
-          <div class="admin-card-actions"><button class="admin-primary-btn" type="button" id="saveDevRolePermissions">Salvar permissões do cargo</button></div>
-        </div>
-        <div class="admin-panel-card">
-          <div class="admin-card-heading"><div><span>EXCEÇÕES INDIVIDUAIS</span><h3>Permissões por conta</h3></div></div>
-          <div class="admin-filterbar"><select id="devUserSelect"><option value="">Selecione uma conta</option></select></div>
-          <div class="admin-permission-grid" id="devUserPermissionGrid"><div class="admin-empty-state">Selecione uma conta para personalizar.</div></div>
-          <div class="admin-card-actions"><button class="admin-primary-btn" type="button" id="saveDevUserPermissions" disabled>Salvar permissões individuais</button></div>
-        </div>
+        <div class="admin-panel-card"><div class="admin-card-heading"><div><span>MATRIZ POR CARGO</span><h3>Permissões padrão</h3></div></div><div class="admin-dev-tabs" id="devRoleTabs"><button class="active" type="button" data-dev-role="dono">Dono</button><button type="button" data-dev-role="admin">Admin</button><button type="button" data-dev-role="financeiro">Financeiro</button><button type="button" data-dev-role="vendedor">Vendedor</button></div><div class="admin-permission-grid" id="devPermissionGrid"><div class="admin-empty-state">Carregando matriz…</div></div><div class="admin-card-actions"><button class="admin-primary-btn" type="button" id="saveDevRolePermissions">Salvar permissões do cargo</button></div></div>
+        <div class="admin-panel-card"><div class="admin-card-heading"><div><span>EXCEÇÕES INDIVIDUAIS</span><h3>Permissões por conta</h3></div></div><div class="admin-filterbar"><select id="devUserSelect"><option value="">Selecione uma conta</option></select></div><div class="admin-permission-grid" id="devUserPermissionGrid"><div class="admin-empty-state">Selecione uma conta para personalizar.</div></div><div class="admin-card-actions"><button class="admin-primary-btn" type="button" id="saveDevUserPermissions" disabled>Salvar permissões individuais</button></div></div>
       </section>
     </div>
   </main>
 
   <div class="admin-toast-stack" id="adminToastStack" aria-live="polite"></div>
 
-  <div class="admin-modal" id="teamModal" aria-hidden="true" hidden>
-    <div class="admin-modal-card" role="dialog" aria-modal="true" aria-labelledby="teamModalTitle">
-      <button class="admin-modal-close" type="button" data-close-modal="team" aria-label="Fechar">×</button>
-      <span class="admin-kicker">EQUIPE</span><h2 id="teamModalTitle">Criar novo membro</h2><p>Cadastre uma conta operacional e defina o cargo inicial.</p>
-      <form id="teamForm" class="admin-form">
-        <input type="hidden" id="teamId" />
-        <div class="admin-form-grid">
-          <label><span>Nome completo</span><input id="teamName" type="text" required placeholder="Nome do membro" /></label>
-          <label><span>E-mail</span><input id="teamEmail" type="email" required placeholder="email@empresa.com" /></label>
-          <label><span>Telefone</span><input id="teamPhone" type="tel" placeholder="(00) 00000-0000" /></label>
-          <label><span>Cargo</span><select id="teamRole" required><option value="vendedor">Vendedor</option><option value="financeiro">Financeiro</option><option value="admin">Admin</option><option value="dono">Dono</option></select></label>
-          <label><span>Senha</span><input id="teamPassword" type="password" minlength="6" placeholder="Mínimo de 6 caracteres" /></label>
-          <label><span>Comissão (%)</span><input id="teamCommission" type="number" min="0" max="100" step="0.1" value="20" /></label>
-        </div>
-        <div class="admin-modal-actions"><button class="admin-secondary-btn" type="button" data-close-modal="team">Cancelar</button><button class="admin-primary-btn" type="submit" id="teamSubmit">Salvar membro</button></div>
-      </form>
-    </div>
-  </div>
+  <div class="admin-modal" id="teamModal" aria-hidden="true" hidden><div class="admin-modal-card" role="dialog" aria-modal="true" aria-labelledby="teamModalTitle"><button class="admin-modal-close" type="button" data-close-modal="team" aria-label="Fechar">×</button><span class="admin-kicker">EQUIPE</span><h2 id="teamModalTitle">Criar novo membro</h2><p>Cadastre uma conta operacional e defina o cargo inicial.</p><form id="teamForm" class="admin-form"><input type="hidden" id="teamId" /><div class="admin-form-grid"><label><span>Nome completo</span><input id="teamName" type="text" required placeholder="Nome do membro" /></label><label><span>E-mail</span><input id="teamEmail" type="email" required placeholder="email@empresa.com" /></label><label><span>Telefone</span><input id="teamPhone" type="tel" placeholder="(00) 00000-0000" /></label><label><span>Cargo</span><select id="teamRole" required><option value="vendedor">Vendedor</option><option value="financeiro">Financeiro</option><option value="admin">Admin</option><option value="dono">Dono</option></select></label><label><span>Senha</span><input id="teamPassword" type="password" minlength="6" placeholder="Mínimo de 6 caracteres" /></label><label><span>Comissão (%)</span><input id="teamCommission" type="number" min="0" max="100" step="0.1" value="20" /></label></div><div class="admin-modal-actions"><button class="admin-secondary-btn" type="button" data-close-modal="team">Cancelar</button><button class="admin-primary-btn" type="submit" id="teamSubmit">Salvar membro</button></div></form></div></div>
 
-  <div class="admin-confirm" id="adminConfirm" aria-hidden="true" hidden>
-    <div class="admin-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
-      <span id="confirmIcon">!</span><h2 id="confirmTitle">Confirmar ação</h2><p id="confirmText">Tem certeza?</p>
-      <div><button class="admin-secondary-btn" type="button" id="confirmCancel">Cancelar</button><button class="admin-primary-btn" type="button" id="confirmAccept">Confirmar</button></div>
-    </div>
-  </div>
+  <div class="admin-modal" id="supportModal" aria-hidden="true" hidden><div class="admin-modal-card admin-modal-wide" role="dialog" aria-modal="true"><button class="admin-modal-close" type="button" id="closeSupportModal">×</button><span class="admin-kicker">CHAMADO</span><h2 id="supportModalTitle">Detalhes do chamado</h2><div class="admin-ticket-thread" id="supportThread"></div><form id="supportReplyForm" class="admin-form"><input type="hidden" id="supportTicketId" /><label><span>Responder ao usuário</span><textarea id="supportReplyMessage" rows="4" required></textarea></label><div class="admin-modal-actions"><select id="supportReplyStatus"><option value="respondido">Respondido</option><option value="em_atendimento">Em atendimento</option><option value="resolvido">Resolvido</option><option value="fechado">Fechado</option></select><button class="admin-primary-btn" type="submit">Enviar resposta</button></div></form></div></div>
+
+  <div class="admin-modal" id="examModal" aria-hidden="true" hidden><div class="admin-modal-card admin-modal-wide" role="dialog" aria-modal="true"><button class="admin-modal-close" type="button" id="closeExamModal">×</button><span class="admin-kicker">PROVA</span><h2 id="examModalTitle">Nova prova</h2><form id="examForm" class="admin-form"><input type="hidden" id="examId" /><div class="admin-form-grid"><label><span>Título</span><input id="examTitle" required /></label><label><span>Módulo</span><input id="examModule" /></label><label><span>Categoria</span><select id="examCategory"><option value="geral">Geral</option><option value="roleta">Roleta</option><option value="gestao">Gestão</option><option value="mentalidade">Mentalidade</option><option value="estrategia">Estratégia</option><option value="outro">Outro</option></select></label><label><span>Dificuldade</span><select id="examDifficulty"><option value="facil">Fácil</option><option value="media">Média</option><option value="dificil">Difícil</option><option value="extrema">Extrema</option></select></label><label><span>Público</span><select id="examAudience"><option value="premium">Premium</option><option value="free">Free</option><option value="todos">Todos</option><option value="admin">Equipe</option></select></label><label><span>Status</span><select id="examFormStatus"><option value="rascunho">Rascunho</option><option value="ativa">Ativa</option><option value="inativa">Inativa</option></select></label><label><span>Nota mínima (%)</span><input id="examMinimum" type="number" min="0" max="100" value="70" /></label><label><span>Tentativas</span><input id="examAttempts" type="number" min="1" value="3" /></label></div><label><span>Descrição</span><textarea id="examDescription" rows="4"></textarea></label><div class="admin-modal-actions"><button class="admin-secondary-btn" type="button" id="cancelExamModal">Cancelar</button><button class="admin-primary-btn" type="submit">Salvar prova</button></div></form></div></div>
+
+  <div class="admin-confirm" id="adminConfirm" aria-hidden="true" hidden><div class="admin-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle"><span id="confirmIcon">!</span><h2 id="confirmTitle">Confirmar ação</h2><p id="confirmText">Tem certeza?</p><div><button class="admin-secondary-btn" type="button" id="confirmCancel">Cancelar</button><button class="admin-primary-btn" type="button" id="confirmAccept">Confirmar</button></div></div></div>
 </body>
 </html>
