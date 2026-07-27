@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" role="img" aria-labelledby="title desc">
+  <title id="title">Mascote tigre Turma do Primo</title>
+  <desc id="desc">Tigre estilizado usando moletom preto e dourado em um cenário roxo.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#7a23ff" stop-opacity=".48"/><stop offset=".55" stop-color="#351064" stop-opacity=".2"/><stop offset="1" stop-color="#08030f" stop-opacity="0"/></radialGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffc943"/><stop offset=".5" stop-color="#f29b22"/><stop offset="1" stop-color="#d96b11"/></linearGradient>
+    <linearGradient id="hood" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#17131e"/><stop offset="1" stop-color="#050408"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <ellipse cx="385" cy="265" rx="310" ry="245" fill="url(#bg)"/>
+  <g opacity=".55" fill="none" stroke="#a95cff"><circle cx="383" cy="262" r="188" stroke-width="3"/><circle cx="383" cy="262" r="226" stroke-width="1" stroke-dasharray="7 13"/><path d="M110 170C250 50 520 45 665 170M90 325C255 445 535 445 690 310" stroke-width="1"/></g>
+  <g filter="url(#glow)">
+    <path d="M210 455c12-105 54-165 118-190l112 4c68 24 112 86 126 186z" fill="url(#hood)" stroke="#7d36db" stroke-width="4"/>
+    <path d="M280 302c-35-12-59-39-61-77-2-38 17-62 51-82l-8-69 65 38c34-13 76-13 111 0l65-38-8 69c34 20 53 44 51 82-2 38-26 65-61 77-17 46-52 75-103 75s-86-29-102-75z" fill="url(#fur)" stroke="#2a1405" stroke-width="6"/>
+    <path d="M266 84l49 35-36 20zM500 84l-49 35 36 20z" fill="#35210e"/>
+    <path d="M290 147c25-22 51-31 78-34-21 19-35 41-43 67zM475 147c-25-22-51-31-78-34 21 19 35 41 43 67z" fill="#2a170a"/>
+    <path d="M319 207c18-15 38-17 57-6-8 25-45 25-57 6zM389 201c19-11 39-9 57 6-12 19-49 19-57-6z" fill="#fff7d0"/>
+    <ellipse cx="351" cy="207" rx="8" ry="11" fill="#100b12"/><ellipse cx="415" cy="207" rx="8" ry="11" fill="#100b12"/>
+    <path d="M369 236c9-9 19-9 28 0-5 13-23 13-28 0z" fill="#2a0d10"/><path d="M341 260c27 28 57 28 84 0-4 39-80 40-84 0z" fill="#fff6df" stroke="#5d2810" stroke-width="4"/>
+    <path d="M302 186l-41-15M304 227l-45 4M462 186l41-15M460 227l45 4" stroke="#2b1507" stroke-width="8" stroke-linecap="round"/>
+    <path d="M382 119v45M349 126l13 42M415 126l-13 42" stroke="#2b1507" stroke-width="11" stroke-linecap="round"/>
+    <path d="M288 310c30 35 58 55 94 55s65-20 95-55" fill="none" stroke="#6d24bd" stroke-width="7" opacity=".7"/><path d="M383 352v95" stroke="#d69b22" stroke-width="5"/>
+    <path d="M348 385h70v50h-70z" fill="#0d0a12" stroke="#d8a52e" stroke-width="4"/><path d="M365 399h34v23h-34zM373 390h18v9h-18z" fill="#d8a52e"/>
+  </g>
+  <g fill="#d49cff" opacity=".65"><circle cx="110" cy="255" r="4"/><circle cx="150" cy="115" r="3"/><circle cx="635" cy="130" r="4"/><circle cx="670" cy="270" r="3"/><circle cx="602" cy="390" r="4"/></g>
+</svg>
