@@ -3,62 +3,87 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#07030d" />
+  <meta name="theme-color" content="#05030a" />
   <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Painel comercial da Turma do Primo." />
   <title>Painel de Vendas | Turma do Primo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20260726-dev-1" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
-  <script defer src="protected.js?v=20260726-dev-1"></script>
+  <link rel="stylesheet" href="painel-vendas.css" />
+  <script defer src="painel-vendas.js"></script>
 </head>
-<body class="legal-body" data-required-access="painelVendas">
-  <main class="legal-shell">
-    <header class="legal-topbar">
-      <a class="legal-brand" href="dashboard.html">
-        <img src="assets/turma-primo-logo.svg" alt="" />
-        <span><small>TURMA DO</small><strong>PRIMO</strong></span>
-      </a>
-      <button class="legal-back" type="button" data-logout>Sair</button>
-    </header>
+<body class="sales-body" data-required-access="painelVendas">
+  <div class="sales-loading" id="salesLoading" role="status" aria-live="polite"><img src="assets/turma-primo-logo.svg" alt="" /><div><strong>Preparando o painel de vendas</strong><span id="salesLoadingText">Conectando ao MySQL…</span></div></div>
+  <div class="sales-mobile-overlay" id="salesMobileOverlay" hidden></div>
 
-    <section class="legal-hero">
-      <div class="legal-icon" aria-hidden="true">↗</div>
-      <span class="legal-kicker">GESTÃO COMERCIAL</span>
-      <h1>Painel de Vendas</h1>
-      <p>Olá, <span data-user-name>Dev</span>. Esta rota já está protegida e preparada para receber vendas, comissões, metas e ranking em tempo real.</p>
-      <span class="legal-updated">Perfil atual: <strong data-user-role>Super Admin</strong></span>
-    </section>
+  <aside class="sales-sidebar" id="salesSidebar">
+    <div class="sales-brand"><img src="assets/turma-primo-logo.svg" alt="Turma do Primo" /><div><strong>Turma do Primo</strong><span>PAINEL DE VENDAS</span></div><button type="button" id="salesSidebarClose" aria-label="Fechar menu">×</button></div>
+    <nav class="sales-nav" id="salesNav">
+      <span class="sales-nav-label">MENU PRINCIPAL</span>
+      <button class="sales-nav-item active" type="button" data-view="dashboard"><i>⌂</i><span>Dashboard</span></button>
+      <button class="sales-nav-item" type="button" data-view="sales"><i>▣</i><span>Vendas</span><b id="salesPendingBadge" hidden>0</b></button>
+      <button class="sales-nav-item" type="button" data-view="clients"><i>♙</i><span>Clientes</span></button>
+      <button class="sales-nav-item" type="button" data-view="sellers"><i>♜</i><span>Vendedores</span></button>
+      <button class="sales-nav-item" type="button" data-view="commissions"><i>◉</i><span>Comissões</span></button>
+      <button class="sales-nav-item" type="button" data-view="reports"><i>↗</i><span>Relatórios</span></button>
+      <span class="sales-nav-label">ACESSOS</span>
+      <a class="sales-nav-item" href="dashboard.html"><i>▶</i><span>Dashboard de Aulas</span></a>
+      <a class="sales-nav-item" href="admin.html"><i>⚙</i><span>Painel Administrativo</span></a>
+      <div class="sales-dev-menu" id="salesDevMenu" hidden><span class="sales-nav-label">CONTROLE TOTAL</span><button class="sales-nav-item sales-dev-item" type="button" data-view="dev"><i>⚡</i><span>Dev</span><b>DEV</b></button></div>
+    </nav>
+    <div class="sales-sidebar-status"><div class="sales-sidebar-system"><i></i><div><strong>Último deploy</strong><span>MySQL + Hostinger online</span></div></div><div class="sales-sidebar-profile"><span class="sales-avatar" data-user-initial>D</span><div><strong data-user-name>Dev</strong><span data-user-role>Desenvolvedor</span></div><button type="button" data-logout title="Sair">↪</button></div></div>
+  </aside>
 
-    <div class="legal-content">
-      <section class="legal-card legal-highlight">
-        <h2>Acesso comercial liberado</h2>
-        <p>O popup encaminha somente perfis autorizados para esta área e a sessão é novamente validada ao abrir a página.</p>
+  <main class="sales-main">
+    <header class="sales-topbar"><div class="sales-topbar-left"><button class="sales-menu-toggle" id="salesMenuToggle" type="button">☰</button><div class="sales-global-search"><span>⌕</span><input id="salesGlobalSearch" placeholder="Buscar cliente, venda ou vendedor…" /><kbd>Ctrl K</kbd></div></div><div class="sales-topbar-actions"><span class="sales-online"><i></i>Sistema online</span><span class="sales-version">v4.4.0</span><button class="sales-icon-btn" type="button" id="salesRefreshTop" title="Atualizar">↻</button><div class="sales-top-user"><span class="sales-avatar" data-user-initial>D</span><div><strong data-user-name>Dev</strong><span data-user-role>Desenvolvedor</span></div></div></div></header>
+
+    <div class="sales-content">
+      <section class="sales-view active" id="view-dashboard" data-title="Painel de Vendas">
+        <div class="sales-page-head"><div><span class="sales-kicker">GESTÃO COMERCIAL</span><h1>Painel de Vendas</h1><p>Gerencie vendas, vendedores, comissões e clientes em tempo real.</p></div><div class="sales-head-actions"><button class="sales-primary-btn" type="button" data-open-sale>＋ Registrar venda</button><button class="sales-secondary-btn" type="button" data-export-sales>⇩ Exportar relatório</button><button class="sales-refresh-btn" type="button" data-refresh-current>↻ Atualizar</button></div></div>
+        <div class="sales-kpi-grid"><article class="sales-kpi purple"><div><small>Faturamento do período</small><strong id="kpiRevenue">R$ 0,00</strong><em id="kpiRevenueGrowth">0% vs período anterior</em></div><span>$</span></article><article class="sales-kpi green"><div><small>Vendas confirmadas</small><strong id="kpiPaid">0</strong><em id="kpiPaidGrowth">0% vs período anterior</em></div><span>✓</span></article><article class="sales-kpi orange"><div><small>Vendas pendentes</small><strong id="kpiPending">0</strong><em>aguardando pagamento</em></div><span>⌛</span></article><article class="sales-kpi blue"><div><small>Ticket médio</small><strong id="kpiTicket">R$ 0,00</strong><em>por venda confirmada</em></div><span>▤</span></article><article class="sales-kpi violet"><div><small>Comissões</small><strong id="kpiCommissions">R$ 0,00</strong><em>do período selecionado</em></div><span>%</span></article></div>
+        <div class="sales-dashboard-main-grid">
+          <article class="sales-card sales-chart-card"><div class="sales-card-head"><div><span>DESEMPENHO</span><h2>Evolução de vendas e faturamento</h2></div><div class="sales-period-switch" id="salesPeriodSwitch"><button data-days="7">7 dias</button><button data-days="14">14 dias</button><button class="active" data-days="30">30 dias</button><button data-days="90">90 dias</button></div></div><div class="sales-chart-wrap"><canvas id="salesChart"></canvas><div class="sales-chart-tooltip" id="salesChartTooltip" hidden></div></div><div class="sales-chart-legend"><span><i class="purple"></i>Faturamento (R$)</span><span><i class="green"></i>Vendas</span></div></article>
+          <article class="sales-card sales-funnel-card"><div class="sales-card-head"><div><span>CONVERSÃO</span><h2>Funil de vendas</h2></div></div><div class="sales-funnel" id="salesFunnel"><div class="sales-empty">Carregando funil…</div></div></article>
+          <article class="sales-card sales-ranking-card"><div class="sales-card-head"><div><span>DESTAQUES</span><h2>Ranking de vendedores</h2></div><button type="button" data-view-trigger="sellers">Ver todos</button></div><div class="sales-ranking-list" id="salesRanking"><div class="sales-empty">Carregando ranking…</div></div></article>
+        </div>
+        <div class="sales-dashboard-bottom-grid">
+          <article class="sales-card sales-recent-card"><div class="sales-card-head"><div><span>TEMPO REAL</span><h2>Últimas vendas</h2></div><button type="button" data-view-trigger="sales">Ver todas</button></div><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Cliente</th><th>Plano</th><th>Vendedor</th><th>Valor</th><th>Pagamento</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead><tbody id="recentSalesBody"><tr><td colspan="8"><div class="sales-empty">Carregando vendas…</div></td></tr></tbody></table></div></article>
+          <article class="sales-card sales-payment-card"><div class="sales-card-head"><div><span>MEIOS DE PAGAMENTO</span><h2>Formas de pagamento</h2></div></div><div class="sales-payment-content"><div class="sales-donut" id="salesPaymentDonut"><strong id="paymentTotal">0</strong><span>vendas</span></div><div class="sales-payment-list" id="salesPaymentList"><div class="sales-empty">Sem dados.</div></div></div></article>
+          <article class="sales-card sales-students-card"><div class="sales-card-head"><div><span>LIBERAÇÕES</span><h2>Status de alunos</h2></div></div><div class="sales-student-status"><div class="green"><strong id="studentActive">0</strong><span>Ativos</span></div><div class="orange"><strong id="studentPending">0</strong><span>Aguardando</span></div><div class="red"><strong id="studentSuspended">0</strong><span>Suspensos</span></div><div class="blue"><strong id="studentTotal">0</strong><span>Total</span></div></div><a class="sales-wide-btn" href="admin.html#students">Ver todos os alunos</a></article>
+        </div>
       </section>
 
-      <section class="legal-card">
-        <h2>Próxima reformulação</h2>
-        <ul>
-          <li>Total vendido, comissão e progresso da meta.</li>
-          <li>Ranking de vendedores e vendas recentes.</li>
-          <li>Filtros por hoje, semana, mês e período personalizado.</li>
-          <li>Cadastro de vendas e vínculo com aluno e vendedor.</li>
-          <li>Exportação de relatórios e experiência mobile premium.</li>
-        </ul>
+      <section class="sales-view" id="view-sales" data-title="Vendas"><div class="sales-page-head"><div><span class="sales-kicker">OPERAÇÃO COMERCIAL</span><h1>Vendas</h1><p>Registre, confirme, edite e acompanhe todas as vendas.</p></div><button class="sales-primary-btn" type="button" data-open-sale>＋ Registrar venda</button></div><div class="sales-card"><div class="sales-filterbar"><div class="sales-search"><span>⌕</span><input id="salesSearch" placeholder="Cliente, e-mail, vendedor ou plano" /></div><select id="salesStatusFilter"><option value="">Todos os status</option><option value="pago">Pagas</option><option value="pendente">Pendentes</option><option value="cancelado">Canceladas</option><option value="estornado">Estornadas</option></select><select id="salesSellerFilter"><option value="">Todos os vendedores</option></select><button class="sales-secondary-btn" type="button" data-export-sales>⇩ CSV</button></div><div class="sales-table-wrap"><table class="sales-table sales-full-table"><thead><tr><th>Cliente</th><th>Produto</th><th>Vendedor</th><th>Valor</th><th>Pagamento</th><th>Comissão</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead><tbody id="allSalesBody"><tr><td colspan="9"><div class="sales-empty">Carregando vendas…</div></td></tr></tbody></table></div></div></section>
+
+      <section class="sales-view" id="view-clients" data-title="Clientes"><div class="sales-page-head"><div><span class="sales-kicker">BASE COMERCIAL</span><h1>Clientes</h1><p>Consulte alunos, planos, validade e histórico comercial.</p></div><a class="sales-secondary-btn" href="admin.html#students">Gerenciar no Admin →</a></div><div class="sales-card"><div class="sales-filterbar"><div class="sales-search"><span>⌕</span><input id="clientsSearch" placeholder="Buscar por nome, e-mail ou telefone" /></div><button class="sales-secondary-btn" type="button" id="refreshClients">↻ Atualizar</button></div><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Cliente</th><th>Telefone</th><th>Plano</th><th>Status</th><th>Validade</th><th>Cadastro</th><th>Ação</th></tr></thead><tbody id="clientsBody"><tr><td colspan="7"><div class="sales-empty">Carregando clientes…</div></td></tr></tbody></table></div></div></section>
+
+      <section class="sales-view" id="view-sellers" data-title="Vendedores"><div class="sales-page-head"><div><span class="sales-kicker">EQUIPE COMERCIAL</span><h1>Vendedores</h1><p>Compare faturamento, vendas e comissões por vendedor.</p></div><a class="sales-secondary-btn" href="admin.html#team">Gerenciar equipe →</a></div><div class="sales-seller-grid" id="sellersGrid"><div class="sales-empty">Carregando vendedores…</div></div></section>
+
+      <section class="sales-view" id="view-commissions" data-title="Comissões"><div class="sales-page-head"><div><span class="sales-kicker">FINANCEIRO</span><h1>Comissões</h1><p>Acompanhe valores previstos, disponíveis e já pagos.</p></div><button class="sales-secondary-btn" type="button" data-export-commissions>⇩ Exportar</button></div><div class="sales-commission-kpis"><article><small>Prevista</small><strong id="commissionExpected">R$ 0,00</strong></article><article><small>Disponível</small><strong id="commissionAvailable">R$ 0,00</strong></article><article><small>Já paga</small><strong id="commissionPaid">R$ 0,00</strong></article></div><div class="sales-card"><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Vendedor</th><th>Cliente</th><th>Produto</th><th>Venda</th><th>Comissão</th><th>Situação</th><th>Data</th><th>Ação</th></tr></thead><tbody id="commissionsBody"><tr><td colspan="8"><div class="sales-empty">Carregando comissões…</div></td></tr></tbody></table></div></div></section>
+
+      <section class="sales-view" id="view-reports" data-title="Relatórios"><div class="sales-page-head"><div><span class="sales-kicker">INTELIGÊNCIA COMERCIAL</span><h1>Relatórios</h1><p>Filtre os dados e exporte o fechamento comercial em CSV.</p></div><button class="sales-primary-btn" type="button" data-export-sales>⇩ Exportar vendas</button></div><div class="sales-report-grid"><article class="sales-card"><div class="sales-card-head"><div><span>PRODUTOS</span><h2>Desempenho por plano</h2></div></div><div id="reportProducts" class="sales-ranking-list"><div class="sales-empty">Carregando…</div></div></article><article class="sales-card"><div class="sales-card-head"><div><span>VENDEDORES</span><h2>Ranking consolidado</h2></div></div><div id="reportSellers" class="sales-ranking-list"><div class="sales-empty">Carregando…</div></div></article><article class="sales-card"><div class="sales-card-head"><div><span>PAGAMENTOS</span><h2>Distribuição</h2></div></div><div id="reportPayments" class="sales-ranking-list"><div class="sales-empty">Carregando…</div></div></article></div></section>
+
+      <section class="sales-view" id="view-dev" data-title="Painel Dev" data-dev-only><div class="sales-dev-head"><div><span>⚡ PAINEL DEV</span><h1>Controle total da operação comercial</h1><p>Configure produtos, preços, pagamentos, cupons, comissão padrão e integrações.</p></div><span class="sales-dev-badge">ACESSO DEV</span></div><div class="sales-dev-tabs"><button class="active" data-dev-tab="products">Produtos</button><button data-dev-tab="payments">Formas de pagamento</button><button data-dev-tab="coupons">Cupons</button><button data-dev-tab="settings">Configurações</button><button data-dev-tab="system">Sistema</button></div>
+        <div class="sales-dev-panel active" id="dev-products"><div class="sales-dev-panel-head"><div><h2>Produtos e planos</h2><p>Valores, duração, ordem e disponibilidade.</p></div><button class="sales-primary-btn" type="button" data-open-product>＋ Novo produto</button></div><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Produto</th><th>Descrição</th><th>Preço</th><th>Duração</th><th>Status</th><th>Ações</th></tr></thead><tbody id="productsBody"><tr><td colspan="6"><div class="sales-empty">Carregando produtos…</div></td></tr></tbody></table></div></div>
+        <div class="sales-dev-panel" id="dev-payments"><div class="sales-dev-panel-head"><div><h2>Formas de pagamento</h2><p>Configure meios aceitos e taxas.</p></div><button class="sales-primary-btn" type="button" data-open-payment>＋ Nova forma</button></div><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Nome</th><th>Código</th><th>Taxa</th><th>Status</th><th>Ações</th></tr></thead><tbody id="paymentsBody"><tr><td colspan="5"><div class="sales-empty">Carregando…</div></td></tr></tbody></table></div></div>
+        <div class="sales-dev-panel" id="dev-coupons"><div class="sales-dev-panel-head"><div><h2>Cupons de desconto</h2><p>Crie campanhas com porcentagem ou valor fixo.</p></div><button class="sales-primary-btn" type="button" data-open-coupon>＋ Novo cupom</button></div><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Código</th><th>Tipo</th><th>Valor</th><th>Usos</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="couponsBody"><tr><td colspan="7"><div class="sales-empty">Carregando…</div></td></tr></tbody></table></div></div>
+        <div class="sales-dev-panel" id="dev-settings"><div class="sales-dev-settings"><label><span>Comissão padrão (%)</span><input id="defaultCommission" type="number" min="0" max="100" step="0.01" /></label><button class="sales-primary-btn" id="saveSalesSettings" type="button">Salvar configurações</button></div></div>
+        <div class="sales-dev-panel" id="dev-system"><div class="sales-system-grid"><article><i></i><strong>Banco MySQL</strong><span>Conectado</span></article><article><i></i><strong>Servidor Express</strong><span>Online</span></article><article><i></i><strong>Frontend</strong><span>Integrado</span></article><article><i></i><strong>Permissões</strong><span>Ativas</span></article></div><div class="sales-quick-actions"><a href="admin.html">Abrir Painel Admin</a><a href="/api/status" target="_blank">Ver status da API</a><a href="/limpar-cache?destino=painel-vendas">Limpar cache</a></div></div>
       </section>
     </div>
-
-    <nav class="legal-links" aria-label="Navegação principal">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="admin.html">Painel Admin</a>
-      <a href="painel-vendas.html" aria-current="page">Painel de Vendas</a>
-    </nav>
-
-    <footer class="legal-footer">
-      <span>© 2026 Turma do Primo.</span>
-      <span>Acesso restrito à equipe comercial autorizada.</span>
-    </footer>
   </main>
+
+  <div class="sales-modal" id="saleModal" hidden><div class="sales-modal-card sales-modal-large"><div class="sales-modal-head"><div><span>REGISTRO COMERCIAL</span><h2 id="saleModalTitle">Registrar venda</h2></div><button type="button" data-close-modal>×</button></div><form id="saleForm" class="sales-form"><input type="hidden" id="saleId" /><div class="sales-form-grid"><label><span>Cliente cadastrado</span><select id="saleClient"><option value="">Selecionar ou preencher abaixo</option></select></label><label><span>Vendedor responsável</span><select id="saleSeller"></select></label><label><span>Nome do cliente</span><input id="saleClientName" required /></label><label><span>E-mail</span><input id="saleClientEmail" type="email" /></label><label><span>Telefone</span><input id="saleClientPhone" /></label><label><span>Produto/Plano</span><select id="saleProduct" required></select></label><label><span>Valor bruto</span><input id="saleGrossValue" type="number" min="0" step="0.01" required /></label><label><span>Cupom</span><input id="saleCoupon" placeholder="Opcional" /></label><label><span>Desconto manual</span><input id="saleManualDiscount" type="number" min="0" step="0.01" value="0" /></label><label><span>Forma de pagamento</span><select id="salePayment" required></select></label><label><span>Parcelas</span><input id="saleInstallments" type="number" min="1" max="24" value="1" /></label><label><span>Status</span><select id="saleStatus"><option value="pendente">Pendente</option><option value="pago">Pago</option><option value="cancelado">Cancelado</option><option value="estornado">Estornado</option></select></label><label><span>Comissão (%)</span><input id="saleCommissionPercent" type="number" min="0" max="100" step="0.01" /></label><label><span>Data da venda</span><input id="saleDate" type="date" /></label></div><label><span>Observações</span><textarea id="saleNotes" rows="4"></textarea></label><div class="sales-sale-preview"><div><small>Valor final estimado</small><strong id="saleFinalPreview">R$ 0,00</strong></div><div><small>Comissão estimada</small><strong id="saleCommissionPreview">R$ 0,00</strong></div></div><div class="sales-modal-actions"><button class="sales-secondary-btn" type="button" data-close-modal>Cancelar</button><button class="sales-primary-btn" id="saveSaleButton" type="submit">Salvar venda</button></div></form></div></div>
+
+  <div class="sales-modal" id="productModal" hidden><div class="sales-modal-card"><div class="sales-modal-head"><div><span>PAINEL DEV</span><h2 id="productModalTitle">Novo produto</h2></div><button type="button" data-close-modal>×</button></div><form id="productForm" class="sales-form"><input type="hidden" id="productId" /><label><span>Nome</span><input id="productName" required /></label><label><span>Código</span><input id="productCode" required /></label><label><span>Descrição</span><textarea id="productDescription" rows="3"></textarea></label><div class="sales-form-grid"><label><span>Preço</span><input id="productPrice" type="number" min="0" step="0.01" required /></label><label><span>Duração em dias</span><input id="productDuration" type="number" min="1" required /></label><label><span>Ordem</span><input id="productOrder" type="number" value="0" /></label><label class="sales-check"><input id="productActive" type="checkbox" checked /><span>Produto ativo</span></label></div><div class="sales-modal-actions"><button class="sales-secondary-btn" type="button" data-close-modal>Cancelar</button><button class="sales-primary-btn" type="submit">Salvar produto</button></div></form></div></div>
+
+  <div class="sales-modal" id="paymentModal" hidden><div class="sales-modal-card"><div class="sales-modal-head"><div><span>PAINEL DEV</span><h2 id="paymentModalTitle">Nova forma de pagamento</h2></div><button type="button" data-close-modal>×</button></div><form id="paymentForm" class="sales-form"><input type="hidden" id="paymentId" /><label><span>Nome</span><input id="paymentName" required /></label><label><span>Código</span><input id="paymentCode" required /></label><label><span>Taxa (%)</span><input id="paymentFee" type="number" min="0" step="0.001" value="0" /></label><label class="sales-check"><input id="paymentActive" type="checkbox" checked /><span>Forma ativa</span></label><div class="sales-modal-actions"><button class="sales-secondary-btn" type="button" data-close-modal>Cancelar</button><button class="sales-primary-btn" type="submit">Salvar forma</button></div></form></div></div>
+
+  <div class="sales-modal" id="couponModal" hidden><div class="sales-modal-card"><div class="sales-modal-head"><div><span>PAINEL DEV</span><h2 id="couponModalTitle">Novo cupom</h2></div><button type="button" data-close-modal>×</button></div><form id="couponForm" class="sales-form"><input type="hidden" id="couponId" /><label><span>Código</span><input id="couponCode" required /></label><div class="sales-form-grid"><label><span>Tipo</span><select id="couponType"><option value="percentual">Percentual</option><option value="fixo">Valor fixo</option></select></label><label><span>Valor</span><input id="couponValue" type="number" min="0" step="0.01" required /></label><label><span>Limite de usos</span><input id="couponLimit" type="number" min="0" value="0" /></label><label><span>Validade</span><input id="couponExpires" type="datetime-local" /></label></div><label class="sales-check"><input id="couponActive" type="checkbox" checked /><span>Cupom ativo</span></label><div class="sales-modal-actions"><button class="sales-secondary-btn" type="button" data-close-modal>Cancelar</button><button class="sales-primary-btn" type="submit">Salvar cupom</button></div></form></div></div>
+
+  <div class="sales-confirm" id="salesConfirm" hidden><div><strong id="salesConfirmTitle">Confirmar ação</strong><p id="salesConfirmText"></p><footer><button class="sales-secondary-btn" id="salesConfirmCancel" type="button">Cancelar</button><button class="sales-danger-btn" id="salesConfirmAccept" type="button">Confirmar</button></footer></div></div>
+  <div class="sales-toast-stack" id="salesToastStack" aria-live="polite"></div>
 </body>
 </html>
