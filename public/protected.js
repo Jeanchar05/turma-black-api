@@ -4,6 +4,16 @@
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
+  function installResponsiveLayer() {
+    if (document.querySelector('link[data-global-responsive]')) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/responsive-global.css?v=20260728-responsive-1";
+    link.dataset.globalResponsive = "true";
+    document.head.appendChild(link);
+  }
+
+  installResponsiveLayer();
   document.addEventListener("DOMContentLoaded", validatePage, { once: true });
 
   async function cleanupLegacyBrowserState() {
