@@ -9,11 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="suporte.css?v=20260728-support-2" />
+  <link rel="stylesheet" href="suporte.css?v=20260728-support-4" />
+  <link rel="stylesheet" href="support-modal-fix.css?v=20260728-support-4" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
   <script defer src="protected.js"></script>
-  <script defer src="suporte.js?v=20260728-support-2"></script>
-  <script defer src="support-runtime-fix.js?v=20260728-support-2"></script>
+  <script defer src="suporte.js?v=20260728-support-4"></script>
+  <script defer src="support-runtime-fix.js?v=20260728-support-4"></script>
+  <script defer src="support-modal-fix.js?v=20260728-support-4"></script>
 </head>
 <body class="support-page" data-required-access="dashboard">
   <div class="support-loading" id="supportLoading"><img src="assets/turma-primo-logo.svg" alt="" /><div><strong>Conectando ao suporte</strong><span>Carregando seus atendimentos…</span></div></div>
@@ -52,7 +54,7 @@
 
       <section class="support-shortcuts">
         <button type="button" data-scroll="new-ticket"><span class="purple"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg></span><div><strong>Abrir chamado</strong><small>Fale diretamente com a equipe</small></div><b>→</b></button>
-        <button type="button" data-scroll="faq"><span class="gold"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><div><strong>Perguntas frequentes</strong><small>Encontre respostas rápidas</small></div><b>→</b></button>
+        <button type="button" data-open-faq><span class="gold"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><div><strong>Perguntas frequentes</strong><small>Encontre respostas rápidas</small></div><b>→</b></button>
         <button type="button" data-open-feedback><span class="pink"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg></span><div><strong>Feedback</strong><small>Envie ideias e sugestões</small></div><b>→</b></button>
       </section>
 
@@ -84,20 +86,26 @@
           </section>
         </div>
       </div>
-
-      <section class="support-card support-faq" id="faq">
-        <div class="support-card-title"><div><small>AJUDA RÁPIDA</small><h2>Perguntas frequentes</h2><p>Respostas para as dúvidas mais comuns.</p></div></div>
-        <div class="support-faq-list">
-          <details><summary>Não consigo acessar minha conta. O que faço?</summary><p>Confira o e-mail e a senha cadastrados. Caso continue sem acesso, abra um chamado na categoria “Acesso à conta” e informe o e-mail utilizado.</p></details>
-          <details><summary>Como acompanho uma solicitação?</summary><p>Todos os seus chamados aparecem nesta página. Clique em “Abrir atendimento” para visualizar o histórico e conversar com a equipe.</p></details>
-          <details><summary>Posso enviar imagens ou documentos?</summary><p>Sim. Você pode anexar imagens, PDFs e documentos de até 4 MB durante a abertura ou dentro do chat.</p></details>
-          <details><summary>Como alterar meus dados?</summary><p>Acesse a página Perfil pelo menu lateral. Dúvidas sobre e-mail ou plano podem ser enviadas pelo suporte.</p></details>
-        </div>
-      </section>
     </div>
   </main>
 
   <div class="support-modal" id="supportChatModal" hidden aria-hidden="true"><div class="support-chat-card"><header><div><small id="chatTicketCode">CHAMADO</small><h2 id="chatTitle">Atendimento</h2><div class="support-chat-meta" id="chatMeta"></div></div><button type="button" data-close-chat>×</button></header><div class="support-chat-messages" id="chatMessages"></div><div class="support-chat-files" id="chatFiles"></div><form id="chatReplyForm"><textarea id="chatReply" rows="3" maxlength="5000" placeholder="Digite sua mensagem…" required></textarea><div><label class="support-chat-attach"><input id="chatReplyFiles" type="file" multiple accept="image/*,.pdf,.txt,.doc,.docx" />＋ Anexar</label><span id="chatReplyStatus"></span><button class="support-primary-btn" type="submit">Enviar</button></div></form></div></div>
+
+  <div class="support-modal" id="faqModal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="faqModalTitle">
+    <div class="support-faq-modal-card">
+      <header class="support-faq-modal-header">
+        <div><span>AJUDA RÁPIDA</span><h2 id="faqModalTitle">Perguntas frequentes</h2><p>Respostas para as dúvidas mais comuns da plataforma.</p></div>
+        <button class="support-faq-close" type="button" data-close-faq aria-label="Fechar perguntas frequentes">×</button>
+      </header>
+      <div class="support-faq-list">
+        <details><summary>Não consigo acessar minha conta. O que faço?</summary><p>Confira o e-mail e a senha cadastrados. Caso continue sem acesso, abra um chamado na categoria “Acesso à conta” e informe o e-mail utilizado.</p></details>
+        <details><summary>Como acompanho uma solicitação?</summary><p>Todos os seus chamados aparecem nesta página. Clique em “Abrir atendimento” para visualizar o histórico e conversar com a equipe.</p></details>
+        <details><summary>Posso enviar imagens ou documentos?</summary><p>Sim. Você pode anexar imagens, PDFs e documentos de até 4 MB durante a abertura ou dentro do chat.</p></details>
+        <details><summary>Como alterar meus dados?</summary><p>Acesse a página Perfil pelo menu lateral. Dúvidas sobre e-mail ou plano podem ser enviadas pelo suporte.</p></details>
+      </div>
+      <div class="support-faq-modal-actions"><button type="button" data-close-faq>Fechar</button></div>
+    </div>
+  </div>
 
   <div class="support-modal" id="feedbackModal" hidden aria-hidden="true"><div class="support-feedback-card"><header><div><small>AJUDE A EVOLUIR</small><h2>Enviar feedback</h2><p>Sua opinião ajuda a melhorar a Turma do Primo.</p></div><button type="button" data-close-feedback>×</button></header><form id="feedbackForm"><label><span>Tipo</span><select id="feedbackType"><option value="sugestao">Sugestão</option><option value="elogio">Elogio</option><option value="problema">Problema</option><option value="outro">Outro</option></select></label><label><span>Avaliação</span><div class="support-rating" id="feedbackRating"><button type="button" data-rating="1">★</button><button type="button" data-rating="2">★</button><button type="button" data-rating="3">★</button><button type="button" data-rating="4">★</button><button class="active" type="button" data-rating="5">★</button></div></label><label><span>Mensagem</span><textarea id="feedbackMessage" rows="7" maxlength="5000" required placeholder="Conte sua ideia, sugestão ou experiência…"></textarea></label><div class="support-form-actions"><button class="support-secondary-btn" type="button" data-close-feedback>Cancelar</button><button class="support-primary-btn" type="submit">Enviar feedback</button></div></form></div></div>
 
