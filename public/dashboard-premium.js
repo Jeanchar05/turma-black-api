@@ -1,6 +1,9 @@
 "use strict";
 const liberarDashboard=()=>setTimeout(()=>document.body?.classList.add("neo-ready"),80);
-import("./dashboard-neo/app.js?v=20260728-neo-3")
+Promise.all([
+  import("./dashboard-neo/routes.js?v=20260728-clean-1"),
+  import("./dashboard-neo/app.js?v=20260728-neo-3")
+])
   .then(()=>document.readyState==="loading"?document.addEventListener("DOMContentLoaded",liberarDashboard,{once:true}):liberarDashboard())
   .catch((error)=>{
     console.error("Falha ao iniciar o dashboard:",error);
