@@ -10,7 +10,7 @@ const connectDatabase = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260728-support-5-hard-reset";
+const CACHE_VERSION = "20260728-responsive-support-7";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -58,6 +58,17 @@ function aplicarVersaoNosAssets(html) {
   );
 }
 
+function aplicarCamadaResponsiva(html) {
+  let resultado = String(html);
+  if (!resultado.includes("responsive-global.css")) {
+    resultado = resultado.replace(
+      "</head>",
+      `  <link rel="stylesheet" href="/responsive-global.css" data-global-responsive />\n</head>`
+    );
+  }
+  return resultado;
+}
+
 function aplicarExtrasAdmin(html) {
   let resultado = String(html);
 
@@ -87,6 +98,7 @@ function servirPagina(nomeArquivo) {
     if (nomeArquivo === "admin.html") {
       html = aplicarExtrasAdmin(html);
     }
+    html = aplicarCamadaResponsiva(html);
     html = aplicarVersaoNosAssets(html);
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -102,7 +114,7 @@ function servirPagina(nomeArquivo) {
 
 app.get(
   "/style.css",
-  servirBundle(["style.css", "login-hotfix.css"], "text/css")
+  servirBundle(["style.css", "login-hotfix.css", "responsive-global.css"], "text/css")
 );
 
 app.get(
@@ -116,7 +128,7 @@ app.get(
 app.get(
   "/admin-enhanced.css",
   servirBundle(
-    ["admin-enhanced.css", "admin-results.css", "admin-hotfix.css"],
+    ["admin-enhanced.css", "admin-results.css", "admin-hotfix.css", "responsive-global.css"],
     "text/css"
   )
 );
@@ -143,7 +155,7 @@ app.get("/limpar-cache", (req, res) => {
   <main class="box">
     <div class="ring"></div>
     <h1>Carregando a nova versão…</h1>
-    <p>Removendo arquivos antigos e atualizando o painel administrativo.</p>
+    <p>Removendo arquivos antigos e aplicando a versão responsiva.</p>
     <small>Versão ${CACHE_VERSION}</small>
   </main>
   <script>
@@ -163,7 +175,7 @@ app.get("/limpar-cache", (req, res) => {
       }
 
       setTimeout(
-        () => window.location.replace("/admin?fresh=${CACHE_VERSION}&t=" + Date.now()),
+        () => window.location.replace("/dashboard?fresh=${CACHE_VERSION}&t=" + Date.now()),
         700
       );
     })();
@@ -197,7 +209,7 @@ app.get("/limpar-cache-suporte", (req, res) => {
   <main class="box">
     <div class="ring"></div>
     <h1>Atualizando a Central de Suporte…</h1>
-    <p>Removendo o popup antigo e carregando a versão corrigida.</p>
+    <p>Removendo o FAQ antigo e carregando o painel interno corrigido.</p>
     <small>Versão ${CACHE_VERSION}</small>
   </main>
   <script>
@@ -230,11 +242,18 @@ app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
 app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
 app.get(["/dashboard-free", "/dashboard-free.html"], servirPagina("dashboard-free.html"));
 app.get(["/admin", "/admin.html"], servirPagina("admin.html"));
+app.get(["/painel-vendas", "/painel-vendas.html"], servirPagina("painel-vendas.html"));
+app.get(["/notas", "/notas.html"], servirPagina("notas.html"));
 app.get(["/suporte", "/suporte.html"], servirPagina("suporte.html"));
-app.get(
-  ["/painel-vendas", "/painel-vendas.html"],
-  servirPagina("painel-vendas.html")
-);
+app.get(["/minigames", "/minigames.html"], servirPagina("minigames.html"));
+app.get(["/estudo", "/estudo.html"], servirPagina("estudo.html"));
+app.get(["/modulos", "/modulos.html"], servirPagina("modulos.html"));
+app.get(["/perfil", "/perfil.html"], servirPagina("perfil.html"));
+app.get(["/roleta", "/roleta.html"], servirPagina("roleta.html"));
+app.get(["/provas", "/provas.html"], servirPagina("provas.html"));
+app.get(["/favoritos", "/favoritos.html"], servirPagina("favoritos.html"));
+app.get(["/atividades", "/atividades.html"], servirPagina("dashboard.html"));
+app.get(["/notificacoes", "/notificacoes.html"], servirPagina("dashboard.html"));
 
 if (fs.existsSync(publicDir)) {
   app.use(
@@ -282,8 +301,8 @@ app.get("/api/status", async (req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.3.1",
-    release: "support-5-hard-reset",
+    versao: "4.5.0",
+    release: "responsive-support-7",
     cacheVersion: CACHE_VERSION,
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
@@ -301,7 +320,9 @@ app.get("/api/status", async (req, res) => {
       senhaComEspacoNasPontas: Boolean(diagnostico.passwordHadEdgeWhitespace),
       codigoErro: diagnostico.lastErrorCode || ""
     },
-    estrutura: "frontend, API e banco na Hostinger"
+    estrutura: "frontend, API, notificações e banco na Hostinger",
+    responsivo: true,
+    faqModalLegado: false
   });
 });
 
@@ -323,15 +344,15 @@ carregarRota("/", "aluno-action-guard.js");
 carregarRota("/", "usuarios.js");
 carregarRota("/", "liberacoes.js");
 
-// Rotas MySQL prioritárias: precisam vir antes das versões legadas.
 carregarRota("/admin", "admin-mysql-core.js");
 carregarRota("/admin", "admin-provas-mysql.js");
-
 carregarRota("/admin", "admin-dashboard.js");
 carregarRota("/admin", "admin-panel.js");
 carregarRota("/admin", "dev-delete.js");
 carregarRota("/admin", "admin-alunos.js");
 carregarRota("/admin", "admin.js");
+
+carregarRota("/dashboard-premium", "dashboard-premium.js");
 carregarRota("/", "alunos.js");
 carregarRota("/", "vendas.js");
 carregarRota("/", "dashboard.js");
