@@ -10,7 +10,7 @@ const connectDatabase = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260726-430-admin-final-ui";
+const CACHE_VERSION = "20260728-support-5-hard-reset";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -93,6 +93,8 @@ function servirPagina(nomeArquivo) {
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
+    res.setHeader("Surrogate-Control", "no-store");
+    res.setHeader("CDN-Cache-Control", "no-store");
     res.setHeader("X-Cache-Version", CACHE_VERSION);
     return res.send(html);
   };
@@ -170,10 +172,65 @@ app.get("/limpar-cache", (req, res) => {
 </html>`);
 });
 
+app.get("/limpar-cache-suporte", (req, res) => {
+  res.setHeader("Clear-Site-Data", '"cache"');
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+
+  return res.send(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07030d" />
+  <title>Atualizando Suporte</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;color:#fff;font-family:Arial,sans-serif;background:radial-gradient(circle at 50% 20%,#37105b,#08030f 48%,#020104)}
+    .box{width:min(430px,100%);padding:34px 28px;text-align:center;border-radius:26px;background:rgba(15,7,25,.96);border:1px solid rgba(192,84,255,.35);box-shadow:0 30px 90px rgba(0,0,0,.62)}
+    .ring{width:68px;height:68px;margin:0 auto 20px;border-radius:50%;border:5px solid rgba(255,255,255,.08);border-top-color:#c054ff;animation:girar .8s linear infinite}
+    h1{margin:0;font-size:25px}p{margin:12px 0 0;color:#b8adbf;line-height:1.55;font-size:14px}small{display:block;margin-top:18px;color:#8f829c}@keyframes girar{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <main class="box">
+    <div class="ring"></div>
+    <h1>Atualizando a Central de Suporte…</h1>
+    <p>Removendo o popup antigo e carregando a versão corrigida.</p>
+    <small>Versão ${CACHE_VERSION}</small>
+  </main>
+  <script>
+    (async function () {
+      try {
+        if ("caches" in window) {
+          const nomes = await caches.keys();
+          await Promise.all(nomes.map((nome) => caches.delete(nome)));
+        }
+        if ("serviceWorker" in navigator) {
+          const registros = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registros.map((registro) => registro.unregister()));
+        }
+        localStorage.removeItem("supportFaqOpen");
+        sessionStorage.removeItem("supportFaqOpen");
+      } catch (erro) {
+        console.warn("Não foi possível limpar todo o cache:", erro);
+      }
+      setTimeout(
+        () => window.location.replace("/suporte?fresh=${CACHE_VERSION}&t=" + Date.now()),
+        850
+      );
+    })();
+  </script>
+</body>
+</html>`);
+});
+
 app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
 app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
 app.get(["/dashboard-free", "/dashboard-free.html"], servirPagina("dashboard-free.html"));
 app.get(["/admin", "/admin.html"], servirPagina("admin.html"));
+app.get(["/suporte", "/suporte.html"], servirPagina("suporte.html"));
 app.get(
   ["/painel-vendas", "/painel-vendas.html"],
   servirPagina("painel-vendas.html")
@@ -192,6 +249,8 @@ if (fs.existsSync(publicDir)) {
           res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
           res.setHeader("Pragma", "no-cache");
           res.setHeader("Expires", "0");
+          res.setHeader("Surrogate-Control", "no-store");
+          res.setHeader("CDN-Cache-Control", "no-store");
         }
       }
     })
@@ -223,8 +282,8 @@ app.get("/api/status", async (req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.3.0",
-    release: "admin-final-provas-periodo",
+    versao: "4.3.1",
+    release: "support-5-hard-reset",
     cacheVersion: CACHE_VERSION,
     frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
     backend: "Node.js + Express",
