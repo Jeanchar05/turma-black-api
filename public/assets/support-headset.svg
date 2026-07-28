@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-labelledby="title desc">
+  <title id="title">Central de Suporte Turma do Primo</title>
+  <desc id="desc">Fones de ouvido roxos e dourados envolvendo o símbolo da Turma do Primo.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="46%" r="54%"><stop offset="0" stop-color="#7323c8" stop-opacity=".52"/><stop offset=".55" stop-color="#2a0d48" stop-opacity=".18"/><stop offset="1" stop-color="#08040f" stop-opacity="0"/></radialGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c05cff"/><stop offset=".46" stop-color="#7b2ae8"/><stop offset="1" stop-color="#35105e"/></linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#24152e"/><stop offset=".52" stop-color="#09050f"/><stop offset="1" stop-color="#170a22"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0a0"/><stop offset=".28" stop-color="#ffc94f"/><stop offset=".65" stop-color="#dc8a10"/><stop offset="1" stop-color="#7b3e03"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="13" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#000" flood-opacity=".58"/></filter>
+  </defs>
+  <rect width="900" height="620" fill="url(#bg)"/>
+  <g opacity=".58" fill="none" stroke="#a33fff">
+    <circle cx="450" cy="310" r="235" stroke-width="2" filter="url(#glow)"/>
+    <circle cx="450" cy="310" r="194" stroke-dasharray="3 15" stroke-opacity=".45"/>
+    <path d="M115 404C210 306 266 232 350 148M786 398C708 307 668 228 561 131" stroke-opacity=".18"/>
+  </g>
+  <g fill="#e0a531"><circle cx="112" cy="188" r="3"/><circle cx="177" cy="454" r="2"/><circle cx="761" cy="154" r="3"/><circle cx="817" cy="390" r="2"/></g>
+  <g fill="#ad48ff"><circle cx="151" cy="276" r="3"/><circle cx="736" cy="474" r="3"/><circle cx="690" cy="102" r="2"/><circle cx="247" cy="108" r="2"/></g>
+  <g filter="url(#shadow)">
+    <path d="M224 318v-61C224 125 324 46 450 46s226 79 226 211v61" fill="none" stroke="url(#purple)" stroke-width="56" stroke-linecap="round"/>
+    <path d="M244 312v-51C244 143 331 72 450 72s206 71 206 189v51" fill="none" stroke="#12091b" stroke-width="31" stroke-linecap="round"/>
+    <path d="M250 318v-43c0-101 78-177 200-177s200 76 200 177v43" fill="none" stroke="#9b3cf4" stroke-opacity=".72" stroke-width="6" filter="url(#glow)"/>
+    <g transform="translate(120 245) rotate(-5 115 150)">
+      <rect x="40" y="40" width="168" height="260" rx="78" fill="url(#purple)"/>
+      <rect x="59" y="58" width="132" height="224" rx="62" fill="url(#dark)" stroke="#cd6bff" stroke-opacity=".45" stroke-width="3"/>
+      <ellipse cx="125" cy="170" rx="47" ry="88" fill="#050307" stroke="#2e1738" stroke-width="14"/>
+      <rect x="104" y="0" width="43" height="74" rx="13" fill="url(#gold)"/>
+      <path d="M114 6h23v55h-23z" fill="#2a1504" opacity=".45"/>
+    </g>
+    <g transform="translate(612 245) rotate(5 85 150)">
+      <rect x="0" y="40" width="168" height="260" rx="78" fill="url(#purple)"/>
+      <rect x="17" y="58" width="132" height="224" rx="62" fill="url(#dark)" stroke="#cd6bff" stroke-opacity=".45" stroke-width="3"/>
+      <ellipse cx="83" cy="170" rx="47" ry="88" fill="#050307" stroke="#2e1738" stroke-width="14"/>
+      <rect x="62" y="0" width="43" height="74" rx="13" fill="url(#gold)"/>
+      <path d="M72 6h23v55H72z" fill="#2a1504" opacity=".45"/>
+    </g>
+  </g>
+  <g transform="translate(340 205)" filter="url(#shadow)">
+    <path d="M110 0 132 34l40-8-8 44 34 25-32 25 6 47-42-10-20 38-20-38-42 10 6-47-32-25 34-25-8-44 40 8Z" fill="url(#gold)"/>
+    <path d="M54 83h112l-15 147c-4 36-25 60-41 68-16-8-37-32-41-68Z" fill="#0c0712" stroke="url(#gold)" stroke-width="11"/>
+    <path d="M80 115h61c22 0 36 13 36 34 0 20-14 34-36 34h-24v47H80Zm37 27v14h20c8 0 12-2 12-7s-4-7-12-7Z" fill="url(#gold)"/>
+    <path d="M67 219h86" stroke="#8c4b0b" stroke-width="6" opacity=".55"/>
+  </g>
+  <path d="M240 517c103 38 317 45 421-3" fill="none" stroke="#9a38ef" stroke-width="3" stroke-opacity=".45" filter="url(#glow)"/>
+</svg>
