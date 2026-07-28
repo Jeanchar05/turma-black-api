@@ -6,6 +6,41 @@
 
   document.addEventListener("DOMContentLoaded", validatePage, { once: true });
 
+  async function cleanupLegacyBrowserState() {
+    const marker = "legacy-render-cleanup-v1";
+
+    try {
+      if (sessionStorage.getItem(marker) === "ok") return;
+    } catch (_) {}
+
+    try {
+      if ("serviceWorker" in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.allSettled(registrations.map((registration) => registration.unregister()));
+      }
+
+      if ("caches" in window) {
+        const names = await caches.keys();
+        await Promise.allSettled(names.map((name) => caches.delete(name)));
+      }
+
+      const legacyKeys = [
+        "API_URL", "apiUrl", "apiURL", "apiBase", "apiBaseUrl",
+        "renderApiUrl", "render_url", "pushSubscription",
+        "notificationEndpoint", "vapidPublicKey", "serviceWorkerVersion"
+      ];
+
+      legacyKeys.forEach((key) => {
+        try { localStorage.removeItem(key); } catch (_) {}
+        try { sessionStorage.removeItem(key); } catch (_) {}
+      });
+
+      try { sessionStorage.setItem(marker, "ok"); } catch (_) {}
+    } catch (error) {
+      console.warn("Não foi possível concluir toda a limpeza legada:", error);
+    }
+  }
+
   function getToken() {
     for (const key of TOKEN_KEYS) {
       try {
@@ -61,6 +96,8 @@
   }
 
   async function validatePage() {
+    cleanupLegacyBrowserState().catch(() => {});
+
     const token = getToken();
 
     if (!token) {
@@ -73,7 +110,8 @@
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`
-        }
+        },
+        cache: "no-store"
       });
 
       const data = await response.json().catch(() => ({}));
@@ -86,7 +124,7 @@
       const required = document.body.dataset.requiredAccess || "dashboard";
 
       if (!hasAccess(user, required)) {
-        window.location.replace("dashboard.html");
+        window.location.replace("/dashboard");
         return;
       }
 
@@ -94,7 +132,7 @@
       document.body.classList.add("protected-ready");
     } catch (_) {
       clearSession();
-      window.location.replace("index.html");
+      window.location.replace("/");
     }
   }
 
@@ -125,7 +163,7 @@
     $$('[data-logout]').forEach((button) => {
       button.addEventListener("click", () => {
         clearSession();
-        window.location.replace("index.html");
+        window.location.replace("/");
       });
     });
   }
