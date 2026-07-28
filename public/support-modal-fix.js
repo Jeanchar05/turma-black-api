@@ -1,110 +1,150 @@
 "use strict";
-
 (() => {
-  const $ = (selector, root = document) => root.querySelector(selector);
-  let lastFocus = null;
+  const FAQ_MODAL_SELECTORS = [
+    "#faqModal",
+    ".support-faq-modal",
+    ".faq-modal",
+    "[data-faq-modal]",
+    ".support-modal[data-modal='faq']",
+    ".support-overlay[data-modal='faq']"
+  ];
 
-  function scrollbarCompensation() {
-    return `${Math.max(0, window.innerWidth - document.documentElement.clientWidth)}px`;
+  const fallbackQuestions = `
+    <details><summary>Não consigo acessar minha conta. O que faço?</summary><p>Confira o e-mail e a senha cadastrados. Caso continue sem acesso, abra um chamado na categoria “Acesso à conta” e informe o e-mail utilizado.</p></details>
+    <details><summary>Como acompanho uma solicitação?</summary><p>Todos os seus chamados aparecem nesta página. Clique em “Abrir atendimento” para visualizar o histórico e conversar com a equipe.</p></details>
+    <details><summary>Posso enviar imagens ou documentos?</summary><p>Sim. Você pode anexar imagens, PDFs e documentos de até 4 MB durante a abertura ou dentro do chat.</p></details>
+    <details><summary>Como alterar meus dados?</summary><p>Acesse a página Perfil pelo menu lateral. Dúvidas sobre e-mail ou plano podem ser enviadas pelo suporte.</p></details>`;
+
+  function unlockPage() {
+    document.body?.classList.remove("support-modal-open", "modal-open", "no-scroll", "overflow-hidden");
+    if (document.body) {
+      document.body.style.removeProperty("overflow");
+      document.body.style.removeProperty("padding-right");
+      document.body.style.removeProperty("position");
+      document.body.style.removeProperty("width");
+    }
+    document.documentElement.style.removeProperty("--support-scrollbar-compensation");
   }
 
-  function faqModal() {
-    return document.getElementById("faqModal");
+  function collectFaqMarkup() {
+    for (const selector of FAQ_MODAL_SELECTORS) {
+      const modal = document.querySelector(selector);
+      const list = modal?.querySelector(".support-faq-list");
+      if (list?.innerHTML.trim()) return list.innerHTML;
+    }
+    return fallbackQuestions;
   }
 
-  function closeDuplicateFaqOverlays() {
-    const official = faqModal();
-    document.querySelectorAll(".support-faq-modal, .faq-modal, [data-faq-modal]").forEach((item) => {
-      if (item !== official) {
-        item.hidden = true;
-        item.setAttribute("aria-hidden", "true");
-        item.classList.remove("active", "open", "visible", "show");
-        item.style.display = "none";
+  function removeFaqOverlays() {
+    FAQ_MODAL_SELECTORS.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((element) => {
+        if (element.id === "faq" || element.classList.contains("support-faq")) return;
+        element.remove();
+      });
+    });
+    unlockPage();
+  }
+
+  function ensureInlineFaq() {
+    let section = document.getElementById("faq");
+    if (section) {
+      removeFaqOverlays();
+      return section;
+    }
+
+    const content = document.querySelector(".support-content");
+    if (!content) {
+      removeFaqOverlays();
+      return null;
+    }
+
+    const questions = collectFaqMarkup();
+    section = document.createElement("section");
+    section.id = "faq";
+    section.className = "support-card support-faq support-faq-inline";
+    section.innerHTML = `
+      <div class="support-card-title">
+        <div><small>AJUDA RÁPIDA</small><h2>Perguntas frequentes</h2><p>Respostas para as dúvidas mais comuns da plataforma.</p></div>
+      </div>
+      <div class="support-faq-list">${questions}</div>`;
+    content.appendChild(section);
+    removeFaqOverlays();
+    return section;
+  }
+
+  function openInlineFaq() {
+    const section = ensureInlineFaq();
+    if (!section) return;
+    section.classList.remove("support-faq-highlight");
+    requestAnimationFrame(() => {
+      section.classList.add("support-faq-highlight");
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    window.setTimeout(() => section.classList.remove("support-faq-highlight"), 1500);
+  }
+
+  function overlayStillNeeded() {
+    const chatOpen = document.getElementById("supportChatModal")?.hidden === false;
+    const feedbackOpen = document.getElementById("feedbackModal")?.hidden === false;
+    const sidebarOpen = document.getElementById("supportSidebar")?.classList.contains("open");
+    return chatOpen || feedbackOpen || sidebarOpen;
+  }
+
+  function normalizeMobileOverlay() {
+    const overlay = document.getElementById("supportMobileOverlay");
+    if (overlay && !overlayStillNeeded()) overlay.hidden = true;
+  }
+
+  function boot() {
+    ensureInlineFaq();
+    normalizeMobileOverlay();
+
+    document.addEventListener("click", (event) => {
+      const open = event.target.closest("[data-open-faq], [data-scroll='faq'], a[href='#faq']");
+      if (open) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        openInlineFaq();
+        return;
       }
+
+      const close = event.target.closest("[data-close-faq], .support-faq-close");
+      if (close) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        removeFaqOverlays();
+        normalizeMobileOverlay();
+      }
+    }, true);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        removeFaqOverlays();
+        normalizeMobileOverlay();
+      }
+    }, true);
+
+    const observer = new MutationObserver((mutations) => {
+      let found = false;
+      mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        if (FAQ_MODAL_SELECTORS.some((selector) => node.matches?.(selector) || node.querySelector?.(selector))) found = true;
+      }));
+      if (found) {
+        window.setTimeout(() => {
+          removeFaqOverlays();
+          normalizeMobileOverlay();
+        }, 0);
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener("pageshow", () => {
+      ensureInlineFaq();
+      normalizeMobileOverlay();
     });
   }
 
-  function setFaqOpen(open, trigger = null) {
-    const modal = faqModal();
-    if (!modal) return;
-
-    if (open) {
-      lastFocus = trigger || document.activeElement;
-      document.documentElement.style.setProperty("--support-scrollbar-compensation", scrollbarCompensation());
-      modal.hidden = false;
-      modal.setAttribute("aria-hidden", "false");
-      document.body.classList.add("support-modal-open");
-      requestAnimationFrame(() => modal.querySelector("[data-close-faq]")?.focus());
-      return;
-    }
-
-    modal.hidden = true;
-    modal.setAttribute("aria-hidden", "true");
-    modal.classList.remove("active", "open", "visible", "show");
-    document.body.classList.remove("support-modal-open");
-    document.documentElement.style.removeProperty("--support-scrollbar-compensation");
-    modal.querySelectorAll("details[open]").forEach((details) => details.removeAttribute("open"));
-    if (lastFocus instanceof HTMLElement && document.contains(lastFocus)) lastFocus.focus();
-    lastFocus = null;
-  }
-
-  function resetModalState() {
-    closeDuplicateFaqOverlays();
-    setFaqOpen(false);
-  }
-
-  document.addEventListener("click", (event) => {
-    const open = event.target.closest("[data-open-faq]");
-    if (open) {
-      event.preventDefault();
-      event.stopPropagation();
-      setFaqOpen(true, open);
-      return;
-    }
-
-    if (event.target.closest("[data-close-faq]")) {
-      event.preventDefault();
-      event.stopPropagation();
-      setFaqOpen(false);
-      return;
-    }
-
-    const modal = faqModal();
-    if (modal && event.target === modal) setFaqOpen(false);
-  }, true);
-
-  document.addEventListener("keydown", (event) => {
-    const modal = faqModal();
-    if (!modal || modal.hidden) return;
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      setFaqOpen(false);
-      return;
-    }
-
-    if (event.key === "Tab") {
-      const focusable = Array.from(modal.querySelectorAll('button, summary, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
-        .filter((item) => !item.disabled && item.offsetParent !== null);
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-  });
-
-  window.addEventListener("pageshow", resetModalState);
-  window.addEventListener("beforeunload", () => document.body.classList.remove("support-modal-open"));
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", resetModalState, { once: true });
-  } else {
-    resetModalState();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
+  else boot();
 })();
