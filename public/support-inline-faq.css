@@ -1,0 +1,18 @@
+/* FAQ interno: sem overlay, sem modal e sem bloqueio da página */
+#faqPanel[hidden]{display:none!important}
+#faqPanel{margin:13px 0;scroll-margin-top:88px;animation:faqPanelIn .24s ease}
+#faqPanel .support-card-title{align-items:center}
+#faqPanel .support-card-title button{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;color:var(--text);background:rgba(163,65,255,.08);cursor:pointer;font-size:22px;line-height:1}
+#faqPanel .support-card-title button:hover{border-color:var(--line2);background:rgba(163,65,255,.14)}
+#faqPanel .support-faq-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#faqPanel details{padding:15px;border:1px solid var(--line);border-radius:12px;background:rgba(124,47,190,.045);transition:border-color .2s ease,background .2s ease,transform .2s ease}
+#faqPanel details:hover{transform:translateY(-2px);border-color:var(--line2);background:rgba(153,61,255,.075)}
+#faqPanel summary{cursor:pointer;font-weight:750;line-height:1.45;list-style:none;position:relative;padding-right:30px}
+#faqPanel summary::-webkit-details-marker{display:none}
+#faqPanel summary:after{content:"+";position:absolute;right:0;top:-3px;width:24px;height:24px;display:grid;place-items:center;border-radius:8px;color:#c976ff;background:rgba(163,65,255,.11);font-size:18px;transition:transform .2s ease}
+#faqPanel details[open] summary:after{content:"−";transform:rotate(180deg)}
+#faqPanel details p{margin:11px 0 0;color:var(--muted);font-size:12px;line-height:1.65}
+body.support-faq-open{overflow:auto!important;padding-right:0!important}
+@keyframes faqPanelIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@media(max-width:760px){#faqPanel .support-faq-list{grid-template-columns:1fr}#faqPanel{scroll-margin-top:72px}}
+@media(prefers-reduced-motion:reduce){#faqPanel{animation:none}}
