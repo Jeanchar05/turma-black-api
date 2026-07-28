@@ -3,8 +3,10 @@
   const panel = () => document.getElementById("faqPanel");
   const overlaySelectors = [
     "#faqModal",
+    "#supportFaqModal",
     ".support-faq-modal",
     ".faq-modal",
+    ".support-info-modal",
     "[data-faq-modal]",
     ".support-modal[data-modal='faq']",
     ".support-overlay[data-modal='faq']"
@@ -14,7 +16,14 @@
     overlaySelectors.forEach((selector) => {
       document.querySelectorAll(selector).forEach((element) => element.remove());
     });
-    document.body?.classList.remove("support-modal-open", "modal-open", "no-scroll", "overflow-hidden");
+
+    document.body?.classList.remove(
+      "support-modal-open",
+      "modal-open",
+      "no-scroll",
+      "overflow-hidden"
+    );
+
     if (document.body) {
       document.body.style.removeProperty("overflow");
       document.body.style.removeProperty("position");
@@ -26,9 +35,12 @@
   function closeFaq() {
     const faq = panel();
     if (!faq) return;
+
     faq.hidden = true;
     faq.setAttribute("aria-hidden", "true");
+    faq.querySelectorAll("details[open]").forEach((item) => item.removeAttribute("open"));
     document.body?.classList.remove("support-faq-open");
+
     document.querySelectorAll("[data-toggle-faq]").forEach((button) => {
       button.setAttribute("aria-expanded", "false");
     });
@@ -38,19 +50,24 @@
     removeLegacyFaq();
     const faq = panel();
     if (!faq) return;
+
     faq.hidden = false;
     faq.setAttribute("aria-hidden", "false");
     document.body?.classList.add("support-faq-open");
+
     document.querySelectorAll("[data-toggle-faq]").forEach((button) => {
       button.setAttribute("aria-expanded", "true");
     });
-    requestAnimationFrame(() => faq.scrollIntoView({ behavior: "smooth", block: "start" }));
+
+    requestAnimationFrame(() => {
+      faq.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function toggleFaq() {
     const faq = panel();
     if (!faq) return;
-    if (faq.hidden) openFaq();
+    if (faq.hidden || faq.getAttribute("aria-hidden") !== "false") openFaq();
     else closeFaq();
   }
 
@@ -83,7 +100,15 @@
       closeFaq();
     });
 
-    const observer = new MutationObserver(() => removeLegacyFaq());
+    const observer = new MutationObserver(() => {
+      removeLegacyFaq();
+      const faq = panel();
+      if (faq && !document.body.classList.contains("support-faq-open")) {
+        faq.hidden = true;
+        faq.setAttribute("aria-hidden", "true");
+      }
+    });
+
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
