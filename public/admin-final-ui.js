@@ -1,5 +1,14 @@
 "use strict";
 (() => {
+  function installResponsiveLayer() {
+    if (document.querySelector('link[data-global-responsive]')) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/responsive-global.css?v=20260728-responsive-1";
+    link.dataset.globalResponsive = "true";
+    document.head.appendChild(link);
+  }
+
   function applyPeriodSwitch() {
     const select = document.getElementById("overviewChartPeriod");
     if (!select || select.closest(".admin-period-switch")) return;
@@ -33,13 +42,15 @@
   }
 
   async function init() {
+    installResponsiveLayer();
     registerPeriodEvents();
     applyPeriodSwitch();
     setTimeout(applyPeriodSwitch, 250);
-    try { await import("./admin-support-center.js?v=20260728-support-1"); }
+    try { await import("./admin-support-center.js?v=20260728-support-2"); }
     catch (error) { console.error("Falha ao carregar a central de suporte:", error); }
   }
 
+  installResponsiveLayer();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();
