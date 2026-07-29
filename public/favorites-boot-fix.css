@@ -1,0 +1,9 @@
+/* Boot seguro da aba Favoritos */
+body.favorites-page{opacity:1!important;visibility:visible!important}
+body.favorites-page:not(.protected-ready) .dash-main,
+body.favorites-page:not(.protected-ready) .dash-sidebar,
+body.favorites-page:not(.protected-ready) .dash-mobile-overlay{visibility:hidden!important}
+body.favorites-page:not(.protected-ready) #favoritesLoading{visibility:visible!important;opacity:1!important;display:flex!important;pointer-events:auto!important}
+body.favorites-page.protected-ready .dash-main,
+body.favorites-page.protected-ready .dash-sidebar{visibility:visible!important}
+#favoritesLoading{z-index:99999!important}
