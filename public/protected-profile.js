@@ -3,18 +3,35 @@
 (() => {
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+  let validationStarted = false;
 
   function installResponsiveLayer() {
     if (document.querySelector('link[data-global-responsive]')) return;
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/responsive-global.css?v=20260729-profile-session-3";
+    link.href = "/responsive-global.css?v=20260729-profile-session-4";
     link.dataset.globalResponsive = "true";
     document.head.appendChild(link);
   }
 
+  function exposeLoadingState() {
+    const body = document.body;
+    if (!body) return;
+    body.style.opacity = "1";
+    body.style.visibility = "visible";
+    body.classList.add("protected-booting");
+  }
+
+  function startValidation() {
+    if (validationStarted) return;
+    validationStarted = true;
+    exposeLoadingState();
+    validatePage();
+  }
+
   installResponsiveLayer();
-  document.addEventListener("DOMContentLoaded", validatePage, { once: true });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startValidation, { once: true });
+  else startValidation();
 
   function getToken() {
     for (const key of TOKEN_KEYS) {
@@ -67,14 +84,19 @@
       if (!response.ok || !data?.usuario) throw new Error(data?.erro || "Sessão inválida.");
 
       const user = data.usuario;
-      const required = document.body.dataset.requiredAccess || "dashboard";
+      const required = document.body?.dataset.requiredAccess || "dashboard";
       if (!hasAccess(user, required)) {
         window.location.replace("/dashboard");
         return;
       }
 
       fillUser(user);
-      document.body.classList.add("protected-ready");
+      document.body?.classList.remove("protected-booting");
+      document.body?.classList.add("protected-ready");
+      if (document.body) {
+        document.body.style.removeProperty("opacity");
+        document.body.style.removeProperty("visibility");
+      }
       document.dispatchEvent(new CustomEvent("turma:protected-ready", { detail: { user } }));
     } catch (_) {
       clearSession();
