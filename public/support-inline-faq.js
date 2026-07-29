@@ -21,7 +21,7 @@
     if (!document.querySelector('link[data-support-final-fix]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "/support-final-fix.css?v=20260729-support-final-2";
+      link.href = "/support-final-fix.css?v=20260729-support-final-3";
       link.dataset.supportFinalFix = "true";
       document.head.appendChild(link);
     }
@@ -39,12 +39,37 @@
     });
 
     document.body?.classList.remove("support-faq-open", "support-modal-open", "modal-open", "no-scroll", "overflow-hidden");
-    if (document.body) {
+    if (document.body && !document.body.classList.contains("support-menu-open")) {
       document.body.style.removeProperty("overflow");
       document.body.style.removeProperty("position");
       document.body.style.removeProperty("width");
       document.body.style.removeProperty("padding-right");
     }
+  }
+
+  function openSupportMenu() {
+    const sidebar = $("supportSidebar");
+    const overlay = $("supportMobileOverlay");
+    if (!sidebar) return;
+    sidebar.classList.add("open");
+    document.body?.classList.add("support-menu-open");
+    if (overlay) overlay.hidden = false;
+    $("supportMenuButton")?.setAttribute("aria-expanded", "true");
+  }
+
+  function closeSupportMenu() {
+    const sidebar = $("supportSidebar");
+    const overlay = $("supportMobileOverlay");
+    sidebar?.classList.remove("open");
+    document.body?.classList.remove("support-menu-open");
+    const chatOpen = Boolean($("supportChatModal") && !$("supportChatModal").hidden);
+    if (overlay && !chatOpen) overlay.hidden = true;
+    $("supportMenuButton")?.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleSupportMenu() {
+    if ($("supportSidebar")?.classList.contains("open")) closeSupportMenu();
+    else openSupportMenu();
   }
 
   function updateFaq() {
@@ -96,6 +121,7 @@
   function scrollToSection(id) {
     const target = $(id);
     if (!target) return;
+    closeSupportMenu();
     target.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -105,12 +131,31 @@
     updateFaq();
     updateFeedbackCount();
     updateRatingLabel(5);
+    $("supportMenuButton")?.setAttribute("aria-expanded", "false");
 
     $("faqSearch")?.addEventListener("input", updateFaq);
     $("feedbackMessage")?.addEventListener("input", updateFeedbackCount);
     $("feedbackForm")?.addEventListener("reset", resetFeedbackUi);
 
     document.addEventListener("click", (event) => {
+      const menuButton = event.target.closest("#supportMenuButton");
+      if (menuButton) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        toggleSupportMenu();
+        return;
+      }
+
+      if (event.target.closest("#supportMobileOverlay") && $("supportSidebar")?.classList.contains("open")) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeSupportMenu();
+        return;
+      }
+
+      const navLink = event.target.closest(".support-nav a");
+      if (navLink && matchMedia("(max-width:1120px)").matches) closeSupportMenu();
+
       const scrollButton = event.target.closest("[data-scroll]");
       if (scrollButton) {
         event.preventDefault();
@@ -144,9 +189,18 @@
       });
     }, true);
 
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && $("supportSidebar")?.classList.contains("open")) closeSupportMenu();
+    }, true);
+
+    window.addEventListener("resize", () => {
+      if (!matchMedia("(max-width:1120px)").matches) closeSupportMenu();
+    });
+
     window.addEventListener("pageshow", () => {
       installFinalLayoutFix();
       removeLegacyFaq();
+      closeSupportMenu();
       updateFaq();
     });
 
