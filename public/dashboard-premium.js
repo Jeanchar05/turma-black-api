@@ -1,6 +1,6 @@
 "use strict";
 
-const DASH_PORTRAIT_URL = "assets/hero-jean-transparent.webp?v=20260729-dashboard-portrait-4";
+const DASH_PORTRAIT_URL = "assets/hero-primo-cutout.svg?v=20260729-dashboard-cutout-1";
 
 function installDashboardPortraitStyles() {
   if (document.getElementById("dashboardPortraitFixStyles")) return;
@@ -65,6 +65,7 @@ function installDashboardPortraitStyles() {
       transform:translateY(3%)!important;
       animation:none!important;
       filter:drop-shadow(0 24px 26px rgba(0,0,0,.58)) drop-shadow(0 0 24px rgba(151,46,255,.34))!important;
+      pointer-events:none!important;
     }
     @media(max-width:1100px){
       .dash-hero-copy{width:58%!important}
@@ -110,34 +111,35 @@ function applyDashboardPortrait() {
   if (portrait.parentElement !== wrap) wrap.appendChild(portrait);
 
   portrait.className = "dash-hero-portrait";
-  portrait.src = DASH_PORTRAIT_URL;
+  const expected = new URL(DASH_PORTRAIT_URL, location.href).href;
+  if (portrait.src !== expected) portrait.src = DASH_PORTRAIT_URL;
   portrait.alt = "Ilustração do Primo";
   portrait.loading = "eager";
   portrait.decoding = "async";
   portrait.removeAttribute("width");
   portrait.removeAttribute("height");
-
-  portrait.addEventListener("error", () => {
-    portrait.src = "assets/hero-jean.webp?v=20260729-dashboard-portrait-fallback-4";
-  }, { once: true });
+  portrait.onerror = () => {
+    portrait.onerror = null;
+    portrait.style.display = "none";
+  };
 
   return true;
 }
 
 function waitForDashboardPortrait() {
-  if (applyDashboardPortrait()) return;
+  installDashboardPortraitStyles();
+  applyDashboardPortrait();
 
-  const observer = new MutationObserver(() => {
-    if (applyDashboardPortrait()) observer.disconnect();
-  });
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-  window.setTimeout(() => observer.disconnect(), 10000);
+  const observer = new MutationObserver(() => applyDashboardPortrait());
+  const target = document.querySelector("#section-inicio") || document.documentElement;
+  observer.observe(target, { childList: true, subtree: true });
+  window.setTimeout(() => observer.disconnect(), 15000);
 }
 
 const releaseDashboard = () => window.setTimeout(() => {
   waitForDashboardPortrait();
   document.body?.classList.add("neo-ready");
-}, 60);
+}, 80);
 
 const preloadPortrait = new Image();
 preloadPortrait.src = DASH_PORTRAIT_URL;
