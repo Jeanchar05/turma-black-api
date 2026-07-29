@@ -1,36 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-labelledby="title desc">
-<title id="title">Central de Suporte Turma do Primo</title><desc id="desc">Atendente digital com headset em visual roxo e dourado.</desc>
-<defs>
-<radialGradient id="a" cx="50%" cy="48%" r="55%"><stop offset="0" stop-color="#7a26d7" stop-opacity=".62"/><stop offset=".58" stop-color="#341056" stop-opacity=".22"/><stop offset="1" stop-color="#08040f" stop-opacity="0"/></radialGradient>
-<linearGradient id="p" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d46bff"/><stop offset=".45" stop-color="#7b2ae8"/><stop offset="1" stop-color="#32105a"/></linearGradient>
-<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4b2"/><stop offset=".28" stop-color="#ffc94f"/><stop offset=".7" stop-color="#d98b13"/><stop offset="1" stop-color="#713805"/></linearGradient>
-<linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f3b489"/><stop offset=".52" stop-color="#d98962"/><stop offset="1" stop-color="#8e4934"/></linearGradient>
-<filter id="glow"><feGaussianBlur stdDeviation="11" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="shadow"><feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#000" flood-opacity=".6"/></filter>
-</defs>
-<rect width="900" height="620" fill="url(#a)"/>
-<g opacity=".48" fill="none" stroke="#a340ff"><circle cx="500" cy="310" r="244" stroke-width="2" filter="url(#glow)"/><circle cx="500" cy="310" r="198" stroke-dasharray="4 15"/><path d="M110 420C230 278 295 171 396 83M793 434C707 301 671 184 563 77" stroke-opacity=".22"/></g>
-<g fill="#e7aa31"><circle cx="118" cy="182" r="3"/><circle cx="188" cy="474" r="2"/><circle cx="760" cy="133" r="3"/><circle cx="820" cy="402" r="2"/></g>
-<g filter="url(#shadow)">
-<path d="M364 531c12-106 55-167 137-184 83 16 130 79 142 184Z" fill="#0c0713" stroke="#7130a9" stroke-width="5"/>
-<path d="M421 389c24 22 53 33 82 33 31 0 59-12 84-35l20 144H401Z" fill="#171022"/>
-<ellipse cx="500" cy="267" rx="111" ry="139" fill="url(#skin)"/>
-<path d="M394 257c0-109 65-174 151-156 67 14 87 69 72 128-24-27-53-42-91-45-51-4-85 15-116 52Z" fill="#120b16"/>
-<path d="M416 213c23-70 84-104 146-76 20 9 39 27 50 48-25-16-58-25-94-23-42 1-76 18-102 51Z" fill="#25112e"/>
-<path d="M444 257c17-13 35-14 53 0M526 257c18-14 37-13 54 1" fill="none" stroke="#241017" stroke-width="8" stroke-linecap="round"/>
-<ellipse cx="470" cy="278" rx="7" ry="9" fill="#0b0710"/><ellipse cx="552" cy="278" rx="7" ry="9" fill="#0b0710"/>
-<path d="M479 333c16 14 42 15 60 0" fill="none" stroke="#632c35" stroke-width="8" stroke-linecap="round"/>
-<path d="M499 281c-8 24-9 43 5 49" fill="none" stroke="#ad5f45" stroke-width="5" stroke-linecap="round"/>
-<path d="M439 286c-6 51 14 100 63 109 52-8 74-56 66-108" fill="none" stroke="#3b1f22" stroke-width="9" stroke-linecap="round" opacity=".5"/>
-<path d="M388 272v-34c0-95 53-160 118-160s119 65 119 160v34" fill="none" stroke="url(#p)" stroke-width="35" stroke-linecap="round"/>
-<path d="M405 267v-28c0-81 43-137 101-137s102 56 102 137v28" fill="none" stroke="#09050d" stroke-width="18" stroke-linecap="round"/>
-<rect x="365" y="235" width="67" height="132" rx="30" fill="url(#p)"/><rect x="580" y="235" width="67" height="132" rx="30" fill="url(#p)"/>
-<rect x="377" y="252" width="43" height="98" rx="21" fill="#09050e" stroke="#c562ff" stroke-opacity=".45"/>
-<rect x="592" y="252" width="43" height="98" rx="21" fill="#09050e" stroke="#c562ff" stroke-opacity=".45"/>
-<path d="M621 344c-8 42-35 60-72 60" fill="none" stroke="#a744ff" stroke-width="8" stroke-linecap="round"/>
-<circle cx="544" cy="404" r="12" fill="url(#g)" filter="url(#glow)"/>
-<path d="M474 430h55v57h-55z" fill="#0b0710" stroke="url(#g)" stroke-width="6"/>
-<path d="M486 443h31c12 0 19 7 19 17 0 11-7 18-19 18h-9v15h-22Zm22 9v16h7c5 0 8-3 8-8s-3-8-8-8Z" fill="url(#g)"/>
-</g>
-<path d="M285 540c126 32 331 33 455-2" fill="none" stroke="#9f3cf0" stroke-width="3" stroke-opacity=".45" filter="url(#glow)"/>
+  <title id="title">Central de Suporte Turma do Primo</title>
+  <desc id="desc">Atendente da Turma do Primo usando headset.</desc>
+  <defs>
+    <radialGradient id="glow" cx="60%" cy="48%" r="54%">
+      <stop offset="0" stop-color="#9e38ff" stop-opacity=".44"/>
+      <stop offset=".48" stop-color="#5d1da7" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#09040f" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-40%" y="-30%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#000" flood-opacity=".62"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#9e38ff" flood-opacity=".32"/>
+    </filter>
+  </defs>
+  <ellipse cx="625" cy="330" rx="260" ry="270" fill="url(#glow)"/>
+  <circle cx="642" cy="318" r="220" fill="none" stroke="#a43cff" stroke-opacity=".32" stroke-width="2"/>
+  <circle cx="642" cy="318" r="180" fill="none" stroke="#efb52f" stroke-opacity=".2" stroke-dasharray="5 14"/>
+  <image href="support-primo-headset.webp?v=20260729-support-portrait-1" x="405" y="-14" width="430" height="660" preserveAspectRatio="xMidYMax meet" filter="url(#shadow)"/>
 </svg>
