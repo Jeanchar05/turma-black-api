@@ -7,6 +7,14 @@
 .support-shortcuts{overflow:visible!important}
 .support-shortcuts button{position:relative!important;pointer-events:auto!important;z-index:2!important}
 
+@media(max-width:1120px){
+  .support-sidebar{display:flex!important;width:245px!important;left:0!important;right:auto!important;transform:translate3d(-105%,0,0)!important;visibility:visible!important;opacity:1!important;z-index:95!important;transition:transform .24s ease!important;will-change:transform}
+  .support-sidebar.open{transform:translate3d(0,0,0)!important}
+  .support-mobile-overlay{z-index:90!important;pointer-events:auto!important}
+  .support-menu-button{display:grid!important;pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important}
+  body.support-menu-open{overflow:hidden!important}
+}
+
 @media(max-width:980px){
   .support-hero-copy{width:62%!important}
   .support-hero>img{right:-30px!important;width:43%!important;max-width:350px!important;bottom:-38px!important}
