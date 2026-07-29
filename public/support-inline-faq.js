@@ -17,6 +17,22 @@
 
   let activeFilter = "all";
 
+  function installFinalLayoutFix() {
+    if (!document.querySelector('link[data-support-final-fix]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "/support-final-fix.css?v=20260729-support-final-2";
+      link.dataset.supportFinalFix = "true";
+      document.head.appendChild(link);
+    }
+
+    const image = document.querySelector(".support-hero > img");
+    if (image) {
+      image.draggable = false;
+      image.style.pointerEvents = "none";
+    }
+  }
+
   function removeLegacyFaq() {
     overlaySelectors.forEach((selector) => {
       document.querySelectorAll(selector).forEach((element) => element.remove());
@@ -77,7 +93,14 @@
     }, 0);
   }
 
+  function scrollToSection(id) {
+    const target = $(id);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function boot() {
+    installFinalLayoutFix();
     removeLegacyFaq();
     updateFaq();
     updateFeedbackCount();
@@ -88,6 +111,14 @@
     $("feedbackForm")?.addEventListener("reset", resetFeedbackUi);
 
     document.addEventListener("click", (event) => {
+      const scrollButton = event.target.closest("[data-scroll]");
+      if (scrollButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        scrollToSection(scrollButton.dataset.scroll);
+        return;
+      }
+
       const filter = event.target.closest("[data-faq-filter]");
       if (filter) {
         event.preventDefault();
@@ -101,9 +132,9 @@
       const legacyFaqTrigger = event.target.closest("[data-toggle-faq], [data-open-faq]");
       if (legacyFaqTrigger) {
         event.preventDefault();
-        $("faqPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        scrollToSection("faqPanel");
       }
-    });
+    }, true);
 
     document.addEventListener("toggle", (event) => {
       const opened = event.target;
@@ -114,11 +145,15 @@
     }, true);
 
     window.addEventListener("pageshow", () => {
+      installFinalLayoutFix();
       removeLegacyFaq();
       updateFaq();
     });
 
-    const observer = new MutationObserver(removeLegacyFaq);
+    const observer = new MutationObserver(() => {
+      removeLegacyFaq();
+      installFinalLayoutFix();
+    });
     if (document.body) observer.observe(document.body, { childList: true, subtree: true });
   }
 
