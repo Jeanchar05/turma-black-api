@@ -1,6 +1,6 @@
 "use strict";
 
-const DASH_PORTRAIT_URL = "assets/hero-jean-transparent.webp?v=20260729-dashboard-portrait-1";
+const DASH_PORTRAIT_URL = "assets/hero-jean.webp?v=20260729-dashboard-portrait-2";
 
 function installDashboardPortraitStyles() {
   if (document.getElementById("dashboardPortraitFixStyles")) return;
@@ -117,7 +117,7 @@ function applyDashboardPortrait() {
   portrait.removeAttribute("height");
 
   portrait.addEventListener("error", () => {
-    portrait.src = "assets/hero-jean.webp?v=20260729-dashboard-portrait-fallback";
+    portrait.src = "assets/hero-jean-transparent.webp?v=20260729-dashboard-portrait-fallback-2";
   }, { once: true });
 
   return true;
