@@ -1,0 +1,8 @@
+body.profile-page{opacity:1!important}
+body.profile-page:not(.protected-ready) #profileSidebar,
+body.profile-page:not(.protected-ready) .dash-main{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body.profile-page #profileLoading{display:flex!important;opacity:1!important;visibility:visible!important;z-index:99999!important}
+body.profile-page.protected-ready #profileLoading{display:none!important}
+body.profile-page.protected-ready #profileSidebar,
+body.profile-page.protected-ready .dash-main{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+@media(max-width:760px){body.profile-page #profileLoading{padding:26px;flex-direction:column;text-align:center}body.profile-page #profileLoading>div:last-child{justify-items:center}}
