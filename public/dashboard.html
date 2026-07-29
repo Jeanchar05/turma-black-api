@@ -9,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="dashboard-premium.css" />
+  <link rel="stylesheet" href="dashboard-premium.css?v=20260728-portrait-4" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
   <script defer src="protected.js"></script>
-  <script defer src="dashboard-premium.js"></script>
+  <script defer src="dashboard-premium.js?v=20260728-portrait-4"></script>
 </head>
 <body class="student-dashboard" data-required-access="dashboard">
   <div class="dash-loading" id="dashLoading" role="status">
@@ -163,75 +163,34 @@
             <div class="dash-panel-head"><div><span>NOVO CHAMADO</span><h2>Como podemos ajudar?</h2></div></div>
             <label><span>Assunto</span><input id="supportSubject" maxlength="180" required /></label>
             <label><span>Prioridade</span><select id="supportPriority"><option value="normal">Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option><option value="baixa">Baixa</option></select></label>
-            <label><span>Mensagem</span><textarea id="supportMessage" rows="7" maxlength="4000" required></textarea></label>
-            <button class="dash-primary-btn" type="submit">Enviar chamado</button>
+            <label><span>Mensagem</span><textarea id="supportMessage" rows="7" maxlength="5000" required></textarea></label>
+            <button class="dash-primary-btn" type="submit">Abrir chamado</button>
           </form>
-          <article class="dash-panel"><div class="dash-panel-head"><div><span>MEUS CHAMADOS</span><h2>Acompanhamento</h2></div><button id="refreshSupport" type="button">↻ Atualizar</button></div><div class="dash-ticket-list" id="supportList"></div></article>
+          <div class="dash-panel"><div class="dash-panel-head"><div><span>MEUS CHAMADOS</span><h2>Acompanhamento</h2></div><button type="button" id="refreshTickets">Atualizar</button></div><div class="dash-ticket-list" id="ticketList"></div></div>
         </div>
       </section>
 
       <section class="dash-section" id="section-perfil" data-title="Perfil">
-        <div class="dash-section-head"><div><span>MINHA CONTA</span><h1>Perfil e preferências</h1><p>Atualize seus dados e personalize sua experiência.</p></div></div>
-        <div class="dash-two-column">
-          <form class="dash-panel dash-form" id="profileForm">
-            <div class="dash-profile-cover"><span class="dash-profile-avatar" data-user-initial>P</span><div><strong data-user-fullname>Usuário</strong><small data-user-role>Aluno</small></div></div>
-            <label><span>Nome completo</span><input id="profileName" maxlength="160" required /></label>
-            <label><span>E-mail</span><input id="profileEmail" type="email" disabled /></label>
-            <label><span>Telefone</span><input id="profilePhone" maxlength="30" /></label>
-            <label><span>URL da foto</span><input id="profilePhoto" type="url" placeholder="https://…" /></label>
-            <button class="dash-primary-btn" type="submit">Salvar perfil</button>
-          </form>
-          <article class="dash-panel dash-preferences-card">
-            <div class="dash-panel-head"><div><span>APARÊNCIA</span><h2>Tema da plataforma</h2></div></div>
-            <div class="dash-theme-options">
-              <button type="button" data-set-theme="dark"><span>☾</span><strong>Escuro</strong><small>Visual premium original</small></button>
-              <button type="button" data-set-theme="light"><span>☀</span><strong>Claro</strong><small>Cinza claro confortável</small></button>
-              <button type="button" data-set-theme="system"><span>◐</span><strong>Sistema</strong><small>Segue seu dispositivo</small></button>
-            </div>
-          </article>
-        </div>
+        <div class="dash-section-head"><div><span>MINHA CONTA</span><h1>Perfil e preferências</h1><p>Gerencie suas informações, foto, segurança e aparência.</p></div></div>
+        <form class="dash-profile-layout" id="profileForm">
+          <div class="dash-panel dash-profile-photo"><span class="dash-profile-avatar" data-user-initial>P</span><label>Alterar foto<input id="profilePhoto" type="file" accept="image/*" hidden /></label><small>PNG ou JPG, até 2 MB</small></div>
+          <div class="dash-panel dash-form"><label><span>Nome</span><input id="profileName" required maxlength="160" /></label><label><span>E-mail</span><input id="profileEmail" disabled /></label><label><span>Telefone</span><input id="profilePhone" maxlength="40" /></label><button class="dash-primary-btn" type="submit">Salvar alterações</button></div>
+          <div class="dash-panel dash-security-card"><span>♨</span><h2>Segurança da conta</h2><p>Seu acesso é protegido por autenticação e sessão segura.</p><div><i></i><i></i><i></i><i></i></div><small id="securityLevelText">Proteção ativa</small></div>
+        </form>
       </section>
 
       <section class="dash-section" id="section-roleta" data-title="Roleta">
-        <div class="dash-section-head"><div><span>FERRAMENTAS</span><h1>Central da Roleta</h1><p>Acesse as ferramentas estratégicas da Turma do Primo.</p></div></div>
-        <div class="dash-feature-grid">
-          <article><span>◉</span><h2>Race</h2><p>Visualização oval com setores e vizinhos.</p><button type="button" data-action="launch-tool" data-tool="Race">Abrir ferramenta →</button></article>
-          <article><span>▦</span><h2>Racetrack</h2><p>Tabela completa 0–36 com marcações inteligentes.</p><button type="button" data-action="launch-tool" data-tool="Racetrack">Abrir ferramenta →</button></article>
-          <article><span>♛</span><h2>Roleta Operacional</h2><p>Estratégias, histórico e ambiente de prática.</p><button type="button" data-action="launch-tool" data-tool="Roleta Operacional">Acessar →</button></article>
-        </div>
+        <div class="dash-section-head"><div><span>FERRAMENTAS PREMIUM</span><h1>Roleta</h1><p>Acesse estudos, simuladores e ferramentas operacionais.</p></div></div><div class="dash-feature-grid"><article><span>◎</span><h2>Race</h2><p>Visualize setores e vizinhos da roda europeia.</p><button type="button" data-action="coming-soon">Abrir ferramenta →</button></article><article><span>0—36</span><h2>Racetrack</h2><p>Tabela completa com marcações e setores.</p><button type="button" data-action="coming-soon">Abrir ferramenta →</button></article><article><span>♛</span><h2>Área do Primo</h2><p>Conteúdos e ferramentas exclusivas do plano.</p><button type="button" data-action="coming-soon">Explorar →</button></article></div>
       </section>
 
-      <section class="dash-section" id="section-provas" data-title="Provas">
-        <div class="dash-section-head"><div><span>AVALIAÇÕES</span><h1>Provas e resultados</h1><p>Consulte avaliações disponíveis e acompanhe seu desempenho.</p></div></div>
-        <div class="dash-panel"><div class="dash-empty-state"><span>▤</span><strong>Suas avaliações aparecerão aqui</strong><p>Os resultados são vinculados automaticamente ao seu perfil.</p></div></div>
-      </section>
-
-      <section class="dash-section" id="section-favoritos" data-title="Favoritos">
-        <div class="dash-section-head"><div><span>ITENS SALVOS</span><h1>Meus favoritos</h1><p>Acesse rapidamente conteúdos e anotações importantes.</p></div></div>
-        <div class="dash-favorite-grid" id="favoriteGrid"></div>
-      </section>
-
-      <section class="dash-section" id="section-notificacoes" data-title="Notificações">
-        <div class="dash-section-head"><div><span>CENTRAL DE AVISOS</span><h1>Notificações</h1><p>Atualizações e comunicados da equipe.</p></div></div>
-        <div class="dash-panel"><div class="dash-activity-list" id="notificationList"></div></div>
-      </section>
-
-      <section class="dash-section" id="section-atividades" data-title="Atividades">
-        <div class="dash-section-head"><div><span>HISTÓRICO</span><h1>Atividades</h1><p>Acompanhe as ações recentes da sua conta.</p></div></div>
-        <div class="dash-panel"><div class="dash-activity-list" id="allActivityList"></div></div>
-      </section>
+      <section class="dash-section" id="section-provas" data-title="Provas"><div class="dash-section-head"><div><span>AVALIAÇÕES</span><h1>Provas e desafios</h1><p>Teste seus conhecimentos e acompanhe seus resultados.</p></div></div><div class="dash-feature-grid" id="examGrid"></div></section>
+      <section class="dash-section" id="section-favoritos" data-title="Favoritos"><div class="dash-section-head"><div><span>ITENS SALVOS</span><h1>Favoritos</h1><p>Acesso rápido aos conteúdos que você marcou.</p></div></div><div class="dash-panel"><div class="dash-note-grid" id="favoriteGrid"></div></div></section>
+      <section class="dash-section" id="section-notificacoes" data-title="Notificações"><div class="dash-section-head"><div><span>CENTRAL DE AVISOS</span><h1>Notificações</h1><p>Atualizações, alertas e comunicados da Turma do Primo.</p></div><button class="dash-secondary-btn" id="markAllRead" type="button">Marcar todas como lidas</button></div><div class="dash-panel"><div class="dash-activity-list" id="notificationList"></div></div></section>
+      <section class="dash-section" id="section-atividades" data-title="Atividades"><div class="dash-section-head"><div><span>HISTÓRICO</span><h1>Atividades</h1><p>Veja suas movimentações recentes na plataforma.</p></div></div><div class="dash-panel"><div class="dash-activity-list" id="activityList"></div></div></section>
     </div>
   </main>
 
-  <div class="dash-search-modal" id="dashSearchModal" hidden>
-    <div class="dash-search-backdrop" data-close-search></div>
-    <section class="dash-search-dialog" role="dialog" aria-modal="true" aria-label="Pesquisa rápida">
-      <header><span>⌕</span><input id="globalSearchInput" type="search" placeholder="Digite para buscar…" autocomplete="off" /><kbd>Esc</kbd></header>
-      <div class="dash-search-hint"><span>↑↓ navegar</span><span>Enter abrir</span><span>Ctrl+K pesquisar</span></div>
-      <div class="dash-search-results" id="globalSearchResults"></div>
-    </section>
-  </div>
-
-  <div class="dash-toast-stack" id="dashToastStack" aria-live="polite"></div>
+  <div class="dash-search-modal" id="dashSearchModal" hidden><div class="dash-search-card"><div><span>⌕</span><input id="globalSearchInput" type="search" placeholder="Digite para buscar…" /><kbd>ESC</kbd></div><div class="dash-search-results" id="globalSearchResults"></div></div></div>
+  <div class="dash-toast-stack" id="dashToastStack"></div>
 </body>
 </html>
