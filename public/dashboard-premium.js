@@ -1,6 +1,6 @@
 "use strict";
 
-const DASH_PORTRAIT_URL = "assets/hero-primo-cutout.svg?v=20260729-dashboard-cutout-1";
+const DASH_PORTRAIT_URL = "assets/hero-jean-transparent.webp?v=20260729-dashboard-transparent-5";
 
 function installDashboardPortraitStyles() {
   if (document.getElementById("dashboardPortraitFixStyles")) return;
@@ -111,16 +111,24 @@ function applyDashboardPortrait() {
   if (portrait.parentElement !== wrap) wrap.appendChild(portrait);
 
   portrait.className = "dash-hero-portrait";
-  const expected = new URL(DASH_PORTRAIT_URL, location.href).href;
-  if (portrait.src !== expected) portrait.src = DASH_PORTRAIT_URL;
+  portrait.style.removeProperty("display");
   portrait.alt = "Ilustração do Primo";
   portrait.loading = "eager";
   portrait.decoding = "async";
   portrait.removeAttribute("width");
   portrait.removeAttribute("height");
-  portrait.onerror = () => {
+
+  const expected = new URL(DASH_PORTRAIT_URL, location.href).href;
+  if (portrait.src !== expected) {
     portrait.onerror = null;
-    portrait.style.display = "none";
+    portrait.src = DASH_PORTRAIT_URL;
+  }
+
+  portrait.onerror = () => {
+    portrait.onerror = () => {
+      portrait.style.visibility = "hidden";
+    };
+    portrait.src = `/assets/hero-jean-transparent.webp?v=20260729-dashboard-transparent-retry-${Date.now()}`;
   };
 
   return true;
