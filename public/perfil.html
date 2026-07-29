@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Perfil | Turma do Primo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dashboard-premium.css?v=20260729-profile-1" />
+  <link rel="stylesheet" href="perfil.css?v=20260729-profile-1" />
+  <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
+  <script defer src="protected.js"></script>
+  <script defer src="perfil.js?v=20260729-profile-1"></script>
+</head>
+<body class="student-dashboard profile-page" data-required-access="dashboard">
+  <div class="dash-loading" id="profileLoading" role="status">
+    <div class="dash-loading-orbit"><img src="assets/turma-primo-logo.svg" alt="" /></div>
+    <div><strong>Carregando seu perfil</strong><span>Sincronizando informações da sua conta…</span></div>
+  </div>
+
+  <div class="dash-mobile-overlay" id="profileMobileOverlay" hidden></div>
+
+  <aside class="dash-sidebar" id="profileSidebar">
+    <a class="dash-brand" href="/dashboard">
+      <img src="assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
+      <span><small>TURMA DO</small><strong>PRIMO</strong></span>
+    </a>
+
+    <nav class="dash-nav" aria-label="Navegação principal">
+      <a class="dash-nav-item" href="/dashboard"><svg><use href="assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
+      <a class="dash-nav-item" href="/notas"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><b>Notas</b></a>
+      <a class="dash-nav-item" href="/minigames"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
+      <a class="dash-nav-item" href="/estudo"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
+      <a class="dash-nav-item" href="/modulos"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item" href="/suporte"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      <a class="dash-nav-item active" href="/perfil"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+      <a class="dash-nav-item" href="/roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
+      <a class="dash-nav-item" href="/provas"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
+      <a class="dash-nav-item" href="/favoritos"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
+    </nav>
+
+    <div class="dash-plan-card profile-side-plan">
+      <div class="dash-plan-icon"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></div>
+      <div><strong id="sidePlanName">Turma do Primo</strong><small id="sidePlanLabel">Acesso completo</small></div>
+      <div class="dash-plan-progress"><i id="sidePlanProgress"></i></div>
+      <p id="sidePlanExpiry">Carregando validade…</p>
+      <a href="#accountPlan" class="profile-side-plan-link">Ver minha conta</a>
+    </div>
+
+    <button class="dash-logout" id="profileLogout" type="button"><svg><use href="assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <button class="dash-menu-toggle" id="profileMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="assets/dashboard-icons.svg#i-menu"></use></svg></button>
+      <button class="dash-search-trigger" id="profileSearchTrigger" type="button">
+        <svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><em>Buscar conteúdos, módulos, provas…</em><kbd>Ctrl + K</kbd>
+      </button>
+      <div class="dash-top-actions">
+        <button class="dash-theme-toggle" id="profileThemeToggle" type="button" aria-label="Alternar tema"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button>
+        <a class="profile-top-user" href="/perfil">
+          <span class="dash-avatar" data-profile-avatar>P</span>
+          <span><strong data-profile-firstname>Primo</strong><small data-profile-plan>Aluno</small></span>
+          <svg><use href="assets/dashboard-icons.svg#i-chevron"></use></svg>
+        </a>
+      </div>
+    </header>
+
+    <div class="dash-content profile-content">
+      <section class="profile-heading">
+        <div><span>MINHA CONTA</span><h1>Meu Perfil</h1><p>Gerencie seus dados, preferências e acompanhe sua jornada na Turma do Primo.</p></div>
+        <span class="profile-account-state"><i></i><b id="accountStateText">Conta ativa</b></span>
+      </section>
+
+      <section class="profile-identity-card" id="accountPlan">
+        <div class="profile-identity-main">
+          <div class="profile-avatar-wrap">
+            <span class="profile-main-avatar" data-profile-avatar>P</span>
+            <span class="profile-avatar-ring"></span>
+          </div>
+          <div class="profile-identity-copy">
+            <div class="profile-name-line"><h2 data-profile-fullname>Usuário</h2><span class="profile-verified" title="Conta verificada">✓</span></div>
+            <strong id="profileRoleLabel">Aluno Turma do Primo</strong>
+            <p><svg><use href="assets/dashboard-icons.svg#i-mail"></use></svg><span data-profile-email>—</span></p>
+            <p><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg><span id="lastAccessText">Sessão atual protegida</span></p>
+          </div>
+        </div>
+        <div class="profile-plan-summary">
+          <small>PLANO ATUAL</small>
+          <div class="profile-plan-badge"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg><strong id="profilePlanName">Turma do Primo</strong></div>
+          <p id="profilePlanExpiry">Acesso ativo</p>
+          <div class="profile-plan-track"><i id="profilePlanProgress"></i></div>
+        </div>
+      </section>
+
+      <nav class="profile-tabs" aria-label="Seções do perfil">
+        <button class="active" type="button" data-profile-tab="personal"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><span>Informações pessoais</span></button>
+        <button type="button" data-profile-tab="preferences"><svg><use href="assets/dashboard-icons.svg#i-settings"></use></svg><span>Preferências</span></button>
+        <button type="button" data-profile-tab="security"><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg><span>Segurança</span></button>
+        <button type="button" data-profile-tab="activity"><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg><span>Atividade</span></button>
+      </nav>
+
+      <div class="profile-tab-panel active" data-profile-panel="personal">
+        <div class="profile-main-grid">
+          <div class="profile-left-column">
+            <form class="profile-card profile-form" id="profileForm">
+              <div class="profile-card-head"><div><span>DADOS DA CONTA</span><h2>Informações pessoais</h2><p>Mantenha seus dados atualizados.</p></div><div class="profile-head-icon"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg></div></div>
+              <div class="profile-form-grid">
+                <label><span>Nome completo</span><input id="profileName" maxlength="160" required autocomplete="name" /></label>
+                <label><span>E-mail</span><input id="profileEmail" disabled /></label>
+                <label><span>Telefone</span><input id="profilePhone" maxlength="30" autocomplete="tel" placeholder="(00) 00000-0000" /></label>
+                <label><span>Status da conta</span><input id="profileStatus" disabled /></label>
+                <label class="profile-form-full"><span>Foto de perfil <small>Link da imagem, opcional</small></span><input id="profilePhoto" maxlength="1000" inputmode="url" placeholder="https://…" /></label>
+              </div>
+              <div class="profile-form-footer"><span id="profileSaveStatus">Seus dados ficam vinculados à sua conta.</span><button class="profile-primary-btn" type="submit">Salvar alterações</button></div>
+            </form>
+
+            <section class="profile-card profile-devices-card">
+              <div class="profile-card-head"><div><span>SESSÃO</span><h2>Dispositivos ativos</h2><p>Veja de onde sua sessão atual está sendo acessada.</p></div><div class="profile-head-icon purple"><svg><use href="assets/dashboard-icons.svg#i-monitor"></use></svg></div></div>
+              <div class="profile-device-list" id="profileDeviceList"></div>
+            </section>
+          </div>
+
+          <aside class="profile-right-column">
+            <section class="profile-card profile-stats-card">
+              <div class="profile-card-head compact"><div><span>EVOLUÇÃO</span><h2>Estatísticas de aprendizado</h2></div></div>
+              <div class="profile-stats-grid">
+                <article><small>Módulos concluídos</small><strong id="profileStatModules">0</strong><span id="profileStatModulesTotal">de 0</span></article>
+                <article><small>Média geral</small><strong id="profileStatAverage">0,0</strong><span>nas avaliações</span></article>
+                <article><small>Progresso geral</small><strong id="profileStatProgress">0%</strong><span>da jornada</span></article>
+                <article><small>Dias de foco</small><strong id="profileStatFocus">0</strong><span>últimos 30 dias</span></article>
+              </div>
+              <a class="profile-outline-btn" href="/dashboard">Ver progresso completo</a>
+            </section>
+
+            <section class="profile-card profile-actions-card">
+              <div class="profile-card-head compact"><div><span>CONTA</span><h2>Ações rápidas</h2></div></div>
+              <button type="button" data-action="open-security"><span><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg></span><div><strong>Segurança da conta</strong><small>Confira a proteção do acesso</small></div><b>→</b></button>
+              <button type="button" id="generateProfilePdf"><span class="gold"><svg><use href="assets/dashboard-icons.svg#i-file"></use></svg></span><div><strong>Gerar PDF dos meus dados</strong><small>Relatório personalizado Turma do Primo</small></div><b>↓</b></button>
+              <button type="button" data-action="open-preferences"><span><svg><use href="assets/dashboard-icons.svg#i-settings"></use></svg></span><div><strong>Editar preferências</strong><small>Tema e experiência da plataforma</small></div><b>→</b></button>
+            </section>
+          </aside>
+        </div>
+      </div>
+
+      <div class="profile-tab-panel" data-profile-panel="preferences">
+        <section class="profile-card profile-wide-card">
+          <div class="profile-card-head"><div><span>APARÊNCIA</span><h2>Preferências da plataforma</h2><p>Escolha como a Turma do Primo aparece para você.</p></div><div class="profile-head-icon"><svg><use href="assets/dashboard-icons.svg#i-settings"></use></svg></div></div>
+          <div class="profile-theme-options">
+            <button type="button" data-set-theme="dark"><span class="theme-preview dark"><i></i><i></i><i></i></span><strong>Escuro</strong><small>Padrão Turma do Primo</small></button>
+            <button type="button" data-set-theme="light"><span class="theme-preview light"><i></i><i></i><i></i></span><strong>Claro</strong><small>Visual suave e elegante</small></button>
+            <button type="button" data-set-theme="system"><span class="theme-preview system"><i></i><i></i><i></i></span><strong>Automático</strong><small>Segue o seu dispositivo</small></button>
+          </div>
+        </section>
+      </div>
+
+      <div class="profile-tab-panel" data-profile-panel="security">
+        <div class="profile-security-grid">
+          <section class="profile-card profile-security-score">
+            <div class="profile-security-orbit"><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg><span>100%</span></div>
+            <div><span>PROTEÇÃO DA CONTA</span><h2>Segurança ativa</h2><p>Sua sessão está protegida por autenticação e validação de acesso da plataforma.</p></div>
+          </section>
+          <section class="profile-card profile-security-list">
+            <div class="profile-card-head compact"><div><span>STATUS</span><h2>Camadas de proteção</h2></div></div>
+            <div><span class="ok">✓</span><p><strong>Sessão autenticada</strong><small>Token de acesso validado pela plataforma.</small></p></div>
+            <div><span class="ok">✓</span><p><strong>Conta vinculada</strong><small>Dados associados ao seu cadastro oficial.</small></p></div>
+            <div><span class="ok">✓</span><p><strong>Acesso protegido</strong><small>Páginas internas exigem uma sessão válida.</small></p></div>
+          </section>
+        </div>
+      </div>
+
+      <div class="profile-tab-panel" data-profile-panel="activity">
+        <section class="profile-card profile-wide-card">
+          <div class="profile-card-head"><div><span>HISTÓRICO</span><h2>Atividades recentes</h2><p>Suas últimas movimentações registradas na plataforma.</p></div><div class="profile-head-icon purple"><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg></div></div>
+          <div class="profile-activity-list" id="profileActivityList"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="profile-toast-stack" id="profileToastStack"></div>
+</body>
+</html>
