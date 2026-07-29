@@ -17,7 +17,7 @@
     if (!document.querySelector('link[href*="support-polish.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "support-polish.css?v=20260728-support-7";
+      link.href = "support-polish.css?v=20260729-support-8";
       document.head.appendChild(link);
     }
   }
@@ -85,14 +85,16 @@
 
       if (title.includes("perguntas")) {
         button.removeAttribute("data-open-faq");
-        button.removeAttribute("data-scroll");
-        button.setAttribute("data-toggle-faq", "");
-        button.setAttribute("aria-expanded", "false");
+        button.removeAttribute("data-toggle-faq");
+        button.removeAttribute("aria-expanded");
+        button.setAttribute("data-scroll", "faqPanel");
         const holder = button.querySelector("span");
         if (holder) holder.innerHTML = icon("i-faq");
       }
 
       if (title.includes("feedback")) {
+        button.removeAttribute("data-open-feedback");
+        button.setAttribute("data-scroll", "feedbackPanel");
         const holder = button.querySelector("span");
         if (holder) holder.innerHTML = icon("i-feedback");
       }
