@@ -1,6 +1,6 @@
 "use strict";
 
-const DASH_PORTRAIT_URL = "assets/hero-jean.webp?v=20260729-dashboard-portrait-2";
+const DASH_PORTRAIT_URL = "assets/hero-jean-transparent.webp?v=20260729-dashboard-portrait-4";
 
 function installDashboardPortraitStyles() {
   if (document.getElementById("dashboardPortraitFixStyles")) return;
@@ -8,13 +8,13 @@ function installDashboardPortraitStyles() {
   const style = document.createElement("style");
   style.id = "dashboardPortraitFixStyles";
   style.textContent = `
-    .dash-hero{isolation:isolate!important;min-height:285px!important}
+    .dash-hero{isolation:isolate!important;min-height:285px!important;overflow:hidden!important}
     .dash-hero-copy{position:relative!important;z-index:6!important;width:55%!important}
     .dash-hero-portrait-wrap{
       position:absolute!important;
       z-index:4!important;
       right:2.5%!important;
-      bottom:0!important;
+      bottom:-4px!important;
       width:39%!important;
       height:100%!important;
       display:flex!important;
@@ -53,35 +53,36 @@ function installDashboardPortraitStyles() {
       z-index:3!important;
       display:block!important;
       width:auto!important;
-      height:112%!important;
+      height:108%!important;
       max-width:100%!important;
-      max-height:345px!important;
+      max-height:340px!important;
       margin:0!important;
       object-fit:contain!important;
       object-position:center bottom!important;
       opacity:1!important;
       visibility:visible!important;
-      transform:translateY(5%)!important;
+      background:transparent!important;
+      transform:translateY(3%)!important;
       animation:none!important;
       filter:drop-shadow(0 24px 26px rgba(0,0,0,.58)) drop-shadow(0 0 24px rgba(151,46,255,.34))!important;
     }
     @media(max-width:1100px){
       .dash-hero-copy{width:58%!important}
       .dash-hero-portrait-wrap{right:0!important;width:42%!important}
-      .dash-hero-portrait{height:107%!important;max-height:325px!important}
+      .dash-hero-portrait{height:104%!important;max-height:320px!important}
     }
     @media(max-width:760px){
-      .dash-hero{min-height:570px!important;padding-bottom:285px!important}
+      .dash-hero{min-height:555px!important;padding-bottom:275px!important}
       .dash-hero-copy{width:100%!important;text-align:left!important}
-      .dash-hero-portrait-wrap{left:0!important;right:0!important;bottom:0!important;width:100%!important;height:290px!important}
-      .dash-hero-portrait{height:300px!important;max-height:300px!important;max-width:92vw!important;transform:translateY(8%)!important}
+      .dash-hero-portrait-wrap{left:0!important;right:0!important;bottom:-2px!important;width:100%!important;height:280px!important}
+      .dash-hero-portrait{height:286px!important;max-height:286px!important;max-width:90vw!important;transform:translateY(4%)!important}
       .dash-hero-portrait-wrap:before{bottom:-63%!important;width:350px!important;height:350px!important}
       .dash-hero-portrait-wrap:after{bottom:-46%!important;width:285px!important;height:285px!important}
     }
     @media(max-width:430px){
-      .dash-hero{min-height:555px!important;padding:27px 22px 270px!important}
-      .dash-hero-portrait-wrap{height:270px!important}
-      .dash-hero-portrait{height:278px!important;max-height:278px!important}
+      .dash-hero{min-height:545px!important;padding:27px 22px 263px!important}
+      .dash-hero-portrait-wrap{height:265px!important}
+      .dash-hero-portrait{height:270px!important;max-height:270px!important}
     }
   `;
   document.head.appendChild(style);
@@ -117,7 +118,7 @@ function applyDashboardPortrait() {
   portrait.removeAttribute("height");
 
   portrait.addEventListener("error", () => {
-    portrait.src = "assets/hero-jean-transparent.webp?v=20260729-dashboard-portrait-fallback-2";
+    portrait.src = "assets/hero-jean.webp?v=20260729-dashboard-portrait-fallback-4";
   }, { once: true });
 
   return true;
