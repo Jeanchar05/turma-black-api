@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Favoritos | Turma do Primo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dashboard-premium.css?v=20260729-favorites-1" />
+  <link rel="stylesheet" href="favoritos.css?v=20260729-favorites-1" />
+  <link rel="stylesheet" href="default-avatar.css?v=20260729-favorites-1" />
+  <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
+  <script defer src="protected-profile.js?v=20260729-favorites-1"></script>
+  <script defer src="favoritos.js?v=20260729-favorites-1"></script>
+</head>
+<body class="student-dashboard favorites-page" data-required-access="dashboard">
+  <div class="dash-loading" id="favoritesLoading" role="status">
+    <div class="favorites-loading-orbit"><img src="assets/turma-primo-logo.svg" alt="" /></div>
+    <div><strong>Carregando seus favoritos</strong><span>Organizando os conteúdos que você salvou…</span></div>
+  </div>
+
+  <div class="dash-mobile-overlay" id="favoritesMobileOverlay" hidden></div>
+
+  <aside class="dash-sidebar favorites-sidebar" id="favoritesSidebar">
+    <a class="dash-brand" href="/dashboard">
+      <img src="assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
+      <span><small>TURMA DO</small><strong>PRIMO</strong></span>
+    </a>
+
+    <nav class="dash-nav" aria-label="Navegação principal">
+      <a class="dash-nav-item" href="/dashboard"><svg><use href="assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
+      <a class="dash-nav-item" href="/notas"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><b>Notas</b></a>
+      <a class="dash-nav-item" href="/minigames"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
+      <a class="dash-nav-item" href="/estudo"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
+      <a class="dash-nav-item" href="/modulos"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item" href="/suporte"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      <a class="dash-nav-item" href="/perfil"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+      <a class="dash-nav-item" href="/roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
+      <a class="dash-nav-item" href="/provas"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
+      <a class="dash-nav-item active" href="/favoritos"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
+    </nav>
+
+    <div class="favorites-side-card">
+      <span class="favorites-side-diamond"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></span>
+      <div><strong id="favoritesPlanName">Turma do Primo</strong><small id="favoritesPlanLabel">Acesso completo</small></div>
+      <p>Seus itens salvos ficam ligados à sua conta e disponíveis em qualquer dispositivo.</p>
+      <a href="/perfil">Ver minha conta <span>→</span></a>
+    </div>
+
+    <button class="dash-logout" id="favoritesLogout" type="button"><svg><use href="assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-topbar favorites-topbar">
+      <button class="dash-menu-toggle" id="favoritesMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="assets/dashboard-icons.svg#i-menu"></use></svg></button>
+      <button class="dash-search-trigger" id="favoritesSearchTrigger" type="button">
+        <svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><em>Buscar nos favoritos…</em><kbd>Ctrl + K</kbd>
+      </button>
+      <div class="dash-top-actions">
+        <button class="dash-theme-toggle" id="favoritesThemeToggle" type="button" aria-label="Alternar tema"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button>
+        <a class="favorites-notification" href="/notificacoes" aria-label="Notificações"><svg><use href="assets/dashboard-icons.svg#i-bell"></use></svg><b id="favoritesNotificationBadge" hidden>0</b></a>
+        <a class="favorites-user" href="/perfil">
+          <span class="dash-avatar" data-favorites-avatar>P</span>
+          <span><strong data-favorites-name>Primo</strong><small data-favorites-role>Aluno</small></span>
+          <svg class="favorites-chevron"><use href="assets/dashboard-icons.svg#i-chevron"></use></svg>
+        </a>
+      </div>
+    </header>
+
+    <div class="dash-content favorites-content">
+      <section class="favorites-hero">
+        <div class="favorites-hero-copy">
+          <span>ITENS SALVOS</span>
+          <h1>Favoritos</h1>
+          <p>Acesse rapidamente todos os conteúdos, anotações, provas e ferramentas que você marcou como favoritos.</p>
+        </div>
+        <div class="favorites-emblem" aria-hidden="true">
+          <span class="favorites-emblem-ring ring-one"></span>
+          <span class="favorites-emblem-ring ring-two"></span>
+          <span class="favorites-emblem-wings left"></span>
+          <span class="favorites-emblem-wings right"></span>
+          <span class="favorites-emblem-core"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg></span>
+        </div>
+      </section>
+
+      <section class="favorites-stats" aria-label="Resumo dos favoritos">
+        <article class="purple"><span><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg></span><div><strong id="favoriteModulesCount">0</strong><b>Módulos salvos</b><small>Conteúdos importantes</small></div></article>
+        <article class="violet"><span><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg></span><div><strong id="favoriteNotesCount">0</strong><b>Anotações salvas</b><small>Seus resumos e insights</small></div></article>
+        <article class="blue"><span><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg></span><div><strong id="favoriteExamsCount">0</strong><b>Provas salvas</b><small>Para revisar depois</small></div></article>
+        <article class="pink"><span><svg><use href="assets/dashboard-icons.svg#i-settings"></use></svg></span><div><strong id="favoriteToolsCount">0</strong><b>Ferramentas salvas</b><small>Utilitários favoritos</small></div></article>
+      </section>
+
+      <section class="favorites-toolbar">
+        <div class="favorites-filters" id="favoritesFilters" role="tablist" aria-label="Filtrar favoritos">
+          <button class="active" type="button" data-favorite-filter="all"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><span>Todos</span></button>
+          <button type="button" data-favorite-filter="modulo"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><span>Módulos</span></button>
+          <button type="button" data-favorite-filter="anotacao"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><span>Anotações</span></button>
+          <button type="button" data-favorite-filter="prova"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><span>Provas</span></button>
+          <button type="button" data-favorite-filter="roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><span>Roleta</span></button>
+          <button type="button" data-favorite-filter="minigame"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><span>Minigames</span></button>
+        </div>
+      </section>
+
+      <section class="favorites-grid" id="favoritesGrid" aria-live="polite"></section>
+
+      <section class="favorites-quick">
+        <div class="favorites-quick-title"><span>⚡</span><strong>ACESSO RÁPIDO</strong><a href="/estudo">VER TODOS <b>›</b></a></div>
+        <div class="favorites-quick-grid">
+          <a class="favorites-quick-card continue" href="/modulos">
+            <span class="favorites-quick-icon"><svg><use href="assets/dashboard-icons.svg#i-play"></use></svg></span>
+            <div><small>Continuar estudando</small><strong id="favoritesContinueTitle">Seus módulos</strong><p id="favoritesContinueText">Retome de onde parou.</p></div>
+            <b>›</b>
+          </a>
+          <a class="favorites-quick-card popular" href="/estudo">
+            <span class="favorites-quick-icon"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg></span>
+            <div><small>Mais acessados</small><strong id="favoritesPopularTitle">Conteúdos salvos</strong><p id="favoritesPopularText">Veja seus itens mais importantes.</p></div>
+            <b>›</b>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="favorites-search-modal" id="favoritesSearchModal" hidden>
+    <div class="favorites-search-card">
+      <header><svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><input id="favoritesSearchInput" type="search" placeholder="Buscar por título, categoria ou descrição…" autocomplete="off" /><kbd>ESC</kbd></header>
+      <div id="favoritesSearchResults"></div>
+    </div>
+  </div>
+
+  <div class="dash-toast-stack" id="favoritesToastStack"></div>
+</body>
+</html>
