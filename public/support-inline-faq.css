@@ -1,4 +1,5 @@
 /* FAQ + Feedback integrados à página de suporte */
+#faqPanel.support-faq{display:block!important}
 .support-section-panel{margin-top:13px;scroll-margin-top:88px;position:relative;overflow:hidden}
 .support-section-panel:before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(180,83,255,.7),rgba(243,181,47,.45),transparent)}
 .support-section-heading{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:13px;margin-bottom:16px}
