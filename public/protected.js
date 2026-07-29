@@ -8,7 +8,7 @@
     if (document.querySelector('link[data-global-responsive]')) return;
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/responsive-global.css?v=20260728-responsive-1";
+    link.href = "/responsive-global.css?v=20260729-profile-session-2";
     link.dataset.globalResponsive = "true";
     document.head.appendChild(link);
   }
@@ -54,8 +54,13 @@
   function getToken() {
     for (const key of TOKEN_KEYS) {
       try {
-        const token = sessionStorage.getItem(key);
-        if (token) return token;
+        const sessionToken = sessionStorage.getItem(key);
+        if (sessionToken) return sessionToken;
+      } catch (_) {}
+
+      try {
+        const localToken = localStorage.getItem(key);
+        if (localToken) return localToken;
       } catch (_) {}
     }
     return "";
@@ -64,6 +69,7 @@
   function clearSession() {
     TOKEN_KEYS.forEach((key) => {
       try { sessionStorage.removeItem(key); } catch (_) {}
+      try { localStorage.removeItem(key); } catch (_) {}
     });
   }
 
@@ -111,7 +117,7 @@
     const token = getToken();
 
     if (!token) {
-      window.location.replace("index.html");
+      window.location.replace("/");
       return;
     }
 
@@ -140,6 +146,7 @@
 
       fillUser(user);
       document.body.classList.add("protected-ready");
+      document.dispatchEvent(new CustomEvent("turma:protected-ready", { detail: { user } }));
     } catch (_) {
       clearSession();
       window.location.replace("/");
