@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Gêmeos | Estudo | Turma do Primo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dashboard-premium.css?v=20260730-gemeos-2" />
+  <link rel="stylesheet" href="estudo.css?v=20260730-gemeos-2" />
+  <link rel="stylesheet" href="estudo-gemeos.css?v=20260730-gemeos-2" />
+  <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
+  <script defer src="protected-estudo.js?v=20260730-gemeos-2"></script>
+  <script defer src="estudo.js?v=20260730-gemeos-2"></script>
+</head>
+<body class="student-dashboard study-page study-gemeos-page" data-required-access="dashboard">
+  <div class="dash-loading" id="studyLoading" role="status"><img src="assets/turma-primo-logo.svg" alt="" /><div><strong>Preparando o módulo</strong><span>Carregando Gêmeos…</span></div></div>
+  <div class="dash-mobile-overlay" id="studyMobileOverlay" hidden></div>
+
+  <aside class="dash-sidebar" id="studySidebar">
+    <a class="dash-brand" href="/dashboard"><img src="assets/turma-primo-logo.svg" alt="Logo Turma do Primo" /><span><small>TURMA DO</small><strong>PRIMO</strong></span></a>
+    <nav class="dash-nav" aria-label="Navegação principal">
+      <a class="dash-nav-item" href="/dashboard"><svg><use href="assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
+      <a class="dash-nav-item" href="/notas"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><b>Notas</b></a>
+      <a class="dash-nav-item" href="/minigames"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
+      <a class="dash-nav-item active" href="/estudo"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
+      <a class="dash-nav-item" href="/modulos"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item" href="/suporte"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      <a class="dash-nav-item" href="/perfil"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+      <a class="dash-nav-item" href="/roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
+      <a class="dash-nav-item" href="/provas"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
+      <a class="dash-nav-item" href="/favoritos"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
+    </nav>
+    <div class="dash-plan-card"><span class="dash-plan-icon"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></span><div><strong id="studyPlanName">Plano Premium</strong><small id="studyPlanLabel">Acesso completo</small></div><div class="dash-plan-progress"><i style="width:100%"></i></div><p>Acesso ativo</p><a class="dash-plan-link" href="/perfil">Ver benefícios</a></div>
+    <button class="dash-logout" id="studyLogout" type="button"><svg><use href="assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <button class="dash-menu-toggle" id="studyMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="assets/dashboard-icons.svg#i-menu"></use></svg></button>
+      <div class="dash-search-trigger" aria-hidden="true"><svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><em>Gêmeos · 11 · 22 · 33</em></div>
+      <div class="dash-top-actions"><button class="dash-theme-toggle" id="studyThemeToggle" type="button" aria-label="Alternar tema"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button><a class="dash-notification-btn" href="/notificacoes" aria-label="Notificações"><svg><use href="assets/dashboard-icons.svg#i-bell"></use></svg><b id="studyNotificationBadge" hidden>0</b></a><a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-study-avatar>P</span><span><strong data-study-name>Primo</strong><small data-study-role>Aluno</small></span><svg class="dash-chevron"><use href="assets/dashboard-icons.svg#i-chevron"></use></svg></a></div>
+    </header>
+
+    <div class="dash-content study-content">
+      <section class="study-heading detail-heading">
+        <div><a class="study-back" href="/estudo">←</a><span class="study-heading-icon"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><span><h1>Gêmeos</h1><p>11, 22 e 33 · leitura, entradas, proteção e reset.</p></span></div>
+        <span class="study-module-count">Módulo 01</span>
+      </section>
+
+      <section class="study-hero study-gemeos-hero">
+        <img src="/assets/study/gemeos-hero-v2.svg?v=20260730-gemeos-1" alt="Espelho dourado refletindo uma roleta europeia" />
+        <div class="study-hero-copy"><span>MÓDULO 01</span><h2>Gêmeos</h2><p>Entenda como 11, 22 e 33 ativam a família, como montar a entrada e quando a leitura volta a ficar válida.</p><div><b>11</b><i>·</i><b>22</b><i>·</i><b>33</b></div></div>
+        <div class="study-hero-actions"><button id="studyFavorite" type="button" aria-pressed="false"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><span>Favoritar módulo</span></button></div>
+      </section>
+
+      <div class="study-layout">
+        <section class="study-main-card">
+          <nav class="study-tabs" aria-label="Etapas do módulo"><button class="study-tab active" data-study-tab="example" type="button"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg><span>Exemplo</span></button><button class="study-tab" data-study-tab="interactive" type="button"><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg><span>Explicação Interativa</span></button><button class="study-tab" data-study-tab="game" type="button"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><span>Minigame Rápido</span></button></nav>
+
+          <section class="study-panel active" data-study-panel="example">
+            <div class="study-panel-head"><div><span class="eyebrow">COMECE POR AQUI</span><h2>Família dos Gêmeos</h2><p>Os números gêmeos são <strong>11, 22 e 33</strong>. Quando um aparece, ele ativa a família e os outros dois viram os alvos principais.</p></div><div class="twin-family"><b>11</b><i>·</i><b>22</b><i>·</i><b>33</b></div></div>
+            <div class="example-grid"><article class="example-rule"><span>1</span><div><strong>Saiu 11</strong><p>O 11 dispara a leitura. Ele não é o alvo principal.</p></div></article><article class="example-rule gold"><span>2</span><div><strong>Alvos: 22 e 33</strong><p>Entre nos outros dois gêmeos com <b>2 vizinhos de cada lado</b>.</p></div></article><article class="example-rule protect"><span>3</span><div><strong>Proteção: 11</strong><p>Mantenha o gêmeo que saiu com <b>1 vizinho de cada lado</b>.</p></div></article><article class="example-rule"><span>4</span><div><strong>Até 2 entradas</strong><p>Se qualquer gêmeo aparecer, a leitura se encerra.</p></div></article></div>
+            <div class="timeline-card"><header><div><h3>Timeline da leitura</h3><p>Exemplo com 12 rodadas. O 11 é o disparo inicial.</p></div><span class="timeline-status">12 RODADAS</span></header><div class="timeline" id="exampleTimeline" aria-label="Timeline de 12 rodadas"></div></div>
+            <div class="race-card"><header><div><h3>Race Europeia</h3><p>Ordem real da roda europeia. Os destaques representam a entrada do exemplo.</p></div><div class="race-legend"><span class="lg-target"></span>Alvo 2 vizinhos <span class="lg-protect"></span>Proteção 1 vizinho</div></header><div class="race" data-race="example"><div class="race-top" data-race-top></div><div class="race-middle"><div class="race-side race-side-left"><button data-num="10">10</button><button data-num="23">23</button></div><div class="race-center"><span class="sector tiers">Tiers</span><span class="sector orphelins">Orphelins</span><span class="sector voisins">Voisins</span><span class="sector zero">Zero</span></div><div class="race-side race-side-right"><button data-num="26">26</button><button data-num="0">0</button></div></div><div class="race-bottom" data-race-bottom></div></div><p class="race-note">Sequência europeia: 0 → 32 → 15 → 19 → 4 → 21 → 2 → 25 → 17 → 34 → 6 → 27 → 13 → 36 → 11 → 30 → 8 → 23 → 10 → 5 → 24 → 16 → 33 → 1 → 20 → 14 → 31 → 9 → 22 → 18 → 29 → 7 → 28 → 12 → 35 → 3 → 26.</p></div>
+            <div class="study-next"><div><span><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg></span><div><strong>Próximo passo</strong><p>Manipule a leitura e veja o reset acontecer na prática.</p></div></div><button type="button" data-go-tab="interactive">Ir para Explicação Interativa <b>→</b></button></div>
+          </section>
+
+          <section class="study-panel" data-study-panel="interactive" hidden>
+            <div class="study-panel-head compact"><div><span class="eyebrow">APRENDA PASSO A PASSO</span><h2>Explicação Interativa</h2><p>Escolha qual gêmeo disparou a leitura e acompanhe alvos, proteção, entradas e reset.</p></div></div>
+            <div class="trigger-picker" role="group" aria-label="Escolha o gêmeo que disparou"><button class="active" type="button" data-trigger="11">11</button><button type="button" data-trigger="22">22</button><button type="button" data-trigger="33">33</button></div>
+            <div class="interactive-summary"><article><small>Gêmeo disparador</small><strong id="interactiveTrigger">11</strong><p>Proteção com 1 vizinho de cada lado.</p></article><article class="gold"><small>Alvos principais</small><strong id="interactiveTargets">22 + 33</strong><p>2 vizinhos de cada lado em cada alvo.</p></article><article><small>Entradas iniciais</small><strong>2</strong><p>Depois disso, a leitura fica pendente.</p></article><article><small>Reset</small><strong>12</strong><p>Rodadas sem nenhum 11, 22 ou 33.</p></article></div>
+            <div class="race-card interactive-race-card"><header><div><h3>Veja a marcação mudar</h3><p>A Race é atualizada automaticamente conforme o gêmeo escolhido.</p></div></header><div class="race" data-race="interactive"><div class="race-top" data-race-top></div><div class="race-middle"><div class="race-side race-side-left"><button data-num="10">10</button><button data-num="23">23</button></div><div class="race-center"><span class="sector tiers">Tiers</span><span class="sector orphelins">Orphelins</span><span class="sector voisins">Voisins</span><span class="sector zero">Zero</span></div><div class="race-side race-side-right"><button data-num="26">26</button><button data-num="0">0</button></div></div><div class="race-bottom" data-race-bottom></div></div></div>
+            <div class="reset-simulator"><div class="reset-copy"><span class="eyebrow">SIMULADOR DE RESET</span><h3 id="resetTitle">11 caminhando pela timeline</h3><p id="resetText">Após duas entradas sem gêmeos, avance rodadas neutras. Se o 11 chegar à posição 12 sem aparecer 11, 22 ou 33, a leitura reseta e libera mais 2 entradas.</p></div><div class="reset-controls"><button id="neutralSpin" type="button">+ Rodada sem gêmeo</button><button id="breakSpin" class="danger" type="button">Simular gêmeo no caminho</button><button id="resetSimulator" class="ghost" type="button">Reiniciar simulação</button></div><div class="timeline interactive-timeline" id="interactiveTimeline"></div><div class="reset-result" id="resetResult"><span class="pulse"></span><strong>Leitura pendente</strong><p>O gêmeo inicial ainda não chegou ao final da timeline.</p></div></div>
+            <div class="study-next"><div><span><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg></span><div><strong>Hora de fixar</strong><p>Marque os números corretos sem ajuda automática.</p></div></div><button type="button" data-go-tab="game">Ir para Minigame Rápido <b>→</b></button></div>
+          </section>
+
+          <section class="study-panel" data-study-panel="game" hidden>
+            <div class="game-head"><div><span class="eyebrow">FIXAÇÃO PRÁTICA</span><h2>Desafio dos Gêmeos</h2><p>O sistema informa apenas qual gêmeo disparou. Você deve marcar toda a entrada correta na Race.</p></div><div class="game-stats"><span><small>Acertos</small><b id="gameScore">0/0</b></span><span><small>Desafio</small><b id="gameRound">1/5</b></span></div></div>
+            <div class="game-instruction"><span class="game-trigger-orb" id="gameTrigger">11</span><div><small>GATILHO DA RODADA</small><h3 id="gameInstructionTitle">Saiu 11</h3><p>Marque os outros dois gêmeos com 2 vizinhos cada e proteja o 11 com 1 vizinho.</p></div></div>
+            <div class="race-card game-race-card"><header><div><h3>Faça sua marcação</h3><p>Clique nos números da Race. A resposta só aparece depois da confirmação.</p></div><span id="gameSelectionCount">0 números marcados</span></header><div class="race race-clickable" data-race="game"><div class="race-top" data-race-top></div><div class="race-middle"><div class="race-side race-side-left"><button data-num="10">10</button><button data-num="23">23</button></div><div class="race-center"><span class="sector tiers">Tiers</span><span class="sector orphelins">Orphelins</span><span class="sector voisins">Voisins</span><span class="sector zero">Zero</span></div><div class="race-side race-side-right"><button data-num="26">26</button><button data-num="0">0</button></div></div><div class="race-bottom" data-race-bottom></div></div><div class="game-actions"><button id="gameClear" class="ghost" type="button">Limpar marcação</button><button id="gameConfirm" type="button">Confirmar marcação</button><button id="gameNext" type="button" hidden>Próximo desafio →</button></div></div>
+            <div class="game-feedback" id="gameFeedback" hidden></div>
+          </section>
+        </section>
+
+        <aside class="study-side">
+          <section class="study-side-card module-summary"><h3>Resumo do módulo</h3><div class="summary-orbit"><span>11</span><b>22</b><span>33</span></div><h4>Família dos Gêmeos</h4><div class="summary-rules"><p><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg>Até 2 entradas iniciais</p><p><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg>Reset após 12 rodadas sem gêmeos</p><p><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg>Qualquer gêmeo no caminho encerra a leitura</p></div></section>
+          <section class="study-side-card progress-card"><h3>Progresso do módulo</h3><div class="progress-number"><strong id="studyProgressText">0%</strong><span>concluído</span></div><div class="study-progress"><i id="studyProgressBar"></i></div><div class="progress-steps"><p data-progress-step="example"><i>✓</i>Exemplo</p><p data-progress-step="interactive"><i>2</i>Explicação Interativa</p><p data-progress-step="game"><i>3</i>Minigame Rápido</p></div></section>
+          <section class="study-side-card confluence-card"><h3>Confluências futuras</h3><p>Este módulo poderá ganhar força quando coincidir com:</p><div><span>Camaleões</span><span>Espelhos</span><span>Fibonacci</span><span>Pitágoras</span></div></section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <div class="study-toast-stack" id="studyToastStack"></div>
+</body>
+</html>
