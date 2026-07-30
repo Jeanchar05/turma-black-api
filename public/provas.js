@@ -7,6 +7,7 @@
   async function api(path,opts={}){const token=getToken();const r=await fetch(`${location.origin}${path}`,{method:opts.method||"GET",headers:{Accept:"application/json",Authorization:`Bearer ${token}`,...(opts.body?{"Content-Type":"application/json"}:{})},body:opts.body?JSON.stringify(opts.body):undefined,cache:"no-store"});const d=await r.json().catch(()=>({}));if(!r.ok||d.erro)throw new Error(d.erro||d.mensagem||`Erro ${r.status}`);return d}
   const first=(n)=>String(n||"Primo").trim().split(/\s+/)[0]||"Primo";
   const role=(v)=>({dev:"Equipe",dono:"Equipe",superadmin:"Equipe",admin:"Equipe",suporte:"Suporte",moderador:"Moderador",vendedor:"Vendedor",aluno:"Aluno"}[String(v||"").toLowerCase()]||"Aluno");
+  function ensureSidebarSync(){if(document.querySelector('link[data-exam-sidebar-sync]'))return;const link=document.createElement("link");link.rel="stylesheet";link.href=`/provas-sidebar-sync.css?v=20260730-sidebar-1&t=${Date.now()}`;link.dataset.examSidebarSync="1";document.head.appendChild(link)}
   function toast(msg){const stack=$("#examToastStack");if(!stack)return;const el=document.createElement("div");el.className="exam-toast";el.textContent=msg;stack.appendChild(el);requestAnimationFrame(()=>el.classList.add("show"));setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),220)},3200)}
   function setAvatar(user){const photo=String(user?.foto||"").trim()||"/assets/default-profile-user.svg";$$('[data-exam-avatar]').forEach(el=>{el.textContent="";el.style.backgroundImage=`url("${photo.replaceAll('"','%22')}")`;el.style.backgroundSize="cover";el.style.backgroundPosition="center"})}
   function applyTheme(value){state.theme=value||"dark";const resolved=state.theme==="system"?(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"):(state.theme==="light"?"light":"dark");document.documentElement.dataset.theme=resolved;const use=$("#examThemeToggle use");if(use)use.setAttribute("href",`assets/dashboard-icons.svg#${resolved==="dark"?"i-moon":"i-sun"}`)}
@@ -23,6 +24,6 @@
     $("#examLogout")?.addEventListener("click",()=>{for(const s of [sessionStorage,localStorage])for(const k of KEYS){try{s.removeItem(k)}catch(_){}}location.replace("/")});
     document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSidebar()});
   }
-  async function init(){register();try{state.home=await api("/dashboard-premium/home");applyTheme(state.home?.preferencias?.tema||"dark");fill()}catch(_){applyTheme("dark")}}
+  async function init(){ensureSidebarSync();register();try{state.home=await api("/dashboard-premium/home");applyTheme(state.home?.preferencias?.tema||"dark");fill()}catch(_){applyTheme("dark")}}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
