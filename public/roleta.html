@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="roleta-isolated-v2.css?v=20260730-r2" />
+  <link rel="stylesheet" href="roleta-sidebar-sync.css?v=20260730-r1" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
   <style>body.roulette-page{opacity:1!important;visibility:visible!important}</style>
   <script defer src="protected-roleta.js?v=20260730-r2"></script>
@@ -24,45 +25,36 @@
   <div class="dash-mobile-overlay" id="rouletteMobileOverlay" hidden></div>
 
   <aside class="roulette-sidebar" id="rouletteSidebar">
-    <a class="roulette-brand-side" href="/dashboard" aria-label="Turma do Primo">
-      <span class="roulette-crown">♛</span>
-      <small>TURMA DO</small>
-      <strong>PRIMO<span>.</span></strong>
+    <a class="dash-brand" href="/dashboard" aria-label="Turma do Primo">
+      <img src="assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
+      <span><small>TURMA DO</small><strong>PRIMO</strong></span>
     </a>
 
-    <nav class="roulette-nav" aria-label="Navegação principal">
-      <a href="/dashboard"><svg><use href="assets/dashboard-icons.svg#i-home"></use></svg><span>Dashboard</span></a>
-      <a href="/notas"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><span>Notas</span></a>
-      <a href="/favoritos"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><span>Favoritos</span></a>
-      <a href="/provas"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><span>Provas</span></a>
-      <a class="active" href="/roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><span>Roleta</span></a>
-      <a href="/minigames"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><span>Minigames</span></a>
-      <a href="/suporte"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><span>Suporte</span></a>
-      <a href="/perfil"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><span>Perfil</span></a>
-      <a href="/perfil#preferencias"><svg><use href="assets/dashboard-icons.svg#i-settings"></use></svg><span>Configurações</span></a>
+    <nav class="dash-nav" aria-label="Navegação principal">
+      <a class="dash-nav-item" href="/dashboard"><svg><use href="assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
+      <a class="dash-nav-item" href="/notas"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><b>Notas</b></a>
+      <a class="dash-nav-item" href="/minigames"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
+      <a class="dash-nav-item" href="/estudo"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
+      <a class="dash-nav-item" href="/modulos"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item" href="/suporte"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      <a class="dash-nav-item" href="/perfil"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+      <a class="dash-nav-item active" href="/roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
+      <a class="dash-nav-item" href="/provas"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
+      <a class="dash-nav-item" href="/favoritos"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
     </nav>
 
-    <div class="roulette-side-bottom">
-      <section class="roulette-plan-box">
-        <small>SEU PLANO</small>
-        <strong><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg><span id="roulettePlanName">PREMIUM</span></strong>
-        <p id="roulettePlanLabel">Acesso total liberado</p>
-        <a href="/perfil">Ver benefícios</a>
-      </section>
-
-      <a class="roulette-side-user" href="/perfil">
-        <span class="dash-avatar" data-roulette-avatar>P</span>
-        <span><strong data-roulette-name>Primo</strong><small data-roulette-role>Aluno</small></span>
-      </a>
-
-      <div class="roulette-side-theme">
-        <span>Tema</span>
-        <button id="rouletteThemeToggle" type="button" aria-label="Alternar tema"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button>
-      </div>
-
-      <button class="roulette-side-logout" id="rouletteLogout" type="button"><svg><use href="assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair</span></button>
+    <div class="dash-plan-card">
+      <span class="dash-plan-icon"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></span>
+      <div><strong id="roulettePlanName">Plano Premium</strong><small id="roulettePlanLabel">Acesso completo</small></div>
+      <div class="dash-plan-progress"><i></i></div>
+      <p>Acesso ativo</p>
+      <a class="dash-plan-link" href="/perfil">Ver benefícios</a>
     </div>
+
+    <button class="dash-logout" id="rouletteLogout" type="button"><svg><use href="assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
   </aside>
+
+  <button class="roulette-theme-hidden" id="rouletteThemeToggle" type="button" aria-hidden="true" tabindex="-1"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button>
 
   <main class="roulette-main">
     <header class="roulette-topbar">
