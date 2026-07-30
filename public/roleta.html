@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Roleta | Turma do Primo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dashboard-premium.css?v=20260729-roulette-1" />
+  <link rel="stylesheet" href="roleta.css?v=20260729-roulette-1" />
+  <link rel="stylesheet" href="default-avatar.css?v=20260729-roulette-1" />
+  <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
+  <script defer src="protected-roleta.js?v=20260729-roulette-1"></script>
+  <script defer src="roleta.js?v=20260729-roulette-1"></script>
+</head>
+<body class="student-dashboard roulette-page" data-required-access="dashboard">
+  <div class="dash-loading roulette-loading" id="rouletteLoading" role="status">
+    <div class="roulette-loading-wheel"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></div>
+    <div><strong>Preparando a Central de Roleta</strong><span>Carregando plataforma e ferramentas…</span></div>
+  </div>
+
+  <div class="dash-mobile-overlay" id="rouletteMobileOverlay" hidden></div>
+
+  <aside class="dash-sidebar roulette-sidebar" id="rouletteSidebar">
+    <a class="dash-brand" href="/dashboard">
+      <img src="assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
+      <span><small>TURMA DO</small><strong>PRIMO</strong></span>
+    </a>
+
+    <nav class="dash-nav" aria-label="Navegação principal">
+      <a class="dash-nav-item" href="/dashboard"><svg><use href="assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
+      <a class="dash-nav-item" href="/notas"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><b>Notas</b></a>
+      <a class="dash-nav-item" href="/minigames"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
+      <a class="dash-nav-item" href="/estudo"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
+      <a class="dash-nav-item" href="/modulos"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item" href="/suporte"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      <a class="dash-nav-item" href="/perfil"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+      <a class="dash-nav-item active" href="/roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
+      <a class="dash-nav-item" href="/provas"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
+      <a class="dash-nav-item" href="/favoritos"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
+    </nav>
+
+    <div class="roulette-side-plan">
+      <span><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></span>
+      <div><small>SEU PLANO</small><strong id="roulettePlanName">Turma do Primo</strong><p id="roulettePlanLabel">Acesso completo</p></div>
+      <a href="/perfil">Ver minha conta <b>›</b></a>
+    </div>
+
+    <button class="dash-logout" id="rouletteLogout" type="button"><svg><use href="assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-topbar roulette-topbar">
+      <button class="dash-menu-toggle" id="rouletteMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="assets/dashboard-icons.svg#i-menu"></use></svg></button>
+      <button class="dash-search-trigger" id="rouletteSearchTrigger" type="button">
+        <svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><em>Buscar ferramentas, módulos, provas…</em><kbd>Ctrl + K</kbd>
+      </button>
+      <div class="dash-top-actions">
+        <button class="dash-theme-toggle" id="rouletteThemeToggle" type="button" aria-label="Alternar tema"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button>
+        <a class="roulette-notification" href="/notificacoes" aria-label="Notificações"><svg><use href="assets/dashboard-icons.svg#i-bell"></use></svg><b id="rouletteNotificationBadge" hidden>0</b></a>
+        <a class="roulette-user" href="/perfil"><span class="dash-avatar" data-roulette-avatar>P</span><span><strong data-roulette-name>Primo</strong><small data-roulette-role>Aluno</small></span><svg><use href="assets/dashboard-icons.svg#i-chevron"></use></svg></a>
+      </div>
+    </header>
+
+    <div class="dash-content roulette-content">
+      <section class="roulette-hero">
+        <div class="roulette-hero-copy">
+          <span class="roulette-eyebrow">CENTRAL OPERACIONAL</span>
+          <div class="roulette-title-line"><span class="roulette-title-icon"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></span><h1>Roleta</h1></div>
+          <p>Plataforma, mesas e recursos organizados para você acessar tudo em um único lugar.</p>
+        </div>
+        <div class="roulette-wheel-art" aria-hidden="true">
+          <div class="roulette-wheel-ring ring-a"></div><div class="roulette-wheel-ring ring-b"></div><div class="roulette-wheel-ring ring-c"></div>
+          <div class="roulette-wheel-numbers">0&nbsp; 32&nbsp; 15&nbsp; 19&nbsp; 4&nbsp; 21&nbsp; 2&nbsp; 25&nbsp; 17</div>
+          <div class="roulette-wheel-core"></div>
+        </div>
+      </section>
+
+      <section class="roulette-platform-card">
+        <div class="roulette-platform-main">
+          <span class="roulette-kicker">PLATAFORMA UTILIZADA PELA TURMA DO PRIMO</span>
+          <div class="roulette-brand"><strong>Esportiva</strong><b>Bet</b></div>
+          <p>Acesse a plataforma que utilizamos nas operações e encontre as mesas disponíveis diretamente por lá.</p>
+          <div class="roulette-platform-features">
+            <span><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg><b>Acesso direto</b></span>
+            <span><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg><b>Link oficial da turma</b></span>
+            <span><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><b>Mesas de roleta</b></span>
+            <span><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte da plataforma</b></span>
+          </div>
+        </div>
+        <div class="roulette-platform-action">
+          <span class="roulette-platform-badge"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></span>
+          <small>PLATAFORMA</small>
+          <strong>EsportivaBet</strong>
+          <p>Abra a plataforma em uma nova guia.</p>
+          <a id="esportivaAccess" href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Acessar EsportivaBet <b>↗</b></a>
+        </div>
+      </section>
+
+      <section class="roulette-section">
+        <div class="roulette-section-head">
+          <div><span class="roulette-section-icon"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></span><div><h2>Mesas de Roleta</h2><p>Atalhos para os principais estilos de mesa. A seleção final acontece dentro da EsportivaBet.</p></div></div>
+          <a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Abrir plataforma <b>›</b></a>
+        </div>
+        <div class="roulette-table-grid">
+          <article class="roulette-table-card purple"><span class="roulette-table-tag">AO VIVO</span><div class="roulette-mini-wheel"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></div><h3>Roleta Ao Vivo</h3><p>Entre na plataforma e escolha uma mesa ao vivo disponível.</p><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Abrir mesas <b>→</b></a></article>
+          <article class="roulette-table-card gold"><span class="roulette-table-tag">CLÁSSICA</span><div class="roulette-mini-wheel"><svg><use href="assets/dashboard-icons.svg#i-target"></use></svg></div><h3>Mesas Clássicas</h3><p>Acesse as opções tradicionais e selecione a mesa da sua preferência.</p><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Abrir mesas <b>→</b></a></article>
+          <article class="roulette-table-card violet"><span class="roulette-table-tag">VIP</span><div class="roulette-mini-wheel"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></div><h3>Mesas VIP</h3><p>Atalho para conferir as opções e limites disponíveis na plataforma.</p><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Abrir mesas <b>→</b></a></article>
+          <article class="roulette-table-card green"><span class="roulette-table-tag">RÁPIDAS</span><div class="roulette-mini-wheel"><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg></div><h3>Roletas Rápidas</h3><p>Confira dentro da plataforma as modalidades de giro mais dinâmicas.</p><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Abrir mesas <b>→</b></a></article>
+        </div>
+      </section>
+
+      <section class="roulette-section tools-section">
+        <div class="roulette-section-head">
+          <div><span class="roulette-section-icon"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg></span><div><h2>Ferramentas da Turma</h2><p>Recursos de leitura e estudo vinculados à nossa área de roleta.</p></div></div>
+        </div>
+        <div class="roulette-tool-grid">
+          <article><span><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></span><div><small>FERRAMENTA</small><h3>Race</h3><p>Setores da roda europeia, vizinhos e leitura visual.</p></div><button type="button" data-roulette-tool="Race">Abrir <b>›</b></button></article>
+          <article><span><svg><use href="assets/dashboard-icons.svg#i-target"></use></svg></span><div><small>FERRAMENTA</small><h3>Racetrack</h3><p>Tabela 0–36 com marcações e setores operacionais.</p></div><button type="button" data-roulette-tool="Racetrack">Abrir <b>›</b></button></article>
+          <article><span><svg><use href="assets/dashboard-icons.svg#i-chart"></use></svg></span><div><small>ESTUDO</small><h3>Leituras e Padrões</h3><p>Acesse conteúdos relacionados a padrões e estratégia.</p></div><a href="/estudo">Estudar <b>›</b></a></article>
+          <article><span><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><div><small>CONTEÚDO</small><h3>Módulos de Roleta</h3><p>Continue sua trilha de estudo dentro da plataforma.</p></div><a href="/modulos">Acessar <b>›</b></a></article>
+        </div>
+      </section>
+
+      <section class="roulette-responsible">
+        <span><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg></span>
+        <div><strong>Jogue com responsabilidade.</strong><p>A roleta deve ser tratada como entretenimento. Defina limites e nunca aposte mais do que pode perder. Conteúdo destinado a maiores de 18 anos.</p></div>
+        <b>18+</b>
+      </section>
+    </div>
+  </main>
+
+  <div class="roulette-search-modal" id="rouletteSearchModal" hidden><div class="roulette-search-card"><header><svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><input id="rouletteSearchInput" type="search" placeholder="Buscar na plataforma…" autocomplete="off" /><kbd>ESC</kbd></header><div id="rouletteSearchResults"></div></div></div>
+  <div class="dash-toast-stack" id="rouletteToastStack"></div>
+</body>
+</html>
