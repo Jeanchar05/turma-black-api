@@ -30,6 +30,13 @@
       loading.style.setProperty("display", "flex", "important");
       loading.style.setProperty("opacity", "1", "important");
       loading.style.setProperty("visibility", "visible", "important");
+
+      if (!loading.__rouletteNativeRemove) {
+        loading.__rouletteNativeRemove = loading.remove.bind(loading);
+        loading.remove = function () {
+          this.dataset.pendingRemove = "1";
+        };
+      }
     }
 
     document.getElementById("rouletteSidebar")?.style.setProperty("visibility", "hidden");
@@ -39,11 +46,22 @@
   function releaseShell(user) {
     const body = document.body;
     if (!body) return;
+
     body.classList.add("protected-ready");
     body.style.removeProperty("opacity");
     body.style.removeProperty("visibility");
     document.getElementById("rouletteSidebar")?.style.removeProperty("visibility");
     document.querySelector(".roulette-page .dash-main")?.style.removeProperty("visibility");
+
+    const loading = document.getElementById("rouletteLoading");
+    if (loading?.__rouletteNativeRemove) {
+      const nativeRemove = loading.__rouletteNativeRemove;
+      const wasPending = loading.dataset.pendingRemove === "1";
+      loading.remove = nativeRemove;
+      delete loading.__rouletteNativeRemove;
+      if (wasPending) setTimeout(() => nativeRemove(), 120);
+    }
+
     document.dispatchEvent(new CustomEvent("turma:roulette-ready", { detail: { user } }));
   }
 
