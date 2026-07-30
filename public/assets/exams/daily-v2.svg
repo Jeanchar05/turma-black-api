@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-label="Cérebro holográfico da Prova Diária">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="44%" r="78%">
+      <stop offset="0" stop-color="#2d0b4a"/>
+      <stop offset="0.5" stop-color="#11051c"/>
+      <stop offset="1" stop-color="#050208"/>
+    </radialGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f08cff"/>
+      <stop offset="0.35" stop-color="#c64cff"/>
+      <stop offset="0.7" stop-color="#8f2cff"/>
+      <stop offset="1" stop-color="#5c16bf"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe38a"/>
+      <stop offset="0.5" stop-color="#f6b832"/>
+      <stop offset="1" stop-color="#9c5c11"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="640" height="340" fill="url(#bg)"/>
+
+  <g opacity="0.3" stroke="#7d22d9" fill="none">
+    <path d="M20 87H143M497 87H620M44 121H124M516 121H596M13 253H171M469 253H627"/>
+    <path d="M320 20v34M320 286v34"/>
+  </g>
+
+  <g fill="#a83cff" opacity="0.65">
+    <circle cx="95" cy="79" r="2.8"/><circle cx="129" cy="206" r="2.4"/><circle cx="175" cy="55" r="2.2"/>
+    <circle cx="470" cy="69" r="2.6"/><circle cx="524" cy="213" r="2.8"/><circle cx="557" cy="125" r="2.1"/>
+  </g>
+  <g fill="#f5b72f" opacity="0.75">
+    <rect x="72" y="158" width="8" height="3" rx="1.5" transform="rotate(-16 76 160)"/>
+    <rect x="557" y="162" width="8" height="3" rx="1.5" transform="rotate(17 561 164)"/>
+    <rect x="492" y="52" width="6" height="3" rx="1.5" transform="rotate(-25 495 54)"/>
+  </g>
+
+  <g opacity="0.6" stroke="#8b2de2" fill="none">
+    <ellipse cx="320" cy="281" rx="228" ry="43"/>
+    <ellipse cx="320" cy="281" rx="170" ry="29"/>
+    <ellipse cx="320" cy="281" rx="112" ry="18"/>
+    <path d="M92 281h456"/>
+  </g>
+
+  <g opacity="0.55" filter="url(#softGlow)">
+    <ellipse cx="320" cy="276" rx="96" ry="18" fill="#8e2cff"/>
+  </g>
+
+  <g stroke="url(#purple)" fill="#110818" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    <path d="M319 89c-20-36-61-45-91-23-34-19-76 2-82 41-34 10-51 46-34 76-16 35 7 71 43 76 10 33 51 48 81 29 20 25 57 29 83 10V89z"/>
+    <path d="M321 89c20-36 61-45 91-23 34-19 76 2 82 41 34 10 51 46 34 76 16 35-7 71-43 76-10 33-51 48-81 29-20 25-57 29-83 10V89z"/>
+
+    <path d="M246 96c-22 12-31 33-25 55M219 151c-23 1-43 15-51 35M244 238c-8-22 0-45 21-58M281 122c15 4 27 16 32 32M278 213c17-4 30-17 35-34M255 169c-18-9-39-5-54 9"/>
+    <path d="M394 96c22 12 31 33 25 55M421 151c23 1 43 15 51 35M396 238c8-22 0-45-21-58M359 122c-15 4-27 16-32 32M362 213c-17-4-30-17-35-34M385 169c18-9 39-5 54 9"/>
+  </g>
+
+  <g fill="none" stroke="#dd71ff" stroke-width="2.2" opacity="0.8">
+    <path d="M241 113c21 7 35 22 40 44M210 190c26-9 48-5 65 11M399 113c-21 7-35 22-40 44M430 190c-26-9-48-5-65 11"/>
+  </g>
+
+  <g filter="url(#glow)">
+    <path d="M291 253h58l-11 23h-36z" fill="url(#purple)" opacity="0.9"/>
+    <path d="M320 276v20" stroke="#d66bff" stroke-width="5"/>
+  </g>
+
+  <g opacity="0.9" filter="url(#glow)">
+    <ellipse cx="320" cy="281" rx="81" ry="12" fill="none" stroke="#b94cff" stroke-width="3"/>
+    <ellipse cx="320" cy="281" rx="126" ry="21" fill="none" stroke="#7726cb" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(458 44)" opacity="0.65">
+    <path d="M0 16h34M17 0v32" stroke="url(#gold)" stroke-width="2.2"/>
+    <circle cx="17" cy="16" r="5" fill="#f4b72e"/>
+  </g>
+</svg>
