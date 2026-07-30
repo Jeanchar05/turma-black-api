@@ -1,0 +1,29 @@
+/* Boot seguro da Central de Roleta.
+   Mantem a pagina renderizavel enquanto o loader cobre o conteudo,
+   evitando tela preta causada pela regra global .student-dashboard{opacity:0}. */
+body.student-dashboard.roulette-page{
+  opacity:1!important;
+  visibility:visible!important;
+}
+body.roulette-page:not(.protected-ready) .roulette-loading{
+  display:flex!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+body.roulette-page:not(.protected-ready) > .dash-sidebar,
+body.roulette-page:not(.protected-ready) > .dash-main,
+body.roulette-page:not(.protected-ready) > .dash-mobile-overlay,
+body.roulette-page:not(.protected-ready) > .roulette-search-modal,
+body.roulette-page:not(.protected-ready) > .dash-toast-stack{
+  visibility:hidden!important;
+}
+body.roulette-page.protected-ready > .dash-sidebar,
+body.roulette-page.protected-ready > .dash-main,
+body.roulette-page.protected-ready > .dash-mobile-overlay,
+body.roulette-page.protected-ready > .roulette-search-modal,
+body.roulette-page.protected-ready > .dash-toast-stack{
+  visibility:visible;
+}
+.roulette-loading{
+  z-index:10050!important;
+}
