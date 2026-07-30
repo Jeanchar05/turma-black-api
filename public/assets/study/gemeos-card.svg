@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-labelledby="t d">
+<title id="t">Módulo Gêmeos</title><desc id="d">Espelho central refletindo uma roda de roleta com os números 11, 22 e 33.</desc>
+<defs>
+  <radialGradient id="bg" cx="50%" cy="42%" r="72%"><stop stop-color="#351050"/><stop offset=".48" stop-color="#12071b"/><stop offset="1" stop-color="#050208"/></radialGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe58b"/><stop offset=".38" stop-color="#f1b936"/><stop offset="1" stop-color="#8f5310"/></linearGradient>
+  <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e274ff"/><stop offset=".55" stop-color="#9b32ef"/><stop offset="1" stop-color="#4f138e"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <clipPath id="mirror"><ellipse cx="360" cy="172" rx="118" ry="134"/></clipPath>
+</defs>
+<rect width="720" height="360" fill="url(#bg)"/>
+<g opacity=".28" stroke="#a83cf0" fill="none"><ellipse cx="360" cy="308" rx="260" ry="34"/><ellipse cx="360" cy="308" rx="205" ry="23"/><path d="M92 308h536"/></g>
+<g clip-path="url(#mirror)">
+  <rect x="238" y="34" width="244" height="276" fill="#09040d"/>
+  <ellipse cx="360" cy="218" rx="172" ry="75" fill="#170822" stroke="#7c23bc" stroke-width="7"/>
+  <ellipse cx="360" cy="218" rx="137" ry="57" fill="#050207" stroke="#d79d2c" stroke-width="6"/>
+  <g stroke="#9d38df" stroke-width="3" opacity=".9">
+    <path d="M360 161v114M300 169l38 101M420 169l-38 101M250 194l107 67M470 194l-107 67M236 222h248"/>
+  </g>
+  <circle cx="360" cy="218" r="29" fill="#16091d" stroke="url(#gold)" stroke-width="5"/>
+  <circle cx="360" cy="218" r="9" fill="#f1b936"/>
+  <g font-family="Inter,Arial" font-weight="900" text-anchor="middle" font-size="23">
+    <text x="303" y="211" fill="#cf58ff">11</text><text x="360" y="282" fill="#f0bb3d">22</text><text x="418" y="211" fill="#cf58ff">33</text>
+  </g>
+</g>
+<ellipse cx="360" cy="172" rx="122" ry="138" fill="none" stroke="#4c2609" stroke-width="16"/>
+<ellipse cx="360" cy="172" rx="118" ry="134" fill="none" stroke="url(#gold)" stroke-width="7"/>
+<path d="M360 28l10 18 20-3-8 19 15 14-21 2-5 20-11-17-11 17-5-20-21-2 15-14-8-19 20 3z" fill="url(#gold)" filter="url(#glow)"/>
+<g filter="url(#glow)" font-family="Sora,Inter,Arial" font-weight="900" text-anchor="middle">
+  <text x="128" y="142" fill="#d668ff" font-size="54">11</text>
+  <text x="590" y="142" fill="#d668ff" font-size="54">33</text>
+  <text x="360" y="337" fill="#f0b936" font-size="42">22</text>
+</g>
+<g fill="#c657ff" opacity=".8"><circle cx="108" cy="75" r="3"/><circle cx="174" cy="256" r="2"/><circle cx="604" cy="83" r="3"/><circle cx="554" cy="271" r="2"/></g>
+</svg>
