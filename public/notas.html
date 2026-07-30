@@ -9,12 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="notas.css?v=20260728-notas-2" />
-  <link rel="stylesheet" href="notas-enhancements.css?v=20260728-pdf-1" />
+  <link rel="stylesheet" href="notas.css?v=20260729-notas-final-1" />
+  <link rel="stylesheet" href="notas-enhancements.css?v=20260729-notas-final-1" />
+  <link rel="stylesheet" href="notas-visual-final.css?v=20260729-notas-final-1" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
-  <script defer src="protected.js"></script>
-  <script defer src="notas.js?v=20260728-notas-2"></script>
-  <script defer src="notas-enhancements.js?v=20260728-pdf-1"></script>
+  <script defer src="protected.js?v=20260729-notas-final-1"></script>
+  <script defer src="notas.js?v=20260729-notas-final-1"></script>
+  <script defer src="notas-enhancements.js?v=20260729-notas-final-1"></script>
 </head>
 <body class="notes-page" data-required-access="dashboard">
   <div class="notes-loading" id="notesLoading" role="status">
@@ -42,8 +43,8 @@
   <main class="notes-main">
     <header class="notes-topbar">
       <button class="notes-icon-button notes-menu-button" id="notesMenuButton" type="button" aria-label="Abrir menu"><svg><use href="assets/dashboard-icons.svg#i-menu"></use></svg></button>
-      <div class="notes-title-group"><span class="notes-title-icon"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg></span><div><h1>Notas</h1><p>Organize ideias, estudos e estratégias.</p></div></div>
-      <label class="notes-global-search"><svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><input id="notesSearch" type="search" placeholder="Buscar notas, conteúdos e tags…" autocomplete="off" /><kbd>Ctrl K</kbd></label>
+      <div class="notes-title-group"><span class="notes-title-icon"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg></span><div><h1>Notas</h1><p>Organize suas ideias, conteúdos e resumos.</p></div></div>
+      <label class="notes-global-search"><svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><input id="notesSearch" type="search" placeholder="Buscar notas, tópicos, tags…" autocomplete="off" /><kbd>Ctrl K</kbd></label>
       <div class="notes-top-actions"><button class="notes-new-button" id="newNoteButton" type="button"><span>＋</span> Nova nota</button><button class="notes-icon-button" id="viewToggleButton" type="button" aria-label="Alternar visualização"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg></button><button class="notes-icon-button" id="themeButton" type="button" aria-label="Alternar tema"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button><button class="notes-top-user" type="button" onclick="location.href='/perfil'"><span class="notes-user-avatar" data-user-avatar data-user-initial>P</span><span><strong data-user-name>Primo</strong><small data-user-role>Aluno</small></span></button></div>
     </header>
     <section class="notes-workspace">
@@ -58,7 +59,7 @@
         <form class="notes-editor-form" id="noteEditorForm" hidden>
           <div class="notes-editor-statusbar"><span class="notes-save-status" id="saveStatus"><i></i> Pronto</span><div><button type="button" data-editor-action="pin"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></button><button type="button" data-editor-action="favorite"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg></button><button type="button" data-editor-action="share"><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg></button><button type="button" data-editor-action="trash"><svg><use href="assets/dashboard-icons.svg#i-trash"></use></svg></button><button type="button" data-editor-action="close"><svg><use href="assets/dashboard-icons.svg#i-close"></use></svg></button></div></div>
           <input id="noteId" type="hidden" /><input class="notes-title-input" id="noteTitle" type="text" maxlength="160" placeholder="Título da nota" required />
-          <div class="notes-meta-row"><label><span>Categoria</span><select id="noteCategory"></select></label><label><span>Tags</span><input id="noteTags" type="text" maxlength="300" placeholder="#resumo, #importante" /></label><div class="notes-color-picker"><span>Cor</span><div id="colorPicker"><button class="purple active" type="button" data-color="purple"></button><button class="gold" type="button" data-color="gold"></button><button class="blue" type="button" data-color="blue"></button><button class="green" type="button" data-color="green"></button><button class="pink" type="button" data-color="pink"></button></div></div></div>
+          <div class="notes-meta-row"><label><span>Categoria</span><select id="noteCategory"></select></label><label><span>Adicionar tags</span><input id="noteTags" type="text" maxlength="300" placeholder="#resumo, #importante" /></label><div class="notes-color-picker"><span>Cor</span><div id="colorPicker"><button class="purple active" type="button" data-color="purple"></button><button class="gold" type="button" data-color="gold"></button><button class="blue" type="button" data-color="blue"></button><button class="green" type="button" data-color="green"></button><button class="pink" type="button" data-color="pink"></button></div></div></div>
           <div class="notes-editor-label">Conteúdo</div>
           <div class="notes-rich-editor"><div class="notes-toolbar" id="notesToolbar"><button type="button" data-command="bold" title="Negrito"><b>B</b></button><button type="button" data-command="italic" title="Itálico"><i>I</i></button><button type="button" data-command="underline" title="Sublinhar texto (Ctrl + U)" aria-label="Sublinhar texto"><u>U</u></button><span></span><button type="button" data-command="insertUnorderedList">• Lista</button><button type="button" data-command="insertOrderedList">1. Lista</button><button type="button" data-command="formatBlock" data-value="h3">Título</button><button type="button" data-command="formatBlock" data-value="blockquote">Citação</button><button type="button" data-command="createLink">Link</button><button type="button" data-command="removeFormat">Limpar</button></div><div class="notes-content-editor" id="noteContent" contenteditable="true" data-placeholder="Escreva sua nota…"></div></div>
           <section class="notes-checklist-section"><div class="notes-editor-label-row"><span>Checklist</span><button id="addChecklistButton" type="button">＋ Adicionar item</button></div><div class="notes-checklist" id="noteChecklist"></div></section>
