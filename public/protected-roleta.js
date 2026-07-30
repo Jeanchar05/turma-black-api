@@ -31,9 +31,8 @@
     forceVisible();
     document.body.classList.add("protected-ready");
     document.getElementById("rouletteSidebar")?.style.removeProperty("visibility");
-    document.querySelector(".roulette-page .dash-main")?.style.removeProperty("visibility");
-    const loader = document.getElementById("rouletteLoading");
-    if (loader) loader.remove();
+    document.querySelector(".roulette-main")?.style.removeProperty("visibility");
+    document.getElementById("rouletteLoading")?.remove();
     document.dispatchEvent(new CustomEvent("turma:roulette-ready", { detail: { user } }));
   }
 
@@ -59,9 +58,6 @@
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
-  } else {
-    start();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+  else start();
 })();
