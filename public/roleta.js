@@ -1,5 +1,14 @@
 "use strict";
 (() => {
+  const bootStyle = document.createElement("style");
+  bootStyle.id = "rouletteBootRecovery";
+  bootStyle.textContent = `
+    body.roulette-page{opacity:1!important;visibility:visible!important}
+    body.roulette-page:not(.protected-ready) #rouletteLoading{display:flex!important;opacity:1!important;visibility:visible!important}
+    body.roulette-page.protected-ready #rouletteLoading{display:none!important}
+  `;
+  document.head.appendChild(bootStyle);
+
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   const $ = (id) => document.getElementById(id);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -123,8 +132,14 @@
     });
   }
 
+  function finishBoot() {
+    if (!document.body.classList.contains("protected-ready")) return;
+    window.setTimeout(() => $("rouletteLoading")?.remove(), 160);
+  }
+
   async function init() {
     registerEvents();
+    document.addEventListener("turma:roulette-ready", finishBoot, { once: true });
     try {
       state.home = await api("/dashboard-premium/home");
       state.user = state.home?.usuario || {};
@@ -135,7 +150,7 @@
       applyTheme("dark");
       toast(error.message || "Não foi possível carregar os dados da conta.", "error");
     } finally {
-      setTimeout(() => $("rouletteLoading")?.remove(), 180);
+      finishBoot();
     }
   }
 
