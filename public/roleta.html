@@ -9,17 +9,36 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="dashboard-premium.css?v=20260729-roulette-1" />
-  <link rel="stylesheet" href="roleta.css?v=20260729-roulette-1" />
-  <link rel="stylesheet" href="default-avatar.css?v=20260729-roulette-1" />
+  <link rel="stylesheet" href="dashboard-premium.css?v=20260729-roulette-final-3" />
+  <link rel="stylesheet" href="roleta.css?v=20260729-roulette-final-3" />
+  <link rel="stylesheet" href="roleta-boot-fix.css?v=20260729-roulette-final-3" />
+  <link rel="stylesheet" href="default-avatar.css?v=20260729-roulette-final-3" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
-  <script defer src="protected-roleta.js?v=20260729-roulette-1"></script>
-  <script defer src="roleta.js?v=20260729-roulette-1"></script>
+  <style id="rouletteCriticalBoot">
+    body.student-dashboard.roulette-page{opacity:1!important;visibility:visible!important;min-height:100vh!important}
+    body.roulette-page:not(.protected-ready) .roulette-loading{display:flex!important;opacity:1!important;visibility:visible!important}
+    body.roulette-page:not(.protected-ready)>#rouletteSidebar,
+    body.roulette-page:not(.protected-ready)>.dash-main{visibility:hidden!important}
+    body.roulette-page.protected-ready>#rouletteSidebar,
+    body.roulette-page.protected-ready>.dash-main{visibility:visible!important}
+    .roulette-loading{position:fixed!important;inset:0!important;z-index:10050!important;align-items:center!important;justify-content:center!important}
+  </style>
+  <script>
+    window.__rouletteBootStarted = Date.now();
+    window.setTimeout(function(){
+      var body=document.body, loader=document.getElementById('rouletteLoading');
+      if(!body || body.classList.contains('protected-ready') || !loader) return;
+      var text=loader.querySelector('[data-roulette-loading-text]');
+      if(text) text.innerHTML='<strong>Ainda estamos carregando…</strong><span>Se esta mensagem permanecer, atualize a página uma vez.</span>';
+    },6500);
+  </script>
+  <script defer src="protected-roleta.js?v=20260729-roulette-final-3"></script>
+  <script defer src="roleta.js?v=20260729-roulette-final-3"></script>
 </head>
 <body class="student-dashboard roulette-page" data-required-access="dashboard">
   <div class="dash-loading roulette-loading" id="rouletteLoading" role="status">
     <div class="roulette-loading-wheel"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></div>
-    <div><strong>Preparando a Central de Roleta</strong><span>Carregando plataforma e ferramentas…</span></div>
+    <div data-roulette-loading-text><strong>Preparando a Central de Roleta</strong><span>Carregando plataforma e ferramentas…</span></div>
   </div>
 
   <div class="dash-mobile-overlay" id="rouletteMobileOverlay" hidden></div>
