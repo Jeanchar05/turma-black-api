@@ -1,2 +1,7 @@
 :root{--turma-default-avatar:url("/assets/default-profile-user.svg?v=20260729-avatar-3")}
 .dash-avatar:not([style*="background-image"]),.dash-profile-avatar:not([style*="background-image"]),.profile-main-avatar:not([style*="background-image"]),.support-avatar:not([style*="background-image"]),[data-user-avatar]:not([style*="background-image"]),[data-profile-avatar]:not([style*="background-image"]),[data-user-initial]:not([style*="background-image"]){background-image:var(--turma-default-avatar)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;text-shadow:none!important}
+
+/* Recuperação da Roleta: evita tela vazia mesmo se o boot JS atrasar ou falhar. */
+body.student-dashboard.roulette-page{opacity:1!important;visibility:visible!important}
+body.student-dashboard.roulette-page #rouletteLoading{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body.student-dashboard.roulette-page .roulette-sidebar,body.student-dashboard.roulette-page .dash-main{visibility:visible!important}
