@@ -6,6 +6,7 @@
     body.roulette-page{opacity:1!important;visibility:visible!important}
     body.roulette-page:not(.protected-ready) #rouletteLoading{display:flex!important;opacity:1!important;visibility:visible!important}
     body.roulette-page.protected-ready #rouletteLoading{display:none!important}
+    #race,#racetrack{scroll-margin-top:90px}
   `;
   document.head.appendChild(bootStyle);
 
@@ -45,7 +46,7 @@
   }
 
   function setAvatar(user) {
-    const photo = String(user?.foto || "").trim() || "/assets/default-profile-user.svg?v=20260729-roulette-avatar";
+    const photo = String(user?.foto || "").trim() || "/assets/default-profile-user.svg?v=20260730-roulette-avatar";
     $$('[data-roulette-avatar]').forEach((element) => {
       element.textContent = "";
       element.style.backgroundImage = `url("${photo.replaceAll('"','%22')}")`;
@@ -62,9 +63,12 @@
     state.theme = value || "dark";
     const resolved = resolveTheme(state.theme);
     document.documentElement.dataset.theme = resolved;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#07030d" : "#f2eff6");
-    const use = $("rouletteThemeToggle")?.querySelector("use");
-    if (use) use.setAttribute("href", `assets/dashboard-icons.svg#${resolved === "dark" ? "i-moon" : "i-sun"}`);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#050208" : "#f2eff6");
+    const icon = resolved === "dark" ? "i-moon" : "i-sun";
+    ["rouletteThemeToggle", "rouletteThemeTop"].forEach((id) => {
+      const use = $(id)?.querySelector("use");
+      if (use) use.setAttribute("href", `assets/dashboard-icons.svg#${icon}`);
+    });
   }
 
   async function toggleTheme() {
@@ -78,8 +82,8 @@
     $$('[data-roulette-name]').forEach((el) => el.textContent = firstName(user.nome));
     $$('[data-roulette-role]').forEach((el) => el.textContent = roleLabel(user.cargo || user.tipo));
     setAvatar(user);
-    if ($("roulettePlanName")) $("roulettePlanName").textContent = plan.nome || "Turma do Primo";
-    if ($("roulettePlanLabel")) $("roulettePlanLabel").textContent = plan.rotulo || "Acesso completo";
+    if ($("roulettePlanName")) $("roulettePlanName").textContent = plan.nome || "PREMIUM";
+    if ($("roulettePlanLabel")) $("roulettePlanLabel").textContent = plan.rotulo || "Acesso total liberado";
     const unread = Number(home.notificacoesNaoLidas || 0), badge = $("rouletteNotificationBadge");
     if (badge) { badge.hidden = unread <= 0; badge.textContent = String(unread); }
   }
@@ -92,8 +96,9 @@
   const searchItems = [
     ["EsportivaBet","Plataforma utilizada pela Turma do Primo","i-roulette","https://go.aff.esportiva.bet/aeg41h8f",true],
     ["Roleta Ao Vivo","Mesas ao vivo na EsportivaBet","i-roulette","https://go.aff.esportiva.bet/aeg41h8f",true],
-    ["Mesas Clássicas","Opções tradicionais de roleta","i-target","https://go.aff.esportiva.bet/aeg41h8f",true],
-    ["Mesas VIP","Confira as mesas disponíveis","i-crown","https://go.aff.esportiva.bet/aeg41h8f",true],
+    ["Roleta Clássica","Opções tradicionais de roleta","i-target","https://go.aff.esportiva.bet/aeg41h8f",true],
+    ["Roleta VIP","Confira as mesas disponíveis","i-crown","https://go.aff.esportiva.bet/aeg41h8f",true],
+    ["Roletas Rápidas","Mesas dinâmicas disponíveis na plataforma","i-activity","https://go.aff.esportiva.bet/aeg41h8f",true],
     ["Race","Ferramenta interna da Turma","i-roulette","#race",false],
     ["Racetrack","Tabela operacional 0–36","i-target","#racetrack",false],
     ["Leituras e Padrões","Conteúdos de estudo","i-chart","/estudo",false],
@@ -120,11 +125,19 @@
     $("rouletteLogout")?.addEventListener("click", logout);
     $("rouletteSearchInput")?.addEventListener("input", (event) => renderSearch(event.target.value));
     $("rouletteSearchModal")?.addEventListener("click", (event) => { if (event.target === $("rouletteSearchModal")) closeSearch(); });
+    $$(".roulette-nav a").forEach((link) => link.addEventListener("click", closeSidebar));
     document.addEventListener("keydown", (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openSearch(); }
       if (event.key === "Escape") { closeSearch(); closeSidebar(); }
     });
     document.addEventListener("click", (event) => {
+      const internalSearchLink = event.target.closest('.roulette-search-result[href^="#"]');
+      if (internalSearchLink) {
+        event.preventDefault();
+        closeSearch();
+        document.querySelector(internalSearchLink.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
       const tool = event.target.closest("[data-roulette-tool]");
       if (!tool) return;
       event.preventDefault();
