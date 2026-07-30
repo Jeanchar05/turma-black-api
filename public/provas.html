@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Provas | Turma do Primo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dashboard-premium.css?v=20260730-exams-1" />
+  <link rel="stylesheet" href="provas.css?v=20260730-exams-1" />
+  <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
+  <script defer src="protected-provas.js?v=20260730-exams-1"></script>
+  <script defer src="provas.js?v=20260730-exams-1"></script>
+</head>
+<body class="student-dashboard exams-page" data-required-access="dashboard">
+  <div class="dash-loading" id="examsLoading" role="status">
+    <img src="assets/turma-primo-logo.svg" alt="" />
+    <div><strong>Preparando suas provas</strong><span>Carregando sua central de avaliações…</span></div>
+  </div>
+
+  <div class="dash-mobile-overlay" id="examMobileOverlay" hidden></div>
+
+  <aside class="dash-sidebar" id="examSidebar">
+    <a class="dash-brand" href="/dashboard">
+      <img src="assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
+      <span><small>TURMA DO</small><strong>PRIMO</strong></span>
+    </a>
+    <nav class="dash-nav" aria-label="Navegação principal">
+      <a class="dash-nav-item" href="/dashboard"><svg><use href="assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
+      <a class="dash-nav-item" href="/notas"><svg><use href="assets/dashboard-icons.svg#i-note"></use></svg><b>Notas</b></a>
+      <a class="dash-nav-item" href="/minigames"><svg><use href="assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
+      <a class="dash-nav-item" href="/estudo"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
+      <a class="dash-nav-item" href="/modulos"><svg><use href="assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item" href="/suporte"><svg><use href="assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      <a class="dash-nav-item" href="/perfil"><svg><use href="assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+      <a class="dash-nav-item" href="/roleta"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
+      <a class="dash-nav-item active" href="/provas"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
+      <a class="dash-nav-item" href="/favoritos"><svg><use href="assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
+    </nav>
+    <div class="dash-plan-card">
+      <span class="dash-plan-icon"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg></span>
+      <div><strong id="examPlanName">Plano Premium</strong><small id="examPlanLabel">Acesso completo</small></div>
+      <div class="dash-plan-progress"><i style="width:100%"></i></div>
+      <p>Acesso ativo</p>
+      <a class="dash-plan-link" href="/perfil">Ver benefícios</a>
+    </div>
+    <button class="dash-logout" id="examLogout" type="button"><svg><use href="assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <button class="dash-menu-toggle" id="examMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="assets/dashboard-icons.svg#i-menu"></use></svg></button>
+      <div class="dash-search-trigger" aria-hidden="true"><svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><em>Busque suas provas e acompanhe sua evolução</em></div>
+      <div class="dash-top-actions">
+        <button class="dash-theme-toggle" id="examThemeToggle" type="button" aria-label="Alternar tema"><svg><use href="assets/dashboard-icons.svg#i-moon"></use></svg></button>
+        <a class="dash-notification-btn" href="/notificacoes" aria-label="Notificações"><svg><use href="assets/dashboard-icons.svg#i-bell"></use></svg><b id="examNotificationBadge" hidden>0</b></a>
+        <a class="dash-user-menu" href="/perfil">
+          <span class="dash-avatar" data-exam-avatar>P</span>
+          <span><strong data-exam-name>Primo</strong><small data-exam-role>Aluno</small></span>
+          <svg class="dash-chevron"><use href="assets/dashboard-icons.svg#i-chevron"></use></svg>
+        </a>
+      </div>
+    </header>
+
+    <div class="dash-content exam-content">
+      <section class="exam-heading">
+        <div class="exam-heading-main">
+          <span class="exam-heading-icon"><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg></span>
+          <div><h1>Provas</h1><p>Teste seus conhecimentos e evolua a cada desafio.</p></div>
+        </div>
+        <button class="exam-history" id="examHistoryBtn" type="button"><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg>Histórico de Provas</button>
+      </section>
+
+      <section class="exam-toolbar" aria-label="Filtros de provas">
+        <label class="exam-tool exam-search"><svg><use href="assets/dashboard-icons.svg#i-search"></use></svg><input id="examSearch" type="search" placeholder="Buscar provas…" autocomplete="off" /></label>
+        <select class="exam-tool exam-select" aria-label="Categoria"><option>Todas as categorias</option><option>Diária</option><option>Semanal</option><option>Prova do Primo</option></select>
+        <select class="exam-tool exam-select" aria-label="Ordenação"><option>Agenda das provas</option><option>Mais recentes</option></select>
+      </section>
+
+      <div class="exam-layout">
+        <section class="exam-grid" aria-label="Provas disponíveis em breve">
+          <article class="exam-card primo" data-exam-card="prova do primo domingo premium desafio">
+            <div class="exam-art"><img src="/assets/exams/primo.svg" alt="Troféu da Prova do Primo" /><span class="exam-badge">DESAFIO PREMIUM</span></div>
+            <div class="exam-card-body">
+              <h2>Prova do Primo</h2>
+              <p class="exam-schedule"><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg>Todo domingo</p>
+              <p class="exam-card-desc">A prova principal da Turma do Primo. Será criada com base no conteúdo estudado e nos módulos da plataforma.</p>
+              <div class="exam-card-meta"><span><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg>30 questões planejadas</span><span>Domingo</span></div>
+              <button class="exam-lock" type="button" data-exam-locked="primo"><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg>Em preparação</button>
+            </div>
+          </article>
+
+          <article class="exam-card" data-exam-card="prova diária diaria todos os dias foco estudo">
+            <div class="exam-art"><img src="/assets/exams/daily.svg" alt="Cérebro da Prova Diária" /><span class="exam-badge">ROTINA DE ESTUDO</span></div>
+            <div class="exam-card-body">
+              <h2>Prova Diária</h2>
+              <p class="exam-schedule"><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg>Todos os dias</p>
+              <p class="exam-card-desc">Desafios diários para revisar o que foi estudado e manter o aprendizado ativo ao longo da semana.</p>
+              <div class="exam-card-meta"><span><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg>20 questões planejadas</span><span>Diária</span></div>
+              <button class="exam-lock" type="button" data-exam-locked="daily"><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg>Em preparação</button>
+            </div>
+          </article>
+
+          <article class="exam-card" data-exam-card="prova semanal sábado sabado difícil revisão">
+            <div class="exam-art"><img src="/assets/exams/weekly.svg" alt="Calendário da Prova Semanal" /><span class="exam-badge">REVISÃO SEMANAL</span></div>
+            <div class="exam-card-body">
+              <h2>Prova Semanal</h2>
+              <p class="exam-schedule"><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg>Todo sábado</p>
+              <p class="exam-card-desc">Uma revisão mais completa dos conteúdos da semana para testar consistência, retenção e evolução.</p>
+              <div class="exam-card-meta"><span><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg>25 questões planejadas</span><span>Sábado</span></div>
+              <button class="exam-lock" type="button" data-exam-locked="weekly"><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg>Em preparação</button>
+            </div>
+          </article>
+        </section>
+
+        <aside class="exam-side">
+          <section class="exam-side-card">
+            <h3>Seu Desempenho</h3>
+            <div class="exam-score-ring"><div><strong>0%</strong><small>Aguardando provas</small></div></div>
+            <p class="exam-score-caption">Seu desempenho começará a ser calculado quando a nova temporada de provas for liberada.</p>
+            <div class="exam-stat-list">
+              <span><i><svg><use href="assets/dashboard-icons.svg#i-exam"></use></svg></i>Provas realizadas <b>0</b></span>
+              <span><i><svg><use href="assets/dashboard-icons.svg#i-target"></use></svg></i>Questões acertadas <b>0</b></span>
+              <span><i><svg><use href="assets/dashboard-icons.svg#i-flame"></use></svg></i>Sequência atual <b>0 dias</b></span>
+            </div>
+          </section>
+
+          <section class="exam-side-card">
+            <h3>Agenda das Provas</h3>
+            <div class="exam-agenda">
+              <div class="gold"><svg><use href="assets/dashboard-icons.svg#i-crown"></use></svg><b>Prova do Primo</b><em>Domingo</em></div>
+              <div><svg><use href="assets/dashboard-icons.svg#i-activity"></use></svg><b>Prova Diária</b><em>Todos os dias</em></div>
+              <div><svg><use href="assets/dashboard-icons.svg#i-clock"></use></svg><b>Prova Semanal</b><em>Sábado</em></div>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="exam-note">
+        <span><svg><use href="assets/dashboard-icons.svg#i-shield"></use></svg></span>
+        <div><strong>Provas temporariamente em preparação</strong><p>As avaliações serão liberadas depois que os módulos estiverem finalizados e a geração de perguntas por IA estiver vinculada ao conteúdo real de Estudo e Módulos.</p></div>
+      </section>
+
+      <section class="exam-workspace" id="examWorkspace" hidden aria-hidden="true"></section>
+    </div>
+  </main>
+
+  <div class="exam-toast-stack" id="examToastStack"></div>
+</body>
+</html>
