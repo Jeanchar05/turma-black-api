@@ -1,11 +1,11 @@
 "use strict";
 (()=>{
   const KEYS=["token","adminToken","authToken","accessToken","jwt"],$=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-  const STORE="study_gemeos_v1",LEGACY="study_espelhos_gemeos_v1"; const state={home:null,favorite:false,progress:{example:false,interactive:false,game:false}};
+  const STORE="study_espelhos_gemeos_v1"; const state={home:null,favorite:false,progress:{example:false,interactive:false,game:false}};
   const getToken=()=>{for(const st of [sessionStorage,localStorage])for(const k of KEYS){try{const v=st.getItem(k);if(v)return v}catch(_){}}return""};
   async function api(path,opts={}){const token=getToken();const r=await fetch(`${location.origin}${path}`,{method:opts.method||"GET",headers:{Accept:"application/json",Authorization:`Bearer ${token}`,...(opts.body?{"Content-Type":"application/json"}:{})},body:opts.body?JSON.stringify(opts.body):undefined,cache:"no-store"});const d=await r.json().catch(()=>({}));if(!r.ok||d.erro)throw new Error(d.erro||d.mensagem||`Erro ${r.status}`);return d}
   function toast(msg){const stack=$("#studyToastStack");if(!stack)return;const el=document.createElement("div");el.className="study-toast";el.textContent=msg;stack.appendChild(el);requestAnimationFrame(()=>el.classList.add("show"));setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),200)},2400)}
-  function loadStudy(){try{const raw=localStorage.getItem(STORE)||localStorage.getItem(LEGACY)||"{}",d=JSON.parse(raw);state.favorite=!!d.favorite;state.progress={...state.progress,...(d.progress||{})}}catch(_){}}
+  function loadStudy(){try{const d=JSON.parse(localStorage.getItem(STORE)||"{}");state.favorite=!!d.favorite;state.progress={...state.progress,...(d.progress||{})}}catch(_){}}
   function saveStudy(){try{localStorage.setItem(STORE,JSON.stringify({favorite:state.favorite,progress:state.progress}))}catch(_){}}
   function progressPct(){return Math.round(Object.values(state.progress).filter(Boolean).length/3*100)}
   function renderStudy(){const pct=progressPct(),done=pct===100;$("#homeProgress").style.width=`${pct}%`;$("#homeProgressText").textContent=`${pct}% concluído`;$("#homeScore").textContent=`${pct}%`;$("#homeScoreRing").style.setProperty("--score",`${pct}%`);$("#homeCompleted").textContent=done?"1/1":"0/1";$("#homeStatus").textContent=done?"Concluído":pct>0?"Em andamento":"Disponível";$("#homeStarted").textContent=pct>0?"1":"0";const fav=$("#homeFavorite");fav.setAttribute("aria-pressed",String(state.favorite));fav.title=state.favorite?"Remover dos favoritos":"Favoritar módulo"}
