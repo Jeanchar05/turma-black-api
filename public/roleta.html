@@ -9,19 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="dashboard-premium.css?v=20260730-roulette-mockup-1" />
-  <link rel="stylesheet" href="roleta.css?v=20260730-roulette-mockup-1" />
-  <link rel="stylesheet" href="default-avatar.css?v=20260730-roulette-mockup-1" />
+  <link rel="stylesheet" href="roleta-isolated-v2.css?v=20260730-r2" />
   <link rel="icon" type="image/svg+xml" href="assets/turma-primo-logo.svg" />
-  <style>
-    body.student-dashboard.roulette-page{opacity:1!important;visibility:visible!important;min-height:100vh!important}
-    .roulette-loading{display:flex!important}
-    body.protected-ready .roulette-loading{display:none!important}
-  </style>
-  <script defer src="protected-roleta.js?v=20260730-roulette-mockup-1"></script>
-  <script defer src="roleta.js?v=20260730-roulette-mockup-2"></script>
+  <style>body.roulette-page{opacity:1!important;visibility:visible!important}</style>
+  <script defer src="protected-roleta.js?v=20260730-r2"></script>
+  <script defer src="roleta.js?v=20260730-r2"></script>
 </head>
-<body class="student-dashboard roulette-page" data-required-access="dashboard">
+<body class="roulette-page" data-required-access="dashboard">
   <div class="roulette-loading" id="rouletteLoading" role="status">
     <span class="roulette-loading-icon"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></span>
     <div><strong>Preparando a Central de Roleta</strong><small>Carregando plataforma e ferramentas...</small></div>
@@ -29,7 +23,7 @@
 
   <div class="dash-mobile-overlay" id="rouletteMobileOverlay" hidden></div>
 
-  <aside class="dash-sidebar roulette-sidebar" id="rouletteSidebar">
+  <aside class="roulette-sidebar" id="rouletteSidebar">
     <a class="roulette-brand-side" href="/dashboard" aria-label="Turma do Primo">
       <span class="roulette-crown">♛</span>
       <small>TURMA DO</small>
@@ -87,7 +81,7 @@
           <div class="roulette-hero-title"><span><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></span><h1>Roleta</h1></div>
           <p>Plataformas, mesas e tudo para você operar com <strong>estratégia, inteligência e disciplina.</strong></p>
         </div>
-        <div class="roulette-hero-image"><img src="/assets/roulette/hero.svg?v=20260730-1" alt="Roleta premium" /></div>
+        <div class="roulette-hero-image"><img src="/assets/roulette/hero.svg?v=20260730-r2" alt="Roleta premium" /></div>
       </section>
 
       <section class="roulette-platform-new">
@@ -114,34 +108,21 @@
           <div><span class="roulette-section-symbol"><svg><use href="assets/dashboard-icons.svg#i-roulette"></use></svg></span><span><h2>Mesas de Roleta</h2><p>Escolha o estilo de mesa e abra a plataforma.</p></span></div>
           <a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Ver todas as mesas <b>→</b></a>
         </header>
-
         <div class="roulette-casino-grid">
-          <article class="roulette-casino-card card-purple">
-            <div class="roulette-card-image"><img src="/assets/roulette/live.svg?v=20260730-1" alt="Roleta ao vivo" /><span class="roulette-badge">◆ RECOMENDADA</span></div>
-            <div class="roulette-card-body"><h3>Roleta Ao Vivo</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div>
-          </article>
-          <article class="roulette-casino-card card-gold">
-            <div class="roulette-card-image"><img src="/assets/roulette/classic.svg?v=20260730-1" alt="Roleta clássica" /><span class="roulette-badge">♛ POPULAR</span></div>
-            <div class="roulette-card-body"><h3>Roleta Clássica</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div>
-          </article>
-          <article class="roulette-casino-card card-violet">
-            <div class="roulette-card-image"><img src="/assets/roulette/vip.svg?v=20260730-1" alt="Roleta VIP" /><span class="roulette-badge">◆ VIP</span></div>
-            <div class="roulette-card-body"><h3>Roleta VIP</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div>
-          </article>
-          <article class="roulette-casino-card card-green">
-            <div class="roulette-card-image"><img src="/assets/roulette/fast.svg?v=20260730-1" alt="Roletas rápidas" /><span class="roulette-badge">◎ RÁPIDAS</span></div>
-            <div class="roulette-card-body"><h3>Roletas Rápidas</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div>
-          </article>
+          <article class="roulette-casino-card card-purple"><div class="roulette-card-image"><img src="/assets/roulette/live.svg?v=20260730-r2" alt="Roleta ao vivo" /><span class="roulette-badge">◆ RECOMENDADA</span></div><div class="roulette-card-body"><h3>Roleta Ao Vivo</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div></article>
+          <article class="roulette-casino-card card-gold"><div class="roulette-card-image"><img src="/assets/roulette/classic.svg?v=20260730-r2" alt="Roleta clássica" /><span class="roulette-badge">♛ POPULAR</span></div><div class="roulette-card-body"><h3>Roleta Clássica</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div></article>
+          <article class="roulette-casino-card card-violet"><div class="roulette-card-image"><img src="/assets/roulette/vip.svg?v=20260730-r2" alt="Roleta VIP" /><span class="roulette-badge">◆ VIP</span></div><div class="roulette-card-body"><h3>Roleta VIP</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div></article>
+          <article class="roulette-casino-card card-green"><div class="roulette-card-image"><img src="/assets/roulette/fast.svg?v=20260730-r2" alt="Roletas rápidas" /><span class="roulette-badge">◎ RÁPIDAS</span></div><div class="roulette-card-body"><h3>Roletas Rápidas</h3><p class="roulette-provider"><b>E</b> EsportivaBet</p><small>Limites: consulte na plataforma</small><a href="https://go.aff.esportiva.bet/aeg41h8f" target="_blank" rel="noopener sponsored">Jogar agora <b>→</b></a></div></article>
         </div>
       </section>
 
       <section class="roulette-panel-new roulette-tools-panel">
         <header class="roulette-panel-head-new"><div><span class="roulette-section-symbol"><svg><use href="assets/dashboard-icons.svg#i-settings"></use></svg></span><span><h2>Ferramentas da Turma</h2><p>Recursos exclusivos para estudo e operação.</p></span></div></header>
         <div class="roulette-tools-grid-new">
-          <article class="roulette-tool-card-new" id="race"><img src="/assets/roulette/race.svg?v=20260730-1" alt="Race" /><div><h3>Race</h3><p>Setores da roda europeia, vizinhos e leitura visual da mesa.</p><button type="button" data-roulette-tool="Race">Acessar</button></div></article>
-          <article class="roulette-tool-card-new" id="racetrack"><img src="/assets/roulette/racetrack.svg?v=20260730-1" alt="Racetrack" /><div><h3>Racetrack</h3><p>Visualização 0–36 com marcações e setores operacionais.</p><button type="button" data-roulette-tool="Racetrack">Acessar</button></div></article>
-          <article class="roulette-tool-card-new"><img src="/assets/roulette/patterns.svg?v=20260730-1" alt="Leituras e padrões" /><div><h3>Leituras e Padrões</h3><p>Identifique padrões e acesse os conteúdos relacionados.</p><a href="/estudo">Acessar</a></div></article>
-          <article class="roulette-tool-card-new"><img src="/assets/roulette/modules.svg?v=20260730-1" alt="Módulos de roleta" /><div><h3>Módulos de Roleta</h3><p>Estratégias e conteúdos aplicados em módulos práticos.</p><a href="/modulos">Acessar</a></div></article>
+          <article class="roulette-tool-card-new" id="race"><img src="/assets/roulette/race.svg?v=20260730-r2" alt="Race" /><div><h3>Race</h3><p>Setores da roda europeia, vizinhos e leitura visual da mesa.</p><button type="button" data-roulette-tool="Race">Acessar</button></div></article>
+          <article class="roulette-tool-card-new" id="racetrack"><img src="/assets/roulette/racetrack.svg?v=20260730-r2" alt="Racetrack" /><div><h3>Racetrack</h3><p>Visualização 0–36 com marcações e setores operacionais.</p><button type="button" data-roulette-tool="Racetrack">Acessar</button></div></article>
+          <article class="roulette-tool-card-new"><img src="/assets/roulette/patterns.svg?v=20260730-r2" alt="Leituras e padrões" /><div><h3>Leituras e Padrões</h3><p>Identifique padrões e acesse os conteúdos relacionados.</p><a href="/estudo">Acessar</a></div></article>
+          <article class="roulette-tool-card-new"><img src="/assets/roulette/modules.svg?v=20260730-r2" alt="Módulos de roleta" /><div><h3>Módulos de Roleta</h3><p>Estratégias e conteúdos aplicados em módulos práticos.</p><a href="/modulos">Acessar</a></div></article>
         </div>
       </section>
 
