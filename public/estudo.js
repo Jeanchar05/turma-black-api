@@ -4,7 +4,7 @@
   const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const WHEEL=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
   const TOP=[5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3];
-  const BOTTOM=[30,11,36,13,27,6,34,17,25,2,21,4,19,15,32];
+  const BOTTOM=[8,30,11,36,13,27,6,34,17,25,2,21,4,19,15,32];
   const RED=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
   const TWINS=[11,22,33];
   const STORE="study_espelhos_gemeos_v1";
@@ -23,8 +23,8 @@
   function classForNumber(n){return n===0?"green":RED.has(n)?"red":"black"}
   function makeButton(n){const b=document.createElement("button");b.type="button";b.dataset.num=String(n);b.className=classForNumber(n);b.textContent=String(n);return b}
   function buildRace(race){const top=$("[data-race-top]",race),bottom=$("[data-race-bottom]",race);if(!top||!bottom)return;top.textContent="";bottom.textContent="";TOP.forEach(n=>top.appendChild(makeButton(n)));BOTTOM.forEach(n=>bottom.appendChild(makeButton(n)));$$('[data-num]',race).forEach(b=>{const n=Number(b.dataset.num);b.classList.add(classForNumber(n));if(race.dataset.race==="game")b.addEventListener("click",()=>toggleGameNumber(n,b))})}
-  function clearMarks(race){$$('[data-num]',race).forEach(b=>b.classList.remove("mark-target","mark-protect","mark-trigger","selected","answer-correct","answer-wrong","answer-missed"))}
-  function markConfig(race,trigger){clearMarks(race);const c=config(trigger);for(const set of c.targetSets)for(const n of set){const b=$(`[data-num="${n}"]`,race);b?.classList.add("mark-target")}for(const n of c.protectSet){const b=$(`[data-num="${n}"]`,race);b?.classList.add("mark-protect")}race.querySelector(`[data-num="${c.trigger}"]`)?.classList.add("mark-trigger")}
+  function clearMarks(race){if(!race)return;$$('[data-num]',race).forEach(b=>b.classList.remove("mark-target","mark-protect","mark-trigger","selected","answer-correct","answer-wrong","answer-missed"))}
+  function markConfig(race,trigger){if(!race)return;clearMarks(race);const c=config(trigger);for(const set of c.targetSets)for(const n of set){const b=$(`[data-num="${n}"]`,race);b?.classList.add("mark-target")}for(const n of c.protectSet){const b=$(`[data-num="${n}"]`,race);b?.classList.add("mark-protect")}race.querySelector(`[data-num="${c.trigger}"]`)?.classList.add("mark-trigger")}
 
   function buildExampleTimeline(){const vals=[8,16,11,27,5,22,14,33,9,31,4,17],box=$("#exampleTimeline");if(!box)return;box.textContent="";vals.forEach((n,i)=>{const el=document.createElement("span");el.className="timeline-slot"+(n===11?" trigger":(n===22||n===33)?" target":"");el.innerHTML=`<small>${i+1}</small>${n}`;box.appendChild(el)})}
   function buildInteractiveTimeline(){const box=$("#interactiveTimeline");if(!box)return;box.textContent="";for(let i=1;i<=12;i++){const el=document.createElement("span");el.className="timeline-slot";el.innerHTML=`<small>${i}</small>${i===state.simStep?state.trigger:"·"}`;if(i===state.simStep)el.classList.add("trigger","walking");if(i<state.simStep)el.classList.add("empty");box.appendChild(el)}updateResetState()}
@@ -35,7 +35,7 @@
 
   function selectTrigger(trigger){state.trigger=Number(trigger);$$('[data-trigger]').forEach(b=>b.classList.toggle("active",Number(b.dataset.trigger)===state.trigger));const c=config(state.trigger);$("#interactiveTrigger").textContent=String(c.trigger);$("#interactiveTargets").textContent=`${c.targets[0]} + ${c.targets[1]}`;$("#resetTitle").textContent=`${c.trigger} caminhando pela timeline`;$("#resetText").textContent=`Após duas entradas sem gêmeos, avance rodadas neutras. Se o ${c.trigger} chegar à posição 12 sem aparecer 11, 22 ou 33, a leitura reseta e libera mais 2 entradas.`;markConfig(document.querySelector('[data-race="interactive"]'),state.trigger);resetSimulation()}
 
-  function showTab(name,markPrevious=true){const current=$('.study-tab.active')?.dataset.studyTab;if(markPrevious&&current&&current!==name)markStep(current);$$('[data-study-tab]').forEach(b=>b.classList.toggle("active",b.dataset.studyTab===name));$$('[data-study-panel]').forEach(p=>{const active=p.dataset.studyPanel===name;p.hidden=!active;p.classList.toggle("active",active)});if(name==="interactive")selectTrigger(state.trigger);if(name==="game"&&!state.gameTrigger)newGameRound();window.scrollTo({top:Math.max(0,$('.study-main-card').offsetTop-76),behavior:"smooth"})}
+  function showTab(name,markPrevious=true){const current=$('.study-tab.active')?.dataset.studyTab;if(markPrevious&&current&&current!==name&&(current==="example"||current==="interactive"))markStep(current);$$('[data-study-tab]').forEach(b=>b.classList.toggle("active",b.dataset.studyTab===name));$$('[data-study-panel]').forEach(p=>{const active=p.dataset.studyPanel===name;p.hidden=!active;p.classList.toggle("active",active)});if(name==="interactive")selectTrigger(state.trigger);window.scrollTo({top:Math.max(0,$('.study-main-card').offsetTop-76),behavior:"smooth"})}
   function markStep(step){if(!["example","interactive","game"].includes(step))return;if(!state.progress[step]){state.progress[step]=true;saveLocal();renderProgress()}}
   function renderProgress(){const done=Object.values(state.progress).filter(Boolean).length;const pct=Math.round(done/3*100);$("#studyProgressText").textContent=`${pct}%`;$("#studyProgressBar").style.width=`${pct}%`;$$('[data-progress-step]').forEach(p=>p.classList.toggle("done",!!state.progress[p.dataset.progressStep]))}
 
