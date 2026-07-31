@@ -1,26 +1,67 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 420" role="img" aria-labelledby="t d">
-<title id="t">Gêmeos</title><desc id="d">Grande espelho dourado refletindo uma roda de roleta europeia em ambiente roxo premium.</desc>
+<title id="t">Gêmeos 11 22 33</title>
+<desc id="d">Arte premium do módulo Gêmeos com os números 11, 22 e 33 em círculos cósmicos roxos e dourados.</desc>
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#08030d"/><stop offset=".45" stop-color="#12071a"/><stop offset="1" stop-color="#050207"/></linearGradient>
-  <radialGradient id="halo" cx="77%" cy="48%" r="42%"><stop stop-color="#5e178c" stop-opacity=".62"/><stop offset="1" stop-color="#170722" stop-opacity="0"/></radialGradient>
-  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe48a"/><stop offset=".42" stop-color="#eeb634"/><stop offset="1" stop-color="#7d4309"/></linearGradient>
-  <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d96aff"/><stop offset=".55" stop-color="#9630ea"/><stop offset="1" stop-color="#471080"/></linearGradient>
-  <filter id="g"><feGaussianBlur stdDeviation="11" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <clipPath id="m"><ellipse cx="1180" cy="194" rx="178" ry="170"/></clipPath>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07030c"/><stop offset=".52" stop-color="#110617"/><stop offset="1" stop-color="#040207"/></linearGradient>
+  <radialGradient id="violetGlow"><stop stop-color="#a92cff" stop-opacity=".78"/><stop offset=".42" stop-color="#511078" stop-opacity=".32"/><stop offset="1" stop-color="#12051a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="goldGlow"><stop stop-color="#ffc84a" stop-opacity=".75"/><stop offset=".42" stop-color="#6d3d09" stop-opacity=".30"/><stop offset="1" stop-color="#160c03" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1a3"/><stop offset=".42" stop-color="#f4bd3b"/><stop offset="1" stop-color="#8a4d0a"/></linearGradient>
+  <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f3b1ff"/><stop offset=".28" stop-color="#c94cff"/><stop offset=".62" stop-color="#7d20c8"/><stop offset="1" stop-color="#3b0b68"/></linearGradient>
+  <linearGradient id="numGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff6bd"/><stop offset=".34" stop-color="#ffc94e"/><stop offset=".66" stop-color="#cf7b10"/><stop offset="1" stop-color="#704008"/></linearGradient>
+  <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="glowStrong"><feGaussianBlur stdDeviation="11" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
-<rect width="1600" height="420" fill="url(#bg)"/><rect width="1600" height="420" fill="url(#halo)"/>
-<g opacity=".22" stroke="#9e35e0" fill="none"><ellipse cx="1160" cy="352" rx="395" ry="44"/><ellipse cx="1160" cy="352" rx="300" ry="30"/><path d="M744 352h780"/></g>
-<g clip-path="url(#m)">
-  <rect x="990" y="18" width="380" height="350" fill="#08030c"/>
-  <ellipse cx="1180" cy="260" rx="270" ry="104" fill="#170722" stroke="#8f2fc8" stroke-width="9"/>
-  <ellipse cx="1180" cy="260" rx="220" ry="83" fill="#060208" stroke="url(#gold)" stroke-width="7"/>
-  <ellipse cx="1180" cy="260" rx="171" ry="61" fill="#100517" stroke="#5e1a8d" stroke-width="5"/>
-  <g stroke="#9f38df" stroke-width="4" opacity=".88"><path d="M1180 177v166M1090 187l58 150M1270 187l-58 150M1025 221l143 105M1335 221l-143 105M990 260h380"/></g>
-  <circle cx="1180" cy="260" r="44" fill="#17091e" stroke="url(#gold)" stroke-width="7"/><circle cx="1180" cy="260" r="13" fill="#f2bb37"/>
-  <g font-family="Inter,Arial" font-size="31" font-weight="900" text-anchor="middle"><text x="1094" y="251" fill="#d968ff">11</text><text x="1180" y="348" fill="#f2bb37">22</text><text x="1268" y="251" fill="#d968ff">33</text></g>
+<rect width="1600" height="420" fill="url(#bg)"/>
+<ellipse cx="800" cy="210" rx="640" ry="210" fill="#351044" opacity=".16" filter="url(#soft)"/>
+<g fill="#b847ff" opacity=".48"><circle cx="78" cy="74" r="2"/><circle cx="148" cy="330" r="2"/><circle cx="268" cy="94" r="3"/><circle cx="405" cy="48" r="2"/><circle cx="565" cy="340" r="2"/><circle cx="736" cy="68" r="2"/><circle cx="866" cy="340" r="2"/><circle cx="1025" cy="62" r="3"/><circle cx="1186" cy="344" r="2"/><circle cx="1375" cy="72" r="2"/><circle cx="1516" cy="303" r="3"/></g>
+<g opacity=".38" fill="none" stroke="#8733bc">
+  <ellipse cx="335" cy="356" rx="245" ry="30"/><ellipse cx="800" cy="356" rx="250" ry="31"/><ellipse cx="1265" cy="356" rx="245" ry="30"/>
+  <path d="M95 356h480M555 356h490M1025 356h480"/>
 </g>
-<ellipse cx="1180" cy="194" rx="184" ry="176" fill="none" stroke="#3f2108" stroke-width="22"/><ellipse cx="1180" cy="194" rx="178" ry="170" fill="none" stroke="url(#gold)" stroke-width="9"/>
-<path d="M1180 8l13 24 27-4-11 25 20 19-28 3-7 27-14-23-15 23-7-27-28-3 20-19-11-25 27 4z" fill="url(#gold)" filter="url(#g)"/>
-<g filter="url(#g)" font-family="Sora,Inter,Arial" font-weight="900"><text x="790" y="170" fill="#d764ff" font-size="64">11</text><text x="840" y="260" fill="#f0b936" font-size="64">22</text><text x="790" y="350" fill="#d764ff" font-size="64">33</text></g>
-<g fill="#bc49ff" opacity=".78"><circle cx="711" cy="82" r="3"/><circle cx="902" cy="115" r="2"/><circle cx="1440" cy="98" r="3"/><circle cx="1510" cy="294" r="2"/></g>
+
+<!-- 11 -->
+<g transform="translate(335 198)">
+  <circle r="188" fill="url(#violetGlow)" opacity=".7"/>
+  <circle r="150" fill="#0b0410" stroke="#52206f" stroke-width="2"/>
+  <circle r="139" fill="none" stroke="#9f31df" stroke-width="2" opacity=".7"/>
+  <circle r="118" fill="none" stroke="#5d1b86" stroke-width="2" opacity=".65"/>
+  <g stroke="#67258e" opacity=".5"><path d="M-125 0h250"/><path d="M0-125v250"/><path d="M-88-88l176 176"/><path d="M88-88L-88 88"/></g>
+  <path d="M0-145l8 18 19 2-14 13 4 19-17-9-17 9 4-19-14-13 19-2z" fill="#f7d37a" filter="url(#glow)"/>
+  <text x="0" y="62" text-anchor="middle" font-family="Sora,Inter,Arial" font-size="188" font-weight="900" fill="url(#purple)" stroke="#ffd66c" stroke-width="2.2" paint-order="stroke" filter="url(#glowStrong)">11</text>
+  <text x="0" y="177" text-anchor="middle" font-family="Sora,Inter,Arial" font-size="28" font-weight="800" letter-spacing="6" fill="#e57bff">INTUIÇÃO</text>
+</g>
+
+<!-- 22 -->
+<g transform="translate(800 198)">
+  <circle r="196" fill="url(#goldGlow)" opacity=".72"/>
+  <circle r="150" fill="#0b0410" stroke="#75510f" stroke-width="2"/>
+  <path d="M0-143L126 96H-126Z" fill="none" stroke="url(#gold)" stroke-width="3" opacity=".86"/>
+  <path d="M0-112L98 72H-98Z" fill="none" stroke="#8a4c17" stroke-width="2" opacity=".6"/>
+  <circle r="123" fill="none" stroke="#6f4312" stroke-width="2" opacity=".5"/>
+  <path d="M0-150l9 20 21 2-16 14 5 21-19-10-19 10 5-21-16-14 21-2z" fill="#ffdd71" filter="url(#glowStrong)"/>
+  <text x="0" y="62" text-anchor="middle" font-family="Sora,Inter,Arial" font-size="188" font-weight="900" fill="url(#numGold)" stroke="#ffd76f" stroke-width="2.4" paint-order="stroke" filter="url(#glowStrong)">22</text>
+  <text x="0" y="177" text-anchor="middle" font-family="Sora,Inter,Arial" font-size="28" font-weight="800" letter-spacing="6" fill="#f5c447">CONSTRUÇÃO</text>
+</g>
+
+<!-- 33 -->
+<g transform="translate(1265 198)">
+  <circle r="188" fill="url(#violetGlow)" opacity=".72"/>
+  <circle r="150" fill="#0b0410" stroke="#52206f" stroke-width="2"/>
+  <circle r="140" fill="none" stroke="#aa37ea" stroke-width="2" opacity=".72"/>
+  <circle r="119" fill="none" stroke="#5f1d89" stroke-width="2" opacity=".6"/>
+  <circle cx="0" cy="-142" r="14" fill="#c94cff" stroke="#f4b8ff" stroke-width="2" filter="url(#glow)"/>
+  <circle cx="128" cy="-58" r="9" fill="#8e2bd1" stroke="#da8cff" stroke-width="2"/>
+  <circle cx="-122" cy="76" r="8" fill="#8e2bd1" stroke="#da8cff" stroke-width="2"/>
+  <path d="M0-142C104-118 144-38 128 46C112 128 28 153-58 129C-137 107-163 22-124-52C-95-108-43-135 0-142Z" fill="none" stroke="#7825aa" stroke-width="2" opacity=".55"/>
+  <text x="0" y="62" text-anchor="middle" font-family="Sora,Inter,Arial" font-size="188" font-weight="900" fill="url(#purple)" stroke="#ffd66c" stroke-width="2.2" paint-order="stroke" filter="url(#glowStrong)">33</text>
+  <text x="0" y="177" text-anchor="middle" font-family="Sora,Inter,Arial" font-size="28" font-weight="800" letter-spacing="6" fill="#e57bff">EXPANSÃO</text>
+</g>
+
+<g transform="translate(800 32)" filter="url(#glow)">
+  <path d="M-24 0h48l-5 34c-7 9-13 13-19 16-6-3-12-7-19-16z" fill="#1b091f" stroke="url(#gold)" stroke-width="2.4"/>
+  <path d="M-18-5l6-10 8 8 8-8 6 10 9-7-2 17h-34l-2-17z" fill="url(#gold)"/>
+  <text x="0" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="31" font-weight="700" fill="#f7c64f">P</text>
+</g>
+<text x="800" y="408" text-anchor="middle" font-family="Sora,Inter,Arial" font-size="18" font-weight="700" letter-spacing="9" fill="#b84ce9" opacity=".95">NÚMEROS MESTRES</text>
 </svg>
