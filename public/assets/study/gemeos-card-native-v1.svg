@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">Gêmeos</title><desc id="desc">Duas figuras espelhadas em roxo com símbolo de Gêmeos dourado.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#050208"/><stop offset=".5" stop-color="#10051a"/><stop offset="1" stop-color="#030106"/></linearGradient>
+  <radialGradient id="halo" cx="50%" cy="42%" r="55%"><stop stop-color="#7c19c8" stop-opacity=".48"/><stop offset="1" stop-color="#12041d" stop-opacity="0"/></radialGradient>
+  <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1a5ff"/><stop offset=".28" stop-color="#be3cff"/><stop offset=".65" stop-color="#6515a8"/><stop offset="1" stop-color="#26043f"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2a6"/><stop offset=".45" stop-color="#f4c44a"/><stop offset="1" stop-color="#8e510e"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="12" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="35"/></filter>
+</defs>
+<rect width="1200" height="720" rx="54" fill="url(#bg)"/>
+<ellipse cx="600" cy="348" rx="430" ry="300" fill="url(#halo)"/>
+<ellipse cx="600" cy="645" rx="385" ry="48" fill="#6b18a7" opacity=".2" filter="url(#soft)"/>
+<g opacity=".55" fill="none" stroke="#6d249b"><circle cx="600" cy="336" r="270"/><circle cx="600" cy="336" r="245"/><path d="M330 336h540"/><path d="M600 66v540"/></g>
+<g fill="#c34aff" opacity=".7"><circle cx="245" cy="115" r="4"/><circle cx="315" cy="555" r="3"/><circle cx="905" cy="112" r="4"/><circle cx="965" cy="520" r="3"/><circle cx="600" cy="78" r="5"/></g>
+<!-- left twin -->
+<g transform="translate(365 164)">
+  <path d="M170 42c-63 0-113 44-122 105-8 54 16 98 56 124-19 22-31 49-34 81-3 37 9 72 30 101 35 48 87 74 147 77 35 2 72-5 104-22-18-48-26-91-23-129 4-47 25-87 57-122-27-17-48-43-57-75-20-71-84-140-158-140Z" fill="url(#purple)" stroke="#d879ff" stroke-width="3"/>
+  <path d="M116 75c22-35 69-53 109-40 37 12 68 42 82 78-27-17-58-26-90-26-37 0-72 12-101 34-8-16-8-31 0-46Z" fill="#35104f"/>
+  <path d="M196 117c-27 3-52 18-67 40 8 5 16 9 25 11 12 3 25 3 37-1 13-4 24-12 31-23-5-17-12-26-26-27Z" fill="#b63fff" opacity=".7"/>
+  <path d="M122 197c20 7 42 9 63 5-7 17-20 29-37 35-13-7-22-20-26-40Z" fill="#5b1986"/>
+</g>
+<!-- right twin mirrored -->
+<g transform="translate(835 164) scale(-1 1)">
+  <path d="M170 42c-63 0-113 44-122 105-8 54 16 98 56 124-19 22-31 49-34 81-3 37 9 72 30 101 35 48 87 74 147 77 35 2 72-5 104-22-18-48-26-91-23-129 4-47 25-87 57-122-27-17-48-43-57-75-20-71-84-140-158-140Z" fill="url(#purple)" stroke="#d879ff" stroke-width="3"/>
+  <path d="M116 75c22-35 69-53 109-40 37 12 68 42 82 78-27-17-58-26-90-26-37 0-72 12-101 34-8-16-8-31 0-46Z" fill="#35104f"/>
+  <path d="M196 117c-27 3-52 18-67 40 8 5 16 9 25 11 12 3 25 3 37-1 13-4 24-12 31-23-5-17-12-26-26-27Z" fill="#b63fff" opacity=".7"/>
+  <path d="M122 197c20 7 42 9 63 5-7 17-20 29-37 35-13-7-22-20-26-40Z" fill="#5b1986"/>
+</g>
+<!-- central gemini -->
+<g filter="url(#glow)">
+  <path d="M476 418h248v42H687v134h37v42H476v-42h37V460h-37Zm82 42v134h84V460Z" fill="url(#gold)" stroke="#ffd86a" stroke-width="3"/>
+</g>
+<path d="M600 75l10 24 25 2-19 16 6 25-22-13-22 13 6-25-19-16 25-2Z" fill="url(#gold)" filter="url(#glow)"/>
+<path d="M246 353l9 20 21 2-16 14 5 21-19-11-19 11 5-21-16-14 21-2Z" fill="url(#gold)" opacity=".9"/>
+<path d="M954 353l9 20 21 2-16 14 5 21-19-11-19 11 5-21-16-14 21-2Z" fill="url(#gold)" opacity=".9"/>
+<ellipse cx="600" cy="650" rx="310" ry="28" fill="none" stroke="#8e26d1" stroke-width="3" opacity=".55"/>
+<ellipse cx="600" cy="650" rx="230" ry="18" fill="none" stroke="#d258ff" stroke-width="2" opacity=".42"/>
+</svg>
