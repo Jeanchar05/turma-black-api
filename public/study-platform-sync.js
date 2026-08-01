@@ -12,7 +12,7 @@
   ];
   const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
   function progress(m){if(m.locked)return 0;try{const x=JSON.parse(localStorage.getItem(m.store)||"{}"),v=Object.values(x.progress||{});return v.length?Math.round(v.filter(Boolean).length/Math.max(3,v.length)*100):0}catch{return 0}}
-  function addAssets(){if(!document.querySelector('link[data-study-sync]')){const l=document.createElement('link');l.rel='stylesheet';l.href=`/study-platform-sync.css?v=20260801-sync-final&t=${Date.now()}`;l.dataset.studySync='1';document.head.appendChild(l)}}
+  function addAssets(){if(!document.querySelector('link[data-study-sync]')){const l=document.createElement('link');l.rel='stylesheet';l.href=`/study-platform-sync.css?v=20260801-sync-last&t=${Date.now()}`;l.dataset.studySync='1';document.head.appendChild(l)}}
   function fixNavigation(){document.addEventListener('click',e=>{const el=e.target.closest('[data-nav]');if(!el)return;const map={estudo:'/estudo',favoritos:'/favoritos',notas:'/notas',minigames:'/minigames',modulos:'/modulos',roleta:'/roleta',provas:'/provas',perfil:'/perfil',suporte:'/suporte'};const route=map[el.dataset.nav];if(route){e.preventDefault();e.stopImmediatePropagation();location.href=route}},true)}
 
   function studyPage(){
@@ -36,24 +36,68 @@
   function favoriteModules(){return MODULES.filter(m=>!m.locked&&localStorage.getItem(`study_favorite_${m.id}`)==='1')}
   function favoritesPage(){
     const grid=$('#favoritesGrid');if(!grid)return;
+    let applying=false;
     const inject=()=>{
+      if(applying)return;
+      applying=true;
       const favorites=favoriteModules();
-      grid.querySelectorAll('[data-sync-study-favorite]').forEach(x=>x.remove());
-      if(favorites.length){
-        grid.classList.add('has-study-favorites');
-        grid.querySelectorAll('.favorites-empty').forEach(x=>x.remove());
-        favorites.forEach(m=>grid.insertAdjacentHTML('beforeend',`<article class="favorite-card modulo" data-sync-study-favorite="${m.id}" data-favorite-type="modulo"><div class="favorite-card-top"><span class="favorite-card-type">MÓDULO DE ESTUDO</span><span class="favorite-card-star">★</span></div><span class="favorite-card-icon"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><h2>${m.name}</h2><p>Módulo favoritado na Central de Estudos.</p><footer class="favorite-card-footer"><span class="favorite-card-meta">${progress(m)}% concluído</span><a class="favorite-card-open" href="${m.href}">Abrir <b>→</b></a></footer></article>`));
-      }else{
-        grid.classList.remove('has-study-favorites');
-      }
+      const wanted=new Set(favorites.map(m=>m.id));
+      $$('[data-sync-study-favorite]',grid).forEach(card=>{if(!wanted.has(card.dataset.syncStudyFavorite))card.remove()});
+      favorites.forEach(m=>{
+        if(grid.querySelector(`[data-sync-study-favorite="${m.id}"]`))return;
+        grid.insertAdjacentHTML('beforeend',`<article class="favorite-card modulo" data-sync-study-favorite="${m.id}" data-favorite-type="modulo"><div class="favorite-card-top"><span class="favorite-card-type">MÓDULO DE ESTUDO</span><span class="favorite-card-star">★</span></div><span class="favorite-card-icon"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><h2>${m.name}</h2><p>Módulo favoritado na Central de Estudos.</p><footer class="favorite-card-footer"><span class="favorite-card-meta">${progress(m)}% concluído</span><a class="favorite-card-open" href="${m.href}">Abrir <b>→</b></a></footer></article>`);
+      });
+      const hasFavorites=favorites.length>0;
+      grid.classList.toggle('has-study-favorites',hasFavorites);
+      grid.dataset.hasFavorites=hasFavorites?'1':'0';
+      $$('.favorites-empty',grid).forEach(empty=>{
+        empty.hidden=hasFavorites;
+        empty.setAttribute('aria-hidden',String(hasFavorites));
+        empty.style.setProperty('display',hasFavorites?'none':'','important');
+      });
       const n=$('#favoriteModulesCount');if(n)n.textContent=String(favorites.length);
+      applying=false;
     };
-    let rounds=0;const timer=setInterval(()=>{inject();if(++rounds>=24)clearInterval(timer)},250);
-    inject();window.addEventListener('focus',inject);window.addEventListener('storage',inject);
+    inject();
+    let queued=false;
+    const observer=new MutationObserver(()=>{
+      if(queued||applying)return;
+      queued=true;
+      requestAnimationFrame(()=>{queued=false;inject()});
+    });
+    observer.observe(grid,{childList:true,subtree:false});
+    [250,600,1200,2200,4000].forEach(ms=>setTimeout(inject,ms));
+    window.addEventListener('focus',inject);
+    window.addEventListener('storage',inject);
   }
 
   function dashboardPage(){const start=$('#section-inicio');if(!start||$('#syncDashboardStudy'))return;const active=MODULES.filter(m=>!m.locked);start.insertAdjacentHTML('beforeend',`<section class="dash-panel sync-dashboard-study" id="syncDashboardStudy"><div class="dash-panel-head"><div><span>CENTRAL DE ESTUDOS</span><h2>Estratégias conectadas à sua jornada</h2></div><a href="/estudo">Ver todos →</a></div><div class="sync-study-grid">${active.map((m,i)=>`<a class="sync-study-link" href="${m.href}"><i>${i+1}</i><span><strong>${m.name}</strong><small>${progress(m)}% concluído</small></span></a>`).join('')}</div></section>`);const stat=$('#statModules');if(stat)stat.textContent=`${active.filter(m=>progress(m)===100).length} / 8`;const detail=$('#statModulesDetail');if(detail)detail.textContent='6 disponíveis · 2 em preparação'}
-  function notesPage(){const org=$('.notes-organizer');if(!org||$('.sync-notes-strategies'))return;const sec=document.createElement('section');sec.className='sync-notes-strategies';sec.innerHTML=`<h4>Estratégias da aba Estudo</h4><div class="sync-strategy-chips">${MODULES.map(m=>`<button type="button" data-strategy-name="${m.name}">${m.name}${m.locked?' · em breve':''}</button>`).join('')}</div>`;org.appendChild(sec);sec.addEventListener('click',e=>{const b=e.target.closest('[data-strategy-name]');if(!b)return;const search=$('#notesSearch');if(search){search.value=b.dataset.strategyName;search.dispatchEvent(new Event('input',{bubbles:true}))}});['#categoryFilter','#noteCategory'].forEach(sel=>{const s=$(sel);if(!s)return;MODULES.forEach(m=>{if([...s.options].some(o=>o.textContent.startsWith(m.name)))return;const o=document.createElement('option');o.value=m.id;o.textContent=m.name+(m.locked?' (em breve)':'');s.appendChild(o)})})}
+
+  function notesPage(){
+    const org=$('.notes-organizer');if(!org)return;
+    if(!$('.sync-notes-strategies')){
+      const sec=document.createElement('section');sec.className='sync-notes-strategies';
+      sec.innerHTML=`<h4>Estratégias da aba Estudo</h4><div class="sync-strategy-chips">${MODULES.map(m=>`<button type="button" data-strategy-name="${m.name}">${m.name}${m.locked?' · em breve':''}</button>`).join('')}</div>`;
+      org.appendChild(sec);
+      sec.addEventListener('click',e=>{const b=e.target.closest('[data-strategy-name]');if(!b)return;const search=$('#notesSearch');if(search){search.value=b.dataset.strategyName;search.dispatchEvent(new Event('input',{bubbles:true}))}});
+    }
+    const rebuildSelects=()=>{
+      const categoryFilter=$('#categoryFilter');
+      if(categoryFilter){
+        const current=categoryFilter.value;
+        categoryFilter.innerHTML='<option value="all">Todas as categorias</option><option value="geral">Geral</option>'+MODULES.map(m=>`<option value="${m.id}">${m.name}${m.locked?' (em breve)':''}</option>`).join('');
+        if([...categoryFilter.options].some(o=>o.value===current))categoryFilter.value=current;
+      }
+      const noteCategory=$('#noteCategory');
+      if(noteCategory){
+        const current=noteCategory.value;
+        noteCategory.innerHTML='<option value="geral">Geral</option>'+MODULES.map(m=>`<option value="${m.id}">${m.name}${m.locked?' (em breve)':''}</option>`).join('');
+        if([...noteCategory.options].some(o=>o.value===current))noteCategory.value=current;
+      }
+    };
+    rebuildSelects();
+    [400,900,1800,3200].forEach(ms=>setTimeout(rebuildSelects,ms));
+  }
   function init(){addAssets();fixNavigation();studyPage();favoritesPage();dashboardPage();notesPage()}
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
 })();
