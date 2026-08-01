@@ -1,13 +1,33 @@
 "use strict";
 (() => {
-  const PAYLOAD = "/assets/study/camaleoes-interno-exato-v2.base64?v=20260801-hero-final-2";
+  const SOURCES = [
+    "https://raw.githubusercontent.com/Jeanchar05/turma-black-api/main/public/assets/study/camaleoes-interno-exato-v2.base64",
+    "/assets/study/camaleoes-interno-exato-v2.base64?v=20260801-hero-final-4"
+  ];
 
-  function base64ToBlobUrl(base64, mime) {
-    const clean = base64.replace(/\s+/g, "");
+  function decodeBase64(base64) {
+    const clean = String(base64 || "").replace(/\s+/g, "");
+    if (!clean.startsWith("UklG")) throw new Error("Payload WebP inválido");
     const binary = atob(clean);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-    return URL.createObjectURL(new Blob([bytes], { type: mime }));
+    return new Blob([bytes], { type: "image/webp" });
+  }
+
+  async function getPayload() {
+    let lastError = null;
+    for (const source of SOURCES) {
+      try {
+        const response = await fetch(source, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const text = (await response.text()).trim();
+        if (!text.startsWith("UklG")) throw new Error("Conteúdo inválido");
+        return text;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError || new Error("Não foi possível carregar a arte");
   }
 
   async function mountHero() {
@@ -17,16 +37,8 @@
     root.innerHTML = '<div class="cam-hero-loading"><span></span><small>Carregando arte oficial…</small></div>';
 
     try {
-      const response = await fetch(PAYLOAD, {
-        cache: "no-store",
-        headers: { "Cache-Control": "no-cache, no-store, must-revalidate" }
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const base64 = (await response.text()).trim();
-      if (!base64.startsWith("UklG")) throw new Error("Payload WebP inválido");
-
-      const objectUrl = base64ToBlobUrl(base64, "image/webp");
+      const payload = await getPayload();
+      const objectUrl = URL.createObjectURL(decodeBase64(payload));
       const image = new Image();
       image.className = "cam-official-hero-image";
       image.alt = "Arte oficial do módulo Camaleões";
@@ -34,15 +46,16 @@
       image.onload = () => {
         root.replaceChildren(image);
         root.classList.add("is-ready");
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
       };
       image.onerror = () => {
         URL.revokeObjectURL(objectUrl);
-        throw new Error("Falha ao decodificar WebP");
+        root.innerHTML = '<div class="cam-hero-error"><strong>Camaleões</strong><small>Não foi possível decodificar a arte.</small></div>';
       };
       image.src = objectUrl;
     } catch (error) {
       console.error("Erro ao carregar a arte oficial de Camaleões:", error);
-      root.innerHTML = '<div class="cam-hero-error"><strong>Camaleões</strong><small>Atualize a página para carregar a arte.</small></div>';
+      root.innerHTML = '<div class="cam-hero-error"><strong>Camaleões</strong><small>Falha ao carregar a imagem oficial.</small></div>';
     }
   }
 
