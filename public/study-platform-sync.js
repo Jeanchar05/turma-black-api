@@ -12,11 +12,47 @@
   ];
   const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
   function progress(m){if(m.locked)return 0;try{const x=JSON.parse(localStorage.getItem(m.store)||"{}"),v=Object.values(x.progress||{});return v.length?Math.round(v.filter(Boolean).length/Math.max(3,v.length)*100):0}catch{return 0}}
-  function addAssets(){if(!document.querySelector('link[data-study-sync]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/study-platform-sync.css?v=20260801-sync-3';l.dataset.studySync='1';document.head.appendChild(l)}}
+  function addAssets(){if(!document.querySelector('link[data-study-sync]')){const l=document.createElement('link');l.rel='stylesheet';l.href=`/study-platform-sync.css?v=20260801-sync-final&t=${Date.now()}`;l.dataset.studySync='1';document.head.appendChild(l)}}
   function fixNavigation(){document.addEventListener('click',e=>{const el=e.target.closest('[data-nav]');if(!el)return;const map={estudo:'/estudo',favoritos:'/favoritos',notas:'/notas',minigames:'/minigames',modulos:'/modulos',roleta:'/roleta',provas:'/provas',perfil:'/perfil',suporte:'/suporte'};const route=map[el.dataset.nav];if(route){e.preventDefault();e.stopImmediatePropagation();location.href=route}},true)}
-  function studyPage(){const grid=$('.study-module-grid');if(!grid)return;const mount=()=>{if(grid.querySelector('[data-module="eclipse-zero"]'))return;MODULES.filter(m=>m.locked).forEach((m,i)=>grid.insertAdjacentHTML('beforeend',`<article class="sync-coming-card" data-module-card data-module="${m.id}" data-progress="0"><span class="sync-lock">⌛</span><small>MÓDULO 0${7+i} · EM PREPARAÇÃO</small><h2>${7+i}. ${m.name}</h2><p>Estratégia já integrada à plataforma. O conteúdo, a explicação interativa e o minigame serão liberados na próxima etapa.</p><button type="button" disabled>Em desenvolvimento</button></article>`));$$('.study-home-state').forEach(x=>x.textContent='8 módulos planejados');const metrics=$$('.study-metric strong');if(metrics[0])metrics[0].textContent='8';if(metrics[3]){const done=MODULES.filter(m=>progress(m)===100).length;metrics[3].textContent=`${done}/8`}const side=$$('.study-side-stats p b');if(side[0])side[0].textContent='8';if($('#homeCompletedSide'))$('#homeCompletedSide').textContent=`${MODULES.filter(m=>progress(m)===100).length}/8`};mount();const observer=new MutationObserver(()=>{if(!grid.querySelector('[data-module="eclipse-zero"]'))mount()});observer.observe(grid,{childList:true})}
-  function favoritesPage(){const grid=$('#favoritesGrid');if(!grid)return;const inject=()=>{const favorites=MODULES.filter(m=>!m.locked&&localStorage.getItem(`study_favorite_${m.id}`)==='1');const existing=$$('[data-sync-study-favorite]',grid).map(x=>x.dataset.syncStudyFavorite).sort().join('|');const desired=favorites.map(m=>m.id).sort().join('|');if(existing===desired)return;grid.querySelectorAll('[data-sync-study-favorite]').forEach(x=>x.remove());favorites.forEach(m=>grid.insertAdjacentHTML('beforeend',`<article class="favorite-card modulo" data-sync-study-favorite="${m.id}" data-favorite-type="modulo"><div class="favorite-card-top"><span class="favorite-card-type">MÓDULO DE ESTUDO</span><span class="favorite-card-star">★</span></div><span class="favorite-card-icon"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><h2>${m.name}</h2><p>Módulo favoritado na Central de Estudos.</p><footer class="favorite-card-footer"><span class="favorite-card-meta">${progress(m)}% concluído</span><a class="favorite-card-open" href="${m.href}">Abrir <b>→</b></a></footer></article>`));const n=$('#favoriteModulesCount');if(n)n.textContent=String(favorites.length)};setTimeout(inject,700);setTimeout(inject,1600)}
-  function dashboardPage(){const start=$('#section-inicio');if(!start||$('#syncDashboardStudy'))return;const active=MODULES.filter(m=>!m.locked);start.insertAdjacentHTML('beforeend',`<section class="dash-panel sync-dashboard-study" id="syncDashboardStudy"><div class="dash-panel-head"><div><span>CENTRAL DE ESTUDOS</span><h2>Estratégias conectadas à sua jornada</h2></div><a href="/estudo" style="color:#c084fc;text-decoration:none;font-weight:800">Ver todos →</a></div><div class="sync-study-grid">${active.map((m,i)=>`<a class="sync-study-link" href="${m.href}"><i>${i+1}</i><span><strong>${m.name}</strong><small>${progress(m)}% concluído</small></span></a>`).join('')}</div></section>`);const stat=$('#statModules');if(stat)stat.textContent=`${active.filter(m=>progress(m)===100).length} / 8`;const detail=$('#statModulesDetail');if(detail)detail.textContent='6 disponíveis · 2 em preparação'}
+
+  function studyPage(){
+    const grid=$('.study-module-grid');if(!grid)return;
+    const mount=()=>{
+      if(!grid.querySelector('[data-module="eclipse-zero"]')){
+        MODULES.filter(m=>m.locked).forEach((m,i)=>grid.insertAdjacentHTML('beforeend',`<article class="sync-coming-card" data-module-card data-module="${m.id}" data-progress="0"><span class="sync-lock">⌛</span><small>MÓDULO 0${7+i} · EM PREPARAÇÃO</small><h2>${7+i}. ${m.name}</h2><p>Estratégia já integrada à plataforma. O conteúdo, a explicação interativa e o minigame serão liberados na próxima etapa.</p><button type="button" disabled>Em desenvolvimento</button></article>`));
+      }
+      $$('.study-home-state').forEach(x=>x.textContent='8 módulos planejados');
+      const metrics=$$('.study-metric strong');if(metrics[0])metrics[0].textContent='8';
+      const done=MODULES.filter(m=>progress(m)===100).length;
+      if(metrics[3])metrics[3].textContent=`${done}/8`;
+      const side=$$('.study-side-stats p b');if(side[0])side[0].textContent='8';
+      if($('#homeCompletedSide'))$('#homeCompletedSide').textContent=`${done}/8`;
+    };
+    mount();
+    const observer=new MutationObserver(()=>mount());observer.observe(grid,{childList:true});
+    setTimeout(mount,500);setTimeout(mount,1500);
+  }
+
+  function favoriteModules(){return MODULES.filter(m=>!m.locked&&localStorage.getItem(`study_favorite_${m.id}`)==='1')}
+  function favoritesPage(){
+    const grid=$('#favoritesGrid');if(!grid)return;
+    const inject=()=>{
+      const favorites=favoriteModules();
+      grid.querySelectorAll('[data-sync-study-favorite]').forEach(x=>x.remove());
+      if(favorites.length){
+        grid.classList.add('has-study-favorites');
+        grid.querySelectorAll('.favorites-empty').forEach(x=>x.remove());
+        favorites.forEach(m=>grid.insertAdjacentHTML('beforeend',`<article class="favorite-card modulo" data-sync-study-favorite="${m.id}" data-favorite-type="modulo"><div class="favorite-card-top"><span class="favorite-card-type">MÓDULO DE ESTUDO</span><span class="favorite-card-star">★</span></div><span class="favorite-card-icon"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span><h2>${m.name}</h2><p>Módulo favoritado na Central de Estudos.</p><footer class="favorite-card-footer"><span class="favorite-card-meta">${progress(m)}% concluído</span><a class="favorite-card-open" href="${m.href}">Abrir <b>→</b></a></footer></article>`));
+      }else{
+        grid.classList.remove('has-study-favorites');
+      }
+      const n=$('#favoriteModulesCount');if(n)n.textContent=String(favorites.length);
+    };
+    let rounds=0;const timer=setInterval(()=>{inject();if(++rounds>=24)clearInterval(timer)},250);
+    inject();window.addEventListener('focus',inject);window.addEventListener('storage',inject);
+  }
+
+  function dashboardPage(){const start=$('#section-inicio');if(!start||$('#syncDashboardStudy'))return;const active=MODULES.filter(m=>!m.locked);start.insertAdjacentHTML('beforeend',`<section class="dash-panel sync-dashboard-study" id="syncDashboardStudy"><div class="dash-panel-head"><div><span>CENTRAL DE ESTUDOS</span><h2>Estratégias conectadas à sua jornada</h2></div><a href="/estudo">Ver todos →</a></div><div class="sync-study-grid">${active.map((m,i)=>`<a class="sync-study-link" href="${m.href}"><i>${i+1}</i><span><strong>${m.name}</strong><small>${progress(m)}% concluído</small></span></a>`).join('')}</div></section>`);const stat=$('#statModules');if(stat)stat.textContent=`${active.filter(m=>progress(m)===100).length} / 8`;const detail=$('#statModulesDetail');if(detail)detail.textContent='6 disponíveis · 2 em preparação'}
   function notesPage(){const org=$('.notes-organizer');if(!org||$('.sync-notes-strategies'))return;const sec=document.createElement('section');sec.className='sync-notes-strategies';sec.innerHTML=`<h4>Estratégias da aba Estudo</h4><div class="sync-strategy-chips">${MODULES.map(m=>`<button type="button" data-strategy-name="${m.name}">${m.name}${m.locked?' · em breve':''}</button>`).join('')}</div>`;org.appendChild(sec);sec.addEventListener('click',e=>{const b=e.target.closest('[data-strategy-name]');if(!b)return;const search=$('#notesSearch');if(search){search.value=b.dataset.strategyName;search.dispatchEvent(new Event('input',{bubbles:true}))}});['#categoryFilter','#noteCategory'].forEach(sel=>{const s=$(sel);if(!s)return;MODULES.forEach(m=>{if([...s.options].some(o=>o.textContent.startsWith(m.name)))return;const o=document.createElement('option');o.value=m.id;o.textContent=m.name+(m.locked?' (em breve)':'');s.appendChild(o)})})}
   function init(){addAssets();fixNavigation();studyPage();favoritesPage();dashboardPage();notesPage()}
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
