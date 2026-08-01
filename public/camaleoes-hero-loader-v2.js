@@ -1,44 +1,20 @@
 "use strict";
 (() => {
-  const SOURCES = [
-    "https://raw.githubusercontent.com/Jeanchar05/turma-black-api/main/public/assets/study/camaleoes-interno-exato-v2.base64",
-    "/assets/study/camaleoes-interno-exato-v2.base64?v=20260801-hero-final-4"
+  const PAYLOADS = [
+    "/assets/study/camaleoes-interno-exato-v2.base64?v=20260801-hero-fix-4",
+    "/assets/study/camaleoes-card-v1.base64?v=20260801-hero-fix-4"
   ];
+  const FALLBACK = "/assets/study/camaleoes-card-v1.svg?v=20260801-hero-fix-4";
 
-  function decodeBase64(base64) {
-    const clean = String(base64 || "").replace(/\s+/g, "");
-    if (!clean.startsWith("UklG")) throw new Error("Payload WebP inválido");
-    const binary = atob(clean);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-    return new Blob([bytes], { type: "image/webp" });
+  function mimeOf(base64) {
+    if (base64.startsWith("UklG")) return "image/webp";
+    if (base64.startsWith("/9j/")) return "image/jpeg";
+    if (base64.startsWith("iVBOR")) return "image/png";
+    return "";
   }
 
-  async function getPayload() {
-    let lastError = null;
-    for (const source of SOURCES) {
-      try {
-        const response = await fetch(source, { cache: "no-store" });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const text = (await response.text()).trim();
-        if (!text.startsWith("UklG")) throw new Error("Conteúdo inválido");
-        return text;
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    throw lastError || new Error("Não foi possível carregar a arte");
-  }
-
-  async function mountHero() {
-    const root = document.getElementById("camHeroMedia");
-    if (!root) return;
-
-    root.innerHTML = '<div class="cam-hero-loading"><span></span><small>Carregando arte oficial…</small></div>';
-
-    try {
-      const payload = await getPayload();
-      const objectUrl = URL.createObjectURL(decodeBase64(payload));
+  function mountImage(root, src) {
+    return new Promise((resolve, reject) => {
       const image = new Image();
       image.className = "cam-official-hero-image";
       image.alt = "Arte oficial do módulo Camaleões";
@@ -46,16 +22,39 @@
       image.onload = () => {
         root.replaceChildren(image);
         root.classList.add("is-ready");
-        setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+        resolve();
       };
-      image.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        root.innerHTML = '<div class="cam-hero-error"><strong>Camaleões</strong><small>Não foi possível decodificar a arte.</small></div>';
-      };
-      image.src = objectUrl;
-    } catch (error) {
-      console.error("Erro ao carregar a arte oficial de Camaleões:", error);
-      root.innerHTML = '<div class="cam-hero-error"><strong>Camaleões</strong><small>Falha ao carregar a imagem oficial.</small></div>';
+      image.onerror = reject;
+      image.src = src;
+    });
+  }
+
+  async function loadPayload(url) {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const base64 = (await response.text()).trim();
+    const mime = mimeOf(base64);
+    if (!mime) throw new Error("Payload inválido");
+    return `data:${mime};base64,${base64}`;
+  }
+
+  async function mountHero() {
+    const root = document.getElementById("camHeroMedia");
+    if (!root) return;
+    root.innerHTML = '<div class="cam-hero-loading"><span></span><small>Carregando arte…</small></div>';
+
+    for (const payload of PAYLOADS) {
+      try {
+        const src = await loadPayload(payload);
+        await mountImage(root, src);
+        return;
+      } catch (_) {}
+    }
+
+    try {
+      await mountImage(root, FALLBACK);
+    } catch (_) {
+      root.innerHTML = '<div class="cam-hero-error"><strong>Camaleões</strong><small>Arte temporariamente indisponível.</small></div>';
     }
   }
 
