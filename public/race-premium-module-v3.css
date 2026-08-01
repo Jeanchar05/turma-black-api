@@ -1,0 +1,22 @@
+/* Race Premium compartilhada — Gêmeos, Espelhos e Fibonacci */
+.race-wrap{overflow:hidden!important;background:linear-gradient(180deg,#09050e,#050208)!important;border:1px solid rgba(171,67,229,.28)!important;box-shadow:inset 0 0 40px rgba(111,23,160,.08),0 18px 50px rgba(0,0,0,.25)!important}
+.premium-race{display:block!important;width:100%!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin;scrollbar-color:#9c2fe1 #13091c}
+.premium-race-shell{position:relative;min-width:870px;padding:14px 18px 16px;border:2px solid rgba(189,78,244,.42);border-radius:110px;background:radial-gradient(circle at 50% 45%,rgba(116,28,165,.19),transparent 44%),linear-gradient(180deg,#12061b,#060209 68%,#0c0412);box-shadow:inset 0 0 0 4px rgba(240,180,54,.07),inset 0 0 40px rgba(178,48,232,.13),0 0 30px rgba(155,41,216,.13)}
+.premium-race-shell:before{content:"";position:absolute;inset:7px;border:1px solid rgba(239,181,57,.35);border-radius:100px;pointer-events:none}
+.premium-race-row{display:grid;gap:3px;position:relative;z-index:2}
+.premium-race-top{grid-template-columns:repeat(17,minmax(38px,1fr));padding:0 68px}
+.premium-race-bottom{grid-template-columns:repeat(16,minmax(38px,1fr));padding:0 68px}
+.premium-race-middle{display:grid;grid-template-columns:62px 1fr 62px;align-items:stretch;min-height:84px;position:relative;z-index:2}
+.premium-race-side{display:grid;grid-template-rows:1fr 1fr;gap:3px}
+.premium-race-center{display:grid;grid-template-columns:1.2fr 1fr 1.3fr .75fr;align-items:center;margin:7px 5px;border:1px solid rgba(175,71,228,.22);border-radius:42px;background:linear-gradient(90deg,rgba(74,18,104,.18),rgba(10,4,15,.82),rgba(83,20,112,.18));overflow:hidden}
+.pr-sector{height:100%;display:grid;place-items:center;padding:0 8px;color:#a98aae;font:800 11px/1 Sora,Inter,sans-serif;letter-spacing:.03em;border-right:1px solid rgba(151,60,203,.16);text-align:center}.pr-sector.zero{border-right:0;color:#dfbd72}.pr-sector.voisins{color:#c99bad}.pr-sector.tiers{color:#a882c9}
+.premium-race .race-num{appearance:none;position:relative;height:36px;min-width:36px;padding:0;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#19141d,#0b080e);color:#eee7f0;font:800 11px/1 Sora,Inter,sans-serif;display:grid;place-items:center;cursor:default;transition:.18s ease;box-shadow:inset 0 -6px 12px rgba(0,0,0,.25)}
+.premium-race .race-num.red{color:#ff747e;background:linear-gradient(180deg,#281018,#12080c)}
+.premium-race .race-num.green{color:#80ffae;background:linear-gradient(180deg,#0c2c20,#07130e)}
+.premium-race .race-num.target,.premium-race .race-num.mark-target{color:#fff0a9!important;border-color:#f2ba3c!important;background:linear-gradient(180deg,#62400b,#2b1b05)!important;box-shadow:0 0 15px rgba(242,186,60,.54),inset 0 0 12px rgba(255,215,95,.13)!important;transform:translateY(-1px)}
+.premium-race .race-num.protect,.premium-race .race-num.mark-protect,.premium-race .race-num.mark-trigger{color:#f4d5ff!important;border-color:#c252f4!important;background:linear-gradient(180deg,#48145e,#21092c)!important;box-shadow:0 0 15px rgba(194,82,244,.5),inset 0 0 12px rgba(218,125,255,.12)!important}
+.premium-race .race-num.extra{color:#c9d9ff!important;border-color:#637ee9!important;background:linear-gradient(180deg,#1b285d,#0d142f)!important;box-shadow:0 0 13px rgba(86,112,235,.38)!important}
+.premium-race .race-num.selected{outline:2px solid #fff;outline-offset:1px}
+.premium-race .race-num.answer-correct{border-color:#42db83!important;background:#0f4a2c!important;color:#d8ffe7!important}.premium-race .race-num.answer-wrong{border-color:#ff5970!important;background:#4a101d!important}.premium-race .race-num.answer-missed{animation:racePulse .8s infinite alternate}
+@keyframes racePulse{to{filter:brightness(1.6);transform:translateY(-2px)}}
+@media(max-width:760px){.race-wrap{padding:10px!important}.premium-race-shell{min-width:780px;padding:11px 14px 13px}.premium-race-top,.premium-race-bottom{padding-left:58px;padding-right:58px}.premium-race-middle{grid-template-columns:54px 1fr 54px;min-height:72px}.premium-race .race-num{height:32px;min-width:32px;font-size:10px}.pr-sector{font-size:10px}}
