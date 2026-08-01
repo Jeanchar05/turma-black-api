@@ -7,6 +7,13 @@
     script.dataset.studyPlatformSync = "1";
     document.head.appendChild(script);
   }
+  if (!document.querySelector('script[data-favorites-study-stable]')) {
+    const stable = document.createElement("script");
+    stable.src = `/favorites-study-stable.js?v=20260801-multi-final&t=${Date.now()}`;
+    stable.defer = true;
+    stable.dataset.favoritesStudyStable = "1";
+    document.head.appendChild(stable);
+  }
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   let started = false;
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
