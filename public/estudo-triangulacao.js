@@ -23,14 +23,16 @@
     image.removeAttribute("src");
     image.style.opacity = "0";
     try {
-      const response = await fetch(`/assets/study/triangulacao-module-exact.base64?v=20260801-pitagoras-3&t=${Date.now()}`, {
+      const response = await fetch(`/assets/study/pitagoras-module-approved.base64?v=20260801-pitagoras-final-1&t=${Date.now()}`, {
         cache: "no-store",
         headers: { "Cache-Control": "no-cache" }
       });
       if (!response.ok) throw new Error("asset indisponível");
       const base64 = (await response.text()).trim();
-      if (!base64.startsWith("UklG")) throw new Error("formato inválido");
-      image.src = `data:image/webp;base64,${base64}`;
+      if (base64.startsWith("/9j/")) image.src = `data:image/jpeg;base64,${base64}`;
+      else if (base64.startsWith("UklG")) image.src = `data:image/webp;base64,${base64}`;
+      else if (base64.startsWith("iVBOR")) image.src = `data:image/png;base64,${base64}`;
+      else throw new Error("formato inválido");
       image.onload = () => { image.style.opacity = "1"; };
     } catch (error) {
       console.warn("Arte oficial do Pitágoras indisponível", error);
