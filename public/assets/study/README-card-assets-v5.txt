@@ -1,0 +1,1 @@
+Card assets v5 use direct binary JPEG files uploaded from the approved module artwork sources. Cache version: 20260731-card-v5.
