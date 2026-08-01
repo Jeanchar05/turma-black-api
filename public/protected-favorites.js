@@ -2,7 +2,7 @@
 (() => {
   if (!document.querySelector('script[data-study-platform-sync]')) {
     const script = document.createElement("script");
-    script.src = "/study-platform-sync.js?v=20260801-sync-2";
+    script.src = `/study-platform-sync.js?v=20260801-sync-final&t=${Date.now()}`;
     script.defer = true;
     script.dataset.studyPlatformSync = "1";
     document.head.appendChild(script);
