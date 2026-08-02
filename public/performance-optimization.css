@@ -1,0 +1,8 @@
+/* Global rendering performance layer */
+img{content-visibility:auto}
+.study-module-card,.dash-panel,.dash-stat-grid>article,.dash-feature-grid>article,.notes-card,.support-card,.module-card{content-visibility:auto;contain-intrinsic-size:320px 420px}
+.study-module-art,.dash-panel,.notes-card,.support-card{contain:layout paint style}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+html.performance-lite *,html.performance-lite *::before,html.performance-lite *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.08s!important}
+html.performance-lite .particles,html.performance-lite [class*="particle"],html.performance-lite [class*="ambient"],html.performance-lite [class*="glow"]::before,html.performance-lite [class*="glow"]::after{display:none!important}
+html.performance-lite .study-module-card,html.performance-lite .dash-panel,html.performance-lite .dash-stat-grid>article{box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
