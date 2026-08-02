@@ -1,0 +1,38 @@
+/* Turma do Primo — camada global final, leve e segura */
+:root{--tp-bg:#060811;--tp-card:#0d1120;--tp-card-2:#11162a;--tp-text:#f7f3ff;--tp-muted:#a9a4b7;--tp-border:rgba(255,255,255,.08);--tp-purple:#a84cff;--tp-gold:#f2c35d}
+html[data-theme="light"]{--tp-bg:#eef1f8;--tp-card:#fff;--tp-card-2:#f7f8fc;--tp-text:#171423;--tp-muted:#696477;--tp-border:rgba(31,24,52,.12)}
+html,body{color-scheme:dark}html[data-theme="light"],html[data-theme="light"] body{color-scheme:light}
+a,.dash-nav-item,.notes-main-nav a,.dash-user-menu,.dash-brand,.notes-brand{text-decoration:none!important}
+body{background:var(--tp-bg)}
+[data-global-theme],.dash-theme-toggle,#studyThemeToggle,#themeButton{cursor:pointer}
+.dash-avatar img,.notes-user-avatar img,[data-user-avatar] img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+/* tema claro global sem destruir a identidade */
+html[data-theme="light"] body,html[data-theme="light"] .dash-main,html[data-theme="light"] .notes-main,html[data-theme="light"] .support-main{background:#eef1f8!important;color:var(--tp-text)!important}
+html[data-theme="light"] .dash-sidebar,html[data-theme="light"] .notes-sidebar{background:linear-gradient(180deg,#fff,#f4f5fa)!important;border-color:var(--tp-border)!important}
+html[data-theme="light"] .dash-topbar,html[data-theme="light"] .notes-topbar{background:rgba(255,255,255,.92)!important;border-color:var(--tp-border)!important}
+html[data-theme="light"] .dash-panel,html[data-theme="light"] .dash-stat-grid article,html[data-theme="light"] .study-module-card,html[data-theme="light"] .study-metric,html[data-theme="light"] .study-home-side-card,html[data-theme="light"] .notes-editor,html[data-theme="light"] .notes-library,html[data-theme="light"] .notes-organizer{background:var(--tp-card)!important;color:var(--tp-text)!important;border-color:var(--tp-border)!important}
+html[data-theme="light"] p,html[data-theme="light"] small,html[data-theme="light"] em{color:var(--tp-muted)!important}
+/* estudo: oito módulos, capas consistentes e cards estáveis */
+.study-module-art{min-height:190px;overflow:hidden;background:radial-gradient(circle at 50% 35%,rgba(148,58,255,.22),transparent 60%),#080610}
+.study-module-art img{width:100%;height:100%;min-height:190px;object-fit:cover;display:block;transition:transform .35s ease}
+.study-module-card:hover .study-module-art img{transform:scale(1.025)}
+.study-module-card[hidden]{display:none!important}
+.study-module-grid{align-items:stretch}.study-module-card{height:100%}
+.study-open-module{margin-top:auto}
+/* navegação mobile consistente */
+@media(max-width:900px){
+  .dash-sidebar,.notes-sidebar{transform:translateX(-105%);transition:transform .25s ease;z-index:300!important}
+  .dash-sidebar.open,.notes-sidebar.open{transform:translateX(0)!important}
+  .dash-main,.notes-main{margin-left:0!important;width:100%!important}
+  .dash-topbar,.notes-topbar{padding-left:max(12px,env(safe-area-inset-left))!important;padding-right:max(12px,env(safe-area-inset-right))!important}
+  .dash-content,.study-home,.notes-workspace{padding-left:12px!important;padding-right:12px!important}
+  .study-home-layout{grid-template-columns:1fr!important}.study-home-side{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+}
+@media(max-width:620px){
+  .study-home-side{grid-template-columns:1fr}.study-metrics{grid-template-columns:1fr 1fr!important}.study-module-grid{grid-template-columns:1fr!important}
+  .dash-top-actions .dash-user-menu>span:nth-child(2){display:none}
+  .dash-notification-panel{right:8px!important;left:8px!important;width:auto!important;max-height:72vh!important}
+}
+/* acessibilidade e desempenho */
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+.performance-lite .dash-hero:after,.performance-lite .dash-progress-ring:after{animation:none!important}
