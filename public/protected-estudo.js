@@ -15,6 +15,11 @@
     if(route==="/estudo"||route==="/estudo.html"||route.startsWith("/estudo-")){
       load("/study-images-final.js?v=20260802-study-images-final-3","script","studyImagesFinalJs");
     }
+    if(route==="/gestao"||route==="/gestao.html"){
+      load("/assets/gestao/gestao-capa-data.js?v=20260802-gestao-cover","script","gestaoCoverData");
+      load("/gestao-final.css?v=20260802-gestao-final","style","gestaoFinalCss");
+      load("/gestao-final.js?v=20260802-gestao-final","script","gestaoFinalJs");
+    }
   }
   function bindImageFallback(){document.addEventListener("error",event=>{const img=event.target;if(!(img instanceof HTMLImageElement))return;const host=img.closest(".study-module-art,.study-final-infographic,.strategy-hero,.module-art");if(!host||host.dataset.fallbackApplied)return;host.dataset.fallbackApplied="1";host.classList.add("study-broken-image");img.style.display="none"},true)}
   function release(){if(released)return;released=true;document.body?.style.setProperty("opacity","1","important");document.body?.style.setProperty("visibility","visible","important");document.body?.classList.add("protected-ready");const loader=document.getElementById("studyLoading");if(loader){loader.style.opacity="0";loader.style.pointerEvents="none";setTimeout(()=>loader.remove(),180)}document.dispatchEvent(new CustomEvent("turma:study-ready"));document.dispatchEvent(new CustomEvent("turma:protected-ready"))}
