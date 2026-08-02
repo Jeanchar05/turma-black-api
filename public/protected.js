@@ -8,8 +8,15 @@
     if (!document.querySelector('link[data-global-responsive]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "/responsive-global.css?v=20260729-profile-session-2";
+      link.href = "/responsive-global.css?v=20260801-eight-modules";
       link.dataset.globalResponsive = "true";
+      document.head.appendChild(link);
+    }
+    if (!document.querySelector('link[data-eight-modules-fix]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "/platform-eight-modules-fix.css?v=20260801-eight-modules";
+      link.dataset.eightModulesFix = "1";
       document.head.appendChild(link);
     }
     if (!document.querySelector('script[data-study-platform-sync]')) {
@@ -17,6 +24,13 @@
       script.src = "/study-platform-sync.js?v=20260801-sync-2";
       script.defer = true;
       script.dataset.studyPlatformSync = "1";
+      document.head.appendChild(script);
+    }
+    if (!document.querySelector('script[data-eight-modules-fix]')) {
+      const script = document.createElement("script");
+      script.src = "/platform-eight-modules-fix.js?v=20260801-eight-modules";
+      script.defer = true;
+      script.dataset.eightModulesFix = "1";
       document.head.appendChild(script);
     }
   }
