@@ -8,7 +8,7 @@
     if (!document.querySelector('link[data-global-responsive]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "/responsive-global.css?v=20260801-eight-modules";
+      link.href = "/responsive-global.css?v=20260802-performance-1";
       link.dataset.globalResponsive = "true";
       document.head.appendChild(link);
     }
@@ -18,6 +18,13 @@
       link.href = "/platform-eight-modules-fix.css?v=20260801-eight-modules";
       link.dataset.eightModulesFix = "1";
       document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[data-performance-optimization]')) {
+      const script = document.createElement("script");
+      script.src = "/performance-optimization.js?v=20260802-performance-1";
+      script.defer = true;
+      script.dataset.performanceOptimization = "1";
+      document.head.appendChild(script);
     }
     if (!document.querySelector('script[data-study-platform-sync]')) {
       const script = document.createElement("script");
@@ -39,7 +46,7 @@
   document.addEventListener("DOMContentLoaded", validatePage, { once: true });
 
   async function cleanupLegacyBrowserState() {
-    const marker = "legacy-render-cleanup-v1";
+    const marker = "legacy-render-cleanup-v2";
     try { if (sessionStorage.getItem(marker) === "ok") return; } catch (_) {}
     try {
       if ("serviceWorker" in navigator) {
@@ -78,8 +85,10 @@
     cleanupLegacyBrowserState().catch(() => {});
     const token = getToken();
     if (!token) { window.location.replace("/"); return; }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
     try {
-      const response = await fetch(`${window.location.origin}/me`, { headers: { Accept: "application/json", Authorization: `Bearer ${token}` }, cache: "no-store" });
+      const response = await fetch(`${window.location.origin}/me`, { headers: { Accept: "application/json", Authorization: `Bearer ${token}` }, cache: "no-store", signal: controller.signal });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data?.usuario) throw new Error(data?.erro || "Sessão inválida.");
       const user = data.usuario;
@@ -88,7 +97,17 @@
       fillUser(user);
       document.body.classList.add("protected-ready");
       document.dispatchEvent(new CustomEvent("turma:protected-ready", { detail: { user } }));
-    } catch (_) { clearSession(); window.location.replace("/"); }
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        document.body.classList.add("protected-ready");
+        document.querySelectorAll(".dash-loading,.notes-loading,.support-loading").forEach((element) => element.remove());
+        return;
+      }
+      clearSession();
+      window.location.replace("/");
+    } finally {
+      clearTimeout(timeout);
+    }
   }
   function roleLabel(role) { return {dev:"Dev",dono:"Dono",superadmin:"Dono",admin:"Admin",financeiro:"Financeiro",vendedor:"Vendedor",moderador:"Moderador",suporte:"Suporte",aluno:"Aluno"}[role] || "Usuário"; }
   function fillUser(user) {
