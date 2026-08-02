@@ -1,0 +1,5 @@
+/* Ajustes globais: navegação, cabeçalhos e contadores de 8 módulos */
+.dash-nav a,.dash-nav button,.notes-main-nav a,.support-nav a,.dash-user-menu,.dash-user-menu strong,.dash-user-menu small,.notes-sidebar-user strong,.notes-sidebar-user small,.support-user strong,.support-user small,.dash-brand,.notes-brand,.support-brand{text-decoration:none!important}
+.dash-nav a:hover,.dash-nav button:hover,.notes-main-nav a:hover,.support-nav a:hover,.dash-user-menu:hover{text-decoration:none!important}
+.study-module-art img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;background:#09040f}
+.study-module-card[data-module="cavalos"] .study-module-art img{object-fit:cover}
