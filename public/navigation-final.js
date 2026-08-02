@@ -12,6 +12,7 @@
     "suporte",
     "perfil",
     "roleta",
+    "gestao",
     "provas",
     "favoritos"
   ];
@@ -65,6 +66,12 @@
       paths: ["/roleta", "/roleta.html"],
       dataNav: ["roleta"]
     },
+    gestao: {
+      label: "Gestão",
+      description: "Banca, unidade, meta, stop-loss e histórico.",
+      paths: ["/gestao", "/gestao.html"],
+      dataNav: ["gestao", "gestao-banca"]
+    },
     provas: {
       label: "Provas",
       description: "Desafios, provas e aprendizado.",
@@ -114,6 +121,12 @@
       element.querySelector("strong");
   }
 
+  function isCurrentItem(key) {
+    const path = normalizedPath(location.pathname);
+    if (MENU[key]?.paths.includes(path)) return true;
+    return key === "estudo" && path.startsWith("/estudo-");
+  }
+
   function applyItem(element, key) {
     const item = MENU[key];
     if (!item) return;
@@ -125,6 +138,7 @@
     element.dataset.menuDescription = item.description;
     element.title = item.description;
     element.setAttribute("aria-label", `${item.label}: ${item.description}`);
+    element.classList.toggle("active", isCurrentItem(key));
   }
 
   function removeStudentAdminLinks(sidebar) {
@@ -148,7 +162,23 @@
     });
   }
 
+  function ensureGestaoItem(nav) {
+    if (!nav || ADMIN_PATHS.includes(normalizedPath(location.pathname))) return;
+    const recognized = Array.from(nav.children).filter(element => itemKey(element));
+    if (recognized.length < 5 || recognized.some(element => itemKey(element) === "gestao")) return;
+
+    const template = recognized.find(element => element.classList.contains("dash-nav-item")) || recognized[0];
+    const item = document.createElement("a");
+    item.className = template?.className || "dash-nav-item";
+    item.classList.remove("active");
+    item.href = "/gestao";
+    item.innerHTML = '<svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Gestão</b>';
+    nav.appendChild(item);
+  }
+
   function normalizeNav(nav) {
+    ensureGestaoItem(nav);
+
     const directItems = Array.from(nav.children).filter((element) => {
       return element.matches?.("a[href],button[data-nav]") && itemKey(element);
     });
@@ -207,7 +237,9 @@
 
   function updateDashboardCopy() {
     const search = document.querySelector(".dash-search-trigger em");
-    if (search) search.textContent = "Buscar conteúdos, módulos e anotações…";
+    if (search && !document.body.classList.contains("bankroll-page")) {
+      search.textContent = "Buscar conteúdos, módulos e anotações…";
+    }
 
     document.querySelectorAll('[data-nav="notas"]').forEach((element) => {
       if (element.closest(".dash-nav")) return;
