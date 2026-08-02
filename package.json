@@ -1,11 +1,9 @@
 {
   "name": "turma-do-primo-api",
-  "version": "4.2.0",
-  "description": "Plataforma Turma do Primo com frontend, backend e MySQL integrados na Hostinger",
+  "version": "4.3.0",
+  "description": "Plataforma Turma do Primo com frontend, backend, MySQL e notificações push integrados na Hostinger",
   "main": "server.js",
-  "engines": {
-    "node": "22.x"
-  },
+  "engines": { "node": "22.x" },
   "scripts": {
     "start": "node scripts/validate.js && node server.js",
     "dev": "nodemon server.js",
@@ -18,9 +16,8 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^8.0.0",
     "mysql2": "^3.14.3",
-    "pdfkit": "^0.15.0"
+    "pdfkit": "^0.15.0",
+    "web-push": "^3.6.7"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.9"
-  }
+  "devDependencies": { "nodemon": "^3.1.9" }
 }
