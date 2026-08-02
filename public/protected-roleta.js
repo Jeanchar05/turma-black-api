@@ -2,6 +2,16 @@
 (() => {
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
 
+  function installGlobalLayer(){
+    if(document.querySelector('script[data-global-theme-v2]'))return;
+    const script=document.createElement("script");
+    script.src="/theme-global-v2.js?v=20260802-upgrade-v6";
+    script.defer=true;
+    script.dataset.globalThemeV2="1";
+    document.head.appendChild(script);
+  }
+  installGlobalLayer();
+
   function forceVisible() {
     if (!document.body) return;
     document.body.style.setProperty("opacity", "1", "important");
@@ -11,10 +21,7 @@
   function getToken() {
     for (const storage of [sessionStorage, localStorage]) {
       for (const key of TOKEN_KEYS) {
-        try {
-          const value = storage.getItem(key);
-          if (value) return value;
-        } catch (_) {}
+        try { const value = storage.getItem(key); if (value) return value; } catch (_) {}
       }
     }
     return "";
@@ -33,22 +40,16 @@
     document.getElementById("rouletteSidebar")?.style.removeProperty("visibility");
     document.querySelector(".roulette-main")?.style.removeProperty("visibility");
     document.getElementById("rouletteLoading")?.remove();
+    document.dispatchEvent(new CustomEvent("turma:protected-ready", { detail: { user } }));
     document.dispatchEvent(new CustomEvent("turma:roulette-ready", { detail: { user } }));
   }
 
   async function start() {
     forceVisible();
     const token = getToken();
-    if (!token) {
-      location.replace("/");
-      return;
-    }
-
+    if (!token) { location.replace("/"); return; }
     try {
-      const response = await fetch(`${location.origin}/me`, {
-        headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
-        cache: "no-store"
-      });
+      const response = await fetch(`${location.origin}/me`, { headers: { Accept: "application/json", Authorization: `Bearer ${token}` }, cache: "no-store" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data?.usuario) throw new Error("Sessão inválida");
       release(data.usuario);
