@@ -1,0 +1,14 @@
+"use strict";
+(() => {
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const KEYS=["token","adminToken","authToken","accessToken","jwt"];
+  const stores=["study_cavalos_v1","study_espelhos_gemeos_v1","study_espelhos_v1","study_fibonacci_v1","study_magneto_v1","study_camaleoes_v2","study_triangulacao_v1","study_eclipse_zero_v1"];
+  const token=()=>{for(const st of[sessionStorage,localStorage])for(const k of KEYS){try{const v=st.getItem(k);if(v)return v}catch{}}return""};
+  function progress(key){try{const p=Object.values(JSON.parse(localStorage.getItem(key)||"{}").progress||{});return p.length?Math.round(p.filter(Boolean).length/Math.max(3,p.length)*100):0}catch{return 0}}
+  function focus(){const key="turma_focus_days_v2",today=new Date().toISOString().slice(0,10);let d={last:"",days:0};try{d=JSON.parse(localStorage.getItem(key)||"{}")||d}catch{}if(d.last!==today){const y=new Date(Date.now()-86400000).toISOString().slice(0,10);d.days=d.last===y?Number(d.days||0)+1:1;d.last=today;localStorage.setItem(key,JSON.stringify(d))}return d.days||1}
+  function fill(){const ps=stores.map(progress),done=ps.filter(x=>x===100).length,avg=Math.round(ps.reduce((a,b)=>a+b,0)/stores.length);$("#statModules").textContent=`${done} / 8`;$("#statProgress").textContent=`${avg}%`;$("#statFocus").textContent=focus();$("#progressBar")?.style.setProperty("--p",`${avg}%`);$("#progressValue").textContent=`${avg}%`;}
+  async function user(){const t=token();if(!t)return;try{const r=await fetch("/dashboard-premium/home",{headers:{Authorization:`Bearer ${t}`,Accept:"application/json"},cache:"no-store"});const d=await r.json();const u=d.usuario||{};$$('[data-user-name]').forEach(e=>e.textContent=String(u.nome||"Primo").split(/\s+/)[0]);$$('[data-user-role]').forEach(e=>e.textContent=u.cargo||u.tipo||"Aluno")}catch{}}
+  function nav(){const routes={inicio:"/dashboard",notas:"/notas",minigames:"/minigames",estudo:"/estudo",modulos:"/modulos",suporte:"/suporte",perfil:"/perfil",roleta:"/roleta",provas:"/provas",favoritos:"/favoritos"};$$('[data-nav]').forEach(b=>b.addEventListener("click",()=>{const r=routes[b.dataset.nav];if(r)location.href=r}));$("#dashMenuToggle")?.addEventListener("click",()=>$("#dashSidebar")?.classList.add("open"));$("#dashMobileOverlay")?.addEventListener("click",()=>$("#dashSidebar")?.classList.remove("open"));}
+  function init(){fill();user();nav();document.body.classList.add("protected-ready","neo-ready");$("#dashLoading")?.remove()}
+  document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init,{once:true}):init();
+})();
