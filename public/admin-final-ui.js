@@ -4,11 +4,10 @@
     if (document.querySelector('link[data-global-responsive]')) return;
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/responsive-global.css?v=20260729-support-online-9";
+    link.href = "/responsive-global.css?v=20260801-push";
     link.dataset.globalResponsive = "true";
     document.head.appendChild(link);
   }
-
   function applyPeriodSwitch() {
     const select = document.getElementById("overviewChartPeriod");
     if (!select || select.closest(".admin-period-switch")) return;
@@ -28,33 +27,28 @@
     select.parentNode.insertBefore(wrapper, select);
     wrapper.appendChild(select);
   }
-
   function registerPeriodEvents() {
-    document.addEventListener("click", (event) => {
+    document.addEventListener("click", event => {
       const button = event.target.closest("[data-overview-days]");
       if (!button) return;
       const select = document.getElementById("overviewChartPeriod");
       if (!select) return;
       select.value = button.dataset.overviewDays;
-      document.querySelectorAll("[data-overview-days]").forEach((item) => item.classList.toggle("active", item === button));
+      document.querySelectorAll("[data-overview-days]").forEach(item => item.classList.toggle("active", item === button));
       select.dispatchEvent(new Event("change", { bubbles: true }));
     });
   }
-
   async function init() {
     installResponsiveLayer();
     registerPeriodEvents();
     applyPeriodSwitch();
     setTimeout(applyPeriodSwitch, 250);
     try {
-      await import("./admin-support-center.js?v=20260729-support-online-9");
-      await import("./admin-support-live.js?v=20260729-support-online-9");
-    } catch (error) {
-      console.error("Falha ao carregar a central de suporte:", error);
-    }
+      await import("./admin-push-bridge.js?v=20260801-push");
+      await import("./admin-support-center.js?v=20260801-push");
+      await import("./admin-support-live.js?v=20260801-push");
+    } catch (error) { console.error("Falha ao carregar extras do admin:", error); }
   }
-
   installResponsiveLayer();
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
-  else init();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true }); else init();
 })();
