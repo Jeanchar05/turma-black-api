@@ -1,0 +1,17 @@
+"use strict";
+(() => {
+  const $=(s,r=document)=>r.querySelector(s);
+  const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const KEYS=["token","adminToken","authToken","accessToken","jwt"];
+  const modules=["Cavalos","Gêmeos","Espelhos","Fibonacci","Magneto","Camaleões","Pitágoras","Eclipse Zero"];
+  function token(){for(const storage of [sessionStorage,localStorage])for(const key of KEYS){try{const v=storage.getItem(key);if(v)return v}catch(_){}}return""}
+  function clear(){for(const storage of [sessionStorage,localStorage])for(const key of KEYS){try{storage.removeItem(key)}catch(_){}}}
+  function readProgress(){const keys=["study_cavalos_v1","study_espelhos_gemeos_v1","study_espelhos_v1","study_fibonacci_v1","study_magneto_v1","study_camaleoes_v2","study_triangulacao_v1","study_eclipse_zero_v1"];let done=0,totalPct=0;keys.forEach(key=>{try{const s=JSON.parse(localStorage.getItem(key)||"{}"),v=Object.values(s.progress||{});const pct=v.length?Math.round(v.filter(Boolean).length/Math.max(3,v.length)*100):0;totalPct+=pct;if(pct===100)done++}catch(_){}});return{done,avg:Math.round(totalPct/keys.length)}}
+  function focusDays(){try{const today=new Date().toISOString().slice(0,10);const list=JSON.parse(localStorage.getItem("turma_focus_days")||"[]");if(!list.includes(today))list.push(today);localStorage.setItem("turma_focus_days",JSON.stringify(list.slice(-120)));const sorted=[...new Set(list)].sort().reverse();let streak=0,cursor=new Date();for(const day of sorted){const expected=cursor.toISOString().slice(0,10);if(day!==expected)break;streak++;cursor.setDate(cursor.getDate()-1)}return streak}catch(_){return 0}}
+  async function getUser(){const t=token();if(!t)return null;const c=new AbortController();const timer=setTimeout(()=>c.abort(),6000);try{const r=await fetch("/me",{headers:{Accept:"application/json",Authorization:`Bearer ${t}`},cache:"no-store",signal:c.signal});const d=await r.json().catch(()=>({}));return r.ok?d.usuario:null}catch(_){return null}finally{clearTimeout(timer)}}
+  function fillUser(user){const name=String(user?.nome||"Primo");const first=name.trim().split(/\s+/)[0]||"Primo";$$('[data-name]').forEach(e=>e.textContent=first);$$('[data-role]').forEach(e=>e.textContent=user?.cargo||user?.tipo||"Aluno");$$('[data-avatar]').forEach(e=>e.textContent=first.charAt(0).toUpperCase())}
+  function render(){const p=readProgress();$("#modulesDone").textContent=`${p.done}/8`;$("#generalProgress").textContent=`${p.avg}%`;$("#focusDays").textContent=String(focusDays());$("#moduleGrid").innerHTML=modules.map((m,i)=>`<article class="lite-module"><h3>${i+1}. ${m}</h3><p>Conteúdo premium disponível na sua trilha de estudos.</p><a href="/estudo">Acessar módulo →</a></article>`).join("")}
+  function bind(){const side=$("#liteSide"),overlay=$("#liteOverlay");$("#liteMenu")?.addEventListener("click",()=>{side.classList.add("open");overlay.classList.add("show")});overlay?.addEventListener("click",()=>{side.classList.remove("open");overlay.classList.remove("show")});$("#logout")?.addEventListener("click",()=>{clear();location.replace("/")})}
+  async function init(){render();bind();const user=await getUser();if(!token()){location.replace("/");return}if(user)fillUser(user);$("#liteLoading")?.classList.add("hidden")}
+  document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init,{once:true}):init();
+})();
