@@ -14,6 +14,11 @@
     if(route==="/estudo"||route==="/estudo.html"||route.startsWith("/estudo-")){
       load("/study-images-final.js?v=20260802-study-images-final-4","script","studyImagesFinalJs");
     }
+    if(route.startsWith("/estudo-")&&route!=="/estudo.html"){
+      load("/race-tool.css?v=20260802-race-shared-1","style","raceToolCss");
+      load("/race-tool.js?v=20260802-race-shared-1","script","raceToolJs");
+      load("/study-race-injector.js?v=20260802-race-shared-1","script","studyRaceInjectorJs");
+    }
     if(route==="/gestao"||route==="/gestao.html"){
       load("/assets/gestao/gestao-capa-data.js?v=20260802-gestao-cover-2","script","gestaoCoverData");
       load("/gestao-final.css?v=20260802-gestao-final-2","style","gestaoFinalCss");
