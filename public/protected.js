@@ -5,41 +5,29 @@
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
   function installResponsiveLayer() {
-    if (!document.querySelector('link[data-global-responsive]')) {
+    const addStyle = (src, marker) => {
+      if (document.querySelector(`link[data-${marker}]`)) return;
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "/responsive-global.css?v=20260802-performance-1";
-      link.dataset.globalResponsive = "true";
+      link.href = src;
+      link.dataset[marker] = "1";
       document.head.appendChild(link);
-    }
-    if (!document.querySelector('link[data-eight-modules-fix]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "/platform-eight-modules-fix.css?v=20260801-eight-modules";
-      link.dataset.eightModulesFix = "1";
-      document.head.appendChild(link);
-    }
-    if (!document.querySelector('script[data-performance-optimization]')) {
+    };
+    const addScript = (src, marker) => {
+      if (document.querySelector(`script[data-${marker}]`)) return;
       const script = document.createElement("script");
-      script.src = "/performance-optimization.js?v=20260802-performance-1";
+      script.src = src;
       script.defer = true;
-      script.dataset.performanceOptimization = "1";
+      script.dataset[marker] = "1";
       document.head.appendChild(script);
-    }
-    if (!document.querySelector('script[data-study-platform-sync]')) {
-      const script = document.createElement("script");
-      script.src = "/study-platform-sync.js?v=20260801-sync-2";
-      script.defer = true;
-      script.dataset.studyPlatformSync = "1";
-      document.head.appendChild(script);
-    }
-    if (!document.querySelector('script[data-eight-modules-fix]')) {
-      const script = document.createElement("script");
-      script.src = "/platform-eight-modules-fix.js?v=20260801-eight-modules";
-      script.defer = true;
-      script.dataset.eightModulesFix = "1";
-      document.head.appendChild(script);
-    }
+    };
+
+    addStyle("/responsive-global.css?v=20260802-performance-2", "globalResponsive");
+    addStyle("/platform-eight-modules-fix.css?v=20260801-eight-modules", "eightModulesFix");
+    addScript("/theme-global-v2.js?v=20260802-upgrade-v6", "globalThemeV2");
+    addScript("/performance-optimization.js?v=20260802-performance-2", "performanceOptimization");
+    addScript("/study-platform-sync.js?v=20260801-sync-2", "studyPlatformSync");
+    addScript("/platform-eight-modules-fix.js?v=20260801-eight-modules", "eightModulesFix");
   }
 
   installResponsiveLayer();
