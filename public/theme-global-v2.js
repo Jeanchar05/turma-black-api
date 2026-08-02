@@ -13,15 +13,16 @@
     load("/platform-final.css?v=20260802-final-1","style","platformFinalCss");
     load("/platform-upgrade-v6.css?v=20260802-upgrade-v6","style","platformUpgradeV6Css");
     load("/platform-final.js?v=20260802-final-2","script","platformFinalJs");
-    load("/navigation-final.js?v=20260802-navigation-final-2","script","navigationFinalJs");
+    load("/navigation-final.js?v=20260802-navigation-final-3","script","navigationFinalJs");
     load("/platform-upgrade-v6.js?v=20260802-upgrade-v6","script","platformUpgradeV6Js");
+    load("/notifications-button-v7.js?v=20260802-notifications-v7","script","notificationsButtonV7Js");
     const route=location.pathname.replace(/\/$/,"")||"/";
     if(route==="/estudo"||route==="/estudo.html"||route.startsWith("/estudo-")){
       load("/study-images-final.js?v=20260802-study-images-final-4","script","studyImagesFinalJs");
     }
     if(document.body?.classList.contains("student-dashboard")&&document.querySelector(".dash-hero")){
       load("/dashboard-final.css?v=20260802-final-2","style","dashboardFinalCss");
-      load("/dashboard-final.js?v=20260802-final-3","script","dashboardFinalJs");
+      load("/dashboard-final.js?v=20260802-final-4","script","dashboardFinalJs");
     }
   }
   apply(saved(),false);
