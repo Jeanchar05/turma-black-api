@@ -1,0 +1,101 @@
+/* Turma do Primo — acabamento global 02/08/2026 */
+:root{
+  --tp-bg:#07030d;
+  --tp-panel:#12081d;
+  --tp-panel-2:#1b0c2a;
+  --tp-border:rgba(190,92,255,.24);
+  --tp-purple:#b14cff;
+  --tp-gold:#f1c45a;
+  --tp-text:#f8f3ff;
+  --tp-muted:#aa9fb5;
+}
+
+/* Cabeçalho da aba Anotações no mesmo padrão das demais áreas */
+.notes-topbar{min-height:82px!important;padding:14px 22px!important;border-bottom:1px solid rgba(190,92,255,.14)!important;background:rgba(7,3,13,.9)!important;backdrop-filter:blur(18px)}
+.notes-title-group{display:flex!important;align-items:center!important;gap:13px!important;min-width:270px!important;padding:8px 13px!important;border:1px solid rgba(190,92,255,.16)!important;border-radius:16px!important;background:linear-gradient(145deg,rgba(27,12,42,.76),rgba(12,5,20,.76))!important;text-decoration:none!important}
+.notes-title-icon{display:grid!important;place-items:center!important;flex:0 0 43px!important;width:43px!important;height:43px!important;border:1px solid rgba(203,111,255,.35)!important;border-radius:14px!important;background:rgba(175,67,255,.13)!important;color:#d694ff!important;box-shadow:0 0 22px rgba(156,48,232,.13)}
+.notes-title-icon svg{width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important}
+.notes-title-group h1{margin:0!important;color:#fff!important;font:800 18px Sora,sans-serif!important;text-decoration:none!important}
+.notes-title-group p{margin:3px 0 0!important;color:#988ca2!important;font-size:11px!important;text-decoration:none!important}
+.notes-sidebar a,.notes-sidebar span,.notes-sidebar strong,.notes-topbar *{text-decoration:none!important}
+
+/* Ícone de Gestão independente do sprite, evitando símbolo quebrado */
+.tp-management-icon{display:grid!important;place-items:center!important;width:22px!important;height:22px!important;flex:0 0 22px!important}
+.tp-management-icon svg{display:block!important;width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+
+/* Popover global de notificações */
+.turma-notification-popover{position:fixed;z-index:100000;right:22px;top:76px;width:min(390px,calc(100vw - 28px));max-height:min(620px,calc(100vh - 98px));overflow:hidden;border:1px solid rgba(190,92,255,.28);border-radius:22px;background:linear-gradient(155deg,rgba(24,10,38,.99),rgba(8,3,14,.99));box-shadow:0 26px 90px rgba(0,0,0,.58),0 0 45px rgba(137,38,213,.18);color:#fff;backdrop-filter:blur(18px)}
+.turma-notification-popover[hidden]{display:none!important}
+.turma-notification-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.turma-notification-head div span{display:block;color:#b46bdf;font-size:9px;font-weight:900;letter-spacing:.16em}
+.turma-notification-head h3{margin:4px 0 0;font:800 17px Sora,sans-serif}
+.turma-notification-head button{border:0;background:transparent;color:#d08cff;font-size:11px;font-weight:800;cursor:pointer}
+.turma-notification-list{display:grid;gap:8px;max-height:490px;overflow:auto;padding:12px}
+.turma-notification-item{display:grid;grid-template-columns:42px 1fr;gap:12px;padding:13px;border:1px solid rgba(255,255,255,.065);border-radius:16px;background:rgba(255,255,255,.025);cursor:pointer;transition:.18s ease}
+.turma-notification-item:hover{transform:translateY(-1px);border-color:rgba(194,91,255,.28);background:rgba(177,68,255,.07)}
+.turma-notification-item.unread{border-color:rgba(194,91,255,.22);background:linear-gradient(145deg,rgba(137,37,208,.11),rgba(255,255,255,.025))}
+.turma-notification-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:rgba(177,68,255,.12);color:#d697ff}
+.turma-notification-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2}
+.turma-notification-item strong{display:block;color:#f8f2fb;font-size:12px}
+.turma-notification-item p{margin:5px 0 0;color:#9f93a8;font-size:11px;line-height:1.5}
+.turma-notification-item time{display:block;margin-top:6px;color:#6f6378;font-size:9px}
+.turma-notification-empty{padding:42px 18px;text-align:center;color:#8f8398;font-size:12px;line-height:1.65}
+.turma-notification-badge{position:absolute;right:-4px;top:-4px;display:grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border:2px solid #08030e;border-radius:999px;background:#e94b67;color:#fff;font:900 9px Inter,sans-serif}
+
+/* Barra de rolagem da aba Favoritos e de todas as áreas principais */
+.favorites-page,.favorites-page .dash-main,.favorites-page .favorites-content{overflow-y:auto!important;scrollbar-width:thin!important;scrollbar-color:#a343e3 rgba(255,255,255,.04)!important}
+.favorites-page::-webkit-scrollbar,.favorites-page .dash-main::-webkit-scrollbar,.favorites-page .favorites-content::-webkit-scrollbar,.turma-notification-list::-webkit-scrollbar{width:9px}
+.favorites-page::-webkit-scrollbar-track,.favorites-page .dash-main::-webkit-scrollbar-track,.favorites-page .favorites-content::-webkit-scrollbar-track,.turma-notification-list::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border-radius:999px}
+.favorites-page::-webkit-scrollbar-thumb,.favorites-page .dash-main::-webkit-scrollbar-thumb,.favorites-page .favorites-content::-webkit-scrollbar-thumb,.turma-notification-list::-webkit-scrollbar-thumb{background:linear-gradient(#cf75ff,#7b25bc);border:2px solid transparent;border-radius:999px;background-clip:padding-box}
+
+/* Capas dos cards de Estudo e Módulos */
+.study-module-art,.module-video-cover{position:relative!important;overflow:hidden!important;background:#08020e!important}
+.study-module-art img,.module-video-cover img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;opacity:1!important;visibility:visible!important;filter:none!important;transform:none!important}
+.study-module-card:hover .study-module-art img,.module-video-item:hover .module-video-cover img{transform:scale(1.025)!important;transition:transform .35s ease!important}
+.study-module-card .study-module-icon,.study-module-card [class*="icon"]{position:relative;z-index:3}
+.study-module-card svg,.modules-page svg{max-width:100%;max-height:100%}
+.study-broken-image{background:radial-gradient(circle at 50% 35%,rgba(149,45,231,.28),transparent 38%),linear-gradient(145deg,#160721,#07020c)!important}
+.study-broken-image::after{content:"Turma do Primo";position:absolute;inset:auto 12px 12px;display:grid;place-items:center;height:34px;border:1px solid rgba(239,193,82,.22);border-radius:12px;color:#e5be60;font:800 10px Sora,sans-serif;letter-spacing:.12em}
+.modules-player-frame.has-module-cover{background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important}
+.modules-player-frame.has-module-cover::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,1,8,.18),rgba(5,2,9,.78));pointer-events:none}
+.modules-player-frame.has-module-cover>*{position:relative;z-index:1}
+
+/* Tema claro da Roleta — substitui cores rígidas do CSS isolado */
+[data-theme="light"] body.roulette-page{background:#f5f1f8!important;color:#312638!important}
+[data-theme="light"] .roulette-sidebar,[data-theme="light"] .roulette-topbar{background:rgba(255,255,255,.96)!important;border-color:rgba(103,50,133,.14)!important;box-shadow:0 14px 35px rgba(75,31,98,.08)!important}
+[data-theme="light"] .roulette-main,[data-theme="light"] .roulette-shell{background:#f5f1f8!important}
+[data-theme="light"] .roulette-hero-new,[data-theme="light"] .roulette-platform-new,[data-theme="light"] .roulette-panel-new,[data-theme="light"] .roulette-responsible-new,[data-theme="light"] .roulette-casino-card,[data-theme="light"] .roulette-tool-card-new{background:#fff!important;border-color:rgba(112,48,157,.15)!important;box-shadow:0 18px 50px rgba(78,32,100,.08)!important}
+[data-theme="light"] .roulette-hero-copy-new h1,[data-theme="light"] .roulette-panel-head-new h2,[data-theme="light"] .roulette-casino-card h3,[data-theme="light"] .roulette-tool-card-new h3,[data-theme="light"] .roulette-platform-info p,[data-theme="light"] .roulette-card-body p{color:#302435!important}
+[data-theme="light"] .roulette-hero-copy-new p,[data-theme="light"] .roulette-panel-head-new p,[data-theme="light"] .roulette-tool-card-new p,[data-theme="light"] .roulette-card-body small,[data-theme="light"] .roulette-responsible-new p{color:#716579!important}
+[data-theme="light"] .roulette-search,[data-theme="light"] .roulette-theme-top,[data-theme="light"] .roulette-notification,[data-theme="light"] .roulette-avatar-top{background:#f5eef9!important;border-color:rgba(102,45,138,.13)!important;color:#4d3b56!important}
+[data-theme="light"] .roulette-sidebar .dash-nav-item{color:#5b4b63!important}
+[data-theme="light"] .roulette-sidebar .dash-nav-item.active{color:#6e238e!important;background:linear-gradient(135deg,#f3e6fb,#ead7f6)!important}
+
+/* Tema claro da aba Provas */
+[data-theme="light"] body.exams-page{background:#f5f1f8!important;color:#302536!important}
+[data-theme="light"] .exams-page .dash-sidebar,[data-theme="light"] .exams-page .dash-topbar{background:rgba(255,255,255,.96)!important;border-color:rgba(107,50,137,.14)!important}
+[data-theme="light"] .exam-content{background:#f5f1f8!important}
+[data-theme="light"] .exam-card,[data-theme="light"] .exam-side-card,[data-theme="light"] .exam-toolbar,[data-theme="light"] .exam-note{background:#fff!important;border-color:rgba(112,48,157,.14)!important;box-shadow:0 18px 45px rgba(75,32,98,.07)!important}
+[data-theme="light"] .exam-heading h1,[data-theme="light"] .exam-card h2,[data-theme="light"] .exam-side-card h3{color:#2f2434!important}
+[data-theme="light"] .exam-heading p,[data-theme="light"] .exam-card-desc,[data-theme="light"] .exam-score-caption,[data-theme="light"] .exam-note p{color:#74677c!important}
+[data-theme="light"] .exam-tool{background:#fff!important;border-color:rgba(104,49,136,.15)!important;color:#46364f!important}
+[data-theme="light"] .exam-tool input,[data-theme="light"] .exam-tool select{color:#46364f!important}
+[data-theme="light"] .exam-lock{background:#f2e9f7!important;color:#735282!important;border-color:rgba(113,50,147,.14)!important}
+
+/* Tema claro do popover */
+[data-theme="light"] .turma-notification-popover{background:rgba(255,255,255,.99);border-color:rgba(109,48,148,.16);box-shadow:0 24px 70px rgba(76,32,99,.18);color:#302536}
+[data-theme="light"] .turma-notification-head{border-color:rgba(80,40,105,.09)}
+[data-theme="light"] .turma-notification-head h3,[data-theme="light"] .turma-notification-item strong{color:#302536}
+[data-theme="light"] .turma-notification-item{background:#faf7fc;border-color:rgba(105,48,140,.1)}
+[data-theme="light"] .turma-notification-item p{color:#74687c}
+
+/* Mobile */
+@media(max-width:760px){
+  .notes-topbar{padding:10px 12px!important;gap:8px!important}
+  .notes-title-group{min-width:0!important;flex:1!important;padding:7px 9px!important}
+  .notes-title-group p{display:none!important}
+  .notes-title-icon{width:38px!important;height:38px!important;flex-basis:38px!important}
+  .notes-global-search{order:5;width:100%!important}
+  .turma-notification-popover{right:10px;top:66px;width:calc(100vw - 20px);max-height:calc(100vh - 78px)}
+  .study-module-art{min-height:150px!important}
+}
