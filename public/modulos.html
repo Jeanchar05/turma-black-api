@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07030d" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Módulos | Turma do Primo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/dashboard-premium.css" />
+  <link rel="stylesheet" href="/theme-global-v2.css" />
+  <link rel="stylesheet" href="/modulos.css" />
+  <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
+
+  <script defer src="/protected-estudo.js"></script>
+  <script defer src="/theme-global-v2.js"></script>
+  <script defer src="/modulos.js"></script>
+</head>
+<body class="student-dashboard modules-page" data-required-access="dashboard">
+  <div class="modules-loading" id="modulesLoading" role="status">
+    <img src="/assets/turma-primo-logo.svg" alt="" />
+    <div>
+      <strong>Preparando suas videoaulas</strong>
+      <span>Organizando os módulos disponíveis…</span>
+    </div>
+  </div>
+
+  <div class="dash-mobile-overlay" id="modulesMobileOverlay" hidden></div>
+
+  <aside class="dash-sidebar" id="modulesSidebar">
+    <a class="dash-brand" href="/dashboard">
+      <img src="/assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
+      <span><small>TURMA DO</small><strong>PRIMO</strong></span>
+    </a>
+
+    <nav class="dash-nav" aria-label="Navegação principal">
+      <a class="dash-nav-item" href="/dashboard"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
+      <a class="dash-nav-item" href="/notas"><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg><b>Anotações</b></a>
+      <a class="dash-nav-item" href="/minigames"><svg><use href="/assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
+      <a class="dash-nav-item" href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
+      <a class="dash-nav-item active" href="/modulos"><svg><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      <a class="dash-nav-item" href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+      <a class="dash-nav-item" href="/roleta"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
+      <a class="dash-nav-item" href="/provas"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
+      <a class="dash-nav-item" href="/favoritos"><svg><use href="/assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
+    </nav>
+
+    <div class="modules-sidebar-card">
+      <span>VIDEOAULAS</span>
+      <strong>Aprenda na prática</strong>
+      <p>Assista, revise e marque cada aula como concluída.</p>
+      <div><i id="sidebarProgressBar"></i></div>
+      <small id="sidebarProgressText">0 de 8 aulas concluídas</small>
+    </div>
+  </aside>
+
+  <main class="dash-main modules-main">
+    <header class="dash-topbar modules-topbar">
+      <button class="dash-menu-toggle" id="modulesMenuToggle" type="button" aria-label="Abrir menu">
+        <svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg>
+      </button>
+
+      <label class="modules-search">
+        <svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg>
+        <input id="modulesSearch" type="search" placeholder="Buscar videoaula ou estratégia…" autocomplete="off" />
+        <kbd>Ctrl K</kbd>
+      </label>
+
+      <div class="dash-top-actions">
+        <button class="global-theme-toggle dash-theme-toggle" data-global-theme type="button" aria-label="Alternar tema">
+          <svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg>
+        </button>
+        <a class="dash-user-menu" href="/perfil">
+          <span class="dash-avatar" data-user-avatar>P</span>
+          <span><strong data-user-name>Primo</strong><small data-user-role>Aluno</small></span>
+          <svg width="14" height="14"><use href="/assets/dashboard-icons.svg#i-chevron"></use></svg>
+        </a>
+      </div>
+    </header>
+
+    <div class="modules-content">
+      <section class="modules-heading">
+        <div>
+          <span class="modules-eyebrow">CENTRAL DE VIDEOAULAS</span>
+          <h1>Aprenda cada estratégia <strong>na prática.</strong></h1>
+          <p>Escolha um módulo, acompanhe a explicação em vídeo e avance no seu ritmo.</p>
+        </div>
+        <div class="modules-summary">
+          <article><span>8</span><small>Módulos atuais</small></article>
+          <article><span id="modulesCompletedCount">0</span><small>Aulas concluídas</small></article>
+          <article><span id="modulesProgressPercent">0%</span><small>Progresso</small></article>
+        </div>
+      </section>
+
+      <div class="modules-layout">
+        <section class="modules-library" aria-label="Lista de módulos">
+          <div class="modules-library-head">
+            <div>
+              <span>TRILHA DE APRENDIZADO</span>
+              <h2>Escolha sua próxima aula</h2>
+            </div>
+            <select id="modulesFilter" aria-label="Filtrar aulas">
+              <option value="all">Todas as aulas</option>
+              <option value="pending">Não concluídas</option>
+              <option value="completed">Concluídas</option>
+            </select>
+          </div>
+          <div class="modules-list" id="modulesList"></div>
+          <div class="modules-empty" id="modulesEmpty" hidden>
+            <strong>Nenhum módulo encontrado</strong>
+            <span>Tente buscar por outro nome ou remova o filtro.</span>
+          </div>
+        </section>
+
+        <aside class="modules-player-card" id="modulesPlayerCard" aria-live="polite">
+          <div class="modules-player-frame" id="modulesPlayerFrame">
+            <div class="modules-video-placeholder" id="modulesVideoPlaceholder">
+              <span class="modules-play-symbol" aria-hidden="true">
+                <svg viewBox="0 0 64 64"><path d="M24 17.5v29l24-14.5-24-14.5Z"></path></svg>
+              </span>
+              <small>VIDEOAULA</small>
+              <strong id="videoPlaceholderTitle">Selecione um módulo</strong>
+              <p id="videoPlaceholderText">O vídeo aparecerá aqui quando você escolher uma aula.</p>
+            </div>
+          </div>
+
+          <div class="modules-player-body">
+            <div class="modules-player-kicker">
+              <span id="selectedModuleNumber">MÓDULO 01</span>
+              <b id="selectedModuleStatus">EM PREPARAÇÃO</b>
+            </div>
+            <h2 id="selectedModuleTitle">Gêmeos</h2>
+            <p id="selectedModuleDescription">Aprenda como os números 11, 22 e 33 formam a família dos gêmeos e como identificar a leitura na prática.</p>
+
+            <div class="modules-player-meta">
+              <span><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg><b id="selectedModuleDuration">A definir</b></span>
+              <span><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Videoaula prática</b></span>
+            </div>
+
+            <div class="modules-player-progress">
+              <div><span>Seu progresso nesta aula</span><strong id="selectedProgressText">0%</strong></div>
+              <div class="modules-progress-track"><i id="selectedProgressBar"></i></div>
+            </div>
+
+            <div class="modules-player-actions">
+              <button class="modules-primary-action" id="markLessonCompleted" type="button">
+                <svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg>
+                <span>Marcar como concluída</span>
+              </button>
+              <button class="modules-secondary-action" id="openStudyModule" type="button">
+                <svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg>
+                <span>Abrir módulo de Estudo</span>
+              </button>
+            </div>
+
+            <div class="modules-coming-note" id="modulesComingNote">
+              <span>●</span>
+              <p><strong>Integração com YouTube pronta.</strong> Quando o vídeo for gravado, basta adicionar o link no cadastro deste módulo.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
