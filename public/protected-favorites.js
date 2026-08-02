@@ -1,19 +1,17 @@
 "use strict";
 (() => {
-  if (!document.querySelector('script[data-study-platform-sync]')) {
-    const script = document.createElement("script");
-    script.src = `/study-platform-sync.js?v=20260801-sync-final&t=${Date.now()}`;
-    script.defer = true;
-    script.dataset.studyPlatformSync = "1";
+  function addScript(src, marker){
+    if(document.querySelector(`script[data-${marker}]`))return;
+    const script=document.createElement("script");
+    script.src=src;
+    script.defer=true;
+    script.dataset[marker]="1";
     document.head.appendChild(script);
   }
-  if (!document.querySelector('script[data-favorites-study-stable]')) {
-    const stable = document.createElement("script");
-    stable.src = `/favorites-study-stable.js?v=20260801-multi-final&t=${Date.now()}`;
-    stable.defer = true;
-    stable.dataset.favoritesStudyStable = "1";
-    document.head.appendChild(stable);
-  }
+  addScript("/theme-global-v2.js?v=20260802-upgrade-v6","globalThemeV2");
+  addScript(`/study-platform-sync.js?v=20260801-sync-final&t=${Date.now()}`,"studyPlatformSync");
+  addScript(`/favorites-study-stable.js?v=20260801-multi-final&t=${Date.now()}`,"favoritesStudyStable");
+
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   let started = false;
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -22,6 +20,7 @@
   const normalizeRole = (user) => String(user?.cargo || user?.tipo || "aluno").trim().toLowerCase().replaceAll("_", "-");
   const roleLabel = (role) => ({ dev:"Dev", dono:"Dono", superadmin:"Dono", admin:"Admin", financeiro:"Financeiro", vendedor:"Vendedor", moderador:"Moderador", suporte:"Suporte", aluno:"Aluno" }[role] || "Usuário");
   const fillUser = (user) => { const name = String(user?.nome || "Usuário"); const firstName = name.trim().split(/\s+/)[0] || "Usuário"; const role = normalizeRole(user); $$('[data-user-name]').forEach((element) => { element.textContent = firstName; }); $$('[data-user-fullname]').forEach((element) => { element.textContent = name; }); $$('[data-user-role]').forEach((element) => { element.textContent = roleLabel(role); }); };
+
   async function validate() {
     if (started) return; started = true;
     if (document.body) { document.body.style.opacity = "1"; document.body.style.visibility = "visible"; document.body.classList.add("protected-booting"); }
