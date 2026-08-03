@@ -6,11 +6,19 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const path = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
-  const nav = [
+  const isFree = path === "/dashboard-free" || document.body.classList.contains("free-dashboard-page");
+  const premiumNav = [
     ["/dashboard", "Início", "i-home"],
     ["/estudo", "Estudos", "i-book"],
     ["/modulos", "Módulos", "i-layers"],
     ["/gestao", "Gestão", "i-activity"],
+    ["/perfil", "Perfil", "i-user"]
+  ];
+  const freeNav = [
+    ["/dashboard-free", "Início", "i-home"],
+    ["/dashboard-free#freeStudy", "Estudo", "i-book"],
+    ["/roleta", "Roleta", "i-roulette"],
+    ["/suporte", "Suporte", "i-support"],
     ["/perfil", "Perfil", "i-user"]
   ];
 
@@ -23,9 +31,11 @@
   ];
 
   function active(href) {
-    if (href === "/dashboard") return path === "/" || path === "/dashboard";
-    if (href === "/estudo") return path === "/estudo" || path.startsWith("/estudo-");
-    return path === href;
+    const clean = href.split("#")[0];
+    if (clean === "/dashboard") return path === "/" || path === "/dashboard";
+    if (clean === "/dashboard-free") return path === "/dashboard-free";
+    if (clean === "/estudo") return path === "/estudo" || path.startsWith("/estudo-");
+    return path === clean;
   }
 
   function populateProgress() {
@@ -42,17 +52,17 @@
 
   function installMobileBottom() {
     if ($(".dash-mobile-bottom")) return;
+    const items = isFree ? freeNav : premiumNav;
     const el = document.createElement("nav");
     el.className = "dash-mobile-bottom";
     el.setAttribute("aria-label", "Navegação mobile");
-    el.innerHTML = nav.map(([href, label, icon]) => `<a class="${active(href) ? "active" : ""}" href="${href}"><svg><use href="/assets/dashboard-icons.svg#${icon}"></use></svg><span>${label}</span></a>`).join("");
+    el.innerHTML = items.map(([href, label, icon]) => `<a class="${active(href) ? "active" : ""}" href="${href}"><svg><use href="/assets/dashboard-icons.svg#${icon}"></use></svg><span>${label}</span></a>`).join("");
     document.body.appendChild(el);
   }
 
   function improveHeader() {
     const topbar = $(".dash-topbar,.notes-topbar,.support-topbar,.roulette-topbar,.favorites-topbar,.exam-topbar,.modules-topbar,.study-topbar,.reel-topbar");
-    if (!topbar) return;
-    topbar.classList.add("reference-topbar");
+    topbar?.classList.add("reference-topbar");
   }
 
   function bindMenu() {
@@ -74,8 +84,7 @@
 
   function syncProgressRing() {
     const value = parseInt(String($("#statProgress")?.textContent || "25").replace(/\D/g, ""), 10) || 25;
-    const icon = $(".dash-progress-icon");
-    if (icon) icon.style.setProperty("--progress", `${Math.min(100, value)}%`);
+    $(".dash-progress-icon")?.style.setProperty("--progress", `${Math.min(100, value)}%`);
   }
 
   function normalizeImages() {
@@ -91,6 +100,10 @@
 
   function reveal() {
     const items = $$(".reference-card,.dash-stat-grid article,.dash-module-tile,.study-module-card,.module-video-item,.tp14-page-hero");
+    if (!("IntersectionObserver" in window)) {
+      items.forEach(el => el.classList.add("is-visible"));
+      return;
+    }
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       entry.target.classList.add("is-visible");
