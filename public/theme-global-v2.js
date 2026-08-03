@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  if(window.__TURMA_THEME_GLOBAL_V10__)return;window.__TURMA_THEME_GLOBAL_V10__=true;
+  if(window.__TURMA_THEME_GLOBAL_V11__)return;window.__TURMA_THEME_GLOBAL_V11__=true;
   const KEY="turma_global_theme_v2",root=document.documentElement;
   const saved=()=>{try{return localStorage.getItem(KEY)||localStorage.getItem("theme")||localStorage.getItem("turma_theme")||"dark"}catch{return"dark"}};
   const normalize=v=>v==="light"?"light":"dark";
@@ -9,7 +9,7 @@
   function bind(){document.addEventListener("click",event=>{const btn=event.target.closest(selectors);if(!btn)return;event.preventDefault();event.stopPropagation();apply(root.dataset.theme==="light"?"dark":"light")},true);window.addEventListener("storage",event=>{if([KEY,"theme","turma_theme"].includes(event.key))apply(event.newValue,false)})}
   function load(src,type,marker){if(document.querySelector(`[data-${marker}]`))return;const el=document.createElement(type==="style"?"link":"script");if(type==="style"){el.rel="stylesheet";el.href=src}else{el.src=src;el.defer=true}el.dataset[marker]="1";document.head.appendChild(el)}
   function install(){
-    const v="20260803-v10";
+    const v="20260803-v11";
     load(`/theme-global-v2.css?v=${v}`,"style","globalThemeCss");
     load(`/platform-final.css?v=${v}`,"style","platformFinalCss");
     load(`/platform-upgrade-v6.css?v=${v}`,"style","platformUpgradeV6Css");
@@ -19,6 +19,7 @@
     load(`/site-stabilization-v9b.css?v=${v}`,"style","siteStabilizationV9bCss");
     load(`/turma-premium-v10.css?v=${v}`,"style","turmaPremiumV10Css");
     load(`/turma-premium-v10-free.css?v=${v}`,"style","turmaPremiumV10FreeCss");
+    load(`/turma-approved-v11.css?v=${v}`,"style","turmaApprovedV11Css");
     load(`/platform-final.js?v=${v}`,"script","platformFinalJs");
     load(`/navigation-final.js?v=${v}`,"script","navigationFinalJs");
     load(`/platform-upgrade-v6.js?v=${v}`,"script","platformUpgradeV6Js");
