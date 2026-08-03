@@ -18,6 +18,7 @@
     load(`/site-stabilization-v9.css?v=${v}`,"style","siteStabilizationV9Css");
     load(`/site-stabilization-v9b.css?v=${v}`,"style","siteStabilizationV9bCss");
     load(`/turma-premium-v10.css?v=${v}`,"style","turmaPremiumV10Css");
+    load(`/turma-premium-v10-free.css?v=${v}`,"style","turmaPremiumV10FreeCss");
     load(`/platform-final.js?v=${v}`,"script","platformFinalJs");
     load(`/navigation-final.js?v=${v}`,"script","navigationFinalJs");
     load(`/platform-upgrade-v6.js?v=${v}`,"script","platformUpgradeV6Js");
