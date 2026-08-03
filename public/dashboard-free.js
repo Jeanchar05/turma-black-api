@@ -1,169 +1,20 @@
 "use strict";
-
 (() => {
-  const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
-  const $ = (id) => document.getElementById(id);
-
-  document.addEventListener("DOMContentLoaded", init, { once: true });
-
-  function getToken() {
-    for (const key of TOKEN_KEYS) {
-      try {
-        const token = sessionStorage.getItem(key);
-        if (token) return token;
-      } catch (_) {}
-    }
-    return "";
-  }
-
-  async function api(endpoint, options = {}) {
-    const token = getToken();
-    if (!token) throw new Error("Sua sessão expirou.");
-
-    const response = await fetch(`${window.location.origin}${endpoint}`, {
-      method: options.method || "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        ...(options.body !== undefined ? { "Content-Type": "application/json" } : {})
-      },
-      body: options.body !== undefined ? JSON.stringify(options.body) : undefined
-    });
-
-    const text = await response.text();
-    let data = {};
-    try { data = text ? JSON.parse(text) : {}; }
-    catch (_) { data = { mensagem: text || "Resposta inválida." }; }
-
-    if (!response.ok || data.erro) {
-      throw new Error(data.erro || data.mensagem || `Erro ${response.status}.`);
-    }
-
-    return data;
-  }
-
-  function escapeHTML(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function planLabel(plan) {
-    return {
-      black30: "Turma Premium — 30 dias",
-      black90: "Turma Premium — 90 dias",
-      black180: "Turma Premium — 180 dias",
-      black360: "Turma Premium — 360 dias"
-    }[plan] || plan;
-  }
-
-  function statusLabel(status) {
-    return {
-      pendente: "Aguardando aprovação",
-      aprovado: "Aprovado",
-      recusado: "Recusado",
-      cancelado: "Cancelado"
-    }[status] || status;
-  }
-
-  function formatDate(value) {
-    if (!value) return "—";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return String(value);
-    return new Intl.DateTimeFormat("pt-BR", {
-      dateStyle: "short",
-      timeStyle: "short"
-    }).format(date);
-  }
-
-  function showMessage(message, type = "sucesso") {
-    const box = $("premiumRequestMessage");
-    if (!box) return;
-    box.textContent = String(message || "");
-    box.className = `auth-message ${type} active`;
-  }
-
-  async function loadRequests() {
-    const list = $("premiumRequestsList");
-    if (!list) return;
-
-    try {
-      const response = await api("/liberacoes/minha");
-      const requests = response.solicitacoes || [];
-
-      if (!requests.length) {
-        list.innerHTML = '<div class="admin-empty-state">Você ainda não gerou nenhum código Premium.</div>';
-        return;
-      }
-
-      list.innerHTML = requests.map((item) => `
-        <div class="admin-list-row">
-          <span class="admin-row-avatar">#</span>
-          <div>
-            <strong class="admin-code">${escapeHTML(item.codigo)}</strong>
-            <small>${escapeHTML(planLabel(item.plano))} • ${formatDate(item.createdAt)}</small>
-          </div>
-          <span>${escapeHTML(statusLabel(item.status))}</span>
-          <span class="admin-status-badge ${escapeHTML(item.status)}">${escapeHTML(item.status)}</span>
-        </div>
-      `).join("");
-    } catch (error) {
-      list.innerHTML = `<div class="admin-empty-state">${escapeHTML(error.message)}</div>`;
-    }
-  }
-
-  async function submitRequest(event) {
-    event.preventDefault();
-
-    const button = $("generatePremiumCode");
-    const select = $("premiumPlan");
-    const selected = select?.selectedOptions?.[0];
-    const plan = select?.value || "black30";
-    const value = Number(selected?.dataset?.value || 0);
-    const reference = String($("paymentReference")?.value || "").trim();
-
-    if (!reference) {
-      showMessage("Informe a referência do pagamento.", "erro");
-      return;
-    }
-
-    button.disabled = true;
-    const original = button.textContent;
-    button.textContent = "Gerando código…";
-
-    try {
-      const response = await api("/liberacoes/solicitar", {
-        method: "POST",
-        body: {
-          plano: plan,
-          valor: value,
-          referenciaPagamento: reference
-        }
-      });
-
-      const code = response.solicitacao?.codigo || "";
-      showMessage(
-        code
-          ? `${response.mensagem} Código: ${code}`
-          : response.mensagem || "Solicitação criada.",
-        "sucesso"
-      );
-
-      event.currentTarget.reset();
-      await loadRequests();
-    } catch (error) {
-      showMessage(error.message || "Não foi possível gerar o código.", "erro");
-    } finally {
-      button.disabled = false;
-      button.textContent = original;
-    }
-  }
-
-  function init() {
-    $("premiumRequestForm")?.addEventListener("submit", submitRequest);
-    loadRequests();
-  }
+  const $=id=>document.getElementById(id),$$=(s,r=document)=>[...r.querySelectorAll(s)],KEYS=["token","adminToken","authToken","accessToken","jwt"];
+  const cover=(title,sub,symbol)=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675"><defs><radialGradient id="b"><stop stop-color="#3a1169"/><stop offset="1" stop-color="#09040f"/></radialGradient><linearGradient id="g"><stop stop-color="#fff0a8"/><stop offset="1" stop-color="#a744f4"/></linearGradient></defs><rect width="1200" height="675" rx="32" fill="url(#b)"/><circle cx="930" cy="330" r="170" fill="#09030f" stroke="#9840df" stroke-width="8"/><text x="930" y="390" text-anchor="middle" fill="url(#g)" font-size="160" font-family="Georgia">${symbol}</text><text x="80" y="270" fill="#fff" font-family="Arial" font-size="72" font-weight="900">${title}</text><text x="84" y="335" fill="#d3a6e6" font-family="Arial" font-size="25" letter-spacing="3">${sub}</text></svg>`);
+  const covers={gemeos:cover("GÊMEOS","11 · 22 · 33","11"),espelhos:cover("ESPELHOS","INVERSÃO","69"),fibonacci:cover("FIBONACCI","SEQUÊNCIA","Φ"),magneto:cover("MAGNETO","CONEXÃO","M"),camaleoes:cover("CAMALEÕES","ADAPTAÇÃO","C"),pitagoras:cover("PITÁGORAS","TRIANGULAÇÃO","△"),cavalo:cover("CAVALO","TERMINAIS","♞"),"eclipse-zero":cover("ECLIPSE ZERO","TERMINAIS 0 E 9","0")};
+  const modules=[['Gêmeos','gemeos'],['Espelhos','espelhos'],['Fibonacci','fibonacci'],['Magneto','magneto'],['Camaleões','camaleoes'],['Pitágoras','pitagoras'],['Cavalo','cavalo'],['Eclipse Zero','eclipse-zero']];
+  const token=()=>{for(const s of[sessionStorage,localStorage])for(const k of KEYS){try{const v=s.getItem(k);if(v)return v}catch{}}return''};
+  async function api(endpoint,opt={}){const r=await fetch(endpoint,{method:opt.method||'GET',headers:{Accept:'application/json',Authorization:`Bearer ${token()}`,...(opt.body?{'Content-Type':'application/json'}:{})},body:opt.body?JSON.stringify(opt.body):undefined,cache:'no-store'}),d=await r.json().catch(()=>({}));if(!r.ok||d.erro)throw new Error(d.erro||d.mensagem||`Erro ${r.status}`);return d}
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  function renderModules(){const host=$("freeModuleGrid");if(host)host.innerHTML=modules.map(([name,slug])=>`<article class="free-module"><img src="${covers[slug]}" alt="Módulo ${name}"><div class="free-lock"><span>🔒</span></div><div class="free-module-copy"><strong>${name}</strong><small>Conteúdo Premium</small></div></article>`).join('')}
+  function message(text,type='sucesso'){const box=$("premiumRequestMessage");if(box){box.textContent=text;box.className=`auth-message ${type} active`}}
+  async function loadUser(){try{const d=await api('/me'),u=d.usuario||d.user||{};$$('[data-user-name]').forEach(el=>el.textContent=String(u.nome||'Aluno').split(/\s+/)[0]);if($("checkoutName"))$("checkoutName").value=u.nome||'';if($("checkoutEmail"))$("checkoutEmail").value=u.email||'';if($("checkoutPhone"))$("checkoutPhone").value=u.telefone||''}catch{}}
+  async function loadSellers(){try{const d=await api('/vendedores');const list=d.vendedores||d.usuarios||[];$("checkoutSeller").innerHTML='<option value="">Compra direta</option>'+list.map(v=>`<option value="${esc(v.id||v._id||v.email)}">${esc(v.nome||v.email)}</option>`).join('')}catch{}}
+  function planLabel(p){return{black30:'Turma Premium — 30 dias',black180:'Turma Premium — 180 dias',black360:'Turma Premium — 360 dias'}[p]||p}
+  async function loadRequests(){const host=$("premiumRequestsList");try{const d=await api('/liberacoes/minha'),items=d.solicitacoes||[];host.innerHTML=items.length?items.map(x=>`<div class="admin-list-row"><span>#</span><div><strong>${esc(x.codigo)}</strong><small>${esc(planLabel(x.plano))}</small></div><span>${esc(x.status||'pendente')}</span><span class="admin-status-badge ${esc(x.status||'pendente')}">${esc(x.status||'pendente')}</span></div>`).join(''):'<div class="admin-empty-state">Nenhum pedido criado.</div>'}catch(e){host.innerHTML=`<div class="admin-empty-state">${esc(e.message)}</div>`}}
+  async function submit(e){e.preventDefault();const btn=$("generatePremiumCode"),radio=$('input[name="plan"]:checked'),plan=radio?.value||'black30',value=Number(radio?.dataset.value||0),reference=$("paymentReference").value.trim(),seller=$("checkoutSeller").value,payment=$('.free-payment-tabs button.active')?.dataset.payment||'pix';if(!reference)return message('Informe a referência ou observação do pagamento.','erro');btn.disabled=true;btn.textContent='Criando pedido…';try{let d;try{d=await api(`/checkout/${payment}`,{method:'POST',body:{plano:plan,valor:value,nome:$("checkoutName").value,email:$("checkoutEmail").value,telefone:$("checkoutPhone").value,vendedor:seller}})}catch{d=await api('/liberacoes/solicitar',{method:'POST',body:{plano:plan,valor:value,referenciaPagamento:reference,vendedor:seller,formaPagamento:payment}})}const code=d.solicitacao?.codigo||d.codigo||'';message(code?`Pedido criado. Código: ${code}`:(d.mensagem||'Pedido criado e aguardando confirmação.'),'sucesso');await loadRequests()}catch(err){message(err.message,'erro')}finally{btn.disabled=false;btn.textContent='Gerar pedido e código de acesso →'}}
+  function bind(){$("freeMenu")?.addEventListener('click',()=>{$("freeSidebar")?.classList.add('open');$("freeOverlay").hidden=false});$("freeOverlay")?.addEventListener('click',()=>{$("freeSidebar")?.classList.remove('open');$("freeOverlay").hidden=true});$$('[data-payment]').forEach(b=>b.addEventListener('click',()=>{$$('[data-payment]').forEach(x=>x.classList.toggle('active',x===b));$$('[data-payment-panel]').forEach(p=>p.classList.toggle('active',p.dataset.paymentPanel===b.dataset.payment))}));$("premiumRequestForm")?.addEventListener('submit',submit);$$('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>$("freeSidebar")?.classList.remove('open')))}
+  async function init(){renderModules();bind();await Promise.allSettled([loadUser(),loadSellers(),loadRequests()]);$("freeLoading")?.remove();document.body.classList.add('protected-ready')}
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
 })();
