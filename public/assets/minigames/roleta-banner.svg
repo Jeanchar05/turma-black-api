@@ -1,52 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 760" role="img" aria-labelledby="t d">
-  <title id="t">Roleta — minigame exclusivo da Turma do Primo</title>
-  <desc id="d">Banner premium em roxo, preto e dourado com uma roleta europeia.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
+  <title id="title">Roleta Reel — minigame exclusivo da Turma do Primo</title>
+  <desc id="desc">Banner premium preto, roxo e dourado com roleta europeia.</desc>
   <defs>
-    <radialGradient id="bg" cx="62%" cy="52%" r="72%"><stop stop-color="#351052"/><stop offset=".42" stop-color="#130520"/><stop offset="1" stop-color="#050208"/></radialGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff3bd"/><stop offset=".35" stop-color="#f2c359"/><stop offset=".72" stop-color="#9a5519"/><stop offset="1" stop-color="#f7d87d"/></linearGradient>
-    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".35" stop-color="#d7c5dd"/><stop offset=".65" stop-color="#8e6e9d"/><stop offset="1" stop-color="#f0d9f5"/></linearGradient>
-    <filter id="glow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000" flood-opacity=".72"/></filter>
-    <pattern id="stars" width="130" height="110" patternUnits="userSpaceOnUse"><circle cx="18" cy="20" r="2" fill="#d887ff"/><circle cx="84" cy="67" r="1.5" fill="#f4c65c"/><circle cx="120" cy="18" r="1" fill="#fff"/></pattern>
+    <radialGradient id="bg" cx="72%" cy="38%" r="82%"><stop stop-color="#371052"/><stop offset=".45" stop-color="#160621"/><stop offset="1" stop-color="#050208"/></radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2b8"/><stop offset=".38" stop-color="#f0c45a"/><stop offset=".72" stop-color="#9a5a1c"/><stop offset="1" stop-color="#f7da83"/></linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".38" stop-color="#e5d8ea"/><stop offset=".72" stop-color="#9c7ba8"/><stop offset="1" stop-color="#f5e5f7"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity=".72"/></filter>
+    <pattern id="stars" width="150" height="120" patternUnits="userSpaceOnUse"><circle cx="20" cy="22" r="2" fill="#cf79ff"/><circle cx="90" cy="74" r="1.5" fill="#f0c45a"/><circle cx="132" cy="24" r="1" fill="#fff"/></pattern>
   </defs>
   <rect width="1600" height="760" fill="url(#bg)"/>
-  <rect width="1600" height="760" fill="url(#stars)" opacity=".55"/>
-  <path d="M0 150C280 10 440 12 690 120" fill="none" stroke="#9b31df" stroke-width="5" opacity=".35" filter="url(#glow)"/>
-  <path d="M1010 30C1270 40 1450 170 1600 330" fill="none" stroke="#9b31df" stroke-width="5" opacity=".4" filter="url(#glow)"/>
-  <g transform="translate(90 70)">
-    <path d="M68 35l16 24 29-5-13 27 18 23-30 2-16 26-11-28-29-8 23-19z" fill="url(#gold)" filter="url(#glow)"/>
-    <path d="M40 89h65v74H40z" rx="8" fill="#120518" stroke="#f0c45a" stroke-width="4"/>
-    <text x="72" y="145" text-anchor="middle" font-family="Georgia" font-weight="700" font-size="66" fill="url(#gold)">P</text>
-    <text x="72" y="200" text-anchor="middle" font-family="Arial" font-size="16" letter-spacing="7" fill="#eadfe9">TURMA DO PRIMO</text>
+  <rect width="1600" height="760" fill="url(#stars)" opacity=".48"/>
+  <path d="M0 142C270 10 480 22 760 142" fill="none" stroke="#8f2bc5" stroke-width="5" opacity=".38"/>
+  <path d="M1040 22C1320 42 1490 190 1600 322" fill="none" stroke="#8f2bc5" stroke-width="5" opacity=".4"/>
+
+  <g transform="translate(105 78)">
+    <rect width="80" height="94" rx="17" fill="#130719" stroke="#f0c45a" stroke-width="3"/>
+    <path d="M22 15 31 30 47 25 55 42 70 48 60 66 20 66 10 48 25 41Z" fill="url(#gold)" opacity=".9"/>
+    <text x="40" y="80" text-anchor="middle" font-family="Georgia" font-weight="700" font-size="49" fill="url(#gold)">P</text>
+    <text x="105" y="38" font-family="Arial" font-size="19" letter-spacing="8" fill="#eadfe9">TURMA DO PRIMO</text>
+    <text x="105" y="70" font-family="Arial" font-size="13" letter-spacing="5" fill="#c677ff">MINIGAME EXCLUSIVO</text>
   </g>
-  <g font-family="Arial" transform="translate(130 255)">
-    <text x="0" y="0" font-size="20" letter-spacing="8" fill="#f2c55f">MINIGAME EXCLUSIVO</text>
-    <text x="0" y="115" font-family="Georgia" font-weight="700" font-size="148" letter-spacing="7" fill="url(#silver)" filter="url(#shadow)">ROULETA</text>
-    <text x="5" y="160" font-size="22" letter-spacing="8" fill="#dfcae6">ESTRATÉGIA · DISCIPLINA · LEITURA</text>
-    <text x="5" y="213" font-size="21" fill="#c8bbce">Treine suas estratégias, analise cada giro</text>
-    <text x="5" y="244" font-size="21" fill="#c8bbce">e evolua com inteligência e controle.</text>
+
+  <g transform="translate(118 292)" font-family="Arial">
+    <text x="0" y="0" font-size="18" letter-spacing="7" fill="#f0c45a">ESTRATÉGIA · DISCIPLINA · LEITURA</text>
+    <text x="0" y="116" font-family="Georgia" font-weight="700" font-size="154" letter-spacing="4" fill="url(#silver)" filter="url(#shadow)">ROLETA</text>
+    <text x="7" y="170" font-size="24" letter-spacing="9" fill="#f0c45a">REEL</text>
+    <text x="7" y="222" font-size="21" fill="#c8bbce">Treine suas estratégias, interprete cada giro</text>
+    <text x="7" y="254" font-size="21" fill="#c8bbce">e evolua com inteligência, controle e disciplina.</text>
   </g>
-  <g transform="translate(1050 370)" filter="url(#shadow)">
-    <circle r="275" fill="#15061e" stroke="#6f258f" stroke-width="20"/>
-    <circle r="242" fill="#220b2d" stroke="url(#gold)" stroke-width="12"/>
-    <g stroke="#d6a547" stroke-width="3">
+
+  <g transform="translate(1195 380)" filter="url(#shadow)">
+    <circle r="276" fill="#14061d" stroke="#6d238f" stroke-width="20"/>
+    <circle r="242" fill="#210b2c" stroke="url(#gold)" stroke-width="12"/>
+    <g stroke="#d7a746" stroke-width="3">
       <path d="M0-236V-92"/><path transform="rotate(30)" d="M0-236V-92"/><path transform="rotate(60)" d="M0-236V-92"/><path transform="rotate(90)" d="M0-236V-92"/><path transform="rotate(120)" d="M0-236V-92"/><path transform="rotate(150)" d="M0-236V-92"/><path transform="rotate(180)" d="M0-236V-92"/><path transform="rotate(210)" d="M0-236V-92"/><path transform="rotate(240)" d="M0-236V-92"/><path transform="rotate(270)" d="M0-236V-92"/><path transform="rotate(300)" d="M0-236V-92"/><path transform="rotate(330)" d="M0-236V-92"/>
     </g>
-    <circle r="172" fill="none" stroke="#6f2631" stroke-width="48" stroke-dasharray="45 45"/>
-    <circle r="122" fill="#09030e" stroke="#c79038" stroke-width="9"/>
+    <circle r="172" fill="none" stroke="#742a38" stroke-width="48" stroke-dasharray="45 45"/>
+    <circle r="122" fill="#08030d" stroke="#c79038" stroke-width="9"/>
     <circle r="42" fill="url(#gold)"/>
-    <path d="M-10-180L0-300 10-180z" fill="url(#gold)" filter="url(#glow)"/>
+    <path d="M-10-178 0-300 10-178Z" fill="url(#gold)" filter="url(#glow)"/>
     <circle cx="42" cy="-218" r="14" fill="#fff" filter="url(#glow)"/>
   </g>
-  <g transform="translate(125 625)" font-family="Arial">
-    <rect width="650" height="82" rx="22" fill="#160720" stroke="#9134bd" stroke-width="2"/>
-    <text x="36" y="34" font-size="17" letter-spacing="4" fill="#f2c55f">LEITURA DE MESA</text><text x="36" y="61" font-size="16" fill="#b8abbf">Observe, interprete e confirme.</text>
-    <text x="250" y="34" font-size="17" letter-spacing="4" fill="#f2c55f">GESTÃO DE BANCA</text><text x="250" y="61" font-size="16" fill="#b8abbf">Defina limites e proteja o capital.</text>
-    <text x="475" y="34" font-size="17" letter-spacing="4" fill="#f2c55f">CONTROLE</text><text x="475" y="61" font-size="16" fill="#b8abbf">Decida com clareza.</text>
-  </g>
-  <g transform="translate(815 635)" font-family="Arial">
-    <rect width="655" height="72" rx="20" fill="#12051a" stroke="#f0c45a" stroke-width="2"/>
-    <text x="327" y="31" text-anchor="middle" font-size="19" letter-spacing="4" fill="#f0c45a">JOGAR AGORA</text>
-    <text x="327" y="55" text-anchor="middle" font-size="15" letter-spacing="3" fill="#e6dce8">GIRE · ANALISE · DECIDA · DOMINE</text>
+
+  <g transform="translate(120 650)" font-family="Arial">
+    <rect width="760" height="70" rx="20" fill="#13071b" stroke="#8330ad" stroke-width="2"/>
+    <text x="34" y="29" font-size="16" letter-spacing="4" fill="#f0c45a">LEITURA DE MESA</text><text x="34" y="52" font-size="15" fill="#b9adbf">Observe, confirme e decida.</text>
+    <text x="278" y="29" font-size="16" letter-spacing="4" fill="#f0c45a">GESTÃO DE BANCA</text><text x="278" y="52" font-size="15" fill="#b9adbf">Defina limites e proteja o capital.</text>
+    <text x="575" y="29" font-size="16" letter-spacing="4" fill="#f0c45a">CONTROLE</text><text x="575" y="52" font-size="15" fill="#b9adbf">Treine com clareza.</text>
   </g>
 </svg>
