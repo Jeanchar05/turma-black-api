@@ -13,6 +13,7 @@
     load("/platform-final.css?v=20260803-v8","style","platformFinalCss");
     load("/platform-upgrade-v6.css?v=20260803-v8","style","platformUpgradeV6Css");
     load("/turma-overhaul-v8.css?v=20260803-v8","style","turmaOverhaulV8Css");
+    load("/turma-overhaul-v8-addons.css?v=20260803-v8","style","turmaOverhaulV8AddonsCss");
     load("/platform-final.js?v=20260803-v8","script","platformFinalJs");
     load("/navigation-final.js?v=20260803-v8","script","navigationFinalJs");
     load("/platform-upgrade-v6.js?v=20260803-v8","script","platformUpgradeV6Js");
