@@ -1,13 +1,14 @@
-@import url("/elite-v19-core.css?v=20260804-css-recovery-2");
-@import url("/elite-v19-pages-a.css?v=20260804-css-recovery-2");
-@import url("/elite-v19-pages-b.css?v=20260804-css-recovery-2");
-@import url("/elite-v19-pages-c.css?v=20260804-css-recovery-2");
-@import url("/elite-v19-responsive.css?v=20260804-css-recovery-2");
-@import url("/elite-v19-fixes.css?v=20260804-css-recovery-2");
-@import url("/dashboard-v20.css?v=20260804-dashboard-v20-1");
+@import url("/elite-v19-core.css?v=20260804-css-recovery-3");
+@import url("/elite-v19-pages-a.css?v=20260804-css-recovery-3");
+@import url("/elite-v19-pages-b.css?v=20260804-css-recovery-3");
+@import url("/elite-v19-pages-c.css?v=20260804-css-recovery-3");
+@import url("/elite-v19-responsive.css?v=20260804-css-recovery-3");
+@import url("/elite-v19-fixes.css?v=20260804-css-recovery-3");
+@import url("/dashboard-v20.css?v=20260804-dashboard-v20-2");
+@import url("/dashboard-character-v21.css?v=20260804-dashboard-character-v21-1");
 
 /* =========================================================
-   TURMA DO PRIMO — CSS RECOVERY V19 + DASHBOARD V20
+   TURMA DO PRIMO — CSS RECOVERY V19 + DASHBOARD V20/V21
    Este arquivo é injetado pelo servidor legado em todas as
    páginas e garante que o site nunca abra sem identidade visual.
 ========================================================= */
