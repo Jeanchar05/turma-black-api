@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 const serverPath = path.join(__dirname, "..", "server.js");
-const UI_VERSION = "20260803-modules-v16-final-3";
-const UI_LABEL = "modules-v16-final-3";
+const UI_VERSION = "20260803-modules-v16-final-4";
+const UI_LABEL = "modules-v16-final-4";
 
 if (!fs.existsSync(serverPath)) {
   console.error("[UI V16] server.js não encontrado.");
@@ -25,7 +25,7 @@ if (start >= 0 && end >= 0) {
   const replacement = `function aplicarCamadaResponsiva(html) {
   let resultado = String(html);
   const ehEstudoHome = /study-home-page/i.test(resultado);
-  const ehModuloInterno = /<body[^>]*class=["'][^"']*\\bstudy-page\\b/i.test(resultado) && !ehEstudoHome;
+  const ehModuloInterno = /<body[^>]*class=["'][^"']*(?:\\bstudy-page\\b|\\bstrategy-page\\b)/i.test(resultado) && !ehEstudoHome;
 
   const folhasLegadas = [
     "theme-global-v2", "platform-final", "platform-upgrade-v6", "turma-overhaul-v8",
