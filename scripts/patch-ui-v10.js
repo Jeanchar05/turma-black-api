@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 const serverPath = path.join(__dirname, "..", "server.js");
-const UI_VERSION = "20260803-modules-v16-final-1";
-const UI_LABEL = "modules-v16-final-1";
+const UI_VERSION = "20260803-modules-v16-final-2";
+const UI_LABEL = "modules-v16-final-2";
 
 if (!fs.existsSync(serverPath)) {
   console.error("[UI V16] server.js não encontrado.");
@@ -14,7 +14,6 @@ if (!fs.existsSync(serverPath)) {
 
 let source = fs.readFileSync(serverPath, "utf8");
 const original = source;
-
 source = source.replace(/const CACHE_VERSION = "[^"]+";/, `const CACHE_VERSION = "${UI_VERSION}";`);
 
 const startMarker = "function aplicarCamadaResponsiva(html) {";
@@ -34,13 +33,13 @@ if (start >= 0 && end >= 0) {
     "turma-premium-v10", "turma-premium-v10-free", "turma-approved-v11",
     "turma-unified-v12", "turma-obsidian-v13", "turma-reference-v15",
     "dashboard-premium", "dashboard-premium-v3", "dashboard-refine-v4", "dashboard-final",
-    "modules-v16"
+    "modules-v16", "modules-v16-polish"
   ].join("|");
   const scriptsLegados = [
     "theme-global-v2", "platform-final", "navigation-final", "platform-upgrade-v6",
     "turma-overhaul-v8", "site-stabilization-v9", "turma-premium-v10",
     "turma-unified-v12", "turma-obsidian-v13", "turma-reference-v15", "dashboard-final",
-    "modules-v16"
+    "modules-v16", "modules-v16-polish"
   ].join("|");
 
   resultado = resultado
@@ -59,8 +58,10 @@ if (start >= 0 && end >= 0) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/modules-v16.css?v=${UI_VERSION}" data-ui-v16="modules-css" />
+    <link rel="stylesheet" href="/modules-v16-polish.css?v=${UI_VERSION}" data-ui-v16="modules-polish-css" />
     <script defer src="/protected-estudo.js?v=${UI_VERSION}" data-ui-v16="protected"></script>
-    <script defer src="/modules-v16.js?v=${UI_VERSION}" data-ui-v16="modules-js"></script>\`;
+    <script defer src="/modules-v16.js?v=${UI_VERSION}" data-ui-v16="modules-js"></script>
+    <script defer src="/modules-v16-polish.js?v=${UI_VERSION}" data-ui-v16="modules-polish-js"></script>\`;
     resultado = resultado.replace("</head>", camadaModulo + "\\n</head>");
     return resultado;
   }
@@ -70,10 +71,10 @@ if (start >= 0 && end >= 0) {
   <link rel="stylesheet" href="/turma-imperial-v14.css?v=${UI_VERSION}" data-ui-v16="base" />
   <link rel="stylesheet" href="/turma-reference-v15.css?v=${UI_VERSION}" data-ui-v16="reference" />
   <link rel="stylesheet" href="/modules-v16.css?v=${UI_VERSION}" data-ui-v16="modules-home" />
+  <link rel="stylesheet" href="/modules-v16-polish.css?v=${UI_VERSION}" data-ui-v16="modules-home-polish" />
   <script defer src="/turma-imperial-v14.js?v=${UI_VERSION}" data-ui-v16="base-js"></script>
   <script defer src="/turma-reference-v15.js?v=${UI_VERSION}" data-ui-v16="reference-js"></script>
   <script defer src="/modules-v16.js?v=${UI_VERSION}" data-ui-v16="modules-home-js"></script>\`;
-
   resultado = resultado.replace("</head>", camadaGlobal + "\\n</head>");
   return resultado;
 }`;
