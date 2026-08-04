@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 const serverPath = path.join(__dirname, "..", "server.js");
-const UI_VERSION = "20260803-elite-v19-root-1";
-const UI_LABEL = "elite-v19-root-1";
+const UI_VERSION = "20260803-elite-v19-root-2";
+const UI_LABEL = "elite-v19-root-2";
 
 if (!fs.existsSync(serverPath)) {
   console.error("[UI V19] server.js não encontrado.");
@@ -36,8 +36,8 @@ if (start >= 0 && end >= 0) {
   resultado = resultado
     .replace(/<link[^>]+(?:data-ui-v(?:10|11|12|13|14|15|16|17|18|19)|data-global-responsive)[^>]*>\\s*/gi, "")
     .replace(/<script[^>]+(?:data-ui-v(?:10|11|12|13|14|15|16|17|18|19))[^>]*><\\/script>\\s*/gi, "")
-    .replace(/<link[^>]+href=["'][^"']*(?:theme-global-v2|platform-upgrade-v6|turma-approved-v11|turma-overhaul-v8|site-stabilization-v9|turma-premium-v10|turma-unified-v12|turma-obsidian-v13|turma-imperial-v14|turma-reference-v15|responsive-global|site-stability-v17|site-final-v18|elite-v19-core|elite-v19-pages-a|elite-v19-pages-b|elite-v19-pages-c|elite-v19-responsive|modules-elite-v19)\\.css[^>]*>\\s*/gi, "")
-    .replace(/<script[^>]+src=["'][^"']*(?:theme-global-v2|platform-final|navigation-final|platform-upgrade-v6|turma-overhaul-v8|site-stabilization-v9|turma-premium-v10|turma-unified-v12|turma-obsidian-v13|turma-imperial-v14|turma-reference-v15|modules-v16|modules-v16-polish|modules-page-v16-fix|study-assets-v17|site-stability-v17|site-final-v18|elite-v19|study-assets-v19|modules-elite-v19)\\.js[^>]*><\\/script>\\s*/gi, "");
+    .replace(/<link[^>]+href=["'][^"']*(?:theme-global-v2|platform-upgrade-v6|turma-approved-v11|turma-overhaul-v8|site-stabilization-v9|turma-premium-v10|turma-unified-v12|turma-obsidian-v13|turma-imperial-v14|turma-reference-v15|responsive-global|site-stability-v17|site-final-v18|elite-v19-core|elite-v19-pages-a|elite-v19-pages-b|elite-v19-pages-c|elite-v19-responsive|elite-v19-fixes|modules-elite-v19)\\.css[^>]*>\\s*/gi, "")
+    .replace(/<script[^>]+src=["'][^"']*(?:theme-global-v2|platform-final|navigation-final|platform-upgrade-v6|turma-overhaul-v8|site-stabilization-v9|turma-premium-v10|turma-unified-v12|turma-obsidian-v13|turma-imperial-v14|turma-reference-v15|modules-v16|modules-v16-polish|modules-page-v16-fix|study-assets-v17|site-stability-v17|site-final-v18|elite-v19|elite-v19-addons|study-assets-v19|modules-elite-v19)\\.js[^>]*><\\/script>\\s*/gi, "");
 
   if (ehModuloInterno) {
     // As oito aulas recebem um runtime isolado. Nada das páginas comuns entra aqui.
@@ -77,7 +77,9 @@ if (start >= 0 && end >= 0) {
   <link rel="stylesheet" href="/elite-v19-pages-b.css?v=${UI_VERSION}" data-ui-v19="pages-b" />
   <link rel="stylesheet" href="/elite-v19-pages-c.css?v=${UI_VERSION}" data-ui-v19="pages-c" />
   <link rel="stylesheet" href="/elite-v19-responsive.css?v=${UI_VERSION}" data-ui-v19="responsive" />
+  <link rel="stylesheet" href="/elite-v19-fixes.css?v=${UI_VERSION}" data-ui-v19="fixes" />
   <script defer src="/elite-v19.js?v=${UI_VERSION}" data-ui-v19="runtime"></script>
+  <script defer src="/elite-v19-addons.js?v=${UI_VERSION}" data-ui-v19="addons"></script>
   \${assetsEstudo}\`;
   resultado = resultado.replace("</head>", camadaElite + "\\n</head>");
   return resultado;
