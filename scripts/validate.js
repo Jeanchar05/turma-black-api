@@ -9,7 +9,8 @@ const DIRECTORIES = [
   "models",
   "routes",
   "services",
-  "public"
+  "public",
+  "scripts"
 ];
 
 const IGNORE_DIRECTORIES = new Set(["node_modules", ".git"]);
