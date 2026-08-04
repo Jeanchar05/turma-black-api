@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 const serverPath = path.join(__dirname, "..", "server.js");
-const UI_VERSION = "20260803-elite-v19-root-2";
-const UI_LABEL = "elite-v19-root-2";
+const UI_VERSION = "20260803-elite-v19-root-3";
+const UI_LABEL = "elite-v19-root-3";
 
 if (!fs.existsSync(serverPath)) {
   console.error("[UI V19] server.js não encontrado.");
@@ -31,8 +31,6 @@ if (start >= 0 && end >= 0) {
   const ehAluno = /student-dashboard/i.test(resultado);
   const ehModuloInterno = /<body[^>]*class=["'][^"']*(?:\\bstudy-page\\b|\\bstrategy-page\\b)/i.test(resultado) && !ehEstudoHome;
 
-  // Remove somente camadas globais e runtimes visuais antigos.
-  // CSS e JS funcionais específicos de cada página permanecem intactos.
   resultado = resultado
     .replace(/<link[^>]+(?:data-ui-v(?:10|11|12|13|14|15|16|17|18|19)|data-global-responsive)[^>]*>\\s*/gi, "")
     .replace(/<script[^>]+(?:data-ui-v(?:10|11|12|13|14|15|16|17|18|19))[^>]*><\\/script>\\s*/gi, "")
@@ -40,7 +38,6 @@ if (start >= 0 && end >= 0) {
     .replace(/<script[^>]+src=["'][^"']*(?:theme-global-v2|platform-final|navigation-final|platform-upgrade-v6|turma-overhaul-v8|site-stabilization-v9|turma-premium-v10|turma-unified-v12|turma-obsidian-v13|turma-imperial-v14|turma-reference-v15|modules-v16|modules-v16-polish|modules-page-v16-fix|study-assets-v17|site-stability-v17|site-final-v18|elite-v19|elite-v19-addons|study-assets-v19|modules-elite-v19)\\.js[^>]*><\\/script>\\s*/gi, "");
 
   if (ehModuloInterno) {
-    // As oito aulas recebem um runtime isolado. Nada das páginas comuns entra aqui.
     resultado = resultado
       .replace(/<link[^>]+rel=["']stylesheet["'][^>]*>\\s*/gi, "")
       .replace(/<script[^>]+src=["'][^"']*(?:estudo|study-race|race-shared)[^"']*\\.js[^>]*><\\/script>\\s*/gi, "");
@@ -91,7 +88,6 @@ if (start >= 0 && end >= 0) {
   process.exit(1);
 }
 
-// Garante que páginas críticas nunca escapem pela entrega estática sem tratamento.
 const staticMarker = "if (fs.existsSync(publicDir)) {";
 if (!source.includes("STABILITY_V17_ROUTES")) {
   const routeBlock = `// STABILITY_V17_ROUTES\napp.get(["/gestao", "/gestao.html"], servirPagina("gestao.html"));\napp.get(["/roleta-reel", "/roleta-reel.html"], servirPagina("roleta-reel.html"));\napp.get(["/estudo-gemeos", "/estudo-gemeos.html"], servirPagina("estudo-gemeos.html"));\napp.get(["/estudo-espelhos", "/estudo-espelhos.html"], servirPagina("estudo-espelhos.html"));\napp.get(["/estudo-fibonacci", "/estudo-fibonacci.html"], servirPagina("estudo-fibonacci.html"));\napp.get(["/estudo-magneto", "/estudo-magneto.html"], servirPagina("estudo-magneto.html"));\napp.get(["/estudo-camaleoes", "/estudo-camaleoes.html"], servirPagina("estudo-camaleoes.html"));\napp.get(["/estudo-triangulacao", "/estudo-triangulacao.html", "/estudo-pitagoras", "/estudo-pitagoras.html"], servirPagina("estudo-triangulacao.html"));\napp.get(["/estudo-cavalos", "/estudo-cavalos.html", "/estudo-cavalo", "/estudo-cavalo.html"], servirPagina("estudo-cavalos.html"));\napp.get(["/estudo-eclipse-zero", "/estudo-eclipse-zero.html"], servirPagina("estudo-eclipse-zero.html"));\n\n`;
