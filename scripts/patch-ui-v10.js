@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 const serverPath = path.join(__dirname, "..", "server.js");
-const UI_VERSION = "20260803-stability-v17-root-1";
-const UI_LABEL = "stability-v17-root-1";
+const UI_VERSION = "20260803-stability-v17-root-2";
+const UI_LABEL = "stability-v17-root-2";
 
 if (!fs.existsSync(serverPath)) {
   console.error("[UI V17] server.js não encontrado.");
@@ -28,7 +28,6 @@ if (start >= 0 && end >= 0) {
   const ehPaginaModulos = /(?:modules-page|modules-content|id=["']modulesList["'])/i.test(resultado);
   const ehModuloInterno = /<body[^>]*class=["'][^"']*(?:\\bstudy-page\\b|\\bstrategy-page\\b)/i.test(resultado) && !ehEstudoHome;
 
-  // Remove exclusivamente camadas dinâmicas que causavam versões sobrepostas.
   resultado = resultado
     .replace(/<link[^>]+(?:data-ui-v(?:10|11|12|13|14|15|16|17)|data-global-responsive)[^>]*>\\s*/gi, "")
     .replace(/<script[^>]+(?:data-ui-v(?:10|11|12|13|14|15|16|17))[^>]*><\\/script>\\s*/gi, "")
@@ -36,7 +35,6 @@ if (start >= 0 && end >= 0) {
     .replace(/<link[^>]+href=["'][^"']*responsive-global\\.css[^>]*>\\s*/gi, "");
 
   if (ehModuloInterno) {
-    // As oito aulas usam um runtime próprio e isolado. Todo o CSS/JS antigo da aula é removido.
     resultado = resultado
       .replace(/<link[^>]+rel=["']stylesheet["'][^>]*>\\s*/gi, "")
       .replace(/<script[^>]+src=["'][^"']*(?:estudo|study-race|race-shared)[^"']*\\.js[^>]*><\\/script>\\s*/gi, "");
@@ -55,7 +53,6 @@ if (start >= 0 && end >= 0) {
     return resultado;
   }
 
-  // Páginas comuns preservam seus próprios CSS e JS. Recebem apenas a camada de segurança.
   const extrasEstudo = (ehEstudoHome || ehPaginaModulos)
     ? \`<script defer src="/study-assets-v17.js?v=${UI_VERSION}" data-ui-v17="study-assets"></script>\`
     : "";
@@ -72,6 +69,13 @@ if (start >= 0 && end >= 0) {
 } else {
   console.error("[UI V17] Não foi possível localizar aplicarCamadaResponsiva em server.js.");
   process.exit(1);
+}
+
+// Rotas que antes escapavam pelo express.static e recebiam HTML sem tratamento.
+const staticMarker = "if (fs.existsSync(publicDir)) {";
+if (!source.includes("STABILITY_V17_ROUTES")) {
+  const routeBlock = `// STABILITY_V17_ROUTES\napp.get(["/gestao", "/gestao.html"], servirPagina("gestao.html"));\napp.get(["/roleta-reel", "/roleta-reel.html"], servirPagina("roleta-reel.html"));\napp.get(["/estudo-gemeos", "/estudo-gemeos.html"], servirPagina("estudo-gemeos.html"));\napp.get(["/estudo-espelhos", "/estudo-espelhos.html"], servirPagina("estudo-espelhos.html"));\napp.get(["/estudo-fibonacci", "/estudo-fibonacci.html"], servirPagina("estudo-fibonacci.html"));\napp.get(["/estudo-magneto", "/estudo-magneto.html"], servirPagina("estudo-magneto.html"));\napp.get(["/estudo-camaleoes", "/estudo-camaleoes.html"], servirPagina("estudo-camaleoes.html"));\napp.get(["/estudo-triangulacao", "/estudo-triangulacao.html", "/estudo-pitagoras", "/estudo-pitagoras.html"], servirPagina("estudo-triangulacao.html"));\napp.get(["/estudo-cavalos", "/estudo-cavalos.html", "/estudo-cavalo", "/estudo-cavalo.html"], servirPagina("estudo-cavalos.html"));\napp.get(["/estudo-eclipse-zero", "/estudo-eclipse-zero.html"], servirPagina("estudo-eclipse-zero.html"));\n\n`;
+  source = source.replace(staticMarker, routeBlock + staticMarker);
 }
 
 source = source.replace(/res\.setHeader\("X-UI-Version", "[^"]+"\);/g, `res.setHeader("X-UI-Version", "${UI_LABEL}");`);
