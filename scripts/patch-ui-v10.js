@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 const serverPath = path.join(__dirname, "..", "server.js");
-const UI_VERSION = "20260803-modules-v16-final-2";
-const UI_LABEL = "modules-v16-final-2";
+const UI_VERSION = "20260803-modules-v16-final-3";
+const UI_LABEL = "modules-v16-final-3";
 
 if (!fs.existsSync(serverPath)) {
   console.error("[UI V16] server.js não encontrado.");
@@ -39,7 +39,7 @@ if (start >= 0 && end >= 0) {
     "theme-global-v2", "platform-final", "navigation-final", "platform-upgrade-v6",
     "turma-overhaul-v8", "site-stabilization-v9", "turma-premium-v10",
     "turma-unified-v12", "turma-obsidian-v13", "turma-reference-v15", "dashboard-final",
-    "modules-v16", "modules-v16-polish"
+    "modules-v16", "modules-v16-polish", "modules-page-v16-fix"
   ].join("|");
 
   resultado = resultado
@@ -74,7 +74,8 @@ if (start >= 0 && end >= 0) {
   <link rel="stylesheet" href="/modules-v16-polish.css?v=${UI_VERSION}" data-ui-v16="modules-home-polish" />
   <script defer src="/turma-imperial-v14.js?v=${UI_VERSION}" data-ui-v16="base-js"></script>
   <script defer src="/turma-reference-v15.js?v=${UI_VERSION}" data-ui-v16="reference-js"></script>
-  <script defer src="/modules-v16.js?v=${UI_VERSION}" data-ui-v16="modules-home-js"></script>\`;
+  <script defer src="/modules-v16.js?v=${UI_VERSION}" data-ui-v16="modules-home-js"></script>
+  <script defer src="/modules-page-v16-fix.js?v=${UI_VERSION}" data-ui-v16="modules-page-fix"></script>\`;
   resultado = resultado.replace("</head>", camadaGlobal + "\\n</head>");
   return resultado;
 }`;
