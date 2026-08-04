@@ -6,7 +6,7 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const route = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
-  const VERSION = "20260803-elite-v19-root-2";
+  const VERSION = "20260803-elite-v19-root-3";
 
   function bindDrawer(sidebar, button, overlay) {
     if (!sidebar || !button || button.dataset.eliteAddonDrawer === "1") return;
