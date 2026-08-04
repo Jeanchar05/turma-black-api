@@ -6,6 +6,7 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const route = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
+  const VERSION = "20260803-elite-v19-root-2";
 
   function bindDrawer(sidebar, button, overlay) {
     if (!sidebar || !button || button.dataset.eliteAddonDrawer === "1") return;
@@ -57,11 +58,27 @@
     document.body.appendChild(bar);
   }
 
+  function dashboardPortrait() {
+    if (!(route === "/dashboard" || route === "/dashboard.html") || document.querySelector('[data-elite-portrait-script]')) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `/elite-v19-portrait.css?v=${VERSION}`;
+    link.dataset.elitePortraitStyle = "1";
+    document.head.appendChild(link);
+
+    const script = document.createElement("script");
+    script.src = `/dashboard-portrait-final.js?v=${VERSION}`;
+    script.defer = true;
+    script.dataset.elitePortraitScript = "1";
+    document.head.appendChild(script);
+  }
+
   function init() {
     protectFreeMenu();
     bindDrawer($("#freeSidebar"), $("#freeMenu"), $("#freeOverlay"));
     bindDrawer($("#rouletteSidebar"), $("#rouletteMenuToggle"), $("#rouletteMobileOverlay"));
     freeMobileBar();
+    dashboardPortrait();
     setTimeout(protectFreeMenu, 250);
     setTimeout(protectFreeMenu, 900);
   }
