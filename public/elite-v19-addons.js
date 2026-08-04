@@ -4,6 +4,7 @@
   window.__TURMA_ELITE_V19_ADDONS__ = true;
 
   const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const route = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
 
   function bindDrawer(sidebar, button, overlay) {
@@ -25,6 +26,22 @@
     sidebar.querySelectorAll("a").forEach((link) => link.addEventListener("click", close));
   }
 
+  function protectFreeMenu() {
+    if (!route.includes("dashboard-free")) return;
+    const nav = $("#freeSidebar .dash-nav");
+    if (!nav) return;
+    $$('a[href="/gestao"]', nav).forEach((link) => link.remove());
+    if (!nav.querySelector('[data-free-management-guard]')) {
+      const guard = document.createElement("a");
+      guard.href = "/gestao";
+      guard.hidden = true;
+      guard.dataset.freeManagementGuard = "1";
+      guard.setAttribute("aria-hidden", "true");
+      guard.tabIndex = -1;
+      nav.appendChild(guard);
+    }
+  }
+
   function freeMobileBar() {
     if (!route.includes("dashboard-free") || document.querySelector(".tp-free-mobile-nav")) return;
     const bar = document.createElement("nav");
@@ -40,22 +57,13 @@
     document.body.appendChild(bar);
   }
 
-  function rouletteTheme() {
-    const top = $("#rouletteThemeTop");
-    const hidden = $("#rouletteThemeToggle");
-    if (!top || !hidden || top.dataset.eliteThemeProxy === "1") return;
-    top.dataset.eliteThemeProxy = "1";
-    top.addEventListener("click", (event) => {
-      event.preventDefault();
-      hidden.click();
-    });
-  }
-
   function init() {
+    protectFreeMenu();
     bindDrawer($("#freeSidebar"), $("#freeMenu"), $("#freeOverlay"));
     bindDrawer($("#rouletteSidebar"), $("#rouletteMenuToggle"), $("#rouletteMobileOverlay"));
-    rouletteTheme();
     freeMobileBar();
+    setTimeout(protectFreeMenu, 250);
+    setTimeout(protectFreeMenu, 900);
   }
 
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init, { once: true }) : init();
