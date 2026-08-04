@@ -1,18 +1,22 @@
 "use strict";
 (() => {
-  if (window.__TURMA_THEME_GLOBAL_V12__) return;
-  window.__TURMA_THEME_GLOBAL_V12__ = true;
+  if (window.__TURMA_THEME_STABLE_V17__) return;
+  window.__TURMA_THEME_STABLE_V17__ = true;
 
   const KEY = "turma_global_theme_v2";
   const root = document.documentElement;
-  const selectors = '[data-global-theme],[data-theme-toggle],.dash-theme-toggle,#studyThemeToggle,#themeButton,#profileThemeToggle,#rouletteThemeTop,#rouletteThemeToggle,#examThemeToggle,#favoritesThemeToggle,#reelThemeToggle';
+  const selector = '[data-global-theme],[data-theme-toggle],.dash-theme-toggle,#studyThemeToggle,#themeButton,#profileThemeToggle,#rouletteThemeTop,#rouletteThemeToggle,#examThemeToggle,#favoritesThemeToggle,#reelThemeToggle';
 
-  const saved = () => {
-    try { return localStorage.getItem(KEY) || localStorage.getItem("theme") || localStorage.getItem("turma_theme") || "dark"; }
-    catch { return "dark"; }
-  };
+  function read() {
+    try {
+      const value = localStorage.getItem(KEY) || localStorage.getItem("theme") || localStorage.getItem("turma_theme");
+      return value === "light" ? "light" : "dark";
+    } catch (_) {
+      return "dark";
+    }
+  }
 
-  function apply(value, broadcast = true) {
+  function paint(value, broadcast = true) {
     const theme = value === "light" ? "light" : "dark";
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
@@ -20,9 +24,9 @@
       localStorage.setItem(KEY, theme);
       localStorage.setItem("theme", theme);
       localStorage.setItem("turma_theme", theme);
-    } catch {}
+    } catch (_) {}
 
-    document.querySelectorAll(selectors).forEach(button => {
+    document.querySelectorAll(selector).forEach((button) => {
       button.setAttribute("aria-pressed", String(theme === "light"));
       button.title = theme === "light" ? "Ativar tema escuro" : "Ativar tema claro";
       const use = button.querySelector("use");
@@ -31,46 +35,26 @@
       }
     });
 
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "light" ? "#edf1f6" : "#05070b");
-    if (broadcast) window.dispatchEvent(new CustomEvent("turma:theme-change", { detail:{ theme } }));
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "light" ? "#eef1f6" : "#05070b");
+    if (broadcast) window.dispatchEvent(new CustomEvent("turma:theme-change", { detail: { theme } }));
   }
 
   function bind() {
-    document.addEventListener("click", event => {
-      const button = event.target.closest(selectors);
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest(selector);
       if (!button) return;
       event.preventDefault();
       event.stopPropagation();
-      apply(root.dataset.theme === "light" ? "dark" : "light");
+      paint(root.dataset.theme === "light" ? "dark" : "light");
     }, true);
 
-    window.addEventListener("storage", event => {
-      if ([KEY,"theme","turma_theme"].includes(event.key)) apply(event.newValue, false);
+    window.addEventListener("storage", (event) => {
+      if ([KEY, "theme", "turma_theme"].includes(event.key)) paint(event.newValue, false);
     });
   }
 
-  function load(src, type, marker) {
-    if (document.querySelector(`[data-${marker}]`)) return;
-    const element = document.createElement(type === "style" ? "link" : "script");
-    if (type === "style") {
-      element.rel = "stylesheet";
-      element.href = src;
-    } else {
-      element.src = src;
-      element.defer = true;
-    }
-    element.dataset[marker] = "1";
-    document.head.appendChild(element);
-  }
-
-  function install() {
-    const version = "20260803-v12-root";
-    load(`/turma-unified-v12.css?v=${version}`, "style", "turmaUnifiedV12Css");
-    load(`/turma-unified-v12.js?v=${version}`, "script", "turmaUnifiedV12Js");
-    load(`/notifications-button-v7.js?v=${version}`, "script", "notificationsButtonV7Js");
-  }
-
-  apply(saved(), false);
-  const start = () => { bind(); install(); };
-  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", start, { once:true }) : start();
+  paint(read(), false);
+  document.readyState === "loading"
+    ? document.addEventListener("DOMContentLoaded", bind, { once: true })
+    : bind();
 })();
