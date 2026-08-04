@@ -6,28 +6,17 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const route = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
+  const THEME_KEY = "turma_global_theme_v2";
 
   const routeClass = {
-    "/dashboard": "dashboard-page",
-    "/notas": "notes-page",
-    "/minigames": "minigames-page",
-    "/estudo": "study-home-page",
-    "/modulos": "modules-page",
-    "/gestao": "bankroll-page",
-    "/suporte": "support-page",
-    "/perfil": "profile-page",
-    "/roleta": "roulette-page",
-    "/roleta-reel": "reel-page",
-    "/provas": "exam-page",
-    "/favoritos": "favorites-page"
+    "/dashboard": "dashboard-page", "/notas": "notes-page", "/minigames": "minigames-page",
+    "/estudo": "study-home-page", "/modulos": "modules-page", "/gestao": "bankroll-page",
+    "/suporte": "support-page", "/perfil": "profile-page", "/roleta": "roulette-page",
+    "/roleta-reel": "reel-page", "/provas": "exam-page", "/favoritos": "favorites-page"
   };
-
   const navItems = [
-    ["/dashboard", "Início", "i-home"],
-    ["/estudo", "Estudos", "i-book"],
-    ["/modulos", "Módulos", "i-layers"],
-    ["/gestao", "Gestão", "i-activity"],
-    ["/perfil", "Perfil", "i-user"]
+    ["/dashboard", "Início", "i-home"], ["/estudo", "Estudos", "i-book"],
+    ["/modulos", "Módulos", "i-layers"], ["/gestao", "Gestão", "i-activity"], ["/perfil", "Perfil", "i-user"]
   ];
 
   function normalizeRoute() {
@@ -48,24 +37,58 @@
         if (href === "/notas" && label) label.textContent = "Anotações";
         link.classList.toggle("active", href === route || (href === "/dashboard" && route === "/dashboard"));
       });
-
       if (!nav.querySelector('a[href="/gestao"]')) {
         const anchor = document.createElement("a");
         anchor.className = `dash-nav-item${route === "/gestao" ? " active" : ""}`;
         anchor.href = "/gestao";
         anchor.innerHTML = '<svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Gestão</b>';
-        const modules = nav.querySelector('a[href="/modulos"]');
-        modules?.insertAdjacentElement("afterend", anchor);
+        nav.querySelector('a[href="/modulos"]')?.insertAdjacentElement("afterend", anchor);
       }
     });
-
     $$(".notes-title-group h1").forEach((title) => { title.textContent = "Anotações"; });
     document.title = document.title.replace(/^Notas\b/, "Anotações");
   }
 
+  function readTheme() {
+    try {
+      const value = localStorage.getItem(THEME_KEY) || localStorage.getItem("theme") || localStorage.getItem("turma_theme");
+      return value === "light" ? "light" : "dark";
+    } catch (_) { return "dark"; }
+  }
+
+  function applyTheme(theme, save = true) {
+    const value = theme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = value;
+    document.documentElement.style.colorScheme = value;
+    if (save) {
+      try {
+        localStorage.setItem(THEME_KEY, value);
+        localStorage.setItem("theme", value);
+        localStorage.setItem("turma_theme", value);
+      } catch (_) {}
+    }
+    const icon = value === "light" ? "i-sun" : "i-moon";
+    $$('[data-global-theme],.dash-theme-toggle,#studyThemeToggle,#profileThemeToggle,#reelThemeToggle,#themeButton,#rouletteThemeToggle,#examThemeToggle,#favoritesThemeToggle').forEach((button) => {
+      button.setAttribute("aria-pressed", String(value === "light"));
+      button.title = value === "light" ? "Ativar tema escuro" : "Ativar tema claro";
+      const use = $("use", button);
+      if (use && /i-(moon|sun)/.test(use.getAttribute("href") || "")) use.setAttribute("href", `/assets/dashboard-icons.svg#${icon}`);
+    });
+  }
+
+  function bindTheme() {
+    applyTheme(readTheme(), false);
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest('[data-global-theme],.dash-theme-toggle,#studyThemeToggle,#profileThemeToggle,#reelThemeToggle,#themeButton,#rouletteThemeToggle,#examThemeToggle,#favoritesThemeToggle');
+      if (!button || button.dataset.v18ThemeHandled === "1") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+    }, true);
+  }
+
   function removeDuplicateMobileBars() {
-    const bars = $$(".tp-mobile-bottom-nav,.dash-mobile-bottom,.m16-bottom");
-    bars.forEach((bar) => bar.remove());
+    $$(".tp-mobile-bottom-nav,.dash-mobile-bottom,.m16-bottom").forEach((bar) => bar.remove());
   }
 
   function createMobileBar() {
@@ -98,18 +121,13 @@
   }
 
   function drawers() {
-    const mappings = [
-      ["#dashSidebar", "#dashMenuToggle", "#dashMobileOverlay"],
-      ["#studySidebar", "#studyMenuToggle", "#studyMobileOverlay"],
-      ["#modulesSidebar", "#modulesMenuToggle", "#modulesMobileOverlay"],
-      ["#profileSidebar", "#profileMenuToggle", "#profileMobileOverlay"],
-      ["#reelSidebar", "#reelMenuToggle", "#reelMobileOverlay"],
-      ["#notesSidebar", "#notesMenuButton", "#notesMobileOverlay"],
-      ["#supportSidebar", "#supportMenuToggle", "#supportMobileOverlay"],
-      ["#rouletteSidebar", "#rouletteMenuToggle", "#rouletteMobileOverlay"],
+    [
+      ["#dashSidebar", "#dashMenuToggle", "#dashMobileOverlay"], ["#studySidebar", "#studyMenuToggle", "#studyMobileOverlay"],
+      ["#modulesSidebar", "#modulesMenuToggle", "#modulesMobileOverlay"], ["#profileSidebar", "#profileMenuToggle", "#profileMobileOverlay"],
+      ["#reelSidebar", "#reelMenuToggle", "#reelMobileOverlay"], ["#notesSidebar", "#notesMenuButton", "#notesMobileOverlay"],
+      ["#supportSidebar", "#supportMenuToggle", "#supportMobileOverlay"], ["#rouletteSidebar", "#rouletteMenuToggle", "#rouletteMobileOverlay"],
       ["#favoritesSidebar", "#favoritesMenuToggle", "#favoritesMobileOverlay"]
-    ];
-    mappings.forEach(([s, b, o]) => bindDrawer($(s), $(b), $(o)));
+    ].forEach(([s, b, o]) => bindDrawer($(s), $(b), $(o)));
   }
 
   function imageSafety() {
@@ -121,17 +139,13 @@
         image.addEventListener("error", () => image.classList.add("image-load-failed"), { once: true });
       }
     });
-
-    // Remove imagens decorativas antigas que apareciam gigantes antes do conteúdo correto.
     $$(".bankroll-hero > img,.bankroll-hero > picture").forEach((node) => node.remove());
   }
 
   function notesFix() {
     if (route !== "/notas") return;
-    const form = $("#noteEditorForm");
-    const editor = $("#notesEditor");
+    const form = $("#noteEditorForm"), editor = $("#notesEditor"), tags = $("#noteTags");
     if (form && !form.hidden && editor) editor.classList.remove("is-empty");
-    const tags = $("#noteTags");
     if (tags) tags.placeholder = "Ex.: resumo, estratégia, importante";
   }
 
@@ -145,8 +159,20 @@
     });
   }
 
+  function releaseLoading() {
+    setTimeout(() => {
+      $$(".dash-loading,.notes-loading,.modules-loading").forEach((loading) => {
+        loading.hidden = true;
+        loading.style.display = "none";
+      });
+      document.body.style.opacity = "1";
+      document.body.style.visibility = "visible";
+    }, 1400);
+  }
+
   function init() {
     normalizeRoute();
+    bindTheme();
     normalizeNavigation();
     removeDuplicateMobileBars();
     createMobileBar();
@@ -154,8 +180,8 @@
     imageSafety();
     notesFix();
     notificationFix();
+    releaseLoading();
     document.documentElement.dataset.uiFinal = "v18";
-
     setTimeout(() => {
       normalizeNavigation();
       drawers();
@@ -164,7 +190,5 @@
     }, 700);
   }
 
-  document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", init, { once: true })
-    : init();
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init, { once: true }) : init();
 })();
