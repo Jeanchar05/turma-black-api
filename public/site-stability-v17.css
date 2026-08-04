@@ -1,0 +1,54 @@
+/* Turma do Primo — estabilidade global V17
+   Esta folha NÃO redesenha páginas. Apenas impede estouros, SVGs gigantes e falhas mobile. */
+:root{--tp17-safe-top:env(safe-area-inset-top,0px);--tp17-safe-bottom:env(safe-area-inset-bottom,0px)}
+html,body{max-width:100%;overflow-x:hidden}
+body{min-width:0}
+*,*::before,*::after{box-sizing:border-box}
+img,video,canvas{max-width:100%;height:auto}
+iframe{max-width:100%}
+[hidden]{display:none!important}
+
+/* Ícones nunca podem assumir o tamanho natural do SVG. */
+.dash-nav-item svg,.dash-topbar svg,.dash-theme-toggle svg,.dash-notification-btn svg,.dash-menu-toggle svg,
+.notes-main-nav svg,.notes-topbar svg,.support-nav svg,.support-topbar svg,.roulette-nav svg,.favorites-nav svg,
+.module-video-item svg,.study-module-card svg,.tp-mobile-bottom-nav svg{width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;max-height:20px!important;display:block!important;fill:none;stroke:currentColor}
+.dash-brand img,.notes-brand img,.support-brand img{width:52px!important;height:60px!important;max-width:52px!important;object-fit:contain!important}
+
+/* Capas e artes com proporção previsível. */
+.study-module-art,.module-video-cover{overflow:hidden}
+.study-module-art img,.module-video-cover img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center!important}
+.study-module-art{aspect-ratio:16/9}
+.module-video-cover{aspect-ratio:16/9}
+.strategy-hero img,.study-hero img,.tp-v10-page-hero img,.modules-player-card img,.minigames-banner img{display:block;max-width:100%!important;max-height:480px!important;object-fit:contain!important}
+.image-load-failed{visibility:hidden!important}
+
+/* Containers não podem forçar largura maior que a tela. */
+.dash-main,.notes-main,.support-main,.roulette-main,.favorites-main,.modules-main,.study-main{min-width:0!important}
+.dash-content,.notes-workspace,.support-content,.roulette-content,.favorites-content,.modules-content,.study-content{max-width:100%!important;min-width:0!important}
+.dash-content>*,.notes-workspace>*,.support-content>*,.roulette-content>*,.favorites-content>*,.modules-content>*,.study-content>*{min-width:0}
+
+/* Uma única navegação inferior; somente no mobile. */
+.tp-mobile-bottom-nav,.m16-bottom{display:none!important}
+
+@media(max-width:820px){
+  body{min-height:100dvh;padding-bottom:calc(72px + var(--tp17-safe-bottom))}
+  .dash-main,.notes-main,.support-main,.roulette-main,.favorites-main,.modules-main,.study-main{width:100%!important;margin-left:0!important}
+  .dash-sidebar,.notes-sidebar,.support-sidebar,.roulette-sidebar,.favorites-sidebar,.modules-sidebar,.study-sidebar{
+    position:fixed!important;inset:0 auto 0 0!important;width:min(286px,86vw)!important;max-width:86vw!important;
+    transform:translateX(-105%)!important;transition:transform .24s ease!important;z-index:180!important
+  }
+  .dash-sidebar.open,.notes-sidebar.open,.support-sidebar.open,.roulette-sidebar.open,.favorites-sidebar.open,.modules-sidebar.open,.study-sidebar.open{transform:none!important}
+  .dash-mobile-overlay:not([hidden]),.notes-mobile-overlay:not([hidden]),.support-mobile-overlay:not([hidden]),.roulette-mobile-overlay:not([hidden]),.favorites-mobile-overlay:not([hidden]),.modules-mobile-overlay:not([hidden]),.study-mobile-overlay:not([hidden]){position:fixed!important;inset:0!important;background:rgba(0,0,0,.68)!important;z-index:170!important}
+  .dash-topbar,.notes-topbar,.support-topbar,.roulette-topbar,.favorites-topbar,.modules-topbar,.study-topbar{min-height:62px!important;height:auto!important;padding-top:max(9px,var(--tp17-safe-top))!important}
+  .dash-content,.support-content,.roulette-content,.favorites-content,.modules-content,.study-content{padding-left:12px!important;padding-right:12px!important}
+  .study-module-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .tp-mobile-bottom-nav{position:fixed!important;left:0;right:0;bottom:0;z-index:160;display:grid!important;grid-template-columns:repeat(5,1fr);min-height:64px;padding:6px 8px calc(6px + var(--tp17-safe-bottom));background:rgba(4,7,12,.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(18px)}
+  .tp-mobile-bottom-nav a{min-width:0;display:grid;place-items:center;gap:2px;color:#8f8997;text-decoration:none;font-size:9px;font-weight:700}
+  .tp-mobile-bottom-nav a.active{color:#c46cff}
+}
+@media(max-width:560px){
+  .study-module-grid{grid-template-columns:1fr!important}
+  .study-module-card,.module-video-item{width:100%!important;max-width:none!important}
+  .dash-stat-grid{grid-template-columns:1fr!important}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
