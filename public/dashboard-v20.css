@@ -1,0 +1,383 @@
+/* =========================================================
+   TURMA DO PRIMO — DASHBOARD V20
+   Refinamento isolado do Dashboard desktop + mobile.
+========================================================= */
+
+/* ---------- Base e desktop ---------- */
+.dashboard-reference .dash-reference-content{
+  width:min(1580px,100%)!important;
+  margin:0 auto!important;
+  padding:22px 24px 44px!important;
+}
+
+.dashboard-reference .reference-hero{
+  min-height:390px!important;
+  border-radius:26px!important;
+  isolation:isolate!important;
+  background:
+    radial-gradient(circle at 82% 42%,rgba(125,35,205,.38),transparent 31%),
+    radial-gradient(circle at 58% 115%,rgba(183,60,255,.13),transparent 42%),
+    linear-gradient(118deg,#050810 0%,#0c0a18 50%,#241039 100%)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.045)!important;
+}
+.dashboard-reference .reference-hero::before{
+  opacity:.72!important;
+  background:
+    repeating-radial-gradient(circle at 88% 48%,transparent 0 54px,rgba(222,164,255,.065) 55px 56px),
+    linear-gradient(115deg,transparent 0 55%,rgba(255,255,255,.022) 55.2%,transparent 55.4%)!important;
+}
+.dashboard-reference .dash-hero-copy{
+  width:58%!important;
+  padding:52px 0 46px 52px!important;
+}
+.dashboard-reference .dash-eyebrow{
+  font-size:11px!important;
+  letter-spacing:.17em!important;
+}
+.dashboard-reference .dash-hero h1{
+  max-width:720px!important;
+  margin:15px 0 16px!important;
+  font-size:clamp(58px,5.3vw,88px)!important;
+  line-height:.88!important;
+}
+.dashboard-reference .dash-hero p{
+  max-width:590px!important;
+  font-size:14px!important;
+  line-height:1.68!important;
+}
+.dashboard-reference .dash-hero-actions{
+  position:static!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:11px!important;
+  margin-top:24px!important;
+}
+.dashboard-reference .dash-primary-btn,
+.dashboard-reference .dash-secondary-btn{
+  position:relative!important;
+  inset:auto!important;
+  min-height:48px!important;
+  border-radius:13px!important;
+  padding:0 21px!important;
+  font-size:12px!important;
+  font-weight:800!important;
+}
+.dashboard-reference .dash-secondary-btn{
+  background:rgba(255,255,255,.025)!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  backdrop-filter:blur(12px)!important;
+}
+.dashboard-reference .dash-hero-portrait-wrap{
+  right:1.5%!important;
+  bottom:-1%!important;
+  width:46%!important;
+  height:104%!important;
+}
+.dashboard-reference .dash-hero-portrait{
+  object-position:center bottom!important;
+}
+.dashboard-reference .dash-reference-crest{
+  right:3%!important;
+  top:10%!important;
+  width:17%!important;
+  height:77%!important;
+  opacity:.23!important;
+}
+
+/* Métricas mais equilibradas */
+.dashboard-reference .reference-stats{
+  gap:14px!important;
+  margin:14px 0!important;
+}
+.dashboard-reference .reference-stats article{
+  min-height:118px!important;
+  padding:18px!important;
+  border-radius:18px!important;
+}
+.dashboard-reference .reference-stats .dash-stat-icon{
+  width:60px!important;
+  height:60px!important;
+  min-width:60px!important;
+  flex-basis:60px!important;
+  border-radius:17px!important;
+}
+.dashboard-reference .reference-stats strong{font-size:32px!important}
+.dashboard-reference .reference-stats small{font-size:9.5px!important}
+.dashboard-reference .reference-stats em{font-size:9.5px!important}
+
+/* Painéis desktop sem ficarem espremidos */
+.dashboard-reference .dash-reference-grid{
+  grid-template-columns:minmax(230px,.82fr) minmax(430px,1.42fr) minmax(300px,1fr)!important;
+  gap:14px!important;
+  margin-top:14px!important;
+}
+.dashboard-reference .reference-premium-card{
+  grid-column:1/-1!important;
+}
+.dashboard-reference .reference-premium-list{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+.dashboard-reference .reference-card{
+  padding:18px!important;
+  border-radius:18px!important;
+}
+.dashboard-reference .reference-action-list a,
+.dashboard-reference .reference-premium-list a{
+  min-height:58px!important;
+  border-radius:13px!important;
+}
+.dashboard-reference .reference-action-list b,
+.dashboard-reference .reference-premium-list b{font-size:11px!important}
+.dashboard-reference .reference-action-list small,
+.dashboard-reference .reference-premium-list small{font-size:9px!important}
+.dashboard-reference .reference-chart{height:175px!important}
+
+/* Módulos: 4 por linha no PC para a arte respirar */
+.dashboard-reference .dash-modules-shelf{
+  margin-top:14px!important;
+  padding:18px!important;
+  border-radius:20px!important;
+}
+.dashboard-reference .dash-modules-track{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:14px!important;
+}
+.dashboard-reference .dash-module-tile{
+  position:relative!important;
+  border-radius:16px!important;
+  background:linear-gradient(155deg,#080d16,#05080e)!important;
+}
+.dashboard-reference .dash-module-tile img{
+  width:100%!important;
+  aspect-ratio:1.85/1!important;
+  object-fit:cover!important;
+  object-position:72% center!important;
+  transform:scale(1.08)!important;
+  transition:transform .32s ease,filter .32s ease!important;
+  filter:saturate(1.08) contrast(1.04)!important;
+}
+.dashboard-reference .dash-module-tile:hover img{
+  transform:scale(1.14)!important;
+  filter:saturate(1.18) contrast(1.07)!important;
+}
+.dashboard-reference .dash-module-tile>span{
+  position:relative!important;
+  z-index:2!important;
+  padding:12px 13px 13px!important;
+  background:linear-gradient(180deg,rgba(5,8,14,.88),#05080e)!important;
+}
+.dashboard-reference .dash-module-tile b{
+  font-size:13px!important;
+  letter-spacing:-.01em!important;
+}
+.dashboard-reference .dash-module-tile small{font-size:10px!important}
+.dashboard-reference .dash-module-tile i{height:4px!important;margin-top:4px!important}
+
+/* ---------- Tablet ---------- */
+@media(max-width:1180px){
+  .dashboard-reference .dash-reference-content{padding:18px 18px 38px!important}
+  .dashboard-reference .reference-hero{min-height:370px!important}
+  .dashboard-reference .dash-hero-copy{width:62%!important;padding-left:40px!important}
+  .dashboard-reference .dash-hero-portrait-wrap{right:-2%!important;width:51%!important}
+  .dashboard-reference .dash-reference-grid{grid-template-columns:1fr 1.25fr!important}
+  .dashboard-reference .reference-progress-card{grid-column:1!important}
+  .dashboard-reference .reference-premium-card{grid-column:2!important}
+  .dashboard-reference .reference-premium-list{grid-template-columns:1fr 1fr!important}
+}
+
+/* ---------- Mobile real ---------- */
+@media(max-width:860px){
+  .dashboard-reference .dash-reference-content{
+    width:100%!important;
+    padding:12px 12px 28px!important;
+  }
+  .dashboard-reference .reference-hero{
+    min-height:600px!important;
+    border-radius:22px!important;
+    overflow:hidden!important;
+  }
+  .dashboard-reference .dash-hero-copy{
+    width:100%!important;
+    padding:27px 22px 0!important;
+  }
+  .dashboard-reference .dash-eyebrow{
+    font-size:9px!important;
+    letter-spacing:.15em!important;
+  }
+  .dashboard-reference .dash-hero h1{
+    max-width:100%!important;
+    margin:12px 0 13px!important;
+    font-size:clamp(43px,12.5vw,58px)!important;
+    line-height:.89!important;
+    letter-spacing:-.04em!important;
+  }
+  .dashboard-reference .dash-hero h1 strong{
+    display:inline!important;
+  }
+  .dashboard-reference .dash-hero p{
+    position:static!important;
+    max-width:96%!important;
+    margin:0!important;
+    font-size:12px!important;
+    line-height:1.52!important;
+  }
+  .dashboard-reference .dash-hero-actions{
+    position:static!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    width:100%!important;
+    margin:17px 0 0!important;
+  }
+  .dashboard-reference .dash-primary-btn,
+  .dashboard-reference .dash-secondary-btn{
+    width:100%!important;
+    min-width:0!important;
+    min-height:46px!important;
+    padding:0 10px!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+  }
+  .dashboard-reference .dash-secondary-btn svg{display:none!important}
+  .dashboard-reference .dash-hero-portrait-wrap{
+    right:-7%!important;
+    bottom:-1%!important;
+    width:88%!important;
+    height:58%!important;
+  }
+  .dashboard-reference .dash-hero-portrait{
+    object-position:right bottom!important;
+  }
+  .dashboard-reference .dash-reference-crest{
+    right:-3%!important;
+    top:auto!important;
+    bottom:7%!important;
+    width:43%!important;
+    height:39%!important;
+    opacity:.18!important;
+  }
+
+  /* 2x2, não quatro cards gigantes empilhados */
+  .dashboard-reference .reference-stats{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:9px!important;
+    margin:10px 0!important;
+  }
+  .dashboard-reference .reference-stats article{
+    min-height:146px!important;
+    padding:14px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    gap:10px!important;
+  }
+  .dashboard-reference .reference-stats .dash-stat-icon{
+    width:45px!important;
+    height:45px!important;
+    min-width:45px!important;
+    flex-basis:45px!important;
+    border-radius:13px!important;
+  }
+  .dashboard-reference .reference-stats .dash-stat-icon svg{width:22px!important;height:22px!important}
+  .dashboard-reference .reference-stats strong{font-size:26px!important}
+  .dashboard-reference .reference-stats small{font-size:8.5px!important;margin-bottom:4px!important}
+  .dashboard-reference .reference-stats em{font-size:8.5px!important;line-height:1.35!important}
+
+  .dashboard-reference .dash-reference-grid{
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+  .dashboard-reference .reference-actions,
+  .dashboard-reference .reference-chart-card,
+  .dashboard-reference .reference-progress-card,
+  .dashboard-reference .reference-premium-card{
+    grid-column:1!important;
+  }
+  .dashboard-reference .reference-card{padding:15px!important}
+  .dashboard-reference .reference-action-list{gap:8px!important}
+  .dashboard-reference .reference-action-list a{
+    min-height:64px!important;
+    padding:10px!important;
+    grid-template-columns:42px minmax(0,1fr) auto!important;
+  }
+  .dashboard-reference .reference-action-list a>span{
+    width:42px!important;
+    height:42px!important;
+  }
+  .dashboard-reference .reference-action-list b{font-size:12px!important}
+  .dashboard-reference .reference-action-list small{font-size:10px!important}
+  .dashboard-reference .reference-chart{height:160px!important}
+  .dashboard-reference .reference-premium-list{grid-template-columns:1fr!important}
+
+  .dashboard-reference .dash-modules-shelf{
+    padding:14px!important;
+    border-radius:18px!important;
+  }
+  .dashboard-reference .dash-modules-shelf header{
+    align-items:flex-start!important;
+  }
+  .dashboard-reference .dash-modules-shelf header a{
+    font-size:9px!important;
+    text-align:right!important;
+  }
+  .dashboard-reference .dash-modules-track{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .dashboard-reference .dash-module-tile{
+    border-radius:14px!important;
+  }
+  .dashboard-reference .dash-module-tile img{
+    aspect-ratio:1.35/1!important;
+    object-position:73% center!important;
+    transform:scale(1.33)!important;
+  }
+  .dashboard-reference .dash-module-tile:hover img{transform:scale(1.33)!important}
+  .dashboard-reference .dash-module-tile>span{
+    padding:10px!important;
+  }
+  .dashboard-reference .dash-module-tile b{font-size:12px!important}
+  .dashboard-reference .dash-module-tile small{font-size:9px!important}
+
+  /* barra inferior mais leve */
+  .dashboard-reference .tp-mobile-bottom-nav{
+    min-height:calc(64px + env(safe-area-inset-bottom))!important;
+    padding:5px 8px calc(5px + env(safe-area-inset-bottom))!important;
+    gap:5px!important;
+  }
+  .dashboard-reference .tp-mobile-bottom-nav a{
+    min-height:52px!important;
+    border-radius:14px!important;
+    font-size:9px!important;
+  }
+  .dashboard-reference .tp-mobile-bottom-nav a svg{
+    width:21px!important;
+    height:21px!important;
+  }
+}
+
+@media(max-width:430px){
+  .dashboard-reference .reference-hero{min-height:575px!important}
+  .dashboard-reference .dash-hero h1{font-size:clamp(40px,12.4vw,52px)!important}
+  .dashboard-reference .dash-hero p{font-size:11.5px!important}
+  .dashboard-reference .dash-hero-actions{grid-template-columns:1fr!important}
+  .dashboard-reference .dash-secondary-btn{min-height:42px!important;background:rgba(255,255,255,.018)!important}
+  .dashboard-reference .dash-hero-portrait-wrap{right:-12%!important;width:98%!important;height:55%!important}
+  .dashboard-reference .reference-stats article{min-height:138px!important;padding:12px!important}
+  .dashboard-reference .reference-stats strong{font-size:24px!important}
+  .dashboard-reference .dash-modules-track{gap:8px!important}
+  .dashboard-reference .dash-module-tile img{aspect-ratio:1.28/1!important;transform:scale(1.38)!important}
+}
+
+@media(max-width:360px){
+  .dashboard-reference .dash-reference-content{padding-left:9px!important;padding-right:9px!important}
+  .dashboard-reference .reference-hero{min-height:560px!important}
+  .dashboard-reference .dash-hero-copy{padding-left:18px!important;padding-right:18px!important}
+  .dashboard-reference .reference-stats{grid-template-columns:1fr!important}
+  .dashboard-reference .reference-stats article{
+    min-height:105px!important;
+    flex-direction:row!important;
+    align-items:center!important;
+  }
+}
