@@ -1,0 +1,9 @@
+/* Retrato transparente do Dashboard — substitui a antiga arte de banner duplicada */
+.dashboard-reference .reference-hero::after{display:none!important;background:none!important}
+.dashboard-reference .dash-reference-character{display:none!important}
+.dashboard-reference .dash-hero-portrait-wrap{position:absolute!important;z-index:4!important;right:1%!important;bottom:-2%!important;width:49%!important;height:108%!important;display:block!important;overflow:hidden!important;pointer-events:none!important}
+.dashboard-reference .dash-hero-portrait{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;display:block!important;object-fit:contain!important;object-position:center bottom!important;filter:drop-shadow(0 27px 38px rgba(0,0,0,.52))!important}
+.dashboard-reference .dash-reference-crest{z-index:2!important}
+@media(max-width:1120px){.dashboard-reference .dash-hero-portrait-wrap{right:-3%!important;width:55%!important}}
+@media(max-width:860px){.dashboard-reference .dash-hero-portrait-wrap{right:-8%!important;bottom:-2%!important;width:82%!important;height:65%!important}.dashboard-reference .dash-hero-portrait{object-position:right bottom!important}}
+@media(max-width:560px){.dashboard-reference .dash-hero-portrait-wrap{right:-19%!important;width:100%!important;height:62%!important}.dashboard-reference .dash-hero-portrait{object-position:center bottom!important}}
