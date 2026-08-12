@@ -23,21 +23,16 @@
       document.head.appendChild(script);
     };
 
-    addStyle("/responsive-global.css?v=20260812-shell-v23", "globalResponsive");
-    addStyle("/theme-global-v2.css?v=20260812-shell-v23", "globalThemeCss");
-    addStyle("/student-shell-v23.css?v=20260812-shell-v23", "studentShellCss");
-    addStyle("/platform-eight-modules-fix.css?v=20260812-shell-v23", "eightModulesFix");
-    addScript("/theme-global-v2.js?v=20260812-shell-v23", "globalThemeV2");
-    addScript("/navigation-final.js?v=20260812-shell-v23", "navigationFinal");
-    addScript("/student-shell-v23.js?v=20260812-shell-v23", "studentShellJs");
-    addScript("/performance-optimization.js?v=20260802-performance-3", "performanceOptimization");
-    addScript("/study-platform-sync.js?v=20260801-sync-2", "studyPlatformSync");
-    addScript("/platform-eight-modules-fix.js?v=20260801-eight-modules", "eightModulesFix");
-
-    const route = (location.pathname.replace(/\/$/, "") || "/").toLowerCase();
-    if (route === "/roleta-reel" || route === "/roleta-reel.html") {
-      addScript("/roleta-reel-recovery.js?v=20260802-reel-recovery-1", "roletaReelRecovery");
-    }
+    addStyle("/responsive-global.css?v=20260812-shell-v24", "globalResponsive");
+    addStyle("/theme-global-v2.css?v=20260812-shell-v24", "globalThemeCss");
+    addStyle("/student-shell-v23.css?v=20260812-shell-v24", "studentShellCss");
+    addStyle("/platform-eight-modules-fix.css?v=20260812-shell-v24", "eightModulesFix");
+    addScript("/theme-global-v2.js?v=20260812-shell-v24", "globalThemeV2");
+    addScript("/navigation-final.js?v=20260812-shell-v24", "navigationFinal");
+    addScript("/student-shell-v23.js?v=20260812-shell-v24", "studentShellJs");
+    addScript("/performance-optimization.js?v=20260812-performance-v24", "performanceOptimization");
+    addScript("/study-platform-sync.js?v=20260812-sync-v24", "studyPlatformSync");
+    addScript("/platform-eight-modules-fix.js?v=20260812-eight-v24", "eightModulesFix");
   }
 
   function getToken() {
@@ -81,7 +76,7 @@
   }
 
   async function cleanupLegacyBrowserState() {
-    const marker = "legacy-render-cleanup-v2";
+    const marker = "legacy-render-cleanup-v3";
     try { if (sessionStorage.getItem(marker) === "ok") return; } catch (_) {}
     try {
       if ("serviceWorker" in navigator) {
@@ -121,22 +116,15 @@
         signal: controller.signal
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data?.usuario) throw new Error(data?.erro || "Sessão inválida.");
-
+      if (!response.ok || !data?.usuario) throw new Error(data?.erro || data?.mensagem || "Sessão inválida.");
       const user = data.usuario;
       const required = document.body?.dataset.requiredAccess || "dashboard";
       if (!hasAccess(user, required)) {
         window.location.replace("/dashboard");
         return;
       }
-
-      fillUser(user);
       revealPage({ user });
-    } catch (error) {
-      if (error?.name === "AbortError") {
-        revealPage({ fallback: true });
-        return;
-      }
+    } catch (_) {
       clearSession();
       window.location.replace("/");
     } finally {
@@ -147,30 +135,10 @@
   function startValidation() {
     if (validationStarted) return;
     validationStarted = true;
+    installResponsiveLayer();
     validatePage();
   }
 
-  function roleLabel(role) {
-    return {dev:"Dev",dono:"Dono",superadmin:"Dono",admin:"Admin",financeiro:"Financeiro",vendedor:"Vendedor",moderador:"Moderador",suporte:"Suporte",aluno:"Aluno"}[role] || "Usuário";
-  }
-
-  function fillUser(user) {
-    const name = String(user?.nome || "Usuário");
-    const firstName = name.trim().split(/\s+/)[0] || "Usuário";
-    const role = normalizeRole(user);
-    $$('[data-user-name]').forEach((element) => { element.textContent = firstName; });
-    $$('[data-user-fullname]').forEach((element) => { element.textContent = name; });
-    $$('[data-user-role]').forEach((element) => { element.textContent = roleLabel(role); });
-    $$('[data-logout]').forEach((button) => button.addEventListener("click", () => {
-      clearSession();
-      window.location.replace("/");
-    }));
-  }
-
-  installResponsiveLayer();
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startValidation, { once: true });
-  } else {
-    startValidation();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startValidation, { once: true });
+  else startValidation();
 })();
