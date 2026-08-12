@@ -6,6 +6,8 @@
   if (/^\/(admin|painel-vendas)(?:\/|$)/.test(path)) return;
   const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const icon=id=>`<svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#${id}"></use></svg>`;
+  function injectStyle(src,key){if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=src;l.dataset[key]='1';document.head.appendChild(l)}
+  function injectScript(src,key){if(document.querySelector(`script[data-${key}]`))return;const s=document.createElement('script');s.src=src;s.defer=true;s.dataset[key]='1';document.head.appendChild(s)}
 
   function cleanLinks(){
     const routes={"dashboard.html":"/dashboard","notas.html":"/notas","minigames.html":"/minigames","estudo.html":"/estudo","modulos.html":"/modulos","gestao.html":"/gestao","suporte.html":"/suporte","perfil.html":"/perfil","roleta.html":"/roleta","provas.html":"/provas","favoritos.html":"/favoritos"};
@@ -52,6 +54,8 @@
     if(path!='/notas'&&path!='/notas.html')return;
     ['categoryFilter','sortFilter','noteCategory'].forEach(id=>{const s=document.getElementById(id);if(s){s.disabled=false;s.removeAttribute('aria-disabled');s.style.pointerEvents='auto'}});
     $$('.notes-category-list button,[data-category]').forEach(b=>{b.disabled=false;b.style.pointerEvents='auto'});
+    injectStyle('/notes-category-hotfix.css?v=20260812-notes-v23','notesCategoryHotfixCss');
+    injectScript('/notes-category-hotfix.js?v=20260812-notes-v23','notesCategoryHotfixJs');
   }
 
   function bindBell(){
