@@ -9,14 +9,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260803-v11" />
-  <link rel="stylesheet" href="/estudo-home.css?v=20260803-v11" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260803-v11" />
-  <link rel="stylesheet" href="/turma-approved-v11.css?v=20260803-v11" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260812-study-v24" />
+  <link rel="stylesheet" href="/estudo-home.css?v=20260812-study-v24" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260812-study-v24" />
+  <link rel="stylesheet" href="/turma-approved-v11.css?v=20260812-study-v24" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <script defer src="/protected-estudo.js?v=20260803-v11"></script>
-  <script defer src="/theme-global-v2.js?v=20260803-v11"></script>
-  <script defer src="/estudo-home-v3.js?v=20260803-v11"></script>
+  <style>
+    .study-module-grid{opacity:0;transform:translateY(4px);transition:opacity .16s ease,transform .16s ease}
+    body.study-images-ready .study-module-grid{opacity:1;transform:none}
+    .study-module-art img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;background:#0a0610}
+  </style>
+  <script defer src="/protected-estudo.js?v=20260812-study-v24"></script>
+  <script defer src="/theme-global-v2.js?v=20260812-study-v24"></script>
+  <script defer src="/estudo-home-v3.js?v=20260812-study-v24"></script>
 </head>
 <body class="student-dashboard study-home-page" data-required-access="dashboard">
   <div class="dash-loading" id="studyLoading"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando seus estudos</strong><small>Carregando a trilha completa…</small></div></div>
@@ -70,7 +75,7 @@
       </div>
 
       <div class="study-home-layout">
-        <section class="study-module-zone"><div class="study-module-grid"></div></section>
+        <section class="study-module-zone"><div class="study-module-grid" aria-live="polite"></div></section>
         <aside class="study-home-side">
           <section class="study-home-side-card"><h3>Seu desempenho</h3><div class="study-score-ring" id="homeScoreRing"><div><strong id="homeScore">0%</strong><small>Aproveitamento geral</small></div></div><div class="study-side-stats"><p><span>Módulos disponíveis</span><b>8</b></p><p><span>Em andamento</span><b id="homeStarted">0</b></p><p><span>Concluídos</span><b id="homeCompletedSide">0/8</b></p></div></section>
           <section class="study-home-side-card"><h3>Estrutura dos módulos</h3><div class="study-structure"><p><i>1</i>Exemplo Premium</p><p><i>2</i>Explicação interativa</p><p><i>3</i>Minigame com Race</p></div></section>
