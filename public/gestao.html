@@ -2,238 +2,122 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#07030d" />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#06030a" />
+  <meta name="robots" content="noindex,nofollow" />
   <title>Gestão de Banca | Turma do Primo</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260802-gestao-1" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260802-gestao-1" />
-  <link rel="stylesheet" href="/gestao-banca.css?v=20260802-gestao-1" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260812-gestao-v24" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260812-gestao-v24" />
+  <link rel="stylesheet" href="/student-shell-v23.css?v=20260812-gestao-v24" />
+  <link rel="stylesheet" href="/gestao-banca.css?v=20260812-gestao-v24" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-
-  <script defer src="/protected-estudo.js?v=20260802-gestao-1"></script>
-  <script defer src="/gestao-banca.js?v=20260802-gestao-1"></script>
+  <script defer src="/protected-estudo.js?v=20260812-gestao-v24"></script>
+  <script defer src="/gestao-banca.js?v=20260812-gestao-v24"></script>
 </head>
 <body class="student-dashboard bankroll-page" data-required-access="dashboard">
-  <div class="dash-loading" id="studyLoading" role="status">
-    <img src="/assets/turma-primo-logo.svg" alt="" />
-    <div>
-      <strong>Preparando sua gestão</strong>
-      <span>Carregando limites e histórico da banca…</span>
-    </div>
-  </div>
-
+  <div class="dash-loading" id="studyLoading"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando sua gestão</strong><small>Organizando banca e resultados…</small></div></div>
   <div class="dash-mobile-overlay" id="studyMobileOverlay" hidden></div>
 
   <aside class="dash-sidebar" id="studySidebar">
-    <a class="dash-brand" href="/dashboard">
-      <img src="/assets/turma-primo-logo.svg" alt="Logo Turma do Primo" />
-      <span><small>TURMA DO</small><strong>PRIMO</strong></span>
-    </a>
-
+    <a class="dash-brand" href="/dashboard"><img src="/assets/turma-primo-logo.svg" alt="Turma do Primo" /><span><small>TURMA DO</small><strong>PRIMO</strong></span></a>
     <nav class="dash-nav" aria-label="Navegação principal">
       <a class="dash-nav-item" href="/dashboard"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
       <a class="dash-nav-item" href="/notas"><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg><b>Anotações</b></a>
       <a class="dash-nav-item" href="/minigames"><svg><use href="/assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
       <a class="dash-nav-item" href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
       <a class="dash-nav-item" href="/modulos"><svg><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
+      <a class="dash-nav-item active" href="/gestao"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Gestão</b></a>
       <a class="dash-nav-item" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
       <a class="dash-nav-item" href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
       <a class="dash-nav-item" href="/roleta"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
-      <a class="dash-nav-item active" href="/gestao"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Gestão</b></a>
       <a class="dash-nav-item" href="/provas"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
       <a class="dash-nav-item" href="/favoritos"><svg><use href="/assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
     </nav>
-
-    <div class="dash-plan-card">
-      <span class="dash-plan-icon"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg></span>
-      <div><strong>Plano Premium</strong><small>Gestão liberada</small></div>
-      <div class="dash-plan-progress"><i style="width:100%"></i></div>
-      <p>Dados salvos neste dispositivo.</p>
-      <a class="dash-plan-link" href="/perfil">Ver benefícios</a>
-    </div>
-
-    <button class="dash-logout" id="studyLogout" type="button">
-      <svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg>
-      <span>Sair da conta</span>
-    </button>
+    <div class="tp-v10-sidebar-spacer"></div>
+    <div class="dash-plan-card"><span class="dash-plan-icon"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg></span><div><strong>Gestão Premium</strong><small>Controle da banca</small></div><div class="dash-plan-progress"><i style="width:100%"></i></div><p>Planejamento salvo automaticamente.</p></div>
+    <button class="dash-logout" id="studyLogout" type="button"><svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
   </aside>
 
   <main class="dash-main">
     <header class="dash-topbar">
-      <button class="dash-menu-toggle" id="studyMenuToggle" type="button" aria-label="Abrir menu">
-        <svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg>
-      </button>
-
-      <div class="dash-search-trigger bankroll-search-copy">
-        <svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg>
-        <em>Limites, disciplina e acompanhamento da banca</em>
-      </div>
-
-      <div class="dash-top-actions">
-        <button class="dash-theme-toggle" id="studyThemeToggle" type="button" aria-label="Alternar tema">
-          <svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg>
-        </button>
-        <a class="dash-user-menu" href="/perfil">
-          <span class="dash-avatar" data-bankroll-avatar>P</span>
-          <span><strong data-bankroll-name>Primo</strong><small>Gestão de banca</small></span>
-        </a>
-      </div>
+      <button class="dash-menu-toggle" id="studyMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg></button>
+      <div class="dash-search-trigger bankroll-search-copy"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><em>Controle sua banca com clareza e disciplina</em></div>
+      <div class="dash-top-actions"><button class="dash-theme-toggle" id="studyThemeToggle" data-global-theme type="button" aria-label="Alternar tema"><svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button><button class="dash-notification-btn" id="notificationButton" type="button" aria-label="Notificações"><svg><use href="/assets/dashboard-icons.svg#i-bell"></use></svg></button><a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-user-avatar>P</span><span><strong data-user-name>Primo</strong><small>Gestão de banca</small></span></a></div>
     </header>
 
-    <div class="dash-content bankroll-content">
-      <section class="bankroll-hero">
-        <div>
-          <span class="bankroll-eyebrow">CONTROLE ANTES DA ENTRADA</span>
-          <h1>Gestão de <strong>Banca</strong></h1>
-          <p>Defina sua unidade, meta e stop-loss. A sessão é bloqueada automaticamente quando um limite é atingido.</p>
-        </div>
-        <div class="bankroll-hero-actions">
-          <button class="bankroll-btn primary" id="startSessionButton" type="button">Iniciar sessão</button>
-          <button class="bankroll-btn" id="exportBankrollButton" type="button">Exportar histórico</button>
-        </div>
+    <div class="dash-content bankroll-v24">
+      <section class="bank-overview">
+        <div class="bank-overview-head"><div><span class="bank-eyebrow">GESTÃO DE BANCA</span><h1>Seu capital, <strong>sob controle.</strong></h1></div><button class="bank-icon-btn" id="openPlanButton" type="button" aria-label="Configurar planejamento"><svg><use href="/assets/dashboard-icons.svg#i-settings"></use></svg></button></div>
+        <div class="bank-balance-row"><div><small>Banca atual</small><strong id="currentBankrollValue">R$ 0,00</strong><span id="bankrollVariationLabel">Configure sua banca para começar</span></div><div class="bank-day-badge" id="todayBadge"><b id="todayResultValue">R$ 0,00</b><small>resultado de hoje</small></div></div>
+        <div class="bank-actions"><button class="profit" type="button" data-open-entry="profit"><span>＋</span><b>Lucro</b></button><button class="loss" type="button" data-open-entry="loss"><span>−</span><b>Perda</b></button><button type="button" id="openPlanButtonSecondary"><span><svg><use href="/assets/dashboard-icons.svg#i-settings"></use></svg></span><b>Planejamento</b></button></div>
       </section>
 
-      <section class="bankroll-summary-grid" aria-label="Resumo da banca">
-        <article class="bankroll-summary-card">
-          <span><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg></span>
-          <div><small>Banca atual</small><strong id="currentBankrollValue">R$ 0,00</strong><em id="bankrollVariationLabel">Configure sua banca</em></div>
+      <section class="bank-mini-grid">
+        <article><span><svg><use href="/assets/dashboard-icons.svg#i-target"></use></svg></span><div><small>Meta diária</small><strong id="dailyTargetValue">R$ 0,00</strong></div></article>
+        <article><span><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg></span><div><small>Stop diário</small><strong id="dailyStopValue">R$ 0,00</strong></div></article>
+        <article><span><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg></span><div><small>Unidade</small><strong id="unitValue">R$ 0,00</strong></div></article>
+        <article><span><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg></span><div><small>Dias restantes</small><strong id="daysRemainingValue">0</strong></div></article>
+      </section>
+
+      <section class="bank-main-grid">
+        <article class="bank-card bank-goal-card">
+          <header><div><span>PLANEJAMENTO</span><h2>Progresso da meta</h2></div><b id="planDayLabel">Dia 0 de 0</b></header>
+          <div class="bank-goal-numbers"><div><small>Objetivo acumulado</small><strong id="planGoalValue">R$ 0,00</strong></div><div><small>Resultado acumulado</small><strong id="planProfitValue">R$ 0,00</strong></div></div>
+          <div class="bank-goal-bar"><i id="planGoalBar"></i></div><p id="planGoalText">Configure o planejamento para acompanhar sua evolução.</p>
         </article>
-        <article class="bankroll-summary-card" id="sessionResultCard">
-          <span><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg></span>
-          <div><small>Resultado da sessão</small><strong id="sessionResultValue">R$ 0,00</strong><em id="sessionStatusLabel">Nenhuma sessão ativa</em></div>
-        </article>
-        <article class="bankroll-summary-card">
-          <span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg></span>
-          <div><small>Progresso da meta</small><strong id="targetProgressValue">0%</strong><em id="targetRemainingLabel">Meta não configurada</em></div>
-        </article>
-        <article class="bankroll-summary-card risk-card" id="riskSummaryCard">
-          <span><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg></span>
-          <div><small>Margem até o stop-loss</small><strong id="stopRemainingValue">R$ 0,00</strong><em id="riskStatusLabel">Limite não configurado</em></div>
+
+        <article class="bank-card bank-chart-card">
+          <header><div><span>EVOLUÇÃO</span><h2>Curva da banca</h2></div><small id="chartPeriodLabel">últimos lançamentos</small></header>
+          <div class="bank-chart" id="bankrollChart"></div>
         </article>
       </section>
 
-      <section class="bankroll-layout">
-        <div class="bankroll-column">
-          <article class="bankroll-panel">
-            <header class="bankroll-panel-head">
-              <div><span>CONFIGURAÇÃO</span><h2>Plano de banca</h2></div>
-              <small>Salvo automaticamente</small>
-            </header>
-
-            <form class="bankroll-form" id="bankrollConfigForm">
-              <label>
-                <span>Banca inicial</span>
-                <div class="bankroll-input-shell"><b>R$</b><input id="initialBankrollInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
-              </label>
-              <label>
-                <span>Banca atual</span>
-                <div class="bankroll-input-shell"><b>R$</b><input id="currentBankrollInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
-              </label>
-              <label>
-                <span>Meta por sessão</span>
-                <div class="bankroll-input-shell"><b>R$</b><input id="sessionTargetInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
-              </label>
-              <label>
-                <span>Stop-loss por sessão</span>
-                <div class="bankroll-input-shell"><b>R$</b><input id="sessionStopInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
-              </label>
-              <label class="wide">
-                <span>Unidade por entrada</span>
-                <div class="bankroll-range-row">
-                  <input id="unitPercentInput" type="range" min="0.1" max="5" step="0.1" value="1" />
-                  <strong id="unitPercentLabel">1,0%</strong>
-                </div>
-                <small>Quanto menor a unidade, maior a proteção da banca.</small>
-              </label>
-              <button class="bankroll-btn primary wide" type="submit">Salvar plano de banca</button>
-            </form>
-          </article>
-
-          <article class="bankroll-panel session-panel">
-            <header class="bankroll-panel-head">
-              <div><span>SESSÃO ATUAL</span><h2>Controle operacional</h2></div>
-              <span class="bankroll-status-pill" id="sessionStatusPill">Inativa</span>
-            </header>
-
-            <div class="bankroll-session-metrics">
-              <div><small>Unidade calculada</small><strong id="recommendedUnitValue">R$ 0,00</strong></div>
-              <div><small>Entradas até o limite</small><strong id="entriesUntilStopValue">0</strong></div>
-              <div><small>Lançamentos da sessão</small><strong id="sessionEntriesValue">0</strong></div>
-            </div>
-
-            <div class="bankroll-progress-block">
-              <div><span>Meta</span><strong id="targetBarLabel">R$ 0,00 / R$ 0,00</strong></div>
-              <div class="bankroll-progress"><i id="targetProgressBar"></i></div>
-            </div>
-            <div class="bankroll-progress-block danger">
-              <div><span>Stop-loss utilizado</span><strong id="stopBarLabel">R$ 0,00 / R$ 0,00</strong></div>
-              <div class="bankroll-progress"><i id="stopProgressBar"></i></div>
-            </div>
-
-            <div class="bankroll-session-actions">
-              <button class="bankroll-btn" id="closeSessionButton" type="button">Encerrar sessão</button>
-              <button class="bankroll-btn subtle" id="newSessionButton" type="button">Nova sessão</button>
-            </div>
-          </article>
-
-          <article class="bankroll-panel">
-            <header class="bankroll-panel-head">
-              <div><span>LANÇAMENTO</span><h2>Registrar resultado</h2></div>
-              <small>Somente com sessão ativa</small>
-            </header>
-
-            <form class="bankroll-entry-form" id="bankrollEntryForm">
-              <div class="bankroll-result-toggle" role="group" aria-label="Tipo de resultado">
-                <button class="active positive" type="button" data-result-type="profit">Lucro</button>
-                <button class="negative" type="button" data-result-type="loss">Perda</button>
-              </div>
-              <label>
-                <span>Valor do resultado</span>
-                <div class="bankroll-input-shell"><b>R$</b><input id="entryAmountInput" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0,00" required /></div>
-              </label>
-              <label>
-                <span>Observação</span>
-                <input id="entryNoteInput" class="bankroll-text-input" type="text" maxlength="80" placeholder="Ex.: entrada 3, leitura dos gêmeos" />
-              </label>
-              <button class="bankroll-btn primary" id="addEntryButton" type="submit">Adicionar lançamento</button>
-            </form>
-            <p class="bankroll-form-message" id="bankrollMessage" aria-live="polite"></p>
-          </article>
-        </div>
-
-        <div class="bankroll-column">
-          <article class="bankroll-panel chart-panel">
-            <header class="bankroll-panel-head">
-              <div><span>EVOLUÇÃO</span><h2>Curva da banca</h2></div>
-              <small>Últimos 20 lançamentos</small>
-            </header>
-            <div class="bankroll-chart" id="bankrollChart" aria-label="Gráfico de evolução da banca"></div>
-          </article>
-
-          <article class="bankroll-panel history-panel">
-            <header class="bankroll-panel-head">
-              <div><span>HISTÓRICO</span><h2>Últimos resultados</h2></div>
-              <button class="bankroll-link-button" id="clearHistoryButton" type="button">Limpar</button>
-            </header>
-            <div class="bankroll-history-list" id="bankrollHistoryList"></div>
-          </article>
-
-          <article class="bankroll-responsible-card">
-            <span><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg></span>
-            <div>
-              <strong>Limite atingido significa sessão encerrada.</strong>
-              <p>A gestão ajuda a reduzir decisões impulsivas, mas não elimina o risco. Não use dinheiro destinado a despesas essenciais e não tente recuperar perdas.</p>
-            </div>
-          </article>
-        </div>
+      <section class="bank-card bank-calendar-card">
+        <header><div><span>CONSISTÊNCIA</span><h2>Calendário da banca</h2></div><div class="bank-calendar-nav"><button id="calendarPrev" type="button">‹</button><strong id="calendarTitle">Mês</strong><button id="calendarNext" type="button">›</button></div></header>
+        <div class="bank-calendar-week"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
+        <div class="bank-calendar" id="bankCalendar"></div>
+        <div class="bank-calendar-legend"><span><i class="profit"></i>Lucro</span><span><i class="loss"></i>Perda</span><span><i></i>Sem lançamento</span></div>
       </section>
+
+      <section class="bank-card bank-movements-card">
+        <header><div><span>MOVIMENTAÇÕES</span><h2>Últimos resultados</h2></div><button class="bank-text-btn" id="clearHistoryButton" type="button">Limpar</button></header>
+        <div class="bank-movement-list" id="bankrollHistoryList"></div>
+      </section>
+
+      <section class="bank-responsible"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg><div><strong>Gestão é limite, não promessa de resultado.</strong><p>A roleta continua aleatória. Use valores que não comprometam despesas essenciais e respeite seu stop.</p></div></section>
     </div>
   </main>
+
+  <dialog class="bank-modal" id="bankPlanModal">
+    <form method="dialog" id="bankrollConfigForm" class="bank-modal-box">
+      <header><div><span>PLANEJAMENTO</span><h2>Configurar banca</h2></div><button type="button" data-close-modal="bankPlanModal">×</button></header>
+      <div class="bank-form-grid">
+        <label><span>Banca inicial</span><div class="bank-input"><b>R$</b><input id="initialBankrollInput" type="number" min="0" step="0.01" inputmode="decimal" required /></div></label>
+        <label><span>Banca atual</span><div class="bank-input"><b>R$</b><input id="currentBankrollInput" type="number" min="0" step="0.01" inputmode="decimal" required /></div></label>
+        <label><span>Meta diária</span><div class="bank-input"><b>R$</b><input id="sessionTargetInput" type="number" min="0" step="0.01" inputmode="decimal" required /></div></label>
+        <label><span>Stop-loss diário</span><div class="bank-input"><b>R$</b><input id="sessionStopInput" type="number" min="0" step="0.01" inputmode="decimal" required /></div></label>
+        <label><span>Dias do planejamento</span><div class="bank-input"><b>DIAS</b><input id="goalDaysInput" type="number" min="1" max="365" value="30" required /></div></label>
+        <label><span>Data de início</span><div class="bank-input"><b>📅</b><input id="goalStartInput" type="date" required /></div></label>
+        <label class="wide"><span>Unidade por entrada</span><div class="bank-range"><input id="unitPercentInput" type="range" min="0.1" max="5" step="0.1" value="1" /><strong id="unitPercentLabel">1,0%</strong></div><small>Percentual calculado sobre a banca atual.</small></label>
+      </div>
+      <footer><button type="button" class="secondary" data-close-modal="bankPlanModal">Cancelar</button><button type="submit" class="primary">Salvar planejamento</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="bank-modal" id="bankEntryModal">
+    <form method="dialog" id="bankrollEntryForm" class="bank-modal-box compact">
+      <header><div><span id="entryEyebrow">LANÇAMENTO</span><h2 id="entryModalTitle">Registrar resultado</h2></div><button type="button" data-close-modal="bankEntryModal">×</button></header>
+      <input type="hidden" id="entryTypeInput" value="profit" />
+      <label><span>Valor</span><div class="bank-input"><b>R$</b><input id="entryAmountInput" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0,00" required /></div></label>
+      <label><span>Data</span><div class="bank-input"><b>📅</b><input id="entryDateInput" type="date" required /></div></label>
+      <label><span>Observação</span><input id="entryNoteInput" class="bank-text-input" type="text" maxlength="100" placeholder="Ex.: sessão da noite, Gêmeos…" /></label>
+      <footer><button type="button" class="secondary" data-close-modal="bankEntryModal">Cancelar</button><button type="submit" class="primary" id="entrySubmitButton">Registrar lucro</button></footer>
+    </form>
+  </dialog>
+
+  <div class="bank-toast" id="bankrollMessage" aria-live="polite"></div>
 </body>
 </html>
