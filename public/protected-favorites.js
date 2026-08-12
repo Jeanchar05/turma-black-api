@@ -1,37 +1,14 @@
 "use strict";
 (() => {
-  function addScript(src, marker){
-    if(document.querySelector(`script[data-${marker}]`))return;
-    const script=document.createElement("script");
-    script.src=src;
-    script.defer=true;
-    script.dataset[marker]="1";
-    document.head.appendChild(script);
-  }
-  addScript("/theme-global-v2.js?v=20260802-upgrade-v6","globalThemeV2");
-  addScript(`/study-platform-sync.js?v=20260801-sync-final&t=${Date.now()}`,"studyPlatformSync");
-  addScript(`/favorites-study-stable.js?v=20260801-multi-final&t=${Date.now()}`,"favoritesStudyStable");
-
-  const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
-  let started = false;
-  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
-  const getToken = () => { for (const key of TOKEN_KEYS) { try { const value = sessionStorage.getItem(key); if (value) return value; } catch (_) {} try { const value = localStorage.getItem(key); if (value) return value; } catch (_) {} } return ""; };
-  const clearSession = () => TOKEN_KEYS.forEach((key) => { try { sessionStorage.removeItem(key); } catch (_) {} try { localStorage.removeItem(key); } catch (_) {} });
-  const normalizeRole = (user) => String(user?.cargo || user?.tipo || "aluno").trim().toLowerCase().replaceAll("_", "-");
-  const roleLabel = (role) => ({ dev:"Dev", dono:"Dono", superadmin:"Dono", admin:"Admin", financeiro:"Financeiro", vendedor:"Vendedor", moderador:"Moderador", suporte:"Suporte", aluno:"Aluno" }[role] || "Usuário");
-  const fillUser = (user) => { const name = String(user?.nome || "Usuário"); const firstName = name.trim().split(/\s+/)[0] || "Usuário"; const role = normalizeRole(user); $$('[data-user-name]').forEach((element) => { element.textContent = firstName; }); $$('[data-user-fullname]').forEach((element) => { element.textContent = name; }); $$('[data-user-role]').forEach((element) => { element.textContent = roleLabel(role); }); };
-
-  async function validate() {
-    if (started) return; started = true;
-    if (document.body) { document.body.style.opacity = "1"; document.body.style.visibility = "visible"; document.body.classList.add("protected-booting"); }
-    const token = getToken(); if (!token) return location.replace("/");
-    try {
-      const response = await fetch(`${location.origin}/me`, { headers: { Accept: "application/json", Authorization: `Bearer ${token}` }, cache: "no-store" });
-      const data = await response.json().catch(() => ({})); if (!response.ok || !data?.usuario) throw new Error("Sessão inválida.");
-      fillUser(data.usuario); document.body?.classList.remove("protected-booting"); document.body?.classList.add("protected-ready");
-      if (document.body) { document.body.style.removeProperty("opacity"); document.body.style.removeProperty("visibility"); }
-      document.dispatchEvent(new CustomEvent("turma:protected-ready", { detail: { user: data.usuario } }));
-    } catch (_) { clearSession(); location.replace("/"); }
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", validate, { once: true }); else validate();
+  function addScript(src,marker){if(document.querySelector(`script[data-${marker}]`))return;const script=document.createElement("script");script.src=src;script.defer=true;script.dataset[marker]="1";document.head.appendChild(script)}
+  function addStyle(src,marker){if(document.querySelector(`link[data-${marker}]`))return;const link=document.createElement("link");link.rel="stylesheet";link.href=src;link.dataset[marker]="1";document.head.appendChild(link)}
+  addStyle("/theme-global-v2.css?v=20260812-shell-v23","favoritesThemeCss");addStyle("/student-shell-v23.css?v=20260812-shell-v23","favoritesShellCss");addScript("/theme-global-v2.js?v=20260812-shell-v23","globalThemeV2");addScript("/navigation-final.js?v=20260812-shell-v23","favoritesNavV23");addScript("/student-shell-v23.js?v=20260812-shell-v23","favoritesShellV23");addScript(`/study-platform-sync.js?v=20260801-sync-final&t=${Date.now()}`,"studyPlatformSync");addScript(`/favorites-study-stable.js?v=20260801-multi-final&t=${Date.now()}`,"favoritesStudyStable");
+  const TOKEN_KEYS=["token","adminToken","authToken","accessToken","jwt"];let started=false;const $$=s=>Array.from(document.querySelectorAll(s));
+  const getToken=()=>{for(const key of TOKEN_KEYS){try{const value=sessionStorage.getItem(key);if(value)return value}catch{}try{const value=localStorage.getItem(key);if(value)return value}catch{}}return""};
+  const clearSession=()=>TOKEN_KEYS.forEach(key=>{try{sessionStorage.removeItem(key)}catch{}try{localStorage.removeItem(key)}catch{}});
+  const normalizeRole=user=>String(user?.cargo||user?.tipo||"aluno").trim().toLowerCase().replaceAll("_","-");
+  const roleLabel=role=>({dev:"Dev",dono:"Dono",superadmin:"Dono",admin:"Admin",financeiro:"Financeiro",vendedor:"Vendedor",moderador:"Moderador",suporte:"Suporte",aluno:"Aluno"}[role]||"Usuário");
+  const fillUser=user=>{const name=String(user?.nome||"Usuário"),first=name.trim().split(/\s+/)[0]||"Usuário",role=normalizeRole(user);$$('[data-user-name]').forEach(el=>el.textContent=first);$$('[data-user-fullname]').forEach(el=>el.textContent=name);$$('[data-user-role]').forEach(el=>el.textContent=roleLabel(role))};
+  async function validate(){if(started)return;started=true;if(document.body){document.body.style.opacity="1";document.body.style.visibility="visible";document.body.classList.add("protected-booting")}const token=getToken();if(!token)return location.replace("/");try{const response=await fetch(`${location.origin}/me`,{headers:{Accept:"application/json",Authorization:`Bearer ${token}`},cache:"no-store"});const data=await response.json().catch(()=>({}));if(!response.ok||!data?.usuario)throw new Error("Sessão inválida.");fillUser(data.usuario);document.body?.classList.remove("protected-booting");document.body?.classList.add("protected-ready");if(document.body){document.body.style.removeProperty("opacity");document.body.style.removeProperty("visibility")}document.dispatchEvent(new CustomEvent("turma:protected-ready",{detail:{user:data.usuario}}))}catch(_){clearSession();location.replace("/")}}
+  document.readyState==="loading"?document.addEventListener("DOMContentLoaded",validate,{once:true}):validate();
 })();
