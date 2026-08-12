@@ -17,6 +17,7 @@
     if(route==="/estudo"||route==="/estudo.html"||route.startsWith("/estudo-"))load("/study-images-final.js?v=20260812-study-stable-1","script","studyImagesFinalJs");
     if(route.startsWith("/estudo-")&&route!=="/estudo.html"){
       load("/race-tool.css?v=20260812-race-v4","style","raceToolCss");
+      load("/race-mobile-v23.css?v=20260812-race-v23","style","raceMobileV23");
       load("/race-tool.js?v=20260812-race-v4","script","raceToolJs");
       load("/study-race-injector.js?v=20260812-race-v4","script","studyRaceInjectorJs");
     }
