@@ -13,8 +13,8 @@
   }
 
   function removeSound(){
-    $$('[data-sound-toggle],[data-audio-toggle],.sound-toggle,.audio-toggle,.volume-toggle,#soundButton,#audioButton,#volumeButton').forEach(el=>el.remove());
-    $$('button,a').forEach(el=>{const t=`${el.getAttribute('aria-label')||''} ${el.title||''}`.toLowerCase();if(/som|áudio|audio|volume|mute/.test(t)&&!/notifica/.test(t))el.remove()});
+    $$('[data-sound-toggle],[data-audio-toggle],.sound-toggle,.audio-toggle,.volume-toggle,#soundButton,#audioButton,#volumeButton,#reelAudio').forEach(el=>el.remove());
+    $$('button,a').forEach(el=>{const t=`${el.getAttribute('aria-label')||''} ${el.title||''} ${el.textContent||''}`.toLowerCase();if(/\b(som|áudio|audio|volume|mute|mutar|desmutar)\b/.test(t)&&!/notifica/.test(t))el.remove()});
   }
 
   function sidebar(){
