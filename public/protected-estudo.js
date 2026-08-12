@@ -5,24 +5,26 @@
   function getToken(){for(const storage of[sessionStorage,localStorage])for(const key of KEYS){try{const value=storage.getItem(key);if(value)return value}catch{}}return""}
   function load(src,type,marker){if(document.querySelector(`[data-${marker}]`))return;const el=document.createElement(type==="style"?"link":"script");if(type==="style"){el.rel="stylesheet";el.href=src}else{el.src=src;el.defer=true}el.dataset[marker]="1";document.head.appendChild(el)}
   function installAssets(){
-    load("/study-mobile-v2.css?v=20260802-study-mobile-2","style","studyMobilePolish");
-    load("/study-icon-fix.css?v=20260802-study-icon-fix-2","style","studyIconFix");
-    load("/theme-global-v2.js?v=20260802-upgrade-v6","script","globalThemeLoader");
-    load("/platform-final.css?v=20260802-final-2","style","platformFinalCss");
-    load("/navigation-final.js?v=20260802-navigation-final-2","script","navigationFinalJs");
+    load("/study-mobile-v2.css?v=20260812-shell-v23","style","studyMobilePolish");
+    load("/study-icon-fix.css?v=20260812-shell-v23","style","studyIconFix");
+    load("/theme-global-v2.css?v=20260812-shell-v23","style","globalThemeCss");
+    load("/student-shell-v23.css?v=20260812-shell-v23","style","studentShellCss");
+    load("/theme-global-v2.js?v=20260812-shell-v23","script","globalThemeLoader");
+    load("/platform-final.css?v=20260812-shell-v23","style","platformFinalCss");
+    load("/navigation-final.js?v=20260812-shell-v23","script","navigationFinalJs");
+    load("/student-shell-v23.js?v=20260812-shell-v23","script","studentShellJs");
     const route=location.pathname.replace(/\/$/,"")||"/";
     if(route==="/estudo"||route==="/estudo.html"||route.startsWith("/estudo-")){
-      load("/study-images-final.js?v=20260802-study-images-final-4","script","studyImagesFinalJs");
+      load("/study-images-final.js?v=20260812-study-stable-1","script","studyImagesFinalJs");
     }
     if(route.startsWith("/estudo-")&&route!=="/estudo.html"){
-      load("/race-tool.css?v=20260802-race-shared-1","style","raceToolCss");
-      load("/race-tool.js?v=20260802-race-shared-1","script","raceToolJs");
-      load("/study-race-injector.js?v=20260802-race-shared-1","script","studyRaceInjectorJs");
+      load("/race-tool.css?v=20260812-race-v4","style","raceToolCss");
+      load("/race-tool.js?v=20260812-race-v4","script","raceToolJs");
+      load("/study-race-injector.js?v=20260812-race-v4","script","studyRaceInjectorJs");
     }
     if(route==="/gestao"||route==="/gestao.html"){
-      load("/assets/gestao/gestao-capa-data.js?v=20260802-gestao-cover-2","script","gestaoCoverData");
-      load("/gestao-final.css?v=20260802-gestao-final-2","style","gestaoFinalCss");
-      load("/gestao-final.js?v=20260802-gestao-final-2","script","gestaoFinalJs");
+      load("/gestao-final.css?v=20260812-gestao-v3","style","gestaoFinalCss");
+      load("/gestao-final.js?v=20260812-gestao-v3","script","gestaoFinalJs");
     }
   }
   function bindImageFallback(){document.addEventListener("error",event=>{const img=event.target;if(!(img instanceof HTMLImageElement))return;const host=img.closest(".study-module-art,.study-final-infographic,.strategy-hero,.module-art,.module-video-cover,.modules-player-frame");if(!host||host.dataset.fallbackApplied)return;host.dataset.fallbackApplied="1";host.classList.add("study-broken-image");img.style.display="none"},true)}
