@@ -24,12 +24,12 @@
   function installShell(){
     const style=(href,key)=>{if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement("link");l.rel="stylesheet";l.href=href;l.dataset[key]="1";document.head.appendChild(l)};
     const script=(src,key)=>{if(document.querySelector(`script[data-${key}]`))return;const s=document.createElement("script");s.src=src;s.defer=true;s.dataset[key]="1";document.head.appendChild(s)};
-    style("/theme-global-v2.css?v=20260812-shell-v23","dashThemeCss");
-    style("/student-shell-v23.css?v=20260812-shell-v23","dashShellCss");
-    script("/theme-global-v2.js?v=20260812-shell-v23","dashThemeJs");
-    script("/navigation-final.js?v=20260812-shell-v23","dashNavigationJs");
-    script("/student-shell-v23.js?v=20260812-shell-v23","dashShellJs");
-    script("/dashboard-notifications-live.js?v=20260812-shell-v23","dashLiveNotifications");
+    style("/theme-global-v2.css?v=20260812-shell-v24","dashThemeCss");
+    style("/student-shell-v23.css?v=20260812-shell-v24","dashShellCss");
+    script("/theme-global-v2.js?v=20260812-shell-v24","dashThemeJs");
+    script("/navigation-final.js?v=20260812-shell-v24","dashNavigationJs");
+    script("/student-shell-v23.js?v=20260812-shell-v24","dashShellJs");
+    script("/dashboard-notifications-live.js?v=20260812-shell-v24","dashLiveNotifications");
   }
   function token(){for(const storage of[sessionStorage,localStorage])for(const key of KEYS){try{const value=storage.getItem(key);if(value)return value}catch{}}return""}
   function pct(module){try{const raw=JSON.parse(localStorage.getItem(module.store)||"{}");const values=Object.values(raw.progress||{});return values.length?Math.round(values.filter(Boolean).length/Math.max(3,values.length)*100):0}catch{return 0}}
@@ -44,8 +44,8 @@
   function renderNotifications(){const list=$("#notificationList"),badge=$("#notificationBadge");if(!list)return;const read=notificationReadIds(),items=defaultNotifications,unread=items.filter(item=>!read.has(item.id)).length;if(badge){badge.textContent=String(unread);badge.hidden=!unread}list.innerHTML=items.map(item=>`<article class="dash-notification-item ${read.has(item.id)?"":"unread"}"><span><svg><use href="/assets/dashboard-icons.svg#${item.icon}"></use></svg></span><div><strong>${item.title}</strong><small>${item.text}</small></div></article>`).join("")}
   function markNotificationsRead(){try{localStorage.setItem("turma_notifications_read_v1",JSON.stringify(defaultNotifications.map(item=>item.id)))}catch{}renderNotifications()}
   function bind(){document.addEventListener("click",event=>{const nav=event.target.closest("[data-nav]");if(nav){const route=routes[nav.dataset.nav];if(route)location.href=route;return}const href=event.target.closest("[data-href]");if(href){location.href=href.dataset.href;return}const panel=$("#notificationPanel");if(panel&&!panel.hidden&&!event.target.closest("#notificationPanel")&&!event.target.closest("#notificationButton"))panel.hidden=true});$("#dashMenuToggle")?.addEventListener("click",()=>{$("#dashSidebar")?.classList.add("open");const overlay=$("#dashMobileOverlay");if(overlay)overlay.hidden=false});$("#dashMobileOverlay")?.addEventListener("click",()=>{$("#dashSidebar")?.classList.remove("open");$("#dashMobileOverlay").hidden=true});$("#notificationButton")?.addEventListener("click",()=>{const panel=$("#notificationPanel");if(panel)panel.hidden=!panel.hidden});$("#markNotificationsRead")?.addEventListener("click",markNotificationsRead);document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();location.href="/estudo"}if(event.key==="Escape"){const panel=$("#notificationPanel");if(panel)panel.hidden=true}})}
-  function installHeroStyles(){if(document.querySelector('link[data-dashboard-hero-v4]'))return;const link=document.createElement("link");link.rel="stylesheet";link.href="/dashboard-hero-v4.css?v=20260812-shell-v23";link.dataset.dashboardHeroV4="1";document.head.appendChild(link)}
-  function loadPortrait(){const run=()=>{document.querySelectorAll('.dash-hero>.dash-hero-portrait,.dash-hero>.dash-hero-portrait-wrap').forEach(el=>el.remove());document.querySelectorAll('script[src*="dashboard-portrait-final.js"]').forEach(el=>el.remove());const script=document.createElement("script");script.src="/dashboard-portrait-final.js?v=20260812-shell-v23";script.async=true;script.dataset.dashboardPortrait="1";document.head.appendChild(script)};"requestIdleCallback"in window?requestIdleCallback(run,{timeout:1000}):setTimeout(run,300)}
+  function installHeroStyles(){if(document.querySelector('link[data-dashboard-hero-v4]'))return;const link=document.createElement("link");link.rel="stylesheet";link.href="/dashboard-hero-v4.css?v=20260812-dashboard-v24";link.dataset.dashboardHeroV4="1";document.head.appendChild(link)}
+  function loadPortrait(){const run=()=>{document.querySelectorAll('.dash-hero>.dash-hero-portrait,.dash-hero>.dash-hero-portrait-wrap').forEach(el=>el.remove())};"requestIdleCallback"in window?requestIdleCallback(run,{timeout:1000}):setTimeout(run,300)}
   function init(){installShell();installHeroStyles();renderProgress();renderActivity();renderNotifications();bind();loadUser();loadPortrait();document.body.classList.add("protected-ready","neo-ready");$("#dashLoading")?.remove()}
   document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init,{once:true}):init();
 })();
