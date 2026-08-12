@@ -9,14 +9,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260802-reel-1" />
-  <link rel="stylesheet" href="/roleta-reel.css?v=20260802-reel-1" />
-  <link rel="stylesheet" href="/race-tool.css?v=20260802-reel-1" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260812-reel-v24" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260812-reel-v24" />
+  <link rel="stylesheet" href="/student-shell-v23.css?v=20260812-reel-v24" />
+  <link rel="stylesheet" href="/roleta-reel.css?v=20260812-reel-v24" />
+  <link rel="stylesheet" href="/race-tool.css?v=20260812-race-v4-1" />
+  <link rel="stylesheet" href="/race-mobile-v23.css?v=20260812-race-v4-1" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <script defer src="/protected.js?v=20260802-reel-1"></script>
-  <script defer src="/race-tool.js?v=20260802-reel-1"></script>
-  <script defer src="/dashboard-notifications-final.js?v=20260802-reel-1"></script>
-  <script defer src="/roleta-reel.js?v=20260802-reel-1"></script>
+  <script defer src="/protected.js?v=20260812-reel-v24"></script>
+  <script defer src="/race-tool.js?v=20260812-race-v4-1"></script>
+  <script defer src="/dashboard-notifications-final.js?v=20260812-reel-v24"></script>
+  <script defer src="/roleta-reel.js?v=20260812-reel-v24"></script>
 </head>
 <body class="student-dashboard roulette-reel-page" data-required-access="dashboard">
   <div class="dash-loading" id="reelLoading" role="status"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando a Roleta Reel</strong><small>Conectando roleta, Race e Racetrack…</small></div></div>
@@ -29,7 +32,7 @@
       <a class="dash-nav-item active" href="/minigames"><svg><use href="/assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
       <a class="dash-nav-item" href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
       <a class="dash-nav-item" href="/modulos"><svg><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
-      <a class="dash-nav-item" href="/gestao"><span class="reel-management-icon"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2M3 10l6-6 6 9 6-7"/></svg></span><b>Gestão</b></a>
+      <a class="dash-nav-item" href="/gestao"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Gestão</b></a>
       <a class="dash-nav-item" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
       <a class="dash-nav-item" href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
       <a class="dash-nav-item" href="/roleta"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
@@ -44,7 +47,7 @@
       <button class="dash-menu-toggle" id="reelMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg></button>
       <a class="reel-back" href="/minigames"><svg><use href="/assets/dashboard-icons.svg#i-chevron"></use></svg><span>Voltar para Minigames</span></a>
       <div class="dash-top-actions">
-        <button class="dash-theme-toggle" id="reelThemeToggle" type="button" aria-label="Alternar tema"><svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button>
+        <button class="dash-theme-toggle" id="reelThemeToggle" data-global-theme type="button" aria-label="Alternar tema"><svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button>
         <button class="dash-notification-btn" id="notificationButton" type="button" aria-label="Abrir notificações"><svg><use href="/assets/dashboard-icons.svg#i-bell"></use></svg><b id="notificationBadge" hidden>0</b></button>
         <a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-user-avatar>P</span><span><strong data-user-name>Primo</strong><small data-user-role>Aluno</small></span></a>
       </div>
@@ -52,20 +55,13 @@
     <aside class="dash-notification-panel" id="notificationPanel" hidden><div class="dash-notification-head"><h3>Notificações</h3><button id="markNotificationsRead" type="button">Marcar como lidas</button></div><div class="dash-notification-list" id="notificationList"></div></aside>
 
     <div class="reel-content">
-      <section class="reel-heading"><div><span class="reel-kicker">MINIGAME EXCLUSIVO • MODO TREINO</span><h1>Roleta <strong>Reel</strong></h1><p>A roleta agora conversa com a Race e o Racetrack. Faça suas marcações abaixo e acompanhe cada resultado em tempo real.</p></div><div class="reel-connection"><i></i><span><b>Race conectada</b><small id="reelConnectionText">Aguardando marcações</small></span></div></section>
+      <section class="reel-heading"><div><span class="reel-kicker">MINIGAME EXCLUSIVO • MODO TREINO</span><h1>Roleta <strong>Reel</strong></h1><p>A roleta conversa com a Race e o Racetrack. Faça suas marcações e acompanhe cada resultado em tempo real.</p></div><div class="reel-connection"><i></i><span><b>Race conectada</b><small id="reelConnectionText">Aguardando marcações</small></span></div></section>
 
       <section class="reel-layout">
         <article class="reel-wheel-card">
           <header class="reel-card-head"><div><span class="reel-live-dot"></span><b>Roleta europeia</b></div><span id="reelStatus">Pronta para girar</span></header>
-          <div class="reel-wheel-stage">
-            <div class="reel-wheel" id="reelWheel">
-              <div class="reel-rim"></div><div class="reel-track"></div><div class="reel-cells" id="reelCells"></div>
-              <div class="reel-ball" id="reelBall"></div>
-              <div class="reel-center"><span class="reel-crown">♛</span><small>ÚLTIMO NÚMERO</small><strong id="reelLastNumber">--</strong></div>
-              <div class="reel-effects" id="reelEffects"></div>
-            </div>
-          </div>
-          <div class="reel-controls"><button class="reel-spin" id="reelSpin" type="button"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><span>Girar Roleta</span></button><button class="reel-secondary" id="reelAudio" type="button">🔇 Áudio OFF</button><button class="reel-secondary" id="reelClear" type="button">Limpar giros</button></div>
+          <div class="reel-wheel-stage"><div class="reel-wheel" id="reelWheel"><div class="reel-rim"></div><div class="reel-track"></div><div class="reel-cells" id="reelCells"></div><div class="reel-ball" id="reelBall"></div><div class="reel-center"><span class="reel-crown">♛</span><small>ÚLTIMO NÚMERO</small><strong id="reelLastNumber">--</strong></div><div class="reel-effects" id="reelEffects"></div></div></div>
+          <div class="reel-controls"><button class="reel-spin" id="reelSpin" type="button"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><span>Girar Roleta</span></button><button class="reel-secondary" id="reelClear" type="button">Limpar giros</button></div>
         </article>
 
         <aside class="reel-side">
