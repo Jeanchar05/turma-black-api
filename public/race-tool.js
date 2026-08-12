@@ -1,100 +1,39 @@
 "use strict";
 (() => {
-  if (window.TurmaRace?.version === "3.0.0") return;
-
-  const VERSION = "3.0.0";
-  const STORE = "turma_race_shared_state_v3";
-  const wheel = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
-  const red = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
-  const layout = [[3,6,9,12,15,18,21,24,27,30,33,36],[2,5,8,11,14,17,20,23,26,29,32,35],[1,4,7,10,13,16,19,22,25,28,31,34]];
-  const bets = {
-    first12:{label:"1st 12",numbers:range(1,12)},second12:{label:"2nd 12",numbers:range(13,24)},third12:{label:"3rd 12",numbers:range(25,36)},
-    low:{label:"1 - 18",numbers:range(1,18)},even:{label:"Par",numbers:range(1,36).filter(n=>n%2===0)},red:{label:"Vermelho",numbers:[...red]},
-    black:{label:"Preto",numbers:range(1,36).filter(n=>!red.has(n))},odd:{label:"Ímpar",numbers:range(1,36).filter(n=>n%2)},high:{label:"19 - 36",numbers:range(19,36)}
-  };
-  const instances = new Set();
-  let customHighlights = {};
+  if (window.TurmaRace?.version === "4.0.0") return;
+  const VERSION="4.0.0",STORE="turma_race_shared_state_v4";
+  const wheel=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+  const red=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+  const layout=[[3,6,9,12,15,18,21,24,27,30,33,36],[2,5,8,11,14,17,20,23,26,29,32,35],[1,4,7,10,13,16,19,22,25,28,31,34]];
+  const bets={first12:{label:"1st 12",numbers:range(1,12)},second12:{label:"2nd 12",numbers:range(13,24)},third12:{label:"3rd 12",numbers:range(25,36)},low:{label:"1 - 18",numbers:range(1,18)},even:{label:"Par",numbers:range(1,36).filter(n=>n%2===0)},red:{label:"Vermelho",numbers:[...red]},black:{label:"Preto",numbers:range(1,36).filter(n=>!red.has(n))},odd:{label:"Ímpar",numbers:range(1,36).filter(n=>n%2)},high:{label:"19 - 36",numbers:range(19,36)}};
+  const instances=new Set();let customHighlights={};
   function range(a,b){return Array.from({length:b-a+1},(_,i)=>a+i)}
   function color(n){return n===0?"green":red.has(n)?"red":"black"}
-  function sanitizeState(raw={}){
-    return {
-      neighbors:Math.max(0,Math.min(9,Number(raw.neighbors)||0)),
-      centers:[...new Set(Array.isArray(raw.centers)?raw.centers.map(Number).filter(n=>wheel.includes(n)):[])],
-      bets:[...new Set(Array.isArray(raw.bets)?raw.bets.filter(k=>bets[k]):[])],
-      view:raw.view==="racetrack"?"racetrack":"race"
-    };
-  }
-  function loadState(){
-    for(const storage of [localStorage,sessionStorage]){try{const raw=storage.getItem(STORE);if(raw)return sanitizeState(JSON.parse(raw))}catch{}}
-    return sanitizeState();
-  }
+  function sanitizeState(raw={}){return{neighbors:Math.max(0,Math.min(9,Number(raw.neighbors)||0)),centers:[...new Set(Array.isArray(raw.centers)?raw.centers.map(Number).filter(n=>wheel.includes(n)):[])],bets:[...new Set(Array.isArray(raw.bets)?raw.bets.filter(k=>bets[k]):[])],view:raw.view==="racetrack"?"racetrack":"race"}}
+  function loadState(){for(const storage of[localStorage,sessionStorage]){try{const raw=storage.getItem(STORE)||storage.getItem("turma_race_shared_state_v3");if(raw)return sanitizeState(JSON.parse(raw))}catch{}}return sanitizeState()}
   function saveState(state){const data=JSON.stringify(sanitizeState({neighbors:state.neighbors,centers:[...state.centers],bets:[...state.bets],view:state.view}));for(const storage of[localStorage,sessionStorage])try{storage.setItem(STORE,data)}catch{}}
   function neighbors(center,count){const i=wheel.indexOf(Number(center));if(i<0)return[];const out=[wheel[i]];for(let s=1;s<=count;s++)out.push(wheel[(i-s+wheel.length)%wheel.length],wheel[(i+s)%wheel.length]);return[...new Set(out)]}
   function numbersFor(state,includeBets=true){const out=new Set();state.centers.forEach(n=>neighbors(n,state.neighbors).forEach(x=>out.add(x)));if(includeBets)state.bets.forEach(k=>bets[k].numbers.forEach(x=>out.add(x)));return[...out]}
-  function emit(instance){const detail={numbers:instance.getTargetNumbers(),centers:[...instance.state.centers],neighbors:instance.state.neighbors,bets:[...instance.state.bets],view:instance.state.view};window.dispatchEvent(new CustomEvent("turma:race-selection",{detail}))}
-  function markup(){return `<section class="tp-race-tool" data-race-ready>
-    <header class="tp-race-head"><div class="tp-race-title"><span class="tp-race-logo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><div><h3>Race</h3><p>Marque números e ajuste os vizinhos manualmente.</p></div></div>
-      <div class="tp-race-toolbar"><div class="tp-race-tabs"><button type="button" data-rt-view="race">Race</button><button type="button" data-rt-view="racetrack">Racetrack</button></div><div class="tp-neighbor"><span>Vizinhos</span><button type="button" data-neighbor-step="-1" aria-label="Diminuir vizinhos">−</button><strong data-neighbor-value>0</strong><button type="button" data-neighbor-step="1" aria-label="Aumentar vizinhos">＋</button></div><button type="button" class="tp-race-clear" data-rt-clear>Limpar</button></div></header>
-    <div class="tp-race-body">
-      <div class="tp-race-view" data-view-panel="race"><div class="tp-race-oval"><div class="tp-race-wheel-order" data-wheel-order></div><div class="tp-race-center"><span>RACE EUROPEIA</span><strong data-race-center-copy>Selecione um número</strong><small>0 a 9 vizinhos</small></div></div></div>
-      <div class="tp-race-view" data-view-panel="racetrack"><div class="tp-racetrack-board"><div class="tp-racetrack-table"><button type="button" class="tp-racetrack-zero" data-number="0">0</button><div class="tp-racetrack-grid" data-racetrack-grid></div></div><div class="tp-race-dozens"><button type="button" data-bet="first12">1st 12</button><button type="button" data-bet="second12">2nd 12</button><button type="button" data-bet="third12">3rd 12</button></div><div class="tp-race-outsides"><button type="button" data-bet="low">1 - 18</button><button type="button" data-bet="even">PAR</button><button type="button" data-bet="red"><i class="tp-race-color red"></i></button><button type="button" data-bet="black"><i class="tp-race-color black"></i></button><button type="button" data-bet="odd">ÍMPAR</button><button type="button" data-bet="high">19 - 36</button></div></div></div>
-    </div>
-    <footer class="tp-race-foot"><div><strong>MARCAÇÕES ATIVAS</strong><p data-race-summary>Nenhuma marcação</p></div><div class="tp-race-result" data-race-result><span class="tp-race-result-number">--</span><span><b>Aguardando giro</b><small>O resultado aparecerá aqui.</small></span></div></footer>
-  </section>`}
-
+  function emit(instance){window.dispatchEvent(new CustomEvent("turma:race-selection",{detail:{numbers:instance.getTargetNumbers(),centers:[...instance.state.centers],neighbors:instance.state.neighbors,bets:[...instance.state.bets],view:instance.state.view}}))}
+  function markup(){return `<section class="tp-race-tool" data-race-ready><header class="tp-race-head"><div class="tp-race-title"><span class="tp-race-logo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><div><h3>Race</h3><p>Ordem oficial da roda europeia.</p></div></div><div class="tp-race-toolbar"><div class="tp-race-tabs"><button type="button" data-rt-view="race">Race</button><button type="button" data-rt-view="racetrack">Racetrack</button></div><div class="tp-neighbor"><span>Vizinhos</span><button type="button" data-neighbor-step="-1">−</button><strong data-neighbor-value>0</strong><button type="button" data-neighbor-step="1">＋</button></div><button type="button" class="tp-race-clear" data-rt-clear>Limpar</button></div></header><div class="tp-race-body"><div class="tp-race-view" data-view-panel="race"><div class="tp-race-oval"><div class="tp-race-wheel-order" data-wheel-order></div><div class="tp-race-center"><span>RACE EUROPEIA</span><strong data-race-center-copy>Selecione um número</strong><small>0 a 9 vizinhos</small></div></div></div><div class="tp-race-view" data-view-panel="racetrack"><div class="tp-racetrack-board"><div class="tp-racetrack-table"><button type="button" class="tp-racetrack-zero" data-number="0">0</button><div class="tp-racetrack-grid" data-racetrack-grid></div></div><div class="tp-race-dozens"><button type="button" data-bet="first12">1st 12</button><button type="button" data-bet="second12">2nd 12</button><button type="button" data-bet="third12">3rd 12</button></div><div class="tp-race-outsides"><button type="button" data-bet="low">1 - 18</button><button type="button" data-bet="even">PAR</button><button type="button" data-bet="red"><i class="tp-race-color red"></i></button><button type="button" data-bet="black"><i class="tp-race-color black"></i></button><button type="button" data-bet="odd">ÍMPAR</button><button type="button" data-bet="high">19 - 36</button></div></div></div></div><footer class="tp-race-foot"><div><strong>MARCAÇÕES ATIVAS</strong><p data-race-summary>Nenhuma marcação</p></div><div class="tp-race-result" data-race-result><span class="tp-race-result-number">--</span><span><b>Aguardando giro</b><small>O resultado aparecerá aqui.</small></span></div></footer></section>`}
   class RaceInstance{
-    constructor(host){
-      this.host=host;this.result=null;this.destroyed=false;
-      const s=loadState();this.state={neighbors:s.neighbors,centers:new Set(s.centers),bets:new Set(s.bets),view:host.dataset.defaultView||s.view};
-      host.innerHTML=markup();this.root=host.firstElementChild;this.build();this.bind();this.sync();instances.add(this);
-    }
-    build(){
-      const strip=this.root.querySelector("[data-wheel-order]");
-      wheel.forEach((n,i)=>{const b=document.createElement("button");b.type="button";b.className=`tp-race-number ${color(n)}`;b.dataset.number=String(n);b.dataset.wheelIndex=String(i);b.textContent=String(n);strip.appendChild(b)});
-      const grid=this.root.querySelector("[data-racetrack-grid]");
-      layout.flat().forEach(n=>{const b=document.createElement("button");b.type="button";b.className=`tp-racetrack-number ${color(n)}`;b.dataset.number=String(n);b.textContent=String(n);grid.appendChild(b)});
-    }
-    bind(){
-      if(this.root.dataset.bound==="1")return;this.root.dataset.bound="1";
-      this.root.addEventListener("click",event=>{
-        const number=event.target.closest("[data-number]");if(number){this.toggle(Number(number.dataset.number));return}
-        const bet=event.target.closest("[data-bet]");if(bet){const k=bet.dataset.bet;this.state.bets.has(k)?this.state.bets.delete(k):this.state.bets.add(k);this.commit();return}
-        const tab=event.target.closest("[data-rt-view]");if(tab){this.state.view=tab.dataset.rtView;this.commit();return}
-        const step=event.target.closest("[data-neighbor-step]");if(step){event.preventDefault();event.stopPropagation();const next=this.state.neighbors+Number(step.dataset.neighborStep);this.state.neighbors=Math.max(0,Math.min(9,next));this.commit();return}
-        if(event.target.closest("[data-rt-clear]")){this.clear();}
-      });
-    }
+    constructor(host){this.host=host;this.result=null;this.destroyed=false;const s=loadState();this.state={neighbors:s.neighbors,centers:new Set(s.centers),bets:new Set(s.bets),view:host.dataset.defaultView||s.view};host.innerHTML=markup();this.root=host.firstElementChild;this.build();this.bind();this.sync();instances.add(this)}
+    build(){const strip=this.root.querySelector("[data-wheel-order]");wheel.forEach((n,i)=>{const b=document.createElement("button");b.type="button";b.className=`tp-race-number ${color(n)}`;b.dataset.number=String(n);b.dataset.wheelIndex=String(i);b.textContent=String(n);const a=(Math.PI*2*i)/wheel.length;b.style.setProperty("--race-x",`${50+46*Math.cos(a)}%`);b.style.setProperty("--race-y",`${50+42*Math.sin(a)}%`);strip.appendChild(b)});const grid=this.root.querySelector("[data-racetrack-grid]");layout.flat().forEach(n=>{const b=document.createElement("button");b.type="button";b.className=`tp-racetrack-number ${color(n)}`;b.dataset.number=String(n);b.textContent=String(n);grid.appendChild(b)})}
+    bind(){if(this.root.dataset.bound==="1")return;this.root.dataset.bound="1";this.root.addEventListener("click",event=>{const number=event.target.closest("[data-number]");if(number){this.toggle(Number(number.dataset.number));return}const bet=event.target.closest("[data-bet]");if(bet){const k=bet.dataset.bet;this.state.bets.has(k)?this.state.bets.delete(k):this.state.bets.add(k);this.commit();return}const tab=event.target.closest("[data-rt-view]");if(tab){this.state.view=tab.dataset.rtView;this.commit();return}const step=event.target.closest("[data-neighbor-step]");if(step){const next=this.state.neighbors+Number(step.dataset.neighborStep);this.state.neighbors=Math.max(0,Math.min(9,next));this.commit();return}if(event.target.closest("[data-rt-clear]"))this.clear()})}
     toggle(n){this.state.centers.has(n)?this.state.centers.delete(n):this.state.centers.add(n);this.commit()}
     clear(){this.state.centers.clear();this.state.bets.clear();this.result=null;this.commit()}
     commit(){saveState(this.state);const s=loadState();instances.forEach(i=>{if(i.destroyed)return;if(i!==this)i.state={neighbors:s.neighbors,centers:new Set(s.centers),bets:new Set(s.bets),view:s.view};i.sync()});emit(this)}
-    sync(){
-      const selected=new Set(numbersFor(this.state,false));
-      this.root.querySelectorAll("[data-number]").forEach(el=>{const n=Number(el.dataset.number);el.classList.toggle("active",selected.has(n));el.classList.toggle("center",this.state.centers.has(n));el.classList.toggle("result",this.result===n);el.classList.remove("highlight-blue","highlight-green","highlight-orange","highlight-gold","highlight-danger");const h=customHighlights[n];if(h)el.classList.add(`highlight-${h}`)});
-      this.root.querySelectorAll("[data-bet]").forEach(el=>el.classList.toggle("active",this.state.bets.has(el.dataset.bet)));
-      this.root.querySelectorAll("[data-rt-view]").forEach(el=>el.classList.toggle("active",el.dataset.rtView===this.state.view));
-      this.root.querySelectorAll("[data-view-panel]").forEach(el=>el.classList.toggle("active",el.dataset.viewPanel===this.state.view));
-      this.root.querySelector("[data-neighbor-value]").textContent=String(this.state.neighbors);
-      const centers=[...this.state.centers];const count=numbersFor(this.state,true).length;
-      this.root.querySelector("[data-race-summary]").textContent=count?`${count} números na leitura • centros: ${centers.join(", ")||"apostas externas"}`:"Nenhuma marcação";
-      this.root.querySelector("[data-race-center-copy]").textContent=centers.length?`${centers.length} centro${centers.length>1?"s":""} marcado${centers.length>1?"s":""}`:"Selecione um número";
-      if(this.result!==null)this.showResult(this.result);
-    }
-    getTargetNumbers(){return numbersFor(this.state,true)}
-    getCenters(){return[...this.state.centers]}
-    getPoint(n){const el=this.root.querySelector(`[data-view-panel="race"] [data-number="${Number(n)}"]`);if(!el)return null;const host=this.root.querySelector("[data-view-panel=\"race\"]"),a=el.getBoundingClientRect(),b=host.getBoundingClientRect();return{x:a.left+a.width/2-b.left,y:a.top+a.height/2-b.top,width:b.width,height:b.height}}
-    evaluate(n){const exact=new Set(numbersFor(this.state,false));const partial=[...this.state.bets].filter(k=>bets[k].numbers.includes(Number(n))).map(k=>bets[k].label);if(exact.has(Number(n)))return{type:"hit",title:`Acerto na Race: ${n}`,text:"O resultado entrou na marcação principal ou em seus vizinhos."};if(partial.length)return{type:"partial",title:`Acerto externo: ${partial.join(", ")}`,text:`O número ${n} entrou em uma aposta externa selecionada.`};return{type:"miss",title:`Resultado ${n}`,text:exact.size||this.state.bets.size?"Fora das marcações atuais.":"Faça uma marcação para avaliar o giro."}}
+    sync(){const selected=new Set(numbersFor(this.state,false));this.root.querySelectorAll("[data-number]").forEach(el=>{const n=Number(el.dataset.number);el.classList.toggle("active",selected.has(n));el.classList.toggle("center",this.state.centers.has(n));el.classList.toggle("result",this.result===n);el.classList.remove("highlight-blue","highlight-green","highlight-orange","highlight-gold","highlight-danger");const h=customHighlights[n];if(h)el.classList.add(`highlight-${h}`)});this.root.querySelectorAll("[data-bet]").forEach(el=>el.classList.toggle("active",this.state.bets.has(el.dataset.bet)));this.root.querySelectorAll("[data-rt-view]").forEach(el=>el.classList.toggle("active",el.dataset.rtView===this.state.view));this.root.querySelectorAll("[data-view-panel]").forEach(el=>el.classList.toggle("active",el.dataset.viewPanel===this.state.view));this.root.querySelector("[data-neighbor-value]").textContent=String(this.state.neighbors);const centers=[...this.state.centers],count=numbersFor(this.state,true).length;this.root.querySelector("[data-race-summary]").textContent=count?`${count} números na leitura • centros: ${centers.join(", ")||"apostas externas"}`:"Nenhuma marcação";this.root.querySelector("[data-race-center-copy]").textContent=centers.length?`${centers.length} centro${centers.length>1?"s":""} marcado${centers.length>1?"s":""}`:"Selecione um número";if(this.result!==null)this.showResult(this.result)}
+    getTargetNumbers(){return numbersFor(this.state,true)}getCenters(){return[...this.state.centers]}
+    getPoint(n){const el=this.root.querySelector(`[data-view-panel="race"] [data-number="${Number(n)}"]`);if(!el)return null;const host=this.root.querySelector('[data-view-panel="race"]'),a=el.getBoundingClientRect(),b=host.getBoundingClientRect();return{x:a.left+a.width/2-b.left,y:a.top+a.height/2-b.top,width:b.width,height:b.height}}
+    evaluate(n){const exact=new Set(numbersFor(this.state,false)),partial=[...this.state.bets].filter(k=>bets[k].numbers.includes(Number(n))).map(k=>bets[k].label);if(exact.has(Number(n)))return{type:"hit",title:`Acerto na Race: ${n}`,text:"O resultado entrou na marcação principal ou em seus vizinhos."};if(partial.length)return{type:"partial",title:`Acerto externo: ${partial.join(", ")}`,text:`O número ${n} entrou em uma aposta externa selecionada.`};return{type:"miss",title:`Resultado ${n}`,text:exact.size||this.state.bets.size?"Fora das marcações atuais.":"Faça uma marcação para avaliar o giro."}}
     showResult(n){this.result=Number(n);const r=this.evaluate(n),box=this.root.querySelector("[data-race-result]");box.className=`tp-race-result ${r.type}`;box.querySelector(".tp-race-result-number").textContent=String(n);box.querySelector("b").textContent=r.title;box.querySelector("small").textContent=r.text;this.root.querySelectorAll("[data-number]").forEach(el=>el.classList.toggle("result",Number(el.dataset.number)===this.result))}
     destroy(){this.destroyed=true;instances.delete(this);this.host.innerHTML=""}
   }
-
-  function mount(host){if(!host||host.__turmaRaceInstance)return host?.__turmaRaceInstance||null;const instance=new RaceInstance(host);host.__turmaRaceInstance=instance;return instance}
-  function mountAll(root=document){root.querySelectorAll("[data-race-tool]").forEach(mount);window.dispatchEvent(new CustomEvent("turma:race-ready"))}
-  function primary(){return[...instances][0]||null}
+  function mount(host){if(!host||host.__turmaRaceInstance)return host?.__turmaRaceInstance||null;const instance=new RaceInstance(host);host.__turmaRaceInstance=instance;return instance}function mountAll(root=document){root.querySelectorAll("[data-race-tool]").forEach(mount);window.dispatchEvent(new CustomEvent("turma:race-ready"))}function primary(){return[...instances][0]||null}
   function setState(partial={}){const p=primary()||mount(document.querySelector("[data-race-tool]"));if(!p)return;if(Number.isFinite(Number(partial.neighbors)))p.state.neighbors=Math.max(0,Math.min(9,Number(partial.neighbors)));if(Array.isArray(partial.centers))p.state.centers=new Set(partial.centers.map(Number).filter(n=>wheel.includes(n)));if(Array.isArray(partial.bets))p.state.bets=new Set(partial.bets.filter(k=>bets[k]));if(partial.view)p.state.view=partial.view==="racetrack"?"racetrack":"race";p.commit()}
-  function highlight(map={}){customHighlights={};Object.entries(map).forEach(([k,v])=>{const n=Number(k);if(wheel.includes(n)&&["blue","green","orange","gold","danger"].includes(v))customHighlights[n]=v});instances.forEach(i=>i.sync())}
-  function clearHighlights(){customHighlights={};instances.forEach(i=>i.sync())}
-  window.addEventListener("turma:roulette-result",event=>{const n=Number(event.detail?.number);if(!wheel.includes(n))return;instances.forEach(i=>i.showResult(n))});
-  window.addEventListener("storage",event=>{if(event.key!==STORE)return;const s=loadState();instances.forEach(i=>{i.state={neighbors:s.neighbors,centers:new Set(s.centers),bets:new Set(s.bets),view:s.view};i.sync()})});
-  window.TurmaRace={version:VERSION,wheel,red,mount,mountAll,getSelectedNumbers:()=>primary()?.getTargetNumbers()||numbersFor({centers:new Set(loadState().centers),bets:new Set(loadState().bets),neighbors:loadState().neighbors},true),getState:()=>{const s=loadState();return{...s}},setState,clear:()=>primary()?.clear(),evaluate:n=>primary()?.evaluate(n)||{type:"miss",title:`Resultado ${n}`,text:"Race sem marcações."},showResult:n=>instances.forEach(i=>i.showResult(n)),highlight,clearHighlights,getPoint:n=>primary()?.getPoint(n)||null,neighborGroup:neighbors};
+  function highlight(map={}){customHighlights={};Object.entries(map).forEach(([k,v])=>{const n=Number(k);if(wheel.includes(n)&&["blue","green","orange","gold","danger"].includes(v))customHighlights[n]=v});instances.forEach(i=>i.sync())}function clearHighlights(){customHighlights={};instances.forEach(i=>i.sync())}
+  window.addEventListener("turma:roulette-result",event=>{const n=Number(event.detail?.number);if(!wheel.includes(n))return;instances.forEach(i=>i.showResult(n))});window.addEventListener("storage",event=>{if(event.key!==STORE)return;const s=loadState();instances.forEach(i=>{i.state={neighbors:s.neighbors,centers:new Set(s.centers),bets:new Set(s.bets),view:s.view};i.sync()})});
+  window.TurmaRace={version:VERSION,wheel,red,mount,mountAll,getSelectedNumbers:()=>primary()?.getTargetNumbers()||numbersFor({centers:new Set(loadState().centers),bets:new Set(loadState().bets),neighbors:loadState().neighbors},true),getState:()=>({...loadState()}),setState,clear:()=>primary()?.clear(),evaluate:n=>primary()?.evaluate(n)||{type:"miss",title:`Resultado ${n}`,text:"Race sem marcações."},showResult:n=>instances.forEach(i=>i.showResult(n)),highlight,clearHighlights,getPoint:n=>primary()?.getPoint(n)||null,neighborGroup:neighbors};
   document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>mountAll(),{once:true}):mountAll();
 })();
