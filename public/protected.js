@@ -23,9 +23,13 @@
       document.head.appendChild(script);
     };
 
-    addStyle("/responsive-global.css?v=20260802-performance-3", "globalResponsive");
-    addStyle("/platform-eight-modules-fix.css?v=20260801-eight-modules", "eightModulesFix");
-    addScript("/theme-global-v2.js?v=20260802-upgrade-v6", "globalThemeV2");
+    addStyle("/responsive-global.css?v=20260812-shell-v23", "globalResponsive");
+    addStyle("/theme-global-v2.css?v=20260812-shell-v23", "globalThemeCss");
+    addStyle("/student-shell-v23.css?v=20260812-shell-v23", "studentShellCss");
+    addStyle("/platform-eight-modules-fix.css?v=20260812-shell-v23", "eightModulesFix");
+    addScript("/theme-global-v2.js?v=20260812-shell-v23", "globalThemeV2");
+    addScript("/navigation-final.js?v=20260812-shell-v23", "navigationFinal");
+    addScript("/student-shell-v23.js?v=20260812-shell-v23", "studentShellJs");
     addScript("/performance-optimization.js?v=20260802-performance-3", "performanceOptimization");
     addScript("/study-platform-sync.js?v=20260801-sync-2", "studyPlatformSync");
     addScript("/platform-eight-modules-fix.js?v=20260801-eight-modules", "eightModulesFix");
