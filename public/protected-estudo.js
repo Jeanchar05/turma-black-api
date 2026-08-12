@@ -20,7 +20,10 @@
       load("/race-tool.js?v=20260812-race-v4","script","raceToolJs");
       load("/study-race-injector.js?v=20260812-race-v4","script","studyRaceInjectorJs");
     }
-    if(route==="/modulos"||route==="/modulos.html")load("/modules-images-v23.js?v=20260812-modules-v23","script","modulesImagesV23");
+    if(route==="/modulos"||route==="/modulos.html"){
+      load("/modules-images-v23.css?v=20260812-modules-v23","style","modulesImagesCssV23");
+      load("/modules-images-v23.js?v=20260812-modules-v23","script","modulesImagesV23");
+    }
     if(route==="/gestao"||route==="/gestao.html"){
       load("/gestao-final.css?v=20260812-gestao-v23","style","gestaoFinalCss");
       load("/gestao-final.js?v=20260812-gestao-v23","script","gestaoFinalJs");
