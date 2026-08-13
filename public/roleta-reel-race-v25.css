@@ -1,0 +1,37 @@
+/* TURMA DO PRIMO — ROLETA REEL / RACE V25 */
+.roulette-reel-page .reel-race-section{overflow:hidden!important}
+.roulette-reel-page .reel-race-section [data-race-tool]{display:block!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding-bottom:4px!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important;scrollbar-width:thin!important}
+.roulette-reel-page .reel-race-section .tp-race-tool{width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important}
+.roulette-reel-page .tp-race-head{align-items:center!important}
+.roulette-reel-page .tp-race-toolbar{min-width:0!important}
+.roulette-reel-page .tp-race-oval{width:min(100%,860px)!important;aspect-ratio:1.82/1!important;min-height:0!important;height:auto!important;border-radius:50%!important;margin:0 auto!important}
+.roulette-reel-page .tp-race-number{width:27px!important;height:27px!important;font-size:8px!important}
+.roulette-reel-page .tp-race-center{width:42%!important;height:29%!important}
+.roulette-reel-page .tp-race-view[data-view-panel="racetrack"]{overflow-x:auto!important;overscroll-behavior-x:contain!important}
+.roulette-reel-page .tp-racetrack-board{min-width:620px!important;max-width:860px!important}
+
+@media(max-width:760px){
+  .roulette-reel-page .reel-race-section{padding-left:0!important;padding-right:0!important}
+  .roulette-reel-page .reel-race-section [data-race-tool]{padding:0 0 7px!important}
+  .roulette-reel-page .reel-race-section .tp-race-tool{min-width:430px!important;border-radius:18px!important}
+  .roulette-reel-page .tp-race-head{padding:12px!important;align-items:flex-start!important;flex-direction:column!important}
+  .roulette-reel-page .tp-race-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;width:100%!important;gap:6px!important}
+  .roulette-reel-page .tp-race-tabs{grid-column:1/-1!important;width:100%!important}
+  .roulette-reel-page .tp-race-tabs button{flex:1!important}
+  .roulette-reel-page .tp-neighbor{min-width:0!important;justify-content:flex-start!important}
+  .roulette-reel-page .tp-race-clear{white-space:nowrap!important}
+  .roulette-reel-page .tp-race-body{padding:10px!important}
+  .roulette-reel-page .tp-race-oval{width:100%!important;aspect-ratio:1.72/1!important;min-height:0!important;height:auto!important;border-radius:50%!important;border-width:5px!important}
+  .roulette-reel-page .tp-race-number{width:23px!important;height:23px!important;font-size:7px!important}
+  .roulette-reel-page .tp-race-center{width:46%!important;height:28%!important}
+  .roulette-reel-page .tp-race-center span{font-size:7px!important}
+  .roulette-reel-page .tp-race-center strong{font-size:10px!important}
+  .roulette-reel-page .tp-race-center small{font-size:8px!important}
+  .roulette-reel-page .tp-race-foot{grid-template-columns:1fr!important;padding:10px!important}
+  .roulette-reel-page .tp-racetrack-board{min-width:600px!important}
+}
+
+@media(max-width:460px){
+  .roulette-reel-page .reel-race-section .tp-race-tool{min-width:410px!important}
+  .roulette-reel-page .tp-race-number{width:22px!important;height:22px!important;font-size:7px!important}
+}
