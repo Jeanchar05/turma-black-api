@@ -9,18 +9,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260813-reel-v26" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260813-reel-v26" />
-  <link rel="stylesheet" href="/student-shell-v23.css?v=20260813-reel-v26" />
-  <link rel="stylesheet" href="/roleta-reel.css?v=20260813-reel-v26" />
-  <link rel="stylesheet" href="/race-tool.css?v=20260813-race-v26" />
-  <link rel="stylesheet" href="/race-mobile-v23.css?v=20260813-race-v26" />
-  <link rel="stylesheet" href="/roleta-reel-race-v25.css?v=20260813-race-v26" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260813-reel-v27" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260813-reel-v27" />
+  <link rel="stylesheet" href="/student-shell-v23.css?v=20260813-reel-v27" />
+  <link rel="stylesheet" href="/roleta-reel.css?v=20260813-reel-v27" />
+  <link rel="stylesheet" href="/race-tool.css?v=20260813-race-v27" />
+  <link rel="stylesheet" href="/race-mobile-v23.css?v=20260813-race-v27" />
+  <link rel="stylesheet" href="/roleta-reel-race-v25.css?v=20260813-race-v27" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <script defer src="/protected.js?v=20260813-reel-v26"></script>
-  <script defer src="/race-tool.js?v=20260813-race-v26"></script>
-  <script defer src="/dashboard-notifications-final.js?v=20260813-reel-v26"></script>
-  <script defer src="/roleta-reel.js?v=20260813-reel-v26"></script>
+  <script defer src="/protected.js?v=20260813-reel-v27"></script>
+  <script defer src="/race-tool.js?v=20260813-race-v27"></script>
+  <script defer src="/dashboard-notifications-final.js?v=20260813-reel-v27"></script>
+  <script defer src="/roleta-reel.js?v=20260813-reel-v27"></script>
+  <script defer src="/roleta-reel-rng-v27.js?v=20260813-unbiased-v27"></script>
 </head>
 <body class="student-dashboard roulette-reel-page" data-required-access="dashboard">
   <div class="dash-loading" id="reelLoading" role="status"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando a Roleta Reel</strong><small>Conectando roleta, Race e estratégias…</small></div></div>
@@ -67,8 +68,8 @@
 
         <aside class="reel-side">
           <section class="reel-side-card"><div class="reel-side-title"><span>01</span><h2>Últimos giros</h2></div><div class="reel-history" id="reelHistory"></div></section>
-          <section class="reel-side-card"><div class="reel-side-title"><span>02</span><h2>Leitura atual</h2></div><div class="reel-stats"><div><small>Origem do giro</small><strong id="reelEngineMode">Aleatório</strong></div><div><small>Zona dominante</small><strong id="reelDominant">Aguardando</strong></div><div><small>Número quente</small><strong id="reelHot">--</strong></div><div><small>Resultado na Race</small><strong id="reelEvaluation">Aguardando</strong></div><div><small>Aproveitamento da leitura</small><strong id="reelHitRate">--</strong></div><div><small>Estratégia conectada</small><strong id="reelStrategy">Race</strong></div></div><p class="reel-evaluation-detail" id="reelEvaluationDetail">Marque a Race antes do próximo giro.</p></section>
-          <section class="reel-side-card reel-rule"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg><p><strong>Ferramenta de treinamento.</strong> O acerto ou erro é calculado usando exatamente as marcações feitas antes do giro.</p></section>
+          <section class="reel-side-card"><div class="reel-side-title"><span>02</span><h2>Leitura atual</h2></div><div class="reel-stats"><div><small>Origem do giro</small><strong id="reelEngineMode">Aleatório uniforme</strong></div><div><small>Zona dominante</small><strong id="reelDominant">Aguardando</strong></div><div><small>Número quente</small><strong id="reelHot">--</strong></div><div><small>Resultado na Race</small><strong id="reelEvaluation">Aguardando</strong></div><div><small>Aproveitamento da leitura</small><strong id="reelHitRate">--</strong></div><div><small>Estratégia conectada</small><strong id="reelStrategy">Race</strong></div></div><p class="reel-evaluation-detail" id="reelEvaluationDetail">Marque a Race antes do próximo giro.</p></section>
+          <section class="reel-side-card reel-rule"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg><p><strong>Ferramenta de treinamento.</strong> O resultado da roleta é aleatório e independente das marcações. Acerto ou erro é calculado somente depois do giro.</p></section>
         </aside>
       </section>
 
