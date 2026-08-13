@@ -54,8 +54,8 @@
     if(path!='/notas'&&path!='/notas.html')return;
     ['categoryFilter','sortFilter','noteCategory'].forEach(id=>{const s=document.getElementById(id);if(s){s.disabled=false;s.removeAttribute('aria-disabled');s.style.pointerEvents='auto'}});
     $$('.notes-category-list button,[data-category]').forEach(b=>{b.disabled=false;b.style.pointerEvents='auto'});
-    injectStyle('/notes-category-hotfix.css?v=20260812-notes-v23','notesCategoryHotfixCss');
-    injectScript('/notes-category-hotfix.js?v=20260812-notes-v23','notesCategoryHotfixJs');
+    injectStyle('/notes-category-hotfix.css?v=20260812-notes-v25','notesCategoryHotfixCss');
+    injectScript('/notes-category-hotfix.js?v=20260812-notes-v25','notesCategoryHotfixJs');
   }
 
   function bindBell(){
@@ -68,10 +68,10 @@
 
   function liveNotifications(){
     if($('script[src*="dashboard-notifications-live.js"]'))return;
-    const s=document.createElement('script');s.src='/dashboard-notifications-live.js?v=20260812-shell-v23';s.defer=true;document.head.appendChild(s);
+    const s=document.createElement('script');s.src='/dashboard-notifications-live.js?v=20260812-shell-v25';s.defer=true;document.head.appendChild(s);
   }
 
-  function init(){cleanLinks();removeSound();sidebar();topbar();notes();bindBell();liveNotifications();document.documentElement.dataset.studentShell='v23'}
+  function init(){cleanLinks();removeSound();sidebar();topbar();notes();bindBell();liveNotifications();document.documentElement.dataset.studentShell='v25'}
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
   document.addEventListener('turma:protected-ready',init);
 })();
