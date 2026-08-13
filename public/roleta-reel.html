@@ -9,21 +9,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260812-reel-v25" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260812-reel-v25" />
-  <link rel="stylesheet" href="/student-shell-v23.css?v=20260812-reel-v25" />
-  <link rel="stylesheet" href="/roleta-reel.css?v=20260812-reel-v25" />
-  <link rel="stylesheet" href="/race-tool.css?v=20260812-race-v25" />
-  <link rel="stylesheet" href="/race-mobile-v23.css?v=20260812-race-v25" />
-  <link rel="stylesheet" href="/roleta-reel-race-v25.css?v=20260812-race-v25" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260813-reel-v26" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260813-reel-v26" />
+  <link rel="stylesheet" href="/student-shell-v23.css?v=20260813-reel-v26" />
+  <link rel="stylesheet" href="/roleta-reel.css?v=20260813-reel-v26" />
+  <link rel="stylesheet" href="/race-tool.css?v=20260813-race-v26" />
+  <link rel="stylesheet" href="/race-mobile-v23.css?v=20260813-race-v26" />
+  <link rel="stylesheet" href="/roleta-reel-race-v25.css?v=20260813-race-v26" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <script defer src="/protected.js?v=20260812-reel-v25"></script>
-  <script defer src="/race-tool.js?v=20260812-race-v25"></script>
-  <script defer src="/dashboard-notifications-final.js?v=20260812-reel-v25"></script>
-  <script defer src="/roleta-reel.js?v=20260812-reel-v25"></script>
+  <script defer src="/protected.js?v=20260813-reel-v26"></script>
+  <script defer src="/race-tool.js?v=20260813-race-v26"></script>
+  <script defer src="/dashboard-notifications-final.js?v=20260813-reel-v26"></script>
+  <script defer src="/roleta-reel.js?v=20260813-reel-v26"></script>
 </head>
 <body class="student-dashboard roulette-reel-page" data-required-access="dashboard">
-  <div class="dash-loading" id="reelLoading" role="status"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando a Roleta Reel</strong><small>Conectando roleta, Race e Racetrack…</small></div></div>
+  <div class="dash-loading" id="reelLoading" role="status"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando a Roleta Reel</strong><small>Conectando roleta, Race e estratégias…</small></div></div>
   <div class="dash-mobile-overlay" id="reelMobileOverlay" hidden></div>
   <aside class="dash-sidebar" id="reelSidebar">
     <a class="dash-brand" href="/dashboard"><img src="/assets/turma-primo-logo.svg" alt="Logo Turma do Primo" /><span><small>TURMA DO</small><strong>PRIMO</strong></span></a>
@@ -40,13 +40,13 @@
       <a class="dash-nav-item" href="/provas"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
       <a class="dash-nav-item" href="/favoritos"><svg><use href="/assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
     </nav>
-    <div class="dash-plan-card"><span class="dash-plan-icon"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg></span><div><strong>Roleta Reel</strong><small>Minigame conectado</small></div><div class="dash-plan-progress"><i style="width:100%"></i></div><p>Race e Racetrack sincronizadas com cada giro.</p><a class="dash-plan-link" href="/minigames">Voltar aos minigames</a></div>
+    <div class="dash-plan-card"><span class="dash-plan-icon"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg></span><div><strong>Roleta Reel</strong><small>Minigame conectado</small></div><div class="dash-plan-progress"><i style="width:100%"></i></div><p>Race, Racetrack e módulos sincronizados com cada giro.</p><a class="dash-plan-link" href="/minigames">Voltar aos minigames</a></div>
   </aside>
 
   <main class="dash-main reel-main">
     <header class="dash-topbar reel-topbar">
       <button class="dash-menu-toggle" id="reelMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg></button>
-      <a class="reel-back" href="/minigames"><svg><use href="/assets/dashboard-icons.svg#i-chevron"></use></svg><span>Voltar para Minigames</span></a>
+      <a class="reel-back" href="/minigames"><span>← Voltar para Minigames</span></a>
       <div class="dash-top-actions">
         <button class="dash-theme-toggle" id="reelThemeToggle" data-global-theme type="button" aria-label="Alternar tema"><svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button>
         <button class="dash-notification-btn" id="notificationButton" type="button" aria-label="Abrir notificações"><svg><use href="/assets/dashboard-icons.svg#i-bell"></use></svg><b id="notificationBadge" hidden>0</b></button>
@@ -56,7 +56,7 @@
     <aside class="dash-notification-panel" id="notificationPanel" hidden><div class="dash-notification-head"><h3>Notificações</h3><button id="markNotificationsRead" type="button">Marcar como lidas</button></div><div class="dash-notification-list" id="notificationList"></div></aside>
 
     <div class="reel-content">
-      <section class="reel-heading"><div><span class="reel-kicker">MINIGAME EXCLUSIVO • MODO TREINO</span><h1>Roleta <strong>Reel</strong></h1><p>A roleta conversa com a Race e o Racetrack. Faça suas marcações e acompanhe cada resultado em tempo real.</p></div><div class="reel-connection"><i></i><span><b>Race conectada</b><small id="reelConnectionText">Aguardando marcações</small></span></div></section>
+      <section class="reel-heading"><div><span class="reel-kicker">MINIGAME EXCLUSIVO • MODO TREINO</span><h1>Roleta <strong>Reel</strong></h1><p>Marque sua leitura na Race antes do giro. O resultado será comparado automaticamente com as marcações feitas.</p></div><div class="reel-connection"><i></i><span><b>Race conectada</b><small id="reelConnectionText">Aguardando marcações</small></span></div></section>
 
       <section class="reel-layout">
         <article class="reel-wheel-card">
@@ -67,12 +67,12 @@
 
         <aside class="reel-side">
           <section class="reel-side-card"><div class="reel-side-title"><span>01</span><h2>Últimos giros</h2></div><div class="reel-history" id="reelHistory"></div></section>
-          <section class="reel-side-card"><div class="reel-side-title"><span>02</span><h2>Leitura atual</h2></div><div class="reel-stats"><div><small>Origem do giro</small><strong id="reelEngineMode">Aleatório</strong></div><div><small>Zona dominante</small><strong id="reelDominant">Aguardando</strong></div><div><small>Número quente</small><strong id="reelHot">--</strong></div><div><small>Resultado na Race</small><strong id="reelEvaluation">Aguardando</strong></div></div></section>
-          <section class="reel-side-card reel-rule"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg><p><strong>Ferramenta de treinamento.</strong> A roleta real permanece aleatória; este minigame organiza a prática e a leitura.</p></section>
+          <section class="reel-side-card"><div class="reel-side-title"><span>02</span><h2>Leitura atual</h2></div><div class="reel-stats"><div><small>Origem do giro</small><strong id="reelEngineMode">Aleatório</strong></div><div><small>Zona dominante</small><strong id="reelDominant">Aguardando</strong></div><div><small>Número quente</small><strong id="reelHot">--</strong></div><div><small>Resultado na Race</small><strong id="reelEvaluation">Aguardando</strong></div><div><small>Aproveitamento da leitura</small><strong id="reelHitRate">--</strong></div><div><small>Estratégia conectada</small><strong id="reelStrategy">Race</strong></div></div><p class="reel-evaluation-detail" id="reelEvaluationDetail">Marque a Race antes do próximo giro.</p></section>
+          <section class="reel-side-card reel-rule"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg><p><strong>Ferramenta de treinamento.</strong> O acerto ou erro é calculado usando exatamente as marcações feitas antes do giro.</p></section>
         </aside>
       </section>
 
-      <section class="reel-race-section"><div class="reel-section-head"><div><span>RACE INTEGRADA</span><h2>Marque antes de girar</h2><p>As mesmas marcações feitas nos módulos de Estudo são carregadas aqui automaticamente.</p></div><a href="/estudo">Abrir módulos de Estudo →</a></div><div data-race-tool data-default-view="race"></div></section>
+      <section class="reel-race-section"><div class="reel-section-head"><div><span>RACE INTEGRADA</span><h2>Marque antes de girar</h2><p>As marcações dos módulos de Estudo usam o mesmo estado compartilhado desta Race.</p></div><a href="/estudo">Abrir módulos de Estudo →</a></div><div data-race-tool data-default-view="race"></div><div class="reel-strategy-sync"><strong>Estratégias reconhecidas na leitura</strong><div class="reel-strategy-chips" id="reelStrategyChips"><a href="/estudo">Leitura Race</a></div></div></section>
     </div>
   </main>
 </body>
