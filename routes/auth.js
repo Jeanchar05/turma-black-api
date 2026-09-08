@@ -1,7 +1,12 @@
 const express = require("express");
 const Usuario = require("../models/Usuario");
 
-const { auth, gerarToken, montarUsuarioSeguro } = require("../middleware/auth");
+const {
+  auth,
+  gerarToken,
+  montarUsuarioSeguro,
+  statusJwtConfiguracao
+} = require("../middleware/auth");
 const { getPermissoesEfetivas, getCargo } = require("../middleware/permissions");
 const {
   processarWebhookBestfy,
@@ -175,7 +180,18 @@ async function login(req, res) {
     });
   } catch (error) {
     console.error("Erro no login:", error);
-    return res.status(500).json({ erro: "Erro interno ao fazer login." });
+
+    if (error?.code === "JWT_NAO_CONFIGURADO") {
+      return res.status(503).json({
+        erro: "Login temporariamente indisponível: a chave de segurança JWT do servidor precisa ser configurada.",
+        codigo: "JWT_NAO_CONFIGURADO"
+      });
+    }
+
+    return res.status(500).json({
+      erro: "Não foi possível concluir o login. Tente novamente em alguns instantes.",
+      codigo: "LOGIN_INTERNAL_ERROR"
+    });
   }
 }
 
@@ -304,9 +320,11 @@ router.post("/setup/superadmin", async (req, res) => {
 });
 
 router.get("/auth/status", (req, res) => {
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
   res.json({
     status: "online",
     modulo: "auth",
+    ...statusJwtConfiguracao(),
     fluxo: {
       cadastro: "Conta FREE criada automaticamente",
       premium: "Pagamento Bestfy aprovado libera o Premium automaticamente pelo e-mail da compra",
