@@ -1,9 +1,21 @@
-/* Turma do Primo — Desktop Login v33
-   Camada exclusiva para computador. O mobile permanece intocado. */
+/* Turma do Primo — Desktop Login v34
+   Camada exclusiva para computador. O mobile permanece intocado.
+   Estrutura em 3 faixas: topo + conteúdo + rodapé. Isso evita scroll/overlap
+   no notebook e mantém o rodapé institucional sempre no lugar correto. */
 
 @media (min-width: 981px) {
+  html {
+    height: 100%;
+  }
+
   .auth-body.auth-2026 {
+    width: 100%;
+    height: 100svh;
     min-height: 100svh;
+    margin: 0;
+    display: grid !important;
+    grid-template-rows: 64px minmax(0, 1fr) 40px;
+    overflow: hidden !important;
     background:
       radial-gradient(circle at 12% 7%, rgba(126,34,206,.18), transparent 27%),
       radial-gradient(circle at 82% 3%, rgba(188,83,255,.11), transparent 24%),
@@ -18,12 +30,15 @@
   }
 
   .login-v30-topbar {
-    min-height: 74px;
+    grid-row: 1;
+    height: 64px;
+    min-height: 64px;
+    margin: 0 auto;
   }
 
   .login-v30-brand img {
-    width: 42px;
-    height: 48px;
+    width: 40px;
+    height: 46px;
   }
 
   .login-v30-brand-copy strong {
@@ -32,14 +47,18 @@
 
   .login-v30-status,
   .login-v30-security {
-    min-height: 34px;
+    min-height: 33px;
     padding: 0 12px;
     font-size: 10px;
     background: rgba(255,255,255,.024);
   }
 
   .login-v30-shell {
-    min-height: 0;
+    grid-row: 2;
+    height: 100%;
+    min-height: 0 !important;
+    margin: 0 auto;
+    padding: 0;
     grid-template-columns: minmax(0,1.2fr) minmax(400px,.8fr);
     gap: 22px;
     align-items: stretch;
@@ -47,62 +66,68 @@
 
   .login-v30-stage,
   .login-v30-auth {
-    height: clamp(590px, calc(100svh - 132px), 700px);
-    min-height: 590px;
+    width: 100%;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
     border-radius: 28px;
   }
 
   .login-v30-stage {
-    padding: 34px 44px 238px;
+    padding: 30px 42px 218px;
     background:
       radial-gradient(circle at 72% 23%,rgba(168,85,247,.145),transparent 25%),
       linear-gradient(145deg,rgba(15,8,23,.97),rgba(5,3,8,.99));
   }
 
   .login-v30-stage::after {
-    width: 500px;
-    height: 500px;
-    right: -180px;
-    top: -210px;
-    opacity: .78;
+    width: 480px;
+    height: 480px;
+    right: -170px;
+    top: -205px;
+    opacity: .76;
   }
 
   .login-v30-eyebrow {
-    min-height: 30px;
+    min-height: 29px;
     padding: 0 11px;
     font-size: 9px;
   }
 
   .login-v30-title {
-    max-width: 690px;
-    margin-top: 19px;
-    font-size: clamp(46px,4.25vw,62px);
+    max-width: 650px;
+    margin-top: 17px;
+    font-size: clamp(43px,3.95vw,58px);
     line-height: .95;
-    letter-spacing: -.058em;
+    letter-spacing: -.056em;
     text-wrap: balance;
   }
 
+  .login-v30-title .gradient {
+    display: inline;
+  }
+
   .login-v30-lead {
-    max-width: 610px;
-    margin-top: 17px;
-    font-size: 13px;
-    line-height: 1.56;
+    max-width: 600px;
+    margin-top: 14px;
+    font-size: 12px;
+    line-height: 1.5;
   }
 
   .login-v30-benefits {
-    margin-top: 20px;
+    margin-top: 16px;
     display: grid;
     grid-template-columns: repeat(4,minmax(0,1fr));
-    gap: 8px;
-    max-width: 670px;
+    gap: 7px;
+    max-width: 650px;
   }
 
   .login-v30-benefits span {
-    min-height: 34px;
+    min-height: 32px;
     justify-content: center;
-    padding: 0 9px;
-    border-radius: 11px;
-    font-size: 9px;
+    padding: 0 8px;
+    border-radius: 10px;
+    font-size: 8px;
     white-space: nowrap;
   }
 
@@ -111,132 +136,136 @@
   }
 
   .login-v31-rail {
-    max-width: 670px !important;
-    margin-top: 12px !important;
+    max-width: 650px !important;
+    margin-top: 9px !important;
     gap: 7px !important;
   }
 
   .login-v31-rail article {
-    min-height: 52px !important;
-    padding: 9px 11px !important;
-    border-radius: 12px !important;
+    min-height: 44px !important;
+    padding: 7px 9px !important;
+    border-radius: 11px !important;
   }
 
   .login-v31-rail b {
-    font-size: 9px !important;
+    font-size: 8px !important;
   }
 
   .login-v31-rail span {
-    margin-top: 4px !important;
-    font-size: 8px !important;
-    line-height: 1.32 !important;
+    margin-top: 3px !important;
+    font-size: 7px !important;
+    line-height: 1.28 !important;
   }
 
   .login-v30-product {
-    left: 44px;
-    right: 44px;
-    bottom: 22px;
+    left: 42px;
+    right: 42px;
+    bottom: 16px;
     min-height: 0;
-    height: 198px;
+    height: 184px;
     grid-template-columns: 1.12fr .88fr;
-    gap: 10px;
-    transform: none;
+    gap: 9px;
+    transform: none !important;
   }
 
   .login-v30-console,
   .login-v30-sidecard {
-    border-radius: 18px;
+    border-radius: 16px;
   }
 
   .login-v30-console {
-    padding: 14px;
+    padding: 12px;
   }
 
   .login-v30-console-head {
-    padding-bottom: 9px;
+    padding-bottom: 8px;
   }
 
   .login-v30-console-title > span {
-    width: 29px;
-    height: 29px;
-    border-radius: 9px;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
   }
 
   .login-v30-console-title strong {
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .login-v30-console-title small {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .login-v30-modules {
-    margin-top: 9px;
-    gap: 7px;
+    margin-top: 8px;
+    gap: 6px;
   }
 
   .login-v30-module {
-    min-height: 56px;
-    padding: 8px;
-    border-radius: 11px;
+    min-height: 51px;
+    padding: 7px;
+    border-radius: 10px;
   }
 
   .login-v30-module span {
-    width: 23px;
-    height: 23px;
-    border-radius: 7px;
-    font-size: 10px;
+    width: 21px;
+    height: 21px;
+    border-radius: 6px;
+    font-size: 9px;
   }
 
   .login-v30-module strong {
-    margin-top: 5px;
-    font-size: 9px;
+    margin-top: 4px;
+    font-size: 8px;
   }
 
   .login-v30-module small {
     margin-top: 2px;
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .login-v30-progress {
-    margin-top: 8px;
-    padding: 8px 9px;
-    border-radius: 10px;
+    margin-top: 7px;
+    padding: 7px 8px;
+    border-radius: 9px;
+  }
+
+  .login-v30-progress-top {
+    font-size: 7px;
   }
 
   .login-v30-sidecard {
-    padding: 14px;
+    padding: 12px;
   }
 
   .login-v30-sidecard h3 {
-    margin-top: 11px;
-    font-size: 17px;
+    margin-top: 9px;
+    font-size: 16px;
   }
 
   .login-v30-sidecard p {
-    margin-top: 6px;
-    font-size: 8px;
-    line-height: 1.42;
+    margin-top: 5px;
+    font-size: 7px;
+    line-height: 1.4;
   }
 
   .login-v30-pills {
-    margin-top: 9px;
-    gap: 5px;
+    margin-top: 8px;
+    gap: 4px;
   }
 
   .login-v30-pills div {
-    min-height: 26px;
-    padding: 0 8px;
-    border-radius: 8px;
-    font-size: 8px;
+    min-height: 24px;
+    padding: 0 7px;
+    border-radius: 7px;
+    font-size: 7px;
   }
 
   .login-v30-pills b {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .login-v30-auth {
-    padding: 9px;
+    padding: 8px;
     overflow: hidden;
     background:
       radial-gradient(circle at 50% 0,rgba(168,85,247,.12),transparent 25%),
@@ -253,29 +282,36 @@
   }
 
   .login-v30-auth-inner {
-    min-height: 100%;
-    padding: 22px 34px 18px;
+    height: 100%;
+    min-height: 0 !important;
+    overflow: auto;
+    scrollbar-width: none;
+    padding: 18px 30px 14px;
+  }
+
+  .login-v30-auth-inner::-webkit-scrollbar {
+    display: none;
   }
 
   .login-v30-auth-badge {
-    min-height: 27px;
-    padding: 0 10px;
+    min-height: 25px;
+    padding: 0 9px;
     font-size: 8px;
   }
 
   .login-v30-auth .auth-tabs {
-    margin-top: 14px;
-    min-height: 46px;
-    border-radius: 13px;
+    margin-top: 11px;
+    min-height: 42px;
+    border-radius: 12px;
   }
 
   .login-v30-auth .auth-tab {
-    min-height: 38px;
-    font-size: 11px;
+    min-height: 34px;
+    font-size: 10px;
   }
 
   .login-v30-auth .auth-card-header {
-    margin-top: 21px;
+    margin-top: 15px;
   }
 
   .login-v30-auth .auth-card-header .eyebrow {
@@ -284,90 +320,100 @@
 
   .login-v30-auth .auth-card-header h2 {
     margin: 0;
-    font-size: clamp(28px,2.2vw,35px);
+    font-size: clamp(26px,2vw,32px);
     line-height: 1.02;
     letter-spacing: -.05em;
   }
 
   .login-v30-auth .auth-card-header p {
-    margin-top: 7px;
-    font-size: 11px;
-  }
-
-  .login-v30-auth .auth-form {
-    margin-top: 20px;
-    gap: 13px;
-  }
-
-  .login-v30-auth .input-group {
-    gap: 6px;
-  }
-
-  .login-v30-auth .input-group > label {
+    margin-top: 5px;
     font-size: 10px;
   }
 
+  .login-v30-auth .auth-form {
+    margin-top: 14px;
+    gap: 10px;
+  }
+
+  .login-v30-auth .input-group {
+    gap: 5px;
+  }
+
+  .login-v30-auth .input-group > label {
+    font-size: 9px;
+  }
+
   .login-v30-auth .auth-input-shell {
-    min-height: 50px;
-    border-radius: 13px;
-  }
-
-  .login-v30-auth .auth-input-shell input {
-    height: 48px;
-    font-size: 12px;
-  }
-
-  .login-v30-auth .auth-submit {
-    min-height: 50px;
-    margin-top: 1px;
-    border-radius: 13px;
-    font-size: 11px;
-    box-shadow: 0 15px 34px rgba(126,34,206,.25);
-  }
-
-  .login-v30-form-note {
-    padding: 9px 10px;
+    min-height: 44px;
     border-radius: 11px;
   }
 
-  .login-v30-form-note span {
-    font-size: 8px;
-    line-height: 1.38;
+  .login-v30-auth .auth-input-shell input {
+    height: 42px;
+    font-size: 11px;
   }
 
-  .login-v30-auth .auth-security-note {
-    margin-top: auto;
-    padding-top: 10px;
-    font-size: 8px;
+  .login-v30-auth .auth-submit {
+    min-height: 44px;
+    margin-top: 1px;
+    border-radius: 11px;
+    font-size: 10px;
+    box-shadow: 0 12px 28px rgba(126,34,206,.24);
+  }
+
+  .login-v30-form-note {
+    padding: 7px 8px;
+    border-radius: 9px;
+  }
+
+  .login-v30-form-note span {
+    font-size: 7px;
     line-height: 1.35;
   }
 
+  .login-v30-auth .auth-security-note {
+    margin-top: 9px;
+    padding-top: 8px;
+    font-size: 7px;
+    line-height: 1.3;
+  }
+
   .login-v31-auth-trust {
-    margin-top: 10px !important;
-    padding-top: 9px !important;
-    gap: 6px !important;
+    margin-top: auto !important;
+    padding-top: 7px !important;
+    gap: 5px !important;
   }
 
   .login-v31-auth-trust span {
-    min-height: 40px !important;
-    padding: 5px !important;
-    border-radius: 10px !important;
-    font-size: 7px !important;
+    min-height: 34px !important;
+    padding: 4px !important;
+    border-radius: 8px !important;
+    font-size: 6px !important;
   }
 
   .login-v31-auth-trust strong {
-    font-size: 8px !important;
+    font-size: 7px !important;
   }
 
-  /* Rodapé institucional restaurado no desktop. */
+  /* Rodapé em fluxo normal: sempre visível e nunca cobre os cards. */
   .login-v30-footer {
-    min-height: 44px;
-    margin-top: 8px;
-    padding: 0 2px 10px;
+    grid-row: 3;
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 4;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 0 auto !important;
+    padding: 0 2px !important;
     display: grid !important;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 20px;
+    border-top: 1px solid rgba(255,255,255,.045);
+    background: linear-gradient(180deg,rgba(4,2,7,.15),rgba(4,2,7,.60));
     color: #777080;
   }
 
@@ -383,7 +429,7 @@
     justify-self: center;
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 22px;
   }
 
   .login-v30-footer p,
@@ -393,7 +439,7 @@
   }
 
   .login-v30-footer a {
-    color: #8f8797;
+    color: #908798;
     transition: color .18s ease;
   }
 
@@ -402,53 +448,58 @@
   }
 }
 
-/* Notebook/desktop com pouca altura: compacto, mas sem esconder o rodapé. */
-@media (min-width: 981px) and (max-height: 760px) {
+/* Notebook baixo, como o print em 1365x768: tudo cabe na mesma dobra. */
+@media (min-width: 981px) and (max-height: 700px) {
+  .auth-body.auth-2026 {
+    grid-template-rows: 56px minmax(0,1fr) 36px;
+  }
+
   .login-v30-topbar {
-    min-height: 60px;
+    height: 56px;
+    min-height: 56px;
   }
 
   .login-v30-brand img {
-    width: 35px;
-    height: 40px;
-  }
-
-  .login-v30-stage,
-  .login-v30-auth {
-    min-height: 510px;
-    height: calc(100svh - 112px);
+    width: 34px;
+    height: 39px;
   }
 
   .login-v30-stage {
-    padding: 24px 36px 195px;
+    padding: 20px 34px 164px;
   }
 
   .login-v30-eyebrow {
-    min-height: 26px;
-    font-size: 8px;
+    min-height: 24px;
+    font-size: 7px;
   }
 
   .login-v30-title {
-    margin-top: 13px;
-    font-size: clamp(40px,3.8vw,53px);
+    margin-top: 11px;
+    max-width: 590px;
+    font-size: clamp(37px,3.35vw,47px);
   }
 
   .login-v30-lead {
-    margin-top: 11px;
-    font-size: 11px;
+    margin-top: 9px;
+    font-size: 10px;
   }
 
   .login-v30-benefits {
-    margin-top: 12px;
+    margin-top: 10px;
+  }
+
+  .login-v30-benefits span {
+    min-height: 27px;
+    font-size: 7px;
   }
 
   .login-v31-rail {
-    margin-top: 7px !important;
+    margin-top: 6px !important;
   }
 
   .login-v31-rail article {
-    min-height: 39px !important;
-    padding: 7px 8px !important;
+    min-height: 31px !important;
+    padding: 5px 7px !important;
   }
 
   .login-v31-rail span {
@@ -456,64 +507,132 @@
   }
 
   .login-v30-product {
-    left: 36px;
-    right: 36px;
-    bottom: 14px;
-    height: 168px;
+    left: 34px;
+    right: 34px;
+    bottom: 10px;
+    height: 145px;
+  }
+
+  .login-v30-console,
+  .login-v30-sidecard {
+    border-radius: 13px;
+  }
+
+  .login-v30-console {
+    padding: 9px;
+  }
+
+  .login-v30-console-head {
+    padding-bottom: 5px;
+  }
+
+  .login-v30-modules {
+    margin-top: 5px;
+  }
+
+  .login-v30-module {
+    min-height: 41px;
+    padding: 5px;
+  }
+
+  .login-v30-module span {
+    width: 18px;
+    height: 18px;
+  }
+
+  .login-v30-module strong {
+    margin-top: 3px;
+    font-size: 7px;
+  }
+
+  .login-v30-module small {
+    display: none;
+  }
+
+  .login-v30-progress {
+    margin-top: 5px;
+    padding: 5px 6px;
+  }
+
+  .login-v30-sidecard {
+    padding: 9px;
+  }
+
+  .login-v30-sidecard h3 {
+    margin-top: 6px;
+    font-size: 13px;
   }
 
   .login-v30-sidecard p {
     display: none;
   }
 
+  .login-v30-pills {
+    margin-top: 6px;
+    gap: 3px;
+  }
+
+  .login-v30-pills div {
+    min-height: 21px;
+    font-size: 6px;
+  }
+
   .login-v30-auth-inner {
-    padding: 15px 27px 12px;
+    padding: 12px 24px 10px;
   }
 
   .login-v30-auth-badge {
-    min-height: 24px;
+    min-height: 22px;
+    font-size: 7px;
   }
 
   .login-v30-auth .auth-tabs {
-    margin-top: 10px;
-    min-height: 42px;
+    margin-top: 8px;
+    min-height: 38px;
   }
 
   .login-v30-auth .auth-tab {
-    min-height: 34px;
+    min-height: 30px;
+    font-size: 9px;
   }
 
   .login-v30-auth .auth-card-header {
-    margin-top: 13px;
+    margin-top: 10px;
   }
 
   .login-v30-auth .auth-card-header h2 {
-    font-size: 27px;
+    font-size: 24px;
   }
 
   .login-v30-auth .auth-card-header p {
-    margin-top: 5px;
+    margin-top: 3px;
+    font-size: 9px;
   }
 
   .login-v30-auth .auth-form {
-    margin-top: 13px;
-    gap: 9px;
+    margin-top: 10px;
+    gap: 7px;
+  }
+
+  .login-v30-auth .input-group > label {
+    font-size: 8px;
   }
 
   .login-v30-auth .auth-input-shell {
-    min-height: 43px;
+    min-height: 38px;
   }
 
   .login-v30-auth .auth-input-shell input {
-    height: 41px;
+    height: 36px;
+    font-size: 10px;
   }
 
   .login-v30-auth .auth-submit {
-    min-height: 43px;
+    min-height: 38px;
   }
 
   .login-v30-form-note {
-    padding: 7px 8px;
+    padding: 5px 7px;
   }
 
   .login-v30-auth .auth-security-note {
@@ -521,35 +640,82 @@
   }
 
   .login-v31-auth-trust {
-    margin-top: auto !important;
-    padding-top: 6px !important;
+    padding-top: 5px !important;
   }
 
   .login-v31-auth-trust span {
-    min-height: 34px !important;
+    min-height: 28px !important;
   }
 
   .login-v30-footer {
-    min-height: 34px;
-    margin-top: 4px;
-    padding-bottom: 4px;
-    display: grid !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    gap: 12px;
+  }
+
+  .login-v30-footer nav {
+    gap: 16px;
+  }
+
+  .login-v30-footer p,
+  .login-v30-footer a {
+    font-size: 7px;
+  }
+}
+
+/* Se a janela ficar baixa demais por zoom/acessibilidade, prioriza scroll em vez de cortar conteúdo. */
+@media (min-width: 981px) and (max-height: 560px) {
+  .auth-body.auth-2026 {
+    height: auto;
+    min-height: 100svh;
+    display: block !important;
+    overflow-y: auto !important;
+  }
+
+  .login-v30-topbar {
+    height: 56px;
+  }
+
+  .login-v30-shell {
+    height: 500px;
+  }
+
+  .login-v30-footer {
+    height: 36px !important;
+    margin-top: 6px !important;
   }
 }
 
 @media (min-width: 1580px) and (min-height: 820px) {
+  .auth-body.auth-2026 {
+    grid-template-rows: 72px minmax(0,1fr) 44px;
+  }
+
   .login-v30-topbar,
   .login-v30-shell,
   .login-v30-footer {
     width: min(1500px, calc(100% - 64px));
   }
 
-  .login-v30-stage,
-  .login-v30-auth {
-    height: 720px;
+  .login-v30-topbar {
+    height: 72px;
+    min-height: 72px;
+  }
+
+  .login-v30-stage {
+    padding-top: 36px;
   }
 
   .login-v30-title {
-    font-size: 66px;
+    font-size: 62px;
+  }
+
+  .login-v30-product {
+    height: 198px;
+  }
+
+  .login-v30-footer {
+    height: 44px !important;
+    min-height: 44px !important;
   }
 }
