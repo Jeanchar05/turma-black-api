@@ -1,6 +1,14 @@
 "use strict";
 
 (() => {
+  const polishHref = "login-polish-v31.css?v=20260908-v31";
+  if (!document.querySelector('link[href^="login-polish-v31.css"]')) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = polishHref;
+    document.head.appendChild(link);
+  }
+
   const canvas = document.getElementById("loginParticleCanvas");
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
