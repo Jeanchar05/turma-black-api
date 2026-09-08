@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario");
 const database = require("../config/database");
 
-function carregarJwtSecret() {
+function carregarJwtConfig() {
   const secret = String(process.env.JWT_SECRET || "").trim();
   const producao = String(process.env.NODE_ENV || "").trim().toLowerCase() === "production";
   const placeholders = new Set([
@@ -13,15 +13,27 @@ function carregarJwtSecret() {
     "changeme",
     "secret"
   ]);
+  const invalidoEmProducao = producao && (
+    secret.length < 32 || placeholders.has(secret.toLowerCase())
+  );
 
-  if (producao && (secret.length < 32 || placeholders.has(secret.toLowerCase()))) {
-    throw new Error("JWT_SECRET ausente, fraco ou usando valor de exemplo em produção.");
+  if (invalidoEmProducao) {
+    console.error(
+      "[SECURITY] JWT_SECRET ausente, fraco ou usando valor de exemplo. " +
+      "O site público continuará online, mas autenticação e emissão de tokens permanecerão bloqueadas até a variável ser corrigida."
+    );
+    return { secret: "", valido: false, producao: true };
   }
 
-  return secret || "turma_black_secret_dev";
+  return {
+    secret: secret || "turma_black_secret_dev",
+    valido: true,
+    producao
+  };
 }
 
-const SECRET = carregarJwtSecret();
+const JWT_CONFIG = carregarJwtConfig();
+const SECRET = JWT_CONFIG.secret;
 
 const PLANOS_PREMIUM = new Set(["black30", "black90", "black180", "black360"]);
 const PLANOS_BESTFY = Object.freeze({
@@ -239,6 +251,10 @@ function montarUsuarioSeguro(usuario) {
 }
 
 async function localizarUsuarioPorToken(token) {
+  if (!JWT_CONFIG.valido || !SECRET) {
+    return { erro: "JWT_NAO_CONFIGURADO" };
+  }
+
   let decoded;
 
   try {
@@ -266,6 +282,13 @@ async function localizarUsuarioPorToken(token) {
 
 async function auth(req, res, next) {
   try {
+    if (!JWT_CONFIG.valido) {
+      return res.status(503).json({
+        erro: "Autenticação temporariamente indisponível por configuração de segurança do servidor.",
+        codigo: "JWT_NAO_CONFIGURADO"
+      });
+    }
+
     const token = extrairToken(req);
 
     if (!token) {
@@ -278,6 +301,12 @@ async function auth(req, res, next) {
     const resultado = await localizarUsuarioPorToken(token);
 
     if (resultado.erro) {
+      if (resultado.erro === "JWT_NAO_CONFIGURADO") {
+        return res.status(503).json({
+          erro: "Autenticação temporariamente indisponível por configuração de segurança do servidor.",
+          codigo: resultado.erro
+        });
+      }
       return res.status(401).json({
         erro: "Token inválido ou expirado.",
         codigo: resultado.erro
@@ -320,6 +349,12 @@ async function auth(req, res, next) {
 
 async function authOpcional(req, res, next) {
   try {
+    if (!JWT_CONFIG.valido) {
+      req.usuario = null;
+      req.usuarioDoc = null;
+      return next();
+    }
+
     const token = extrairToken(req);
 
     if (!token) {
@@ -369,6 +404,14 @@ function requirePremium(req, res, next) {
 }
 
 function gerarToken(usuario) {
+  if (!JWT_CONFIG.valido || !SECRET) {
+    const error = new Error(
+      "JWT_SECRET precisa ser configurado com pelo menos 32 caracteres seguros no ambiente de produção."
+    );
+    error.code = "JWT_NAO_CONFIGURADO";
+    throw error;
+  }
+
   const cargo = normalizarCargo(usuario);
   const id = obterId(usuario);
 
