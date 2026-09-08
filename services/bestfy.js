@@ -171,21 +171,60 @@ async function buscarTransacao(transactionId) {
   return transaction;
 }
 
-function calcularValorCentavos(transaction) {
+function calcularTotalCarrinhoCentavos(transaction) {
   const cart = Array.isArray(transaction?.cart) ? transaction.cart : [];
+  if (!cart.length) return 0;
 
-  if (cart.length) {
-    const total = cart.reduce((soma, item) => {
-      const preco = Number(item?.price || 0);
-      const quantidade = Math.max(1, Number(item?.quantity || 1));
-      return soma + Math.round(preco) * quantidade;
-    }, 0);
+  return cart.reduce((soma, item) => {
+    const preco = Number(item?.price);
+    const quantidade = Number(item?.quantity || 1);
 
-    if (total > 0) return total;
+    if (!Number.isFinite(preco) || preco <= 0) {
+      throw erro("BESTFY_CART_PRICE_INVALID", "O carrinho possui preço inválido.");
+    }
+
+    if (!Number.isInteger(quantidade) || quantidade <= 0) {
+      throw erro("BESTFY_CART_QUANTITY_INVALID", "O carrinho possui quantidade inválida.");
+    }
+
+    return soma + Math.round(preco) * quantidade;
+  }, 0);
+}
+
+function calcularValorCentavos(transaction) {
+  const candidatos = [];
+
+  const valor = Number(transaction?.value);
+  if (Number.isFinite(valor) && valor > 0) {
+    candidatos.push({ origem: "transaction.value", centavos: Math.round(valor * 100) });
   }
 
-  const valor = Number(transaction?.value ?? transaction?.paymentMetadata?.value ?? 0);
-  return Number.isFinite(valor) ? Math.round(valor * 100) : 0;
+  const metadataValue = Number(transaction?.paymentMetadata?.value);
+  if (Number.isFinite(metadataValue) && metadataValue > 0) {
+    candidatos.push({ origem: "paymentMetadata.value", centavos: Math.round(metadataValue * 100) });
+  }
+
+  const finalAmountInCents = Number(transaction?.finalAmountInCents);
+  if (Number.isFinite(finalAmountInCents) && finalAmountInCents > 0) {
+    candidatos.push({ origem: "finalAmountInCents", centavos: Math.round(finalAmountInCents) });
+  }
+
+  if (!candidatos.length) {
+    throw erro(
+      "BESTFY_AMOUNT_MISSING",
+      "A Bestfy não retornou um valor efetivamente cobrado que possa ser validado."
+    );
+  }
+
+  const referencia = candidatos[0].centavos;
+  if (candidatos.some((item) => item.centavos !== referencia)) {
+    throw erro(
+      "BESTFY_AMOUNT_INCONSISTENT",
+      `A Bestfy retornou valores divergentes para a mesma transação: ${candidatos.map((item) => `${item.origem}=${item.centavos}`).join(", ")}.`
+    );
+  }
+
+  return referencia;
 }
 
 function identificarPlano(transaction) {
@@ -200,7 +239,7 @@ function identificarPlano(transaction) {
 
   const item = cart[0] || {};
   const quantidade = Number(item.quantity || 1);
-  if (!Number.isFinite(quantidade) || quantidade !== 1) {
+  if (!Number.isInteger(quantidade) || quantidade !== 1) {
     throw erro(
       "BESTFY_CART_QUANTITY_INVALID",
       "A compra Premium precisa ter quantidade igual a 1."
@@ -208,7 +247,8 @@ function identificarPlano(transaction) {
   }
 
   const titulo = normalizarTexto(item.title || "");
-  const valorCentavos = calcularValorCentavos(transaction);
+  const valorCobradoCentavos = calcularValorCentavos(transaction);
+  const valorCarrinhoCentavos = calcularTotalCarrinhoCentavos(transaction);
 
   let chave = "";
   if (/\banual\b|\b12 meses?\b|\b360 dias?\b|\b365 dias?\b/.test(titulo)) {
@@ -227,10 +267,18 @@ function identificarPlano(transaction) {
   }
 
   const plano = PLANOS[chave];
-  if (valorCentavos !== plano.valorCentavos) {
+
+  if (valorCarrinhoCentavos !== plano.valorCentavos) {
+    throw erro(
+      "BESTFY_CART_PRICE_MISMATCH",
+      `Preço do produto incompatível com o plano ${chave}. Esperado ${plano.valorCentavos} centavos e recebido ${valorCarrinhoCentavos}.`
+    );
+  }
+
+  if (valorCobradoCentavos !== plano.valorCentavos) {
     throw erro(
       "BESTFY_PLAN_PRICE_MISMATCH",
-      `Valor incompatível com o plano ${chave}. Esperado ${plano.valorCentavos} centavos e recebido ${valorCentavos}.`
+      `Valor efetivamente pago incompatível com o plano ${chave}. Esperado ${plano.valorCentavos} centavos e recebido ${valorCobradoCentavos}.`
     );
   }
 
