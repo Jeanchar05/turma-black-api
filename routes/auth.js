@@ -3,6 +3,11 @@ const Usuario = require("../models/Usuario");
 
 const { auth, gerarToken, montarUsuarioSeguro } = require("../middleware/auth");
 const { getPermissoesEfetivas, getCargo } = require("../middleware/permissions");
+const {
+  processarWebhookBestfy,
+  aplicarCompraPendentePorEmail,
+  statusConfiguracaoBestfy
+} = require("../services/bestfy");
 
 const router = express.Router();
 
@@ -90,9 +95,19 @@ async function criarConta(req, res) {
       atualizadoPor: "cadastro-online"
     });
 
+    let compraBestfy = { aplicado: false };
+    try {
+      compraBestfy = await aplicarCompraPendentePorEmail(usuario);
+    } catch (error) {
+      console.warn("Conta criada, mas não foi possível consultar compra Bestfy pendente:", error.message);
+    }
+
     return res.status(201).json({
       sucesso: true,
-      mensagem: "Conta criada com sucesso. Faça login para acessar o plano gratuito.",
+      mensagem: compraBestfy.aplicado
+        ? "Conta criada e pagamento localizado. Seu acesso Premium foi liberado."
+        : "Conta criada com sucesso. Faça login para acessar a plataforma.",
+      premiumLiberado: Boolean(compraBestfy.aplicado),
       usuario: await respostaUsuario(usuario)
     });
   } catch (error) {
@@ -122,6 +137,12 @@ async function login(req, res) {
 
     if (usuario.status === "bloqueado") {
       return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
+    }
+
+    try {
+      await aplicarCompraPendentePorEmail(usuario);
+    } catch (error) {
+      console.warn("Não foi possível aplicar compra Bestfy pendente no login:", error.message);
     }
 
     if (!usuario.aprovado && usuario.plano === "free" && usuario.cargo === "aluno") {
@@ -201,6 +222,41 @@ router.get("/auth/me", auth, me);
 router.get("/auth/validar-token", auth, validarToken);
 router.post("/auth/logout", logout);
 
+router.post("/webhooks/bestfy", async (req, res) => {
+  try {
+    const resultado = await processarWebhookBestfy(req.body || {});
+    return res.status(200).json({ sucesso: true, ...resultado });
+  } catch (error) {
+    const codigo = String(error?.code || "BESTFY_WEBHOOK_ERROR");
+    console.error(`Erro no webhook Bestfy (${codigo}):`, error?.message || error);
+
+    if (codigo === "BESTFY_WEBHOOK_INVALID") {
+      return res.status(400).json({ erro: error.message, codigo });
+    }
+
+    if (codigo === "BESTFY_COMPANY_MISMATCH") {
+      return res.status(403).json({ erro: "Evento rejeitado.", codigo });
+    }
+
+    if (codigo === "BESTFY_NOT_CONFIGURED" || codigo === "BESTFY_COMPANY_INVALID") {
+      return res.status(503).json({ erro: "Integração Bestfy ainda não configurada no servidor.", codigo });
+    }
+
+    return res.status(503).json({
+      erro: "Não foi possível processar o evento Bestfy agora.",
+      codigo
+    });
+  }
+});
+
+router.get("/webhooks/bestfy/status", (req, res) => {
+  return res.json({
+    status: "online",
+    integracao: "Bestfy",
+    ...statusConfiguracaoBestfy()
+  });
+});
+
 router.post("/setup/superadmin", async (req, res) => {
   try {
     const chaveCorreta =
@@ -253,7 +309,7 @@ router.get("/auth/status", (req, res) => {
     modulo: "auth",
     fluxo: {
       cadastro: "Conta FREE criada automaticamente",
-      premium: "Código gerado no dashboard-free e aprovado no painel admin",
+      premium: "Pagamento Bestfy aprovado libera o Premium automaticamente pelo e-mail da compra",
       login: "Permissões efetivas carregadas por cargo"
     }
   });
