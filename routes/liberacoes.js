@@ -7,7 +7,7 @@ const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
-const PLANOS_VALIDOS = ["black30", "black90", "black180", "black360"];
+const PLANOS_VALIDOS = new Set(["black30", "black90", "black180", "black360"]);
 
 function gerarCodigo() {
   const bloco = () => crypto.randomBytes(2).toString("hex").toUpperCase();
@@ -24,11 +24,20 @@ async function gerarCodigoUnico() {
   throw new Error("Não foi possível gerar um código único.");
 }
 
+function textoLimitado(valor, limite) {
+  return String(valor || "").trim().slice(0, limite);
+}
+
 router.post("/liberacoes/solicitar", auth, async (req, res) => {
   try {
-    const plano = PLANOS_VALIDOS.includes(req.body?.plano)
-      ? req.body.plano
-      : "black30";
+    const plano = String(req.body?.plano || "").trim().toLowerCase();
+
+    if (!PLANOS_VALIDOS.has(plano)) {
+      return res.status(400).json({
+        erro: "Plano inválido para solicitação de liberação.",
+        codigo: "PLANO_LIBERACAO_INVALIDO"
+      });
+    }
 
     const pendente = await SolicitacaoLiberacao.findOne({
       usuarioId: req.usuario.id,
@@ -44,19 +53,27 @@ router.post("/liberacoes/solicitar", auth, async (req, res) => {
     }
 
     const configuracao = await Configuracao.obterConfiguracao();
-    const dadosPlano = configuracao?.planos?.[plano] || {};
+    const dadosPlano = configuracao?.planos?.[plano] || null;
+    const valorOficial = Number(dadosPlano?.valor);
+
+    if (!dadosPlano || !Number.isFinite(valorOficial) || valorOficial <= 0) {
+      return res.status(503).json({
+        erro: "Este plano ainda não possui valor oficial configurado.",
+        codigo: "PLANO_SEM_VALOR_OFICIAL"
+      });
+    }
 
     const solicitacao = await SolicitacaoLiberacao.create({
       codigo: await gerarCodigoUnico(),
       usuarioId: req.usuario.id,
-      nome: req.usuario.nome || "",
-      email: req.usuario.email || "",
-      telefone: req.usuario.telefone || "",
+      nome: textoLimitado(req.usuario.nome, 160),
+      email: textoLimitado(req.usuario.email, 190).toLowerCase(),
+      telefone: textoLimitado(req.usuario.telefone, 60),
       plano,
-      valor: Number(req.body?.valor ?? dadosPlano.valor ?? 0),
-      referenciaPagamento: String(req.body?.referenciaPagamento || "").trim(),
-      comprovante: String(req.body?.comprovante || "").trim(),
-      observacao: String(req.body?.observacao || "").trim(),
+      valor: valorOficial,
+      referenciaPagamento: textoLimitado(req.body?.referenciaPagamento, 190),
+      comprovante: textoLimitado(req.body?.comprovante, 2000),
+      observacao: textoLimitado(req.body?.observacao, 1000),
       status: "pendente"
     });
 
