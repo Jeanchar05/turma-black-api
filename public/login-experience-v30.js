@@ -9,6 +9,14 @@
     document.head.appendChild(link);
   }
 
+  if (window.matchMedia?.("(min-width: 981px)")?.matches && !document.querySelector('link[href^="login-desktop-v32.css"]')) {
+    const desktopLink = document.createElement("link");
+    desktopLink.rel = "stylesheet";
+    desktopLink.href = "login-desktop-v32.css?v=20260908-desktop-v32";
+    desktopLink.media = "screen and (min-width: 981px)";
+    document.head.appendChild(desktopLink);
+  }
+
   const canvas = document.getElementById("loginParticleCanvas");
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
