@@ -14,13 +14,6 @@ const PLANOS = {
   black360: { dias: 365, valorCentavos: 39700 }
 };
 
-const STATUS_REVOGAM = new Set([
-  "REFUNDED",
-  "CHARGEBACK",
-  "MED",
-  "DISPUTE_ACCEPTED"
-]);
-
 let tabelaGarantida = false;
 let companyCache = { id: "", carregadoEm: 0 };
 
@@ -387,7 +380,7 @@ async function salvarEventoBase(payload) {
      VALUES (?, ?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE
        company_id = VALUES(company_id),
-       status = VALUES(status),
+       status = CASE WHEN applied_at IS NULL THEN VALUES(status) ELSE status END,
        raw_json = VALUES(raw_json),
        payment_confirmed_at = CASE
          WHEN VALUES(payment_confirmed_at) <> '' THEN VALUES(payment_confirmed_at)
@@ -667,17 +660,30 @@ async function processarWebhookBestfy(payload = {}) {
     };
   }
 
-  if (STATUS_REVOGAM.has(status)) {
-    const revogacao = await processarRevogacao(transactionId, status);
-    return { recebido: true, transactionId, status, ...revogacao };
-  }
+  const registro = await obterRegistro(transactionId);
+  if (registro?.applied_at && !registro.revoked_at) {
+    const transaction = await buscarTransacao(transactionId);
+    const statusApi = normalizarStatus(transaction?.status);
 
-  if (status === "CANCELED") {
-    const registro = await obterRegistro(transactionId);
-    if (registro?.applied_at) {
-      const revogacao = await processarRevogacao(transactionId, status);
-      return { recebido: true, transactionId, status, ...revogacao };
+    if (statusApi === "PAID") {
+      return {
+        recebido: true,
+        transactionId,
+        status,
+        statusVerificado: statusApi,
+        alteracaoAcesso: false,
+        eventoDesatualizado: true
+      };
     }
+
+    const revogacao = await processarRevogacao(transactionId, statusApi || status);
+    return {
+      recebido: true,
+      transactionId,
+      status,
+      statusVerificado: statusApi || status,
+      ...revogacao
+    };
   }
 
   return { recebido: true, transactionId, status, alteracaoAcesso: false };
