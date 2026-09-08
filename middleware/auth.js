@@ -31,11 +31,7 @@ function extrairToken(req) {
   }
 
   if (req.headers["x-access-token"]) {
-    return req.headers["x-access-token"];
-  }
-
-  if (req.query && req.query.token) {
-    return req.query.token;
+    return String(req.headers["x-access-token"]).trim();
   }
 
   return null;
@@ -139,9 +135,17 @@ async function validarLedgerBestfyLocal(usuario) {
 
   const expLedger = new Date(registro.access_expires_at || "").getTime();
   const expUsuario = new Date(usuario?.dataExpiracao || "").getTime();
+  const agora = Date.now();
   if (!Number.isFinite(expLedger) || !Number.isFinite(expUsuario)) return false;
+  if (expLedger <= agora - 60000 || expUsuario <= agora) return false;
 
-  return Math.abs(expLedger - expUsuario) <= 60000;
+  const origem = String(usuario?.atualizadoPor || "").trim().toLowerCase();
+
+  if (origem === "bestfy-webhook") {
+    return Math.abs(expLedger - expUsuario) <= 60000;
+  }
+
+  return expUsuario + 60000 >= expLedger;
 }
 
 async function revogarAcessoInvalido(usuario, motivo) {
