@@ -9,13 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260908-free-v10" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260908-free-v10" />
-  <link rel="stylesheet" href="/dashboard-free-v10.css?v=20260908-free-v10" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260908-free-v11" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260908-free-v11" />
+  <link rel="stylesheet" href="/dashboard-free-v10.css?v=20260908-free-v11" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <script defer src="/protected.js?v=20260908-free-v10"></script>
-  <script defer src="/theme-global-v2.js?v=20260908-free-v10"></script>
-  <script defer src="/dashboard-free.js?v=20260908-free-v10"></script>
+  <script defer src="/protected.js?v=20260908-free-v11"></script>
+  <script defer src="/theme-global-v2.js?v=20260908-free-v11"></script>
+  <script defer src="/dashboard-free.js?v=20260908-free-v11"></script>
 </head>
 <body class="student-dashboard free-dashboard-page" data-required-access="dashboard">
   <div class="dash-loading" id="freeLoading"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando sua área gratuita</strong><small>Sincronizando sua conta…</small></div></div>
@@ -45,12 +45,8 @@
     </button>
 
     <div class="free-v10-sidebar-bottom">
-      <div class="free-v10-sidebar-links">
-        <a class="free-v10-nav-item" href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
-        <a class="free-v10-nav-item" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
-      </div>
       <div class="free-v10-sidebar-user">
-        <a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-user-avatar>A</span><span><strong data-user-name>Aluno</strong><small>PLANO FREE</small></span></a>
+        <div class="dash-user-menu" aria-label="Conta atual"><span class="dash-avatar" data-user-avatar>A</span><span><strong data-user-name>Aluno</strong><small>PLANO FREE</small></span></div>
       </div>
       <button class="dash-logout" type="button" data-logout><svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair</span></button>
     </div>
@@ -66,12 +62,11 @@
       </label>
       <div class="dash-top-actions">
         <button class="dash-theme-toggle" data-global-theme type="button" aria-label="Alternar tema"><svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button>
-        <a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-user-avatar>A</span><span><strong data-user-name>Aluno</strong><small>FREE</small></span></a>
+        <div class="dash-user-menu" aria-label="Conta atual"><span class="dash-avatar" data-user-avatar>A</span><span><strong data-user-name>Aluno</strong><small>FREE</small></span></div>
       </div>
     </header>
 
     <div class="dash-content free-v10-content">
-      <!-- DASHBOARD -->
       <section class="free-v10-view active" data-free-view="dashboard">
         <section class="free-v10-hero">
           <div class="free-v10-hero-copy">
@@ -120,7 +115,6 @@
         </div>
       </section>
 
-      <!-- AULAS -->
       <section class="free-v10-view" data-free-view="aulas">
         <header class="free-v10-page-head">
           <span class="free-v10-kicker">CONTEÚDO ABERTO</span>
@@ -137,7 +131,6 @@
         <div class="free-v10-lessons-grid" id="freeLessonsGrid"></div>
       </section>
 
-      <!-- PREMIUM -->
       <section class="free-v10-view" data-free-view="premium">
         <section class="free-v10-premium-hero">
           <div>
@@ -169,7 +162,6 @@
         <div class="free-v10-premium-cta"><div><strong>Pronto para desbloquear tudo?</strong><p>Escolha o período que combina melhor com você.</p></div><button class="free-v10-primary" type="button" data-free-view-target="assine">Conhecer os planos →</button></div>
       </section>
 
-      <!-- ASSINE AGORA -->
       <section class="free-v10-view" data-free-view="assine">
         <header class="free-v10-plans-head"><span class="free-v10-kicker">PLANOS PREMIUM</span><h1>Escolha como você quer evoluir.</h1><p>Todos os planos liberam a experiência Premium completa. A diferença é o período de acesso e o valor economizado.</p></header>
 
