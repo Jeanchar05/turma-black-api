@@ -11,11 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/dashboard-premium.css?v=20260803-v10" />
   <link rel="stylesheet" href="/theme-global-v2.css?v=20260803-v10" />
-  <link rel="stylesheet" href="/dashboard-free-v8.css?v=20260803-v10" />
+  <link rel="stylesheet" href="/dashboard-free-v8.css?v=20260908-bestfy" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
   <script defer src="/protected.js?v=20260803-v10"></script>
   <script defer src="/theme-global-v2.js?v=20260803-v10"></script>
-  <script defer src="/dashboard-free.js?v=20260803-v10"></script>
+  <script defer src="/dashboard-free.js?v=20260908-bestfy"></script>
 </head>
 <body class="student-dashboard free-dashboard-page" data-required-access="dashboard">
   <div class="dash-loading" id="freeLoading"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando sua área gratuita</strong><small>Carregando conteúdos disponíveis…</small></div></div>
@@ -71,23 +71,30 @@
         </div>
 
         <aside class="free-checkout free-upgrade-panel" id="premiumCheckout">
-          <header><span>♛ TURMA DO PRIMO PREMIUM</span><h2>Upgrade para o Premium</h2><p>Escolha seu plano, informe seus dados e gere a solicitação de acesso.</p></header>
+          <header><span>♛ TURMA DO PRIMO PREMIUM</span><h2>Escolha seu plano</h2><p>Selecione uma opção e continue para o checkout seguro da Bestfy.</p></header>
           <form id="premiumRequestForm">
             <div class="free-plan-grid" id="freePlanGrid">
-              <label><input type="radio" name="plan" value="black30" data-value="97" checked /><span><b>30 dias</b><strong>R$ 97</strong><small>Acesso completo por 1 mês</small></span></label>
-              <label><input type="radio" name="plan" value="black180" data-value="297" /><span><b>180 dias</b><strong>R$ 297</strong><small>Melhor custo-benefício</small></span></label>
-              <label><input type="radio" name="plan" value="black360" data-value="497" /><span><b>360 dias</b><strong>R$ 497</strong><small>Experiência anual</small></span></label>
+              <label><input type="radio" name="plan" value="monthly" data-value="99.99" data-checkout="https://pay.turmablack.com.br/p/01a08137-2df6-b69d-88ec-5f45fb8b21a8" checked /><span><b>Mensal</b><strong>R$ 99,99</strong><small>Acesso por 30 dias</small></span></label>
+              <label><input type="radio" name="plan" value="six_months" data-value="249.99" data-checkout="https://pay.turmablack.com.br/p/01a08168-5100-e379-4364-86851cf61be9" /><span><b>6 meses</b><strong>R$ 249,99</strong><small>Pagamento único</small></span></label>
+              <label><input type="radio" name="plan" value="annual" data-value="397" data-checkout="https://pay.turmablack.com.br/p/01a08193-e367-dedb-cc44-95594c527a02" /><span><b>Anual</b><strong>R$ 397,00</strong><small>Acesso por 12 meses</small></span></label>
             </div>
 
             <div class="free-checkout-grid">
-              <section><h3>Seus dados</h3><label>Nome completo<input id="checkoutName" required autocomplete="name" /></label><label>E-mail<input id="checkoutEmail" type="email" required autocomplete="email" /></label><label>WhatsApp<input id="checkoutPhone" type="tel" required autocomplete="tel" /></label><label>Vendedor responsável<select id="checkoutSeller"><option value="">Compra direta</option></select></label></section>
-              <section><h3>Pagamento</h3><div class="free-payment-tabs"><button class="active" type="button" data-payment="pix">Pix</button><button type="button" data-payment="card">Cartão</button></div><div class="free-payment-panel active" data-payment-panel="pix"><div class="free-qr-placeholder"><span>PIX</span><small>QR Code gerado pelo gateway após integração.</small></div><p>Confirmação automática quando o gateway estiver configurado.</p></div><div class="free-payment-panel" data-payment-panel="card"><label>Número do cartão<input inputmode="numeric" placeholder="0000 0000 0000 0000" /></label><div class="free-card-fields"><label>Validade<input placeholder="MM/AA" /></label><label>CVV<input inputmode="numeric" placeholder="123" /></label></div></div><label>Referência ou observação<input id="paymentReference" placeholder="Nome do pagador ou observação" required /></label></section>
+              <section>
+                <h3>Pagamento seguro</h3>
+                <p>Você será redirecionado para <strong>pay.turmablack.com.br</strong>, o checkout oficial da Turma do Primo processado pela Bestfy.</p>
+                <p>Após a confirmação do pagamento, seu acesso Premium será liberado conforme o plano adquirido.</p>
+              </section>
+              <section>
+                <h3>Seu plano</h3>
+                <p id="selectedPlanSummary">Mensal — R$ 99,99</p>
+                <p>Revise a opção selecionada antes de continuar.</p>
+              </section>
             </div>
 
-            <button class="free-checkout-submit" id="generatePremiumCode" type="submit">Gerar pedido e código de acesso →</button>
+            <button class="free-checkout-submit" id="generatePremiumCode" type="submit">Ir para pagamento seguro →</button>
             <div id="premiumRequestMessage" class="auth-message" role="status"></div>
           </form>
-          <section class="free-requests"><h3>Meus pedidos</h3><div id="premiumRequestsList"><div class="admin-empty-state">Carregando…</div></div></section>
         </aside>
       </section>
     </div>
