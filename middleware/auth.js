@@ -2,10 +2,16 @@
 
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario");
+const database = require("../config/database");
 
 const SECRET = process.env.JWT_SECRET || "turma_black_secret_dev";
 
 const PLANOS_PREMIUM = new Set(["black30", "black90", "black180", "black360"]);
+const PLANOS_BESTFY = Object.freeze({
+  black30: { valorCentavos: 9999 },
+  black180: { valorCentavos: 24999 },
+  black360: { valorCentavos: 39700 }
+});
 const CARGOS_ACESSO_TOTAL = new Set([
   "dev",
   "dono",
@@ -103,22 +109,77 @@ function estadoAcessoPremium(usuario, agoraMs = Date.now()) {
   };
 }
 
+async function validarLedgerBestfyLocal(usuario) {
+  const transactionId = String(usuario?.bestfyTransactionId || "").trim();
+  const plano = String(usuario?.plano || "").trim().toLowerCase();
+  const esperado = PLANOS_BESTFY[plano];
+
+  if (!transactionId || !esperado) return true;
+
+  const rows = await database.query(
+    `SELECT transaction_id, status, customer_email, plan, amount_cents,
+            verified_at, applied_at, access_expires_at, revoked_at
+       FROM bestfy_transactions
+      WHERE transaction_id = ?
+      LIMIT 1`,
+    [transactionId]
+  );
+
+  const registro = rows[0] || null;
+  if (!registro) return false;
+
+  if (String(registro.status || "").trim().toUpperCase() !== "PAID") return false;
+  if (!registro.verified_at || !registro.applied_at || registro.revoked_at) return false;
+  if (String(registro.plan || "").trim().toLowerCase() !== plano) return false;
+  if (Number(registro.amount_cents || 0) !== esperado.valorCentavos) return false;
+
+  const emailRegistro = String(registro.customer_email || "").trim().toLowerCase();
+  const emailUsuario = String(usuario?.email || "").trim().toLowerCase();
+  if (!emailRegistro || emailRegistro !== emailUsuario) return false;
+
+  const expLedger = new Date(registro.access_expires_at || "").getTime();
+  const expUsuario = new Date(usuario?.dataExpiracao || "").getTime();
+  if (!Number.isFinite(expLedger) || !Number.isFinite(expUsuario)) return false;
+
+  return Math.abs(expLedger - expUsuario) <= 60000;
+}
+
+async function revogarAcessoInvalido(usuario, motivo) {
+  usuario.plano = "free";
+  usuario.dataExpiracao = "";
+  usuario.bestfyTransactionId = "";
+  usuario.bestfyStatus = motivo || "ACCESS_REVOKED";
+  usuario.bestfyRevokedAt = new Date().toISOString();
+  usuario.atualizadoPor = "seguranca-acesso";
+  await usuario.save({ validateModifiedOnly: true });
+}
+
 async function sincronizarExpiracaoPremium(usuario) {
   if (!usuario) return estadoAcessoPremium(usuario);
 
-  const estado = estadoAcessoPremium(usuario);
+  let estado = estadoAcessoPremium(usuario);
   const cargo = normalizarCargo(usuario);
   const plano = String(usuario.plano || "free").trim().toLowerCase();
+
+  if (cargo === "aluno" && PLANOS_PREMIUM.has(plano) && estado.acessoPremium) {
+    const possuiBestfy = Boolean(String(usuario.bestfyTransactionId || "").trim());
+    if (possuiBestfy && PLANOS_BESTFY[plano]) {
+      const ledgerValido = await validarLedgerBestfyLocal(usuario);
+      if (!ledgerValido) {
+        await revogarAcessoInvalido(usuario, "BESTFY_LEDGER_INVALID");
+        return estadoAcessoPremium(usuario);
+      }
+    }
+  }
+
+  estado = estadoAcessoPremium(usuario);
 
   if (
     cargo === "aluno" &&
     PLANOS_PREMIUM.has(plano) &&
     !estado.acessoPremium
   ) {
-    usuario.plano = "free";
-    usuario.dataExpiracao = "";
-    usuario.atualizadoPor = "expiracao-automatica";
-    await usuario.save({ validateModifiedOnly: true });
+    await revogarAcessoInvalido(usuario, "PLAN_EXPIRED");
     return estadoAcessoPremium(usuario);
   }
 
