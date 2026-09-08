@@ -9,145 +9,213 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260908-free-v9" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260908-free-v9" />
-  <link rel="stylesheet" href="/dashboard-free-v8.css?v=20260908-free-v9" />
-  <link rel="stylesheet" href="/dashboard-free-v9.css?v=20260908-free-v9" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260908-free-v10" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260908-free-v10" />
+  <link rel="stylesheet" href="/dashboard-free-v10.css?v=20260908-free-v10" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <script defer src="/protected.js?v=20260908-free-v9"></script>
-  <script defer src="/theme-global-v2.js?v=20260908-free-v9"></script>
-  <script defer src="/dashboard-free.js?v=20260908-free-v9"></script>
+  <script defer src="/protected.js?v=20260908-free-v10"></script>
+  <script defer src="/theme-global-v2.js?v=20260908-free-v10"></script>
+  <script defer src="/dashboard-free.js?v=20260908-free-v10"></script>
 </head>
 <body class="student-dashboard free-dashboard-page" data-required-access="dashboard">
-  <div class="dash-loading" id="freeLoading">
-    <div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando sua área gratuita</strong><small>Sincronizando sua conta…</small></div>
-  </div>
+  <div class="dash-loading" id="freeLoading"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando sua área gratuita</strong><small>Sincronizando sua conta…</small></div></div>
   <div class="dash-mobile-overlay" id="freeOverlay" hidden></div>
 
   <aside class="dash-sidebar" id="freeSidebar">
-    <a class="dash-brand" href="/dashboard-free">
+    <a class="dash-brand" href="/dashboard-free" aria-label="Turma do Primo">
       <img src="/assets/turma-primo-logo.svg" alt="Turma do Primo" />
       <span><small>TURMA DO</small><strong>PRIMO</strong></span>
     </a>
 
-    <nav class="dash-nav" aria-label="Área gratuita">
-      <a class="dash-nav-item active" href="/dashboard-free"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
-      <a class="dash-nav-item" href="#freeStudy"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Prévia dos módulos</b></a>
-      <a class="dash-nav-item" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
-      <a class="dash-nav-item" href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><b>Meu perfil</b></a>
-      <a class="dash-nav-item premium" href="#premiumCheckout"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b><span class="free-nav-lock">Premium</span></a>
-      <a class="dash-nav-item premium" href="#premiumCheckout"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg><b>Turma Premium</b></a>
+    <div class="free-v10-nav-label">EXPLORAR</div>
+    <nav class="free-v10-nav" aria-label="Área gratuita">
+      <button class="free-v10-nav-item active" type="button" data-free-view-target="dashboard">
+        <svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b>
+      </button>
+      <button class="free-v10-nav-item" type="button" data-free-view-target="aulas">
+        <svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Aulas</b><span class="nav-mini">FREE</span>
+      </button>
+      <button class="free-v10-nav-item nav-premium" type="button" data-free-view-target="premium">
+        <svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg><b>Premium</b>
+      </button>
     </nav>
 
-    <div class="free-side-premium free-upgrade-card">
-      <span>♛</span>
-      <strong>Libere a experiência completa</strong>
-      <p>Módulos, ferramentas, roleta, minigames, provas e muito mais em uma única conta.</p>
-      <a href="#premiumCheckout">Ver planos Premium</a>
-    </div>
+    <button class="free-v10-subscribe" type="button" data-free-view-target="assine">
+      <span class="bolt">⚡</span><span>ASSINE AGORA</span>
+    </button>
 
-    <div class="tp-v10-sidebar-spacer"></div>
-    <div class="tp-v10-user-card">
-      <a class="dash-user-menu" href="/perfil">
-        <span class="dash-avatar" data-user-avatar>A</span>
-        <span><strong data-user-name>Aluno</strong><small>PLANO FREE</small></span>
-      </a>
+    <div class="free-v10-sidebar-bottom">
+      <div class="free-v10-sidebar-links">
+        <a class="free-v10-nav-item" href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
+        <a class="free-v10-nav-item" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
+      </div>
+      <div class="free-v10-sidebar-user">
+        <a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-user-avatar>A</span><span><strong data-user-name>Aluno</strong><small>PLANO FREE</small></span></a>
+      </div>
+      <button class="dash-logout" type="button" data-logout><svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair</span></button>
     </div>
-    <button class="dash-logout" type="button" data-logout><svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
   </aside>
 
   <main class="dash-main">
     <header class="dash-topbar">
       <button class="dash-menu-toggle" id="freeMenu" type="button" aria-label="Abrir menu"><svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg></button>
-      <a class="dash-search-trigger" href="#freeStudy" aria-label="Explorar módulos">
-        <svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg><em>Explorar módulos, estratégias e recursos…</em>
-      </a>
+      <label class="free-v10-search" aria-label="Buscar aulas">
+        <svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg>
+        <input id="freeSearch" type="search" placeholder="Buscar aulas, estratégias e conteúdos…" autocomplete="off" />
+        <kbd>/</kbd>
+      </label>
       <div class="dash-top-actions">
         <button class="dash-theme-toggle" data-global-theme type="button" aria-label="Alternar tema"><svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button>
         <a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-user-avatar>A</span><span><strong data-user-name>Aluno</strong><small>FREE</small></span></a>
       </div>
     </header>
 
-    <div class="dash-content free-content">
-      <section class="free-hero">
-        <div class="free-hero-copy">
-          <span class="free-access-pill"><i></i> SUA CONTA FREE ESTÁ ATIVA</span>
-          <span class="dash-eyebrow" id="freeGreeting">BEM-VINDO À TURMA DO PRIMO</span>
-          <h1>Comece no seu ritmo.<br /><strong>Evolua quando quiser.</strong></h1>
-          <p>Sua conta gratuita já está pronta. Explore a estrutura da plataforma e conheça o que o <strong>Premium desbloqueia para sua evolução.</strong></p>
-          <div class="free-hero-actions">
-            <a class="free-premium-button" href="#freeStudy">Explorar a plataforma →</a>
-            <a class="dash-secondary-btn" href="#premiumCheckout">Ver planos Premium</a>
+    <div class="dash-content free-v10-content">
+      <!-- DASHBOARD -->
+      <section class="free-v10-view active" data-free-view="dashboard">
+        <section class="free-v10-hero">
+          <div class="free-v10-hero-copy">
+            <span class="free-v10-account-pill"><i></i> CONTA FREE ATIVA</span>
+            <h1><span id="freeGreeting">Boa noite, Aluno</span><br />Sua jornada começa aqui.</h1>
+            <p>Explore os conteúdos gratuitos, conheça a metodologia e veja tudo o que espera por você na experiência Premium da Turma do Primo.</p>
+            <div class="free-v10-actions">
+              <button class="free-v10-primary" type="button" data-free-view-target="aulas">Assistir aulas →</button>
+              <button class="free-v10-secondary" type="button" data-free-view-target="premium">Conhecer o Premium</button>
+            </div>
           </div>
-          <div class="free-hero-trust" aria-label="Diferenciais da plataforma">
-            <span>Conta sincronizada</span><span>Checkout seguro</span><span>Liberação automática</span>
+          <div class="free-v10-hero-art" aria-hidden="true">
+            <div class="free-v10-orbit">
+              <div class="free-v10-orbit-brand"><img src="/assets/turma-primo-logo.svg" alt="" /><div><strong>Turma do Primo</strong><small>ambiente integrado</small></div></div>
+              <div class="free-v10-orbit-cards">
+                <article><span>▶</span><b>Aulas</b><small>conteúdo aberto</small></article>
+                <article><span>♛</span><b>Premium</b><small>experiência completa</small></article>
+                <article><span>⚡</span><b>Planos</b><small>3 opções</small></article>
+              </div>
+            </div>
           </div>
+        </section>
+
+        <div class="free-v10-shortcuts" aria-label="Atalhos">
+          <button class="free-v10-shortcut" type="button" data-free-view-target="aulas"><span class="ico">▶</span><span><strong>Assistir aulas</strong><small>Conteúdos gratuitos e novidades.</small></span></button>
+          <button class="free-v10-shortcut gold" type="button" data-free-view-target="premium"><span class="ico">♛</span><span><strong>Conhecer o Premium</strong><small>Veja como funciona a plataforma completa.</small></span></button>
+          <button class="free-v10-shortcut blue" type="button" data-free-view-target="assine"><span class="ico">▥</span><span><strong>Ver planos</strong><small>Compare período, valor e economia.</small></span></button>
         </div>
 
-        <div class="free-hero-preview" aria-hidden="true">
-          <div class="free-preview-shell">
-            <div class="free-preview-top">
-              <div class="free-preview-brand"><span>✦</span><div><strong>Central Premium</strong><small>Turma do Primo</small></div></div>
-              <span class="free-preview-status">● ONLINE</span>
-            </div>
-            <div class="free-preview-grid">
-              <article><span>◎</span><b>Estudo</b><small>módulos completos</small></article>
-              <article><span>◈</span><b>Ferramentas</b><small>prática integrada</small></article>
-              <article><span>♛</span><b>Roleta</b><small>treino exclusivo</small></article>
-            </div>
-            <div class="free-preview-progress"><div><span>Jornada de evolução</span><b>Experiência completa</b></div><span><i></i></span></div>
-            <div class="free-preview-lock"><strong>♛ Recursos Premium</strong><small>Ative um plano para liberar toda a plataforma.</small></div>
-          </div>
+        <div class="free-v10-status-grid" aria-label="Resumo da conta">
+          <article><small>Plano atual</small><strong class="ok">Free</strong><em>conta ativa</em></article>
+          <article><small>Aulas disponíveis</small><strong data-lesson-count>0</strong><em>conteúdos gratuitos</em></article>
+          <article><small>Recursos liberados</small><strong>Conteúdo básico</strong><em>área gratuita</em></article>
+          <article><small>Premium</small><strong class="locked">Bloqueado</strong><em>libere ao assinar</em></article>
+        </div>
+
+        <div class="free-v10-dashboard-grid">
+          <section class="free-v10-lessons-preview">
+            <div class="free-v10-section-head"><div><span class="free-v10-kicker">Continue explorando</span><h2>Aulas mais recentes</h2><p>Conteúdos gratuitos para conhecer a metodologia da Turma do Primo.</p></div><button class="free-v10-link-btn" type="button" data-free-view-target="aulas">Ver todas →</button></div>
+            <div class="free-v10-mini-lessons" id="freeRecentLessons"></div>
+          </section>
+          <aside class="free-v10-premium-strip">
+            <div><span class="crown">♛</span><h3>Conheça a experiência completa</h3><p>Módulos, ferramentas, treinos, provas e recursos organizados em um único ambiente.</p></div>
+            <button class="free-v10-primary" type="button" data-free-view-target="premium">Explorar Premium →</button>
+          </aside>
         </div>
       </section>
 
-      <section class="free-layout">
-        <div class="free-main-column">
-          <section class="dash-stat-grid free-stats" aria-label="Resumo da experiência">
-            <article><span class="dash-stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg></span><div><small>Biblioteca</small><strong>8 módulos</strong><em>estrutura completa</em></div></article>
-            <article><span class="dash-stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-target"></use></svg></span><div><small>Seu plano</small><strong>Free</strong><em>conta ativa</em></div></article>
-            <article><span class="dash-stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg></span><div><small>Planos Premium</small><strong>3 opções</strong><em>escolha quando quiser</em></div></article>
-            <article><span class="dash-stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg></span><div><small>Ativação</small><strong>Automática</strong><em>após confirmação</em></div></article>
-          </section>
+      <!-- AULAS -->
+      <section class="free-v10-view" data-free-view="aulas">
+        <header class="free-v10-page-head">
+          <span class="free-v10-kicker">CONTEÚDO ABERTO</span>
+          <h1>Aulas gratuitas</h1>
+          <p>Conteúdos que você poderá acompanhar também pelo Instagram da Turma do Primo. A biblioteca já fica organizada aqui para facilitar seu acesso.</p>
+          <div class="free-v10-filters" id="freeLessonFilters">
+            <button class="free-v10-filter active" type="button" data-filter="all">Todas</button>
+            <button class="free-v10-filter" type="button" data-filter="recentes">Recentes</button>
+            <button class="free-v10-filter" type="button" data-filter="estrategias">Estratégias</button>
+            <button class="free-v10-filter" type="button" data-filter="fundamentos">Fundamentos</button>
+            <button class="free-v10-filter" type="button" data-filter="instagram">Instagram</button>
+          </div>
+        </header>
+        <div class="free-v10-lessons-grid" id="freeLessonsGrid"></div>
+      </section>
 
-          <section class="free-study" id="freeStudy">
-            <header>
-              <div><span>PRÉVIA DA BIBLIOTECA</span><h2>Conheça os módulos</h2><p>Veja a estrutura da coleção. O acesso ao conteúdo é liberado quando um plano Premium é ativado.</p></div>
-              <a href="#premiumCheckout">Comparar planos →</a>
-            </header>
-            <div class="free-module-grid" id="freeModuleGrid"></div>
-            <div class="free-study-cta"><span>♛</span><p><strong>8 módulos completos</strong> reunidos em uma jornada organizada de estudo e prática.</p><a href="#premiumCheckout">Desbloquear biblioteca</a></div>
-          </section>
+      <!-- PREMIUM -->
+      <section class="free-v10-view" data-free-view="premium">
+        <section class="free-v10-premium-hero">
+          <div>
+            <span class="free-v10-kicker">EXPERIÊNCIA COMPLETA</span>
+            <h1>Tudo muda quando você entra no <span>Premium.</span></h1>
+            <p>Conteúdo, ferramentas, treinamento e evolução dentro de um único ambiente, com sua conta, progresso e recursos conectados.</p>
+            <div class="free-v10-actions"><button class="free-v10-primary" type="button" data-free-view-target="assine">Ver planos →</button><button class="free-v10-secondary" type="button" data-scroll-premium>Explorar recursos ↓</button></div>
+          </div>
+          <div class="free-v10-dashboard-mock" aria-label="Prévia visual do dashboard Premium">
+            <div class="free-v10-mock-top"><div class="free-v10-mock-brand"><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Dashboard Premium</strong></div><span class="free-v10-mock-pill">● ACESSO COMPLETO</span></div>
+            <div class="free-v10-mock-layout"><div class="free-v10-mock-side"><i></i><i></i><i></i><i></i><i></i></div><div class="free-v10-mock-main"><div class="free-v10-mock-stat"><small>Módulos</small><strong>8</strong></div><div class="free-v10-mock-stat"><small>Progresso</small><strong>68%</strong></div><div class="free-v10-mock-stat"><small>Recursos</small><strong>+10</strong></div><div class="free-v10-mock-chart"></div><div class="free-v10-mock-wheel"><span>♛</span></div></div></div>
+          </div>
+        </section>
+
+        <div class="free-v10-feature-grid" id="premiumResources">
+          <article class="free-v10-feature"><span class="ico">▦</span><strong>Dashboard completo</strong><p>Progresso, atividades e acesso centralizado em um só lugar.</p></article>
+          <article class="free-v10-feature"><span class="ico">◇</span><strong>8 módulos estratégicos</strong><p>Conteúdo organizado por metodologia e etapa de aprendizado.</p></article>
+          <article class="free-v10-feature"><span class="ico">◉</span><strong>Minigames</strong><p>Treino prático para reforçar os conteúdos da plataforma.</p></article>
+          <article class="free-v10-feature"><span class="ico">◎</span><strong>Roleta</strong><p>Ferramentas e estratégias reunidas dentro da plataforma.</p></article>
+          <article class="free-v10-feature"><span class="ico">✓</span><strong>Provas</strong><p>Teste seu aprendizado e acompanhe sua evolução.</p></article>
+          <article class="free-v10-feature"><span class="ico">☆</span><strong>Favoritos e anotações</strong><p>Organize os conteúdos que você quer rever e acompanhar.</p></article>
         </div>
 
-        <aside class="free-checkout free-upgrade-panel" id="premiumCheckout">
-          <header><span>♛ TURMA DO PRIMO PREMIUM</span><h2>Escolha seu plano</h2><p>Pagamento processado no checkout oficial da Bestfy.</p></header>
-          <form id="premiumRequestForm">
-            <div class="free-plan-grid" id="freePlanGrid">
-              <label>
-                <input type="radio" name="plan" value="monthly" data-value="99.99" data-checkout="https://pay.turmablack.com.br/p/01a08137-2df6-b69d-88ec-5f45fb8b21a8" checked />
-                <span><b>Mensal</b><strong>R$ 99,99</strong><small>30 dias de acesso</small></span>
-              </label>
-              <label>
-                <input type="radio" name="plan" value="six_months" data-value="249.99" data-checkout="https://pay.turmablack.com.br/p/01a08168-5100-e379-4364-86851cf61be9" />
-                <span><b>6 meses</b><strong>R$ 249,99</strong><small>equivale a R$ 41,67/mês</small></span>
-              </label>
-              <label>
-                <input type="radio" name="plan" value="annual" data-value="397" data-checkout="https://pay.turmablack.com.br/p/01a08193-e367-dedb-cc44-95594c527a02" />
-                <span><i class="free-plan-badge">MELHOR VALOR</i><b>Anual</b><strong>R$ 397,00</strong><small>equivale a R$ 33,08/mês</small></span>
-              </label>
-            </div>
+        <section class="free-v10-journey">
+          <div class="free-v10-section-head"><div><span class="free-v10-kicker">SUA JORNADA</span><h2>Da teoria até a evolução</h2><p>Uma experiência pensada para conectar aprendizado, prática e acompanhamento.</p></div></div>
+          <div class="free-v10-journey-row"><article class="free-v10-step"><b>01</b><strong>Aprenda</strong><small>Aulas e módulos.</small></article><article class="free-v10-step"><b>02</b><strong>Pratique</strong><small>Ferramentas e minigames.</small></article><article class="free-v10-step"><b>03</b><strong>Analise</strong><small>Resultados e progresso.</small></article><article class="free-v10-step"><b>04</b><strong>Evolua</strong><small>Continue avançando.</small></article></div>
+        </section>
 
-            <div class="free-checkout-grid">
-              <section><h3>Pagamento protegido</h3><p>Você será redirecionado para <strong>pay.turmablack.com.br</strong>, checkout oficial processado pela Bestfy.</p></section>
-              <section><h3>Plano selecionado</h3><p id="selectedPlanSummary">Mensal — R$ 99,99</p><p>Seu acesso é liberado automaticamente após a confirmação do pagamento.</p></section>
-            </div>
+        <div class="free-v10-premium-cta"><div><strong>Pronto para desbloquear tudo?</strong><p>Escolha o período que combina melhor com você.</p></div><button class="free-v10-primary" type="button" data-free-view-target="assine">Conhecer os planos →</button></div>
+      </section>
 
-            <button class="free-checkout-submit" id="generatePremiumCode" type="submit">Continuar para pagamento seguro →</button>
-            <div class="free-checkout-trust"><span>PIX</span><span>Cartão</span><span>Boleto</span><span>Bestfy</span></div>
-            <div id="premiumRequestMessage" class="auth-message" role="status"></div>
-          </form>
-        </aside>
+      <!-- ASSINE AGORA -->
+      <section class="free-v10-view" data-free-view="assine">
+        <header class="free-v10-plans-head"><span class="free-v10-kicker">PLANOS PREMIUM</span><h1>Escolha como você quer evoluir.</h1><p>Todos os planos liberam a experiência Premium completa. A diferença é o período de acesso e o valor economizado.</p></header>
+
+        <div class="free-v10-plan-grid">
+          <article class="free-v10-plan">
+            <div class="free-v10-plan-art"><div class="big">30 DIAS<span>PLANO MENSAL</span></div></div>
+            <h2>Mensal</h2><div class="free-v10-price"><strong>R$ 99,99</strong><small>aprox. R$ 3,33 por dia</small></div>
+            <div class="free-v10-saving neutral">Ideal para começar com um período menor.</div>
+            <ul class="free-v10-benefits"><li>Acesso Premium completo</li><li>Todos os módulos</li><li>Ferramentas e minigames</li><li>Provas e favoritos</li><li>Atualizações durante o período</li></ul>
+            <button class="free-v10-primary" type="button" data-plan="monthly" data-checkout="https://pay.turmablack.com.br/p/01a08137-2df6-b69d-88ec-5f45fb8b21a8">Assinar 30 dias</button>
+          </article>
+
+          <article class="free-v10-plan">
+            <span class="free-v10-plan-badge purple">ECONOMIZE R$ 349,95</span>
+            <div class="free-v10-plan-art"><div class="big">6 MESES<span>PLANO SEMESTRAL</span></div></div>
+            <h2>6 meses</h2><div class="free-v10-price"><strong>R$ 249,99</strong><small>equivale a R$ 41,67 por mês</small></div>
+            <div class="free-v10-saving">R$ 599,94 no mensal → <strong>R$ 249,99</strong></div>
+            <ul class="free-v10-benefits"><li>Acesso Premium completo</li><li>Todos os módulos</li><li>Ferramentas e minigames</li><li>Provas e favoritos</li><li>Atualizações durante o período</li></ul>
+            <button class="free-v10-primary" type="button" data-plan="six_months" data-checkout="https://pay.turmablack.com.br/p/01a08168-5100-e379-4364-86851cf61be9">Assinar 6 meses</button>
+          </article>
+
+          <article class="free-v10-plan featured">
+            <span class="free-v10-plan-badge">MELHOR CUSTO-BENEFÍCIO</span>
+            <div class="free-v10-plan-art"><div class="big">1 ANO<span>PLANO ANUAL</span></div></div>
+            <h2>Anual</h2><div class="free-v10-price"><strong>R$ 397,00</strong><small>equivale a R$ 33,08 por mês</small></div>
+            <div class="free-v10-saving">Economia de <strong>R$ 802,88</strong> vs. mensal por 12 meses.</div>
+            <ul class="free-v10-benefits"><li>Acesso Premium completo</li><li>Todos os módulos</li><li>Ferramentas e minigames</li><li>Provas e favoritos</li><li>Atualizações durante o período</li></ul>
+            <button class="free-v10-primary" type="button" data-plan="annual" data-checkout="https://pay.turmablack.com.br/p/01a08193-e367-dedb-cc44-95594c527a02">Assinar 1 ano</button>
+          </article>
+        </div>
+
+        <section class="free-v10-comparison">
+          <div class="free-v10-section-head"><div><span class="free-v10-kicker">COMPARAÇÃO</span><h2>O Premium é completo em todos os planos</h2></div></div>
+          <table><thead><tr><th>Benefício</th><th>30 dias</th><th>6 meses</th><th>1 ano</th></tr></thead><tbody>
+            <tr><td>Dashboard Premium</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>8 módulos</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Aulas Premium</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Roleta e minigames</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Provas e favoritos</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Período</td><td>30 dias</td><td>180 dias</td><td>365 dias</td></tr>
+            <tr><td>Valor</td><td>R$ 99,99</td><td>R$ 249,99</td><td>R$ 397,00</td></tr>
+          </tbody></table>
+        </section>
+
+        <div class="free-v10-payment-row"><article><span class="ico">◆</span><div><strong>Pagamento protegido</strong><p>PIX, cartão e boleto pelo checkout oficial processado pela Bestfy.</p></div></article><article><span class="ico">⚡</span><div><strong>Liberação automática</strong><p>Após a confirmação do pagamento, o servidor libera o período correspondente à compra.</p></div></article></div>
+        <div id="premiumRequestMessage" class="auth-message" role="status" aria-live="polite"></div>
       </section>
     </div>
   </main>
