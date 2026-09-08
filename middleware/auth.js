@@ -22,13 +22,14 @@ function carregarJwtConfig() {
       "[SECURITY] JWT_SECRET ausente, fraco ou usando valor de exemplo. " +
       "O site público continuará online, mas autenticação e emissão de tokens permanecerão bloqueadas até a variável ser corrigida."
     );
-    return { secret: "", valido: false, producao: true };
+    return { secret: "", valido: false, producao: true, tamanho: secret.length };
   }
 
   return {
     secret: secret || "turma_black_secret_dev",
     valido: true,
-    producao
+    producao,
+    tamanho: secret.length
   };
 }
 
@@ -431,6 +432,16 @@ function gerarToken(usuario) {
   );
 }
 
+function statusJwtConfiguracao() {
+  return {
+    jwtConfigurado: Boolean(JWT_CONFIG.valido && SECRET),
+    producao: Boolean(JWT_CONFIG.producao),
+    comprimentoMinimoAtendido: JWT_CONFIG.producao
+      ? Number(JWT_CONFIG.tamanho || 0) >= 32
+      : true
+  };
+}
+
 module.exports = {
   auth,
   authOpcional,
@@ -440,5 +451,6 @@ module.exports = {
   normalizarCargo,
   montarUsuarioSeguro,
   estadoAcessoPremium,
-  sincronizarExpiracaoPremium
+  sincronizarExpiracaoPremium,
+  statusJwtConfiguracao
 };
