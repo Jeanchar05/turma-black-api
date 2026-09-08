@@ -4,7 +4,24 @@ const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario");
 const database = require("../config/database");
 
-const SECRET = process.env.JWT_SECRET || "turma_black_secret_dev";
+function carregarJwtSecret() {
+  const secret = String(process.env.JWT_SECRET || "").trim();
+  const producao = String(process.env.NODE_ENV || "").trim().toLowerCase() === "production";
+  const placeholders = new Set([
+    "turma_black_secret_dev",
+    "troque-por-uma-chave-segura-e-unica",
+    "changeme",
+    "secret"
+  ]);
+
+  if (producao && (secret.length < 32 || placeholders.has(secret.toLowerCase()))) {
+    throw new Error("JWT_SECRET ausente, fraco ou usando valor de exemplo em produção.");
+  }
+
+  return secret || "turma_black_secret_dev";
+}
+
+const SECRET = carregarJwtSecret();
 
 const PLANOS_PREMIUM = new Set(["black30", "black90", "black180", "black360"]);
 const PLANOS_BESTFY = Object.freeze({
