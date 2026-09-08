@@ -5,6 +5,18 @@ const Usuario = require("../models/Usuario");
 
 const SECRET = process.env.JWT_SECRET || "turma_black_secret_dev";
 
+const PLANOS_PREMIUM = new Set(["black30", "black90", "black180", "black360"]);
+const CARGOS_ACESSO_TOTAL = new Set([
+  "dev",
+  "dono",
+  "superadmin",
+  "admin",
+  "financeiro",
+  "vendedor",
+  "moderador",
+  "suporte"
+]);
+
 function extrairToken(req) {
   const authHeader = req.headers.authorization || "";
 
@@ -26,7 +38,7 @@ function extrairToken(req) {
 function normalizarCargo(usuario) {
   if (!usuario) return "aluno";
   if (usuario.contaDev === true) return "dev";
-  if (usuario.cargo) return usuario.cargo;
+  if (usuario.cargo) return String(usuario.cargo).trim().toLowerCase().replaceAll("_", "-");
   if (usuario.tipo === "admin") return "admin";
   return "aluno";
 }
@@ -35,9 +47,88 @@ function obterId(usuario) {
   return String(usuario?._id || usuario?.id || "");
 }
 
+function estadoAcessoPremium(usuario, agoraMs = Date.now()) {
+  const cargo = normalizarCargo(usuario);
+  const plano = String(usuario?.plano || "free").trim().toLowerCase();
+
+  if (CARGOS_ACESSO_TOTAL.has(cargo)) {
+    return {
+      acessoPremium: true,
+      planoAtivo: plano === "free" ? "admin" : plano,
+      planoExpirado: false,
+      diasRestantes: null,
+      motivoAcesso: "equipe"
+    };
+  }
+
+  if (!PLANOS_PREMIUM.has(plano)) {
+    return {
+      acessoPremium: false,
+      planoAtivo: "free",
+      planoExpirado: false,
+      diasRestantes: 0,
+      motivoAcesso: "free"
+    };
+  }
+
+  const expiracaoMs = new Date(usuario?.dataExpiracao || "").getTime();
+
+  if (!Number.isFinite(expiracaoMs)) {
+    return {
+      acessoPremium: false,
+      planoAtivo: "free",
+      planoExpirado: true,
+      diasRestantes: 0,
+      motivoAcesso: "validade-invalida"
+    };
+  }
+
+  const restanteMs = expiracaoMs - agoraMs;
+  if (restanteMs <= 0) {
+    return {
+      acessoPremium: false,
+      planoAtivo: "free",
+      planoExpirado: true,
+      diasRestantes: 0,
+      motivoAcesso: "expirado"
+    };
+  }
+
+  return {
+    acessoPremium: true,
+    planoAtivo: plano,
+    planoExpirado: false,
+    diasRestantes: Math.max(1, Math.ceil(restanteMs / 86400000)),
+    motivoAcesso: "plano-pago"
+  };
+}
+
+async function sincronizarExpiracaoPremium(usuario) {
+  if (!usuario) return estadoAcessoPremium(usuario);
+
+  const estado = estadoAcessoPremium(usuario);
+  const cargo = normalizarCargo(usuario);
+  const plano = String(usuario.plano || "free").trim().toLowerCase();
+
+  if (
+    cargo === "aluno" &&
+    PLANOS_PREMIUM.has(plano) &&
+    !estado.acessoPremium
+  ) {
+    usuario.plano = "free";
+    usuario.dataExpiracao = "";
+    usuario.atualizadoPor = "expiracao-automatica";
+    await usuario.save({ validateModifiedOnly: true });
+    return estadoAcessoPremium(usuario);
+  }
+
+  return estado;
+}
+
 function montarUsuarioSeguro(usuario) {
   const cargo = normalizarCargo(usuario);
   const id = obterId(usuario);
+  const acesso = estadoAcessoPremium(usuario);
 
   return {
     id,
@@ -55,6 +146,11 @@ function montarUsuarioSeguro(usuario) {
     status: usuario.status || "pendente",
     plano: usuario.plano || "free",
     dataExpiracao: usuario.dataExpiracao || "",
+    acessoPremium: acesso.acessoPremium,
+    planoAtivo: acesso.planoAtivo,
+    planoExpirado: acesso.planoExpirado,
+    diasRestantes: acesso.diasRestantes,
+    motivoAcesso: acesso.motivoAcesso,
     telefone: usuario.telefone || "",
     foto: usuario.foto || ""
   };
@@ -129,6 +225,8 @@ async function auth(req, res, next) {
       });
     }
 
+    await sincronizarExpiracaoPremium(usuario);
+
     req.usuarioDoc = usuario;
     req.usuario = montarUsuarioSeguro(usuario);
     return next();
@@ -157,6 +255,7 @@ async function authOpcional(req, res, next) {
       return next();
     }
 
+    await sincronizarExpiracaoPremium(usuario);
     req.usuarioDoc = usuario;
     req.usuario = montarUsuarioSeguro(usuario);
     return next();
@@ -165,6 +264,26 @@ async function authOpcional(req, res, next) {
     req.usuarioDoc = null;
     return next();
   }
+}
+
+function requirePremium(req, res, next) {
+  if (!req.usuario) {
+    return res.status(401).json({
+      erro: "Usuário não autenticado.",
+      codigo: "USUARIO_NAO_AUTENTICADO"
+    });
+  }
+
+  if (!req.usuario.acessoPremium) {
+    return res.status(403).json({
+      erro: "Este recurso exige um plano Premium ativo.",
+      codigo: req.usuario.planoExpirado ? "PLANO_EXPIRADO" : "PLANO_PREMIUM_NECESSARIO",
+      plano: req.usuario.planoAtivo || "free",
+      diasRestantes: req.usuario.diasRestantes || 0
+    });
+  }
+
+  return next();
 }
 
 function gerarToken(usuario) {
@@ -190,8 +309,11 @@ function gerarToken(usuario) {
 module.exports = {
   auth,
   authOpcional,
+  requirePremium,
   gerarToken,
   extrairToken,
   normalizarCargo,
-  montarUsuarioSeguro
+  montarUsuarioSeguro,
+  estadoAcessoPremium,
+  sincronizarExpiracaoPremium
 };
