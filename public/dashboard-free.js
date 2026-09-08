@@ -5,39 +5,21 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
 
-  const cover = (title, sub, symbol) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675">
-      <defs>
-        <radialGradient id="b" cx="78%" cy="36%"><stop stop-color="#41156f"/><stop offset=".58" stop-color="#1a0b27"/><stop offset="1" stop-color="#08040d"/></radialGradient>
-        <linearGradient id="g"><stop stop-color="#fff1b1"/><stop offset=".48" stop-color="#d99cff"/><stop offset="1" stop-color="#8d35e8"/></linearGradient>
-        <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#fff" stroke-opacity=".025"/></pattern>
-      </defs>
-      <rect width="1200" height="675" rx="32" fill="url(#b)"/>
-      <rect width="1200" height="675" rx="32" fill="url(#grid)"/>
-      <circle cx="940" cy="326" r="176" fill="#09040e" fill-opacity=".84" stroke="#a44be5" stroke-opacity=".72" stroke-width="6"/>
-      <circle cx="940" cy="326" r="216" fill="none" stroke="#d99cff" stroke-opacity=".08" stroke-width="2"/>
-      <text x="940" y="382" text-anchor="middle" fill="url(#g)" font-size="158" font-family="Georgia">${symbol}</text>
-      <text x="74" y="274" fill="#fff" font-family="Arial" font-size="70" font-weight="900">${title}</text>
-      <text x="78" y="338" fill="#d7a8e8" font-family="Arial" font-size="24" letter-spacing="4">${sub}</text>
-      <rect x="76" y="385" width="170" height="5" rx="3" fill="#a855f7" fill-opacity=".72"/>
-    </svg>`);
-
-  const covers = {
-    gemeos: cover("GÊMEOS", "11 · 22 · 33", "11"),
-    espelhos: cover("ESPELHOS", "INVERSÃO", "69"),
-    fibonacci: cover("FIBONACCI", "SEQUÊNCIA", "Φ"),
-    magneto: cover("MAGNETO", "CONEXÃO", "M"),
-    camaleoes: cover("CAMALEÕES", "ADAPTAÇÃO", "C"),
-    pitagoras: cover("PITÁGORAS", "TRIANGULAÇÃO", "△"),
-    cavalo: cover("CAVALO", "TERMINAIS", "♞"),
-    "eclipse-zero": cover("ECLIPSE ZERO", "TERMINAIS 0 E 9", "0")
-  };
-
-  const modules = [
-    ["Gêmeos", "gemeos"], ["Espelhos", "espelhos"], ["Fibonacci", "fibonacci"],
-    ["Magneto", "magneto"], ["Camaleões", "camaleoes"], ["Pitágoras", "pitagoras"],
-    ["Cavalo", "cavalo"], ["Eclipse Zero", "eclipse-zero"]
+  const lessons = [
+    { id:"cavalo", title:"Estratégia do Cavalo", description:"Entenda a lógica dos terminais e como organizar a leitura da estratégia.", category:"estrategias", duration:"08 min", source:"Instagram", recent:true, symbol:"♞", tone:"purple", status:"soon" },
+    { id:"gemeos", title:"Entendendo os Gêmeos", description:"Uma introdução simples à leitura dos números repetidos e suas relações.", category:"fundamentos", duration:"09 min", source:"Instagram", recent:true, symbol:"11", tone:"blue", status:"soon" },
+    { id:"fibonacci", title:"Fibonacci na prática", description:"Veja como organizar a sequência e identificar os pontos principais da estratégia.", category:"estrategias", duration:"11 min", source:"Instagram", recent:true, symbol:"Φ", tone:"violet", status:"soon" },
+    { id:"espelhos", title:"Espelhos e inversões", description:"Conheça a ideia por trás das inversões e como reconhecer padrões rapidamente.", category:"fundamentos", duration:"10 min", source:"Instagram", recent:false, symbol:"69", tone:"gold", status:"soon" },
+    { id:"magneto", title:"Magneto: zonas de força", description:"Uma visão introdutória da estratégia e de como as conexões são organizadas.", category:"estrategias", duration:"12 min", source:"Instagram", recent:false, symbol:"M", tone:"purple", status:"soon" },
+    { id:"pitagoras", title:"Pitágoras: lógica e probabilidade", description:"Fundamentos para entender a construção e a leitura da estratégia.", category:"fundamentos", duration:"12 min", source:"Instagram", recent:false, symbol:"△", tone:"blue", status:"soon" }
   ];
+
+  const toneBackground = {
+    purple:"radial-gradient(circle at 72% 30%,rgba(168,85,247,.28),transparent 28%),linear-gradient(145deg,#251130,#09050e)",
+    violet:"radial-gradient(circle at 68% 28%,rgba(113,45,205,.31),transparent 30%),linear-gradient(145deg,#1e1230,#08050e)",
+    blue:"radial-gradient(circle at 70% 28%,rgba(60,130,246,.22),transparent 30%),linear-gradient(145deg,#101a2d,#08050e)",
+    gold:"radial-gradient(circle at 70% 28%,rgba(240,188,77,.20),transparent 30%),linear-gradient(145deg,#241a10,#09060a)"
+  };
 
   function token() {
     for (const storage of [sessionStorage, localStorage]) {
@@ -67,32 +49,14 @@
     return data;
   }
 
-  function renderModules() {
-    const host = $("freeModuleGrid");
-    if (!host) return;
-    host.innerHTML = modules.map(([name, slug]) => `
-      <article class="free-module" aria-label="${name} — conteúdo Premium">
-        <img src="${covers[slug]}" alt="Módulo ${name}" loading="lazy" />
-        <div class="free-lock"><span aria-hidden="true">🔒</span></div>
-        <div class="free-module-copy"><strong>${name}</strong><small>Disponível no Premium</small></div>
-      </article>`).join("");
-  }
-
-  function showMessage(text, type = "sucesso") {
-    const box = $("premiumRequestMessage");
-    if (!box) return;
-    box.textContent = text;
-    box.className = `auth-message ${type} active`;
-  }
-
   function firstName(name) {
     return String(name || "Aluno").trim().split(/\s+/)[0] || "Aluno";
   }
 
   function greeting(name) {
     const hour = new Date().getHours();
-    const period = hour < 12 ? "BOM DIA" : hour < 18 ? "BOA TARDE" : "BOA NOITE";
-    return `${period}, ${String(name || "ALUNO").toUpperCase()}`;
+    const period = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+    return `${period}, ${name} 👋`;
   }
 
   function applyUser(user) {
@@ -116,48 +80,113 @@
       const data = await api("/me");
       const user = data.usuario || data.user || {};
       applyUser(user);
-
       const role = String(user.cargo || user.tipo || "aluno").toLowerCase();
       if (role === "aluno" && user.acessoPremium === true) {
         window.location.replace("/dashboard");
-        return;
       }
     } catch (_) {}
   }
 
-  function planLabel(value) {
-    return {
-      monthly: "Mensal — R$ 99,99",
-      six_months: "6 meses — R$ 249,99",
-      annual: "Anual — R$ 397,00"
-    }[value] || value;
+  function lessonCard(lesson) {
+    const soon = lesson.status !== "published";
+    return `
+      <article class="free-v10-lesson" data-lesson-card data-category="${lesson.category}" data-recent="${lesson.recent ? "1" : "0"}" data-source="instagram" data-search="${`${lesson.title} ${lesson.description} ${lesson.category}`.toLowerCase()}">
+        <div class="free-v10-lesson-thumb" style="--lesson-bg:${toneBackground[lesson.tone]}">
+          <span class="free-v10-lesson-badge ${soon ? "soon" : ""}">${soon ? "EM BREVE" : "NOVA AULA"}</span>
+          <span class="free-v10-lesson-symbol">${lesson.symbol}</span>
+          <span class="free-v10-lesson-play">${soon ? "⌛" : "▶"}</span>
+        </div>
+        <div class="free-v10-lesson-copy">
+          <h3>${lesson.title}</h3>
+          <p>${lesson.description}</p>
+          <div class="free-v10-lesson-meta"><span>${lesson.duration}</span><span>${lesson.source}</span></div>
+        </div>
+      </article>`;
   }
 
-  function syncPlanSummary() {
-    const radio = document.querySelector('input[name="plan"]:checked');
-    const summary = $("selectedPlanSummary");
-    if (summary && radio) summary.textContent = planLabel(radio.value);
-  }
+  function renderLessons() {
+    const grid = $("freeLessonsGrid");
+    if (grid) grid.innerHTML = lessons.map(lessonCard).join("");
 
-  function submit(event) {
-    event.preventDefault();
-    const button = $("generatePremiumCode");
-    const radio = document.querySelector('input[name="plan"]:checked');
-    const checkout = radio?.dataset.checkout;
-
-    if (!checkout) return showMessage("Não foi possível localizar o checkout deste plano.", "erro");
-
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Abrindo checkout seguro…";
+    const recent = $("freeRecentLessons");
+    if (recent) {
+      recent.innerHTML = lessons.filter((item) => item.recent).slice(0, 3).map((lesson) => `
+        <button class="free-v10-mini-lesson" type="button" data-free-view-target="aulas">
+          <span class="free-v10-mini-thumb" style="background:${toneBackground[lesson.tone]}"><span>▶</span></span>
+          <span class="free-v10-mini-copy"><b>${lesson.title}</b><small>${lesson.duration} • ${lesson.source}</small></span>
+        </button>`).join("");
     }
-    showMessage("Redirecionando para o checkout oficial da Bestfy…", "sucesso");
-    window.location.assign(checkout);
+
+    $$('[data-lesson-count]').forEach((el) => { el.textContent = String(lessons.length); });
   }
 
   function closeMobileMenu() {
     $("freeSidebar")?.classList.remove("open");
     if ($("freeOverlay")) $("freeOverlay").hidden = true;
+  }
+
+  function validView(value) {
+    return ["dashboard", "aulas", "premium", "assine"].includes(value) ? value : "dashboard";
+  }
+
+  function setView(view, options = {}) {
+    const next = validView(view);
+    $$('[data-free-view]').forEach((section) => section.classList.toggle("active", section.dataset.freeView === next));
+    $$('[data-free-view-target]').forEach((control) => control.classList.toggle("active", control.dataset.freeViewTarget === next && control.classList.contains("free-v10-nav-item")));
+    closeMobileMenu();
+    if (!options.skipHash) history.replaceState(null, "", `#${next}`);
+    if (!options.keepScroll) window.scrollTo({ top: 0, behavior: options.instant ? "auto" : "smooth" });
+    if (next === "aulas" && options.focusSearch) setTimeout(() => $("freeSearch")?.focus(), 160);
+  }
+
+  let activeFilter = "all";
+  function applyLessonFilters() {
+    const query = String($("freeSearch")?.value || "").trim().toLowerCase();
+    let visible = 0;
+    $$('[data-lesson-card]').forEach((card) => {
+      const category = card.dataset.category;
+      const filterMatch = activeFilter === "all" ||
+        (activeFilter === "recentes" && card.dataset.recent === "1") ||
+        (activeFilter === "instagram" && card.dataset.source === "instagram") ||
+        activeFilter === category;
+      const searchMatch = !query || String(card.dataset.search || "").includes(query);
+      const show = filterMatch && searchMatch;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+
+    const grid = $("freeLessonsGrid");
+    let empty = $("freeLessonEmpty");
+    if (!visible && grid) {
+      if (!empty) {
+        empty = document.createElement("div");
+        empty.id = "freeLessonEmpty";
+        empty.className = "free-v10-empty";
+        grid.appendChild(empty);
+      }
+      empty.textContent = "Nenhuma aula encontrada com esse filtro.";
+      empty.hidden = false;
+    } else if (empty) empty.hidden = true;
+  }
+
+  function showMessage(text, type = "sucesso") {
+    const box = $("premiumRequestMessage");
+    if (!box) return;
+    box.textContent = text;
+    box.className = `auth-message ${type} active`;
+  }
+
+  function openCheckout(button) {
+    const checkout = String(button?.dataset.checkout || "");
+    if (!checkout) return showMessage("Não foi possível localizar o checkout deste plano.", "erro");
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = "Abrindo checkout seguro…";
+    showMessage("Redirecionando para o checkout oficial da Bestfy…", "sucesso");
+    setTimeout(() => {
+      window.location.assign(checkout);
+      setTimeout(() => { button.disabled = false; button.textContent = original; }, 1800);
+    }, 180);
   }
 
   function bind() {
@@ -166,21 +195,57 @@
       if ($("freeOverlay")) $("freeOverlay").hidden = false;
     });
     $("freeOverlay")?.addEventListener("click", closeMobileMenu);
-    $("premiumRequestForm")?.addEventListener("submit", submit);
-    $$('input[name="plan"]').forEach((radio) => radio.addEventListener("change", syncPlanSummary));
-    $$('a[href^="#"]').forEach((anchor) => anchor.addEventListener("click", closeMobileMenu));
+
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-free-view-target]");
+      if (target) {
+        event.preventDefault();
+        setView(target.dataset.freeViewTarget);
+        return;
+      }
+      const planButton = event.target.closest("[data-checkout]");
+      if (planButton) {
+        event.preventDefault();
+        openCheckout(planButton);
+      }
+    });
+
+    $$('[data-filter]').forEach((button) => button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter || "all";
+      $$('[data-filter]').forEach((item) => item.classList.toggle("active", item === button));
+      applyLessonFilters();
+    }));
+
+    $("freeSearch")?.addEventListener("input", () => {
+      setView("aulas", { keepScroll:true, instant:true, skipHash:false });
+      applyLessonFilters();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "")) {
+        event.preventDefault();
+        setView("aulas", { focusSearch:true });
+      }
+    });
+
+    $$('[data-scroll-premium]').forEach((button) => button.addEventListener("click", () => {
+      $("premiumResources")?.scrollIntoView({ behavior:"smooth", block:"start" });
+    }));
+
+    window.addEventListener("hashchange", () => setView(location.hash.replace("#", ""), { skipHash:true, instant:true }));
   }
 
   async function init() {
-    renderModules();
+    renderLessons();
     bind();
-    syncPlanSummary();
+    setView(location.hash.replace("#", ""), { skipHash:true, instant:true });
+    applyLessonFilters();
     await Promise.allSettled([loadUser()]);
     $("freeLoading")?.remove();
     document.body.classList.add("protected-ready");
   }
 
   document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", init, { once: true })
+    ? document.addEventListener("DOMContentLoaded", init, { once:true })
     : init();
 })();
