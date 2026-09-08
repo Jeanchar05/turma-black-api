@@ -21,12 +21,12 @@ const {
 const router = express.Router();
 
 const CARGOS_GERENCIAVEIS = ["dono", "admin", "financeiro", "vendedor"];
-const PLANOS_DIAS = {
+const PLANOS_DIAS = Object.freeze({
   black30: 30,
   black90: 90,
   black180: 180,
-  black360: 360
-};
+  black360: 365
+});
 
 function validarId(id) {
   return mongoose.Types.ObjectId.isValid(String(id || ""));
@@ -69,10 +69,33 @@ function formatarUsuario(usuario) {
   };
 }
 
-function somarDias(dias) {
-  const data = new Date();
-  data.setDate(data.getDate() + Number(dias || 30));
-  return data.toISOString().split("T")[0];
+function calcularExpiracaoSegura(usuario, plano) {
+  const dias = PLANOS_DIAS[plano];
+  if (!Number.isInteger(dias) || dias <= 0) {
+    throw new Error("Plano sem quantidade de dias autorizada.");
+  }
+
+  const agora = new Date();
+  let base = agora;
+  const expiracaoAtual = new Date(usuario?.dataExpiracao || "");
+  const planoAtual = String(usuario?.plano || "").trim().toLowerCase();
+
+  if (
+    PLANOS_DIAS[planoAtual] &&
+    !Number.isNaN(expiracaoAtual.getTime()) &&
+    expiracaoAtual.getTime() > agora.getTime()
+  ) {
+    base = expiracaoAtual;
+  }
+
+  const expiraEm = new Date(base);
+  expiraEm.setUTCDate(expiraEm.getUTCDate() + dias);
+
+  if (Number.isNaN(expiraEm.getTime())) {
+    throw new Error("Não foi possível calcular a validade do plano.");
+  }
+
+  return expiraEm.toISOString();
 }
 
 router.get(
@@ -218,16 +241,45 @@ router.post(
         return res.status(404).json({ erro: "Conta vinculada não encontrada." });
       }
 
-      const plano = PLANOS_DIAS[solicitacao.plano] ? solicitacao.plano : "black30";
-      const dias = Number(req.body?.dias || PLANOS_DIAS[plano]);
+      if (usuario.contaDev === true || getCargo(usuario) !== "aluno") {
+        return res.status(403).json({
+          erro: "Liberação por código é permitida somente para contas de alunos."
+        });
+      }
+
+      const emailSolicitacao = normalizarEmail(solicitacao.email);
+      const emailUsuario = normalizarEmail(usuario.email);
+      if (emailSolicitacao && emailUsuario && emailSolicitacao !== emailUsuario) {
+        return res.status(409).json({
+          erro: "Os dados da solicitação não correspondem mais à conta vinculada."
+        });
+      }
+
+      const plano = String(solicitacao.plano || "").trim().toLowerCase();
+      const dias = PLANOS_DIAS[plano];
+
+      if (!dias) {
+        return res.status(400).json({
+          erro: "O plano desta solicitação não possui validade autorizada."
+        });
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(req.body || {}, "dias") &&
+        Number(req.body.dias) !== dias
+      ) {
+        console.warn(
+          `Tentativa de alterar dias da liberação ${solicitacao.id || solicitacao._id}: solicitado=${req.body.dias}, autorizado=${dias}`
+        );
+      }
 
       usuario.plano = plano;
-      usuario.dataExpiracao = somarDias(dias);
+      usuario.dataExpiracao = calcularExpiracaoSegura(usuario, plano);
       usuario.aprovado = true;
       usuario.suspenso = false;
       usuario.status = "ativo";
       usuario.codigo = solicitacao.codigo;
-      usuario.aprovadoEm = new Date().toISOString();
+      usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
       usuario.atualizadoPor = req.usuario.email;
       await usuario.save();
 
@@ -240,6 +292,8 @@ router.post(
       return res.json({
         sucesso: true,
         mensagem: "Código aprovado e plano Premium liberado.",
+        diasLiberados: dias,
+        expiraEm: usuario.dataExpiracao,
         solicitacao,
         usuario: formatarUsuario(usuario)
       });
