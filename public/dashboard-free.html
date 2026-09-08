@@ -9,13 +9,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260908-free-v11" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260908-free-v11" />
-  <link rel="stylesheet" href="/dashboard-free-v10.css?v=20260908-free-v11" />
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260908-free-v12" />
+  <link rel="stylesheet" href="/theme-global-v2.css?v=20260908-free-v12" />
+  <link rel="stylesheet" href="/dashboard-free-v10.css?v=20260908-free-v12" />
+  <link rel="stylesheet" href="/dashboard-free-v12.css?v=20260908-free-v12" />
   <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <script defer src="/protected.js?v=20260908-free-v11"></script>
-  <script defer src="/theme-global-v2.js?v=20260908-free-v11"></script>
-  <script defer src="/dashboard-free.js?v=20260908-free-v11"></script>
+  <script defer src="/protected.js?v=20260908-free-v12"></script>
+  <script defer src="/theme-global-v2.js?v=20260908-free-v12"></script>
+  <script defer src="/dashboard-free.js?v=20260908-free-v12"></script>
+  <script defer src="/dashboard-free-v12-fix.js?v=20260908-free-v12"></script>
 </head>
 <body class="student-dashboard free-dashboard-page" data-required-access="dashboard">
   <div class="dash-loading" id="freeLoading"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando sua área gratuita</strong><small>Sincronizando sua conta…</small></div></div>
@@ -30,18 +32,18 @@
     <div class="free-v10-nav-label">EXPLORAR</div>
     <nav class="free-v10-nav" aria-label="Área gratuita">
       <button class="free-v10-nav-item active" type="button" data-free-view-target="dashboard">
-        <svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/free-icons-v12.svg#i-dashboard"></use></svg><b>Dashboard</b>
       </button>
       <button class="free-v10-nav-item" type="button" data-free-view-target="aulas">
-        <svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Aulas</b><span class="nav-mini">FREE</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/free-icons-v12.svg#i-lessons"></use></svg><b>Aulas</b><span class="nav-mini">FREE</span>
       </button>
       <button class="free-v10-nav-item nav-premium" type="button" data-free-view-target="premium">
-        <svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg><b>Premium</b>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/free-icons-v12.svg#i-premium"></use></svg><b>Premium</b>
       </button>
     </nav>
 
     <button class="free-v10-subscribe" type="button" data-free-view-target="assine">
-      <span class="bolt">⚡</span><span>ASSINE AGORA</span>
+      <span class="bolt"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/free-icons-v12.svg#i-subscribe"></use></svg></span><span>ASSINE AGORA</span>
     </button>
 
     <div class="free-v10-sidebar-bottom">
@@ -82,18 +84,18 @@
             <div class="free-v10-orbit">
               <div class="free-v10-orbit-brand"><img src="/assets/turma-primo-logo.svg" alt="" /><div><strong>Turma do Primo</strong><small>ambiente integrado</small></div></div>
               <div class="free-v10-orbit-cards">
-                <article><span>▶</span><b>Aulas</b><small>conteúdo aberto</small></article>
-                <article><span>♛</span><b>Premium</b><small>experiência completa</small></article>
-                <article><span>⚡</span><b>Planos</b><small>3 opções</small></article>
+                <article><span><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-lessons"></use></svg></span><b>Aulas</b><small>conteúdo aberto</small></article>
+                <article><span><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-premium"></use></svg></span><b>Premium</b><small>experiência completa</small></article>
+                <article><span><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-subscribe"></use></svg></span><b>Planos</b><small>3 opções</small></article>
               </div>
             </div>
           </div>
         </section>
 
         <div class="free-v10-shortcuts" aria-label="Atalhos">
-          <button class="free-v10-shortcut" type="button" data-free-view-target="aulas"><span class="ico">▶</span><span><strong>Assistir aulas</strong><small>Conteúdos gratuitos e novidades.</small></span></button>
-          <button class="free-v10-shortcut gold" type="button" data-free-view-target="premium"><span class="ico">♛</span><span><strong>Conhecer o Premium</strong><small>Veja como funciona a plataforma completa.</small></span></button>
-          <button class="free-v10-shortcut blue" type="button" data-free-view-target="assine"><span class="ico">▥</span><span><strong>Ver planos</strong><small>Compare período, valor e economia.</small></span></button>
+          <button class="free-v10-shortcut" type="button" data-free-view-target="aulas"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-play"></use></svg></span><span><strong>Assistir aulas</strong><small>Conteúdos gratuitos e novidades.</small></span></button>
+          <button class="free-v10-shortcut gold" type="button" data-free-view-target="premium"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-premium"></use></svg></span><span><strong>Conhecer o Premium</strong><small>Veja como funciona a plataforma completa.</small></span></button>
+          <button class="free-v10-shortcut blue" type="button" data-free-view-target="assine"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-subscribe"></use></svg></span><span><strong>Ver planos</strong><small>Compare período, valor e economia.</small></span></button>
         </div>
 
         <div class="free-v10-status-grid" aria-label="Resumo da conta">
@@ -146,12 +148,12 @@
         </section>
 
         <div class="free-v10-feature-grid" id="premiumResources">
-          <article class="free-v10-feature"><span class="ico">▦</span><strong>Dashboard completo</strong><p>Progresso, atividades e acesso centralizado em um só lugar.</p></article>
-          <article class="free-v10-feature"><span class="ico">◇</span><strong>8 módulos estratégicos</strong><p>Conteúdo organizado por metodologia e etapa de aprendizado.</p></article>
-          <article class="free-v10-feature"><span class="ico">◉</span><strong>Minigames</strong><p>Treino prático para reforçar os conteúdos da plataforma.</p></article>
-          <article class="free-v10-feature"><span class="ico">◎</span><strong>Roleta</strong><p>Ferramentas e estratégias reunidas dentro da plataforma.</p></article>
-          <article class="free-v10-feature"><span class="ico">✓</span><strong>Provas</strong><p>Teste seu aprendizado e acompanhe sua evolução.</p></article>
-          <article class="free-v10-feature"><span class="ico">☆</span><strong>Favoritos e anotações</strong><p>Organize os conteúdos que você quer rever e acompanhar.</p></article>
+          <article class="free-v10-feature"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-dashboard"></use></svg></span><strong>Dashboard completo</strong><p>Progresso, atividades e acesso centralizado em um só lugar.</p></article>
+          <article class="free-v10-feature"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-modules"></use></svg></span><strong>8 módulos estratégicos</strong><p>Conteúdo organizado por metodologia e etapa de aprendizado.</p></article>
+          <article class="free-v10-feature"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-games"></use></svg></span><strong>Minigames</strong><p>Treino prático para reforçar os conteúdos da plataforma.</p></article>
+          <article class="free-v10-feature"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-roulette"></use></svg></span><strong>Roleta</strong><p>Ferramentas e estratégias reunidas dentro da plataforma.</p></article>
+          <article class="free-v10-feature"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-exam"></use></svg></span><strong>Provas</strong><p>Teste seu aprendizado e acompanhe sua evolução.</p></article>
+          <article class="free-v10-feature"><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-favorite"></use></svg></span><strong>Favoritos e anotações</strong><p>Organize os conteúdos que você quer rever e acompanhar.</p></article>
         </div>
 
         <section class="free-v10-journey">
@@ -206,7 +208,7 @@
           </tbody></table>
         </section>
 
-        <div class="free-v10-payment-row"><article><span class="ico">◆</span><div><strong>Pagamento protegido</strong><p>PIX, cartão e boleto pelo checkout oficial processado pela Bestfy.</p></div></article><article><span class="ico">⚡</span><div><strong>Liberação automática</strong><p>Após a confirmação do pagamento, o servidor libera o período correspondente à compra.</p></div></article></div>
+        <div class="free-v10-payment-row"><article><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-payment"></use></svg></span><div><strong>Pagamento protegido</strong><p>PIX, cartão e boleto pelo checkout oficial processado pela Bestfy.</p></div></article><article><span class="ico"><svg viewBox="0 0 24 24"><use href="/assets/free-icons-v12.svg#i-auto"></use></svg></span><div><strong>Liberação automática</strong><p>Após a confirmação do pagamento, o servidor libera o período correspondente à compra.</p></div></article></div>
         <div id="premiumRequestMessage" class="auth-message" role="status" aria-live="polite"></div>
       </section>
     </div>
