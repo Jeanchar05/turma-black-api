@@ -1,7 +1,7 @@
 "use strict";
 
 (() => {
-  const polishHref = "login-polish-v31.css?v=20260908-v31";
+  const polishHref = "login-polish-v31.css?v=20260908-desktop-v32";
   if (!document.querySelector('link[href^="login-polish-v31.css"]')) {
     const link = document.createElement("link");
     link.rel = "stylesheet";
