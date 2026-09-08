@@ -85,6 +85,8 @@
       const rect = stage.getBoundingClientRect();
       const px = (event.clientX - rect.left) / rect.width - 0.5;
       const py = (event.clientY - rect.top) / rect.height - 0.5;
+      stage.style.setProperty("--spot-x", `${event.clientX - rect.left}px`);
+      stage.style.setProperty("--spot-y", `${event.clientY - rect.top}px`);
       product.style.transform = `perspective(1200px) rotateX(${1.2 - py * 3}deg) rotateY(${-1.8 + px * 4}deg) translate3d(${px * 6}px,${py * 4}px,0)`;
     });
     stage.addEventListener("pointerleave", () => {
@@ -99,7 +101,79 @@
       : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7S18 19 12 19 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
   };
 
+  function installV31Enhancements() {
+    if (document.getElementById("loginV31EnhancementStyle")) return;
+
+    const style = document.createElement("style");
+    style.id = "loginV31EnhancementStyle";
+    style.textContent = `
+      .login-v30-stage{--spot-x:72%;--spot-y:28%}
+      .login-v30-stage .login-v31-spotlight{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(420px circle at var(--spot-x) var(--spot-y),rgba(207,148,255,.11),transparent 62%);opacity:.95}
+      .login-v31-rail{margin-top:22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-width:660px}
+      .login-v31-rail article{position:relative;min-height:72px;padding:13px 14px;border:1px solid rgba(255,255,255,.065);border-radius:15px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012));backdrop-filter:blur(16px);overflow:hidden}
+      .login-v31-rail article::before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,rgba(216,121,255,.42),transparent)}
+      .login-v31-rail b{display:flex;align-items:center;gap:7px;color:#f2edf5;font-size:10px;letter-spacing:.02em}
+      .login-v31-rail b i{width:6px;height:6px;border-radius:50%;background:#82edbd;box-shadow:0 0 11px rgba(130,237,189,.7)}
+      .login-v31-rail span{display:block;margin-top:7px;color:#8f8798;font-size:9px;line-height:1.45}
+      .login-v31-auth-trust{margin-top:auto;padding-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;border-top:1px solid rgba(255,255,255,.055)}
+      .login-v31-auth-trust span{min-height:50px;display:grid;place-items:center;text-align:center;padding:8px;border:1px solid rgba(255,255,255,.055);border-radius:12px;color:#928a9c;background:rgba(255,255,255,.018);font-size:8px;font-weight:800;line-height:1.35;letter-spacing:.035em}
+      .login-v31-auth-trust strong{display:block;color:#d8d0de;font-size:9px;margin-bottom:2px}
+      .login-v30-auth{overflow:visible}
+      .login-v30-auth::after{content:"";position:absolute;inset:-1px;border-radius:34px;padding:1px;background:linear-gradient(145deg,rgba(216,121,255,.38),transparent 32%,transparent 68%,rgba(240,188,77,.16));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.75}
+      .login-v30-auth .auth-submit{position:relative;overflow:hidden;isolation:isolate}
+      .login-v30-auth .auth-submit::after{content:"";position:absolute;inset:-2px auto -2px -35%;width:30%;transform:skewX(-24deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);z-index:-1;transition:transform .55s ease}
+      .login-v30-auth .auth-submit:hover::after{transform:translateX(520%) skewX(-24deg)}
+      .login-v30-topbar{border-bottom:1px solid transparent}
+      .login-v30-brand-copy strong{background:linear-gradient(90deg,#fff,#e1c9f1);-webkit-background-clip:text;background-clip:text;color:transparent}
+      .login-v30-brand-copy strong span{color:#d879ff;-webkit-text-fill-color:#d879ff}
+      @media(max-width:900px){
+        .login-v31-rail{grid-template-columns:1fr;margin-top:18px}
+        .login-v31-rail article{min-height:58px}
+        .login-v31-auth-trust{grid-template-columns:1fr 1fr 1fr}
+      }
+      @media(max-width:620px){
+        .login-v31-rail{display:none}
+        .login-v31-auth-trust{grid-template-columns:1fr 1fr;margin-top:14px}
+        .login-v31-auth-trust span:last-child{grid-column:1/-1;min-height:38px}
+        .login-v30-auth{border-radius:26px}
+      }
+    `;
+    document.head.appendChild(style);
+
+    const stageEl = document.querySelector(".login-v30-stage");
+    if (stageEl && !stageEl.querySelector(".login-v31-spotlight")) {
+      const spotlight = document.createElement("div");
+      spotlight.className = "login-v31-spotlight";
+      spotlight.setAttribute("aria-hidden", "true");
+      stageEl.prepend(spotlight);
+    }
+
+    const benefits = document.querySelector(".login-v30-benefits");
+    if (benefits && !document.querySelector(".login-v31-rail")) {
+      benefits.insertAdjacentHTML("afterend", `
+        <div class="login-v31-rail" aria-label="Diferenciais do acesso">
+          <article><b><i></i> Conta validada</b><span>Sessão e permissões conferidas diretamente no servidor.</span></article>
+          <article><b><i></i> Plano sincronizado</b><span>Validade e acesso Premium acompanhados pela plataforma.</span></article>
+          <article><b><i></i> Experiência integrada</b><span>Conteúdo, ferramentas e progresso no mesmo ambiente.</span></article>
+        </div>
+      `);
+    }
+
+    const authInner = document.querySelector(".login-v30-auth-inner");
+    if (authInner && !authInner.querySelector(".login-v31-auth-trust")) {
+      authInner.insertAdjacentHTML("beforeend", `
+        <div class="login-v31-auth-trust" aria-label="Proteções do acesso">
+          <span><strong>Sessão isolada</strong>token temporário</span>
+          <span><strong>Acesso por perfil</strong>permissões validadas</span>
+          <span><strong>Validade ativa</strong>checagem no servidor</span>
+        </div>
+      `);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    installV31Enhancements();
+
     document.querySelectorAll(".toggle-password").forEach((button) => {
       setEyeIcon(button, false);
       button.addEventListener("click", () => {
