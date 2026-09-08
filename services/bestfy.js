@@ -6,6 +6,7 @@ const Usuario = require("../models/Usuario");
 const BESTFY_API_BASE = "https://api.bestfy.io";
 const API_TIMEOUT_MS = 3500;
 const COMPANY_CACHE_MS = 10 * 60 * 1000;
+const MAX_PAYMENT_FUTURE_SKEW_MS = 10 * 60 * 1000;
 
 const PLANOS = {
   black30: { dias: 30, valorCentavos: 9999 },
@@ -31,6 +32,11 @@ function erro(codigo, mensagem) {
 
 function normalizarEmail(valor) {
   return String(valor || "").trim().toLowerCase();
+}
+
+function emailValido(valor) {
+  const email = normalizarEmail(valor);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function normalizarTexto(valor) {
@@ -184,30 +190,102 @@ function calcularValorCentavos(transaction) {
 
 function identificarPlano(transaction) {
   const cart = Array.isArray(transaction?.cart) ? transaction.cart : [];
-  const titulos = normalizarTexto(cart.map((item) => item?.title || "").join(" | "));
+
+  if (cart.length !== 1) {
+    throw erro(
+      "BESTFY_CART_INVALID",
+      "A compra Premium precisa conter exatamente um produto elegível."
+    );
+  }
+
+  const item = cart[0] || {};
+  const quantidade = Number(item.quantity || 1);
+  if (!Number.isFinite(quantidade) || quantidade !== 1) {
+    throw erro(
+      "BESTFY_CART_QUANTITY_INVALID",
+      "A compra Premium precisa ter quantidade igual a 1."
+    );
+  }
+
+  const titulo = normalizarTexto(item.title || "");
   const valorCentavos = calcularValorCentavos(transaction);
 
-  if (/\banual\b|12 meses|360 dias|365 dias/.test(titulos)) {
-    return { chave: "black360", ...PLANOS.black360, valorCentavos };
+  let chave = "";
+  if (/\banual\b|\b12 meses?\b|\b360 dias?\b|\b365 dias?\b/.test(titulo)) {
+    chave = "black360";
+  } else if (/\b6 meses?\b|\b180 dias?\b|\bsemestral\b/.test(titulo)) {
+    chave = "black180";
+  } else if (/\bmensal\b|\b30 dias?\b|\b1 mes\b/.test(titulo)) {
+    chave = "black30";
   }
 
-  if (/6 meses|180 dias|semestral/.test(titulos)) {
-    return { chave: "black180", ...PLANOS.black180, valorCentavos };
+  if (!chave || !PLANOS[chave]) {
+    throw erro(
+      "BESTFY_PLAN_NOT_FOUND",
+      "O produto pago não corresponde a um plano Premium autorizado."
+    );
   }
 
-  if (/\bmensal\b|30 dias|1 mes/.test(titulos)) {
-    return { chave: "black30", ...PLANOS.black30, valorCentavos };
+  const plano = PLANOS[chave];
+  if (valorCentavos !== plano.valorCentavos) {
+    throw erro(
+      "BESTFY_PLAN_PRICE_MISMATCH",
+      `Valor incompatível com o plano ${chave}. Esperado ${plano.valorCentavos} centavos e recebido ${valorCentavos}.`
+    );
   }
 
-  const porValor = Object.entries(PLANOS).find(([, plano]) => plano.valorCentavos === valorCentavos);
-  if (porValor) {
-    return { chave: porValor[0], ...porValor[1], valorCentavos };
+  return {
+    chave,
+    dias: plano.dias,
+    valorCentavos: plano.valorCentavos
+  };
+}
+
+function validarTransacaoPaga(transaction, expectedCompanyId = "") {
+  const status = normalizarStatus(transaction?.status);
+  if (status !== "PAID") {
+    throw erro(
+      "BESTFY_STATUS_MISMATCH",
+      `A API da Bestfy retornou status ${status || "vazio"}.`
+    );
   }
 
-  throw erro(
-    "BESTFY_PLAN_NOT_FOUND",
-    `Não foi possível identificar o plano da transação (${valorCentavos} centavos).`
-  );
+  const transactionCompanyId = String(
+    transaction?.companyId || transaction?.company?.id || ""
+  ).trim();
+
+  if (transactionCompanyId && expectedCompanyId && transactionCompanyId !== expectedCompanyId) {
+    throw erro(
+      "BESTFY_COMPANY_MISMATCH",
+      "A transação consultada não pertence à empresa configurada."
+    );
+  }
+
+  const email = normalizarEmail(transaction?.customer?.email);
+  if (!emailValido(email)) {
+    throw erro(
+      "BESTFY_CUSTOMER_EMAIL_INVALID",
+      "A transação paga não possui um e-mail de cliente válido."
+    );
+  }
+
+  const confirmedAtRaw = String(transaction?.paymentConfirmedAt || "").trim();
+  const confirmedAtMs = new Date(confirmedAtRaw).getTime();
+  if (!confirmedAtRaw || !Number.isFinite(confirmedAtMs)) {
+    throw erro(
+      "BESTFY_PAYMENT_DATE_INVALID",
+      "A confirmação de pagamento da Bestfy é inválida."
+    );
+  }
+
+  if (confirmedAtMs > Date.now() + MAX_PAYMENT_FUTURE_SKEW_MS) {
+    throw erro(
+      "BESTFY_PAYMENT_DATE_FUTURE",
+      "A confirmação de pagamento possui data futura incompatível."
+    );
+  }
+
+  return { email, status, confirmedAt: confirmedAtRaw };
 }
 
 function dataBaseParaExtensao(usuario) {
@@ -222,8 +300,22 @@ function dataBaseParaExtensao(usuario) {
 }
 
 function adicionarDias(data, dias) {
+  const diasPermitidos = new Set(Object.values(PLANOS).map((plano) => plano.dias));
+  const quantidade = Number(dias);
+
+  if (!Number.isInteger(quantidade) || !diasPermitidos.has(quantidade)) {
+    throw erro(
+      "BESTFY_GRANT_DAYS_INVALID",
+      "Quantidade de dias não autorizada para liberação automática."
+    );
+  }
+
   const resultado = new Date(data);
-  resultado.setUTCDate(resultado.getUTCDate() + Number(dias || 0));
+  if (Number.isNaN(resultado.getTime())) {
+    throw erro("BESTFY_GRANT_BASE_INVALID", "Data base inválida para liberação do acesso.");
+  }
+
+  resultado.setUTCDate(resultado.getUTCDate() + quantidade);
   return resultado;
 }
 
@@ -295,6 +387,9 @@ async function reivindicarAplicacao(transactionId) {
         SET processing = 1, processing_started_at = CURRENT_TIMESTAMP
       WHERE transaction_id = ?
         AND applied_at IS NULL
+        AND revoked_at IS NULL
+        AND status = 'PAID'
+        AND verified_at IS NOT NULL
         AND (processing = 0 OR processing_started_at < (CURRENT_TIMESTAMP - INTERVAL 2 MINUTE))`,
     [String(transactionId)]
   );
@@ -307,7 +402,7 @@ async function liberarClaim(transactionId, mensagem = "") {
     `UPDATE bestfy_transactions
         SET processing = 0, processing_started_at = NULL, last_error = ?
       WHERE transaction_id = ?`,
-    [String(mensagem || ""), String(transactionId)]
+    [String(mensagem || "").slice(0, 2000), String(transactionId)]
   );
 }
 
@@ -318,6 +413,33 @@ async function aplicarRegistroAoUsuario(registro, usuario) {
   const plano = PLANOS[registro.plan];
   if (!plano) {
     throw erro("BESTFY_PLAN_INVALID", `Plano interno inválido: ${registro.plan || "vazio"}.`);
+  }
+
+  if (normalizarStatus(registro.status) !== "PAID") {
+    throw erro("BESTFY_GRANT_STATUS_INVALID", "Acesso não pode ser liberado sem status PAID.");
+  }
+
+  if (!registro.verified_at || registro.revoked_at) {
+    throw erro(
+      "BESTFY_GRANT_VERIFICATION_INVALID",
+      "A transação não possui verificação válida para liberação."
+    );
+  }
+
+  if (Number(registro.amount_cents || 0) !== plano.valorCentavos) {
+    throw erro(
+      "BESTFY_GRANT_AMOUNT_INVALID",
+      "O valor verificado não corresponde ao plano que seria liberado."
+    );
+  }
+
+  const emailRegistro = normalizarEmail(registro.customer_email);
+  const emailUsuario = normalizarEmail(usuario.email);
+  if (!emailRegistro || emailRegistro !== emailUsuario) {
+    throw erro(
+      "BESTFY_GRANT_EMAIL_MISMATCH",
+      "O e-mail do pagamento não corresponde à conta que receberia o acesso."
+    );
   }
 
   const claimed = await reivindicarAplicacao(registro.transaction_id);
@@ -345,13 +467,17 @@ async function aplicarRegistroAoUsuario(registro, usuario) {
       `UPDATE bestfy_transactions
           SET user_id = ?, applied_at = CURRENT_TIMESTAMP, access_expires_at = ?,
               processing = 0, processing_started_at = NULL, last_error = NULL
-        WHERE transaction_id = ?`,
+        WHERE transaction_id = ?
+          AND applied_at IS NULL
+          AND revoked_at IS NULL
+          AND status = 'PAID'`,
       [String(usuario.id || usuario._id), expiraEm.toISOString(), String(registro.transaction_id)]
     );
 
     return {
       aplicado: true,
       plano: registro.plan,
+      diasLiberados: plano.dias,
       expiraEm: expiraEm.toISOString(),
       usuarioId: String(usuario.id || usuario._id)
     };
@@ -367,9 +493,9 @@ async function aplicarPagamentoVerificado(transaction, plano) {
   if (registro.applied_at) return { aplicado: false, duplicado: true };
 
   const email = normalizarEmail(transaction?.customer?.email || registro.customer_email);
-  if (!email) {
-    await liberarClaim(transaction.transactionId, "Cliente sem e-mail na transação.").catch(() => {});
-    throw erro("BESTFY_CUSTOMER_EMAIL_MISSING", "A transação paga não possui e-mail do cliente.");
+  if (!emailValido(email)) {
+    await liberarClaim(transaction.transactionId, "Cliente sem e-mail válido na transação.").catch(() => {});
+    throw erro("BESTFY_CUSTOMER_EMAIL_MISSING", "A transação paga não possui e-mail válido do cliente.");
   }
 
   const usuario = await Usuario.findOne({ email });
@@ -476,11 +602,7 @@ async function processarWebhookBestfy(payload = {}) {
 
   if (status === "PAID") {
     const transaction = await buscarTransacao(transactionId);
-    const statusApi = normalizarStatus(transaction.status);
-
-    if (statusApi !== "PAID") {
-      throw erro("BESTFY_STATUS_MISMATCH", `A API da Bestfy retornou status ${statusApi || "vazio"}.`);
-    }
+    validarTransacaoPaga(transaction, expectedCompanyId);
 
     const plano = identificarPlano(transaction);
     await salvarDetalhesVerificados(transaction, plano);
@@ -490,6 +612,9 @@ async function processarWebhookBestfy(payload = {}) {
       recebido: true,
       transactionId,
       status,
+      planoValidado: plano.chave,
+      valorValidadoCentavos: plano.valorCentavos,
+      diasAutorizados: plano.dias,
       ...aplicacao
     };
   }
@@ -526,6 +651,7 @@ async function aplicarCompraPendentePorEmail(usuario) {
       WHERE customer_email = ?
         AND status = 'PAID'
         AND applied_at IS NULL
+        AND revoked_at IS NULL
         AND verified_at IS NOT NULL
       ORDER BY payment_confirmed_at ASC, created_at ASC
       LIMIT 5`,
@@ -533,10 +659,49 @@ async function aplicarCompraPendentePorEmail(usuario) {
   );
 
   const aplicados = [];
+  const expectedCompanyId = await obterCompanyIdEsperado();
 
   for (const registro of rows) {
-    const resultado = await aplicarRegistroAoUsuario(registro, usuario);
-    if (resultado.aplicado) aplicados.push(resultado);
+    try {
+      const transaction = await buscarTransacao(registro.transaction_id);
+      const statusApi = normalizarStatus(transaction.status);
+
+      if (statusApi !== "PAID") {
+        await database.query(
+          `UPDATE bestfy_transactions
+              SET status = ?, processing = 0, processing_started_at = NULL,
+                  last_error = 'REVALIDACAO_NAO_PAGA', updated_at = CURRENT_TIMESTAMP
+            WHERE transaction_id = ?`,
+          [statusApi || "UNKNOWN", String(registro.transaction_id)]
+        );
+        continue;
+      }
+
+      validarTransacaoPaga(transaction, expectedCompanyId);
+      const plano = identificarPlano(transaction);
+
+      if (
+        plano.chave !== String(registro.plan || "") ||
+        plano.valorCentavos !== Number(registro.amount_cents || 0)
+      ) {
+        throw erro(
+          "BESTFY_PENDING_MISMATCH",
+          "A revalidação da compra pendente não corresponde ao plano salvo."
+        );
+      }
+
+      await salvarDetalhesVerificados(transaction, plano);
+      const registroAtualizado = await obterRegistro(registro.transaction_id);
+      const resultado = await aplicarRegistroAoUsuario(registroAtualizado, usuario);
+      if (resultado.aplicado) aplicados.push(resultado);
+    } catch (error) {
+      await database.query(
+        `UPDATE bestfy_transactions
+            SET processing = 0, processing_started_at = NULL, last_error = ?
+          WHERE transaction_id = ?`,
+        [String(error?.code || error?.message || "REVALIDACAO_FALHOU").slice(0, 2000), String(registro.transaction_id)]
+      ).catch(() => {});
+    }
   }
 
   return {
@@ -551,7 +716,14 @@ function statusConfiguracaoBestfy() {
     apiKeyConfigurada: Boolean(String(process.env.BESTFY_API_KEY || "").trim()),
     companyIdConfiguradoManual: Boolean(String(process.env.BESTFY_COMPANY_ID || "").trim()),
     endpoint: "/webhooks/bestfy",
-    evento: "TRANSACTION_CREATED_OR_UPDATED"
+    evento: "TRANSACTION_CREATED_OR_UPDATED",
+    validacaoEstrita: true,
+    planosAutomaticos: Object.fromEntries(
+      Object.entries(PLANOS).map(([chave, plano]) => [chave, {
+        dias: plano.dias,
+        valorCentavos: plano.valorCentavos
+      }])
+    )
   };
 }
 
