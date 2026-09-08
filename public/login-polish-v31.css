@@ -1,31 +1,300 @@
-/* Turma do Primo — Login polish v31
-   Ajustes finais de composição para desktop real e celular.
-   Carregado depois do v30 para preservar toda a lógica existente. */
+/* Turma do Primo — Login polish v32
+   Desktop refinado para ocupar melhor o viewport.
+   Tablet e celular preservados. */
 
 @media (min-width: 981px) {
+  .login-v30-topbar {
+    width: min(1440px, calc(100% - 56px));
+    min-height: 78px;
+  }
+
   .login-v30-shell {
-    align-items: start;
+    width: min(1440px, calc(100% - 56px));
+    min-height: 0;
+    height: clamp(610px, calc(100svh - 140px), 760px);
+    grid-template-columns: minmax(0, 1.12fr) minmax(420px, .68fr);
+    gap: 24px;
+    align-items: stretch;
   }
 
   .login-v30-stage,
   .login-v30-auth {
-    min-height: 690px;
+    min-height: 0;
+    height: 100%;
   }
 
   .login-v30-stage {
-    padding-bottom: 318px;
+    padding: clamp(34px, 3.2vw, 48px);
+    padding-bottom: 254px;
+    border-radius: 30px;
+  }
+
+  .login-v30-eyebrow {
+    min-height: 31px;
+    padding: 0 12px;
+    font-size: 9px;
+  }
+
+  .login-v30-title {
+    max-width: 700px;
+    margin-top: 18px;
+    font-size: clamp(50px, 4.35vw, 66px);
+    line-height: .95;
+    letter-spacing: -.064em;
+  }
+
+  .login-v30-lead {
+    max-width: 620px;
+    margin-top: 18px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .login-v30-benefits {
+    margin-top: 22px;
+    gap: 8px;
+  }
+
+  .login-v30-benefits span {
+    min-height: 35px;
+    padding: 0 11px;
+    font-size: 10px;
+  }
+
+  .login-v31-rail {
+    max-width: 650px;
+    margin-top: 16px;
+    gap: 8px;
+  }
+
+  .login-v31-rail article {
+    min-height: 61px;
+    padding: 11px 12px;
+    border-radius: 13px;
+  }
+
+  .login-v31-rail span {
+    margin-top: 5px;
+    font-size: 8px;
+  }
+
+  .login-v30-floating-tag.tag-one {
+    top: 29%;
+    right: 7%;
+    left: auto;
+  }
+
+  .login-v30-floating-tag.tag-two {
+    top: 43%;
+    right: 4%;
+    left: auto;
   }
 
   .login-v30-product {
-    bottom: 38px;
+    left: clamp(34px, 3.2vw, 48px);
+    right: clamp(34px, 3.2vw, 48px);
+    bottom: 24px;
+    min-height: 208px;
+    grid-template-columns: 1.08fr .92fr;
+    gap: 12px;
+  }
+
+  .login-v30-console,
+  .login-v30-sidecard {
+    border-radius: 18px;
+  }
+
+  .login-v30-console {
+    padding: 15px;
+  }
+
+  .login-v30-console-head {
+    padding-bottom: 11px;
+  }
+
+  .login-v30-modules {
+    margin-top: 11px;
+    gap: 7px;
+  }
+
+  .login-v30-module {
+    min-height: 62px;
+    padding: 10px;
+  }
+
+  .login-v30-module span {
+    width: 25px;
+    height: 25px;
+  }
+
+  .login-v30-module strong {
+    margin-top: 7px;
+    font-size: 9px;
+  }
+
+  .login-v30-progress {
+    margin-top: 10px;
+    padding: 10px 11px;
+  }
+
+  .login-v30-sidecard {
+    padding: 15px;
+  }
+
+  .login-v30-sidecard h3 {
+    margin-top: 13px;
+    font-size: 18px;
+  }
+
+  .login-v30-sidecard p {
+    font-size: 9px;
+    line-height: 1.45;
+  }
+
+  .login-v30-pills {
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .login-v30-pills div {
+    min-height: 29px;
+    font-size: 8px;
+  }
+
+  .login-v30-auth {
+    padding: 10px;
+    border-radius: 30px;
+  }
+
+  .login-v30-auth::before {
+    inset: 7px;
+    border-radius: 24px;
   }
 
   .login-v30-auth-inner {
-    min-height: 660px;
+    min-height: 100%;
+    padding: 22px clamp(22px, 2.4vw, 34px) 22px;
+  }
+
+  .login-v30-auth-badge {
+    min-height: 28px;
+    font-size: 8px;
+  }
+
+  .login-v30-auth .auth-tabs {
+    margin-top: 16px;
+    min-height: 48px;
+  }
+
+  .login-v30-auth .auth-tab {
+    min-height: 39px;
+    font-size: 11px;
+  }
+
+  .login-v30-auth .auth-card-header {
+    margin-top: 24px;
+  }
+
+  .login-v30-auth .auth-card-header h2 {
+    font-size: clamp(25px, 2.1vw, 32px);
+    line-height: 1.04;
+  }
+
+  .login-v30-auth .auth-card-header p {
+    margin-top: 6px;
+    font-size: 11px;
+  }
+
+  .login-v30-auth .auth-form {
+    margin-top: 22px;
+    gap: 14px;
+  }
+
+  .login-v30-auth .input-group {
+    gap: 7px;
+  }
+
+  .login-v30-auth .input-group > label {
+    font-size: 10px;
+  }
+
+  .login-v30-auth .auth-input-shell {
+    min-height: 50px;
+    border-radius: 12px;
+  }
+
+  .login-v30-auth .auth-input-shell input {
+    height: 48px;
+    font-size: 12px;
+  }
+
+  .login-v30-auth .auth-submit {
+    min-height: 52px;
+    margin-top: 2px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  .login-v30-form-note {
+    padding: 10px 11px;
+    border-radius: 11px;
+  }
+
+  .login-v30-form-note span {
+    font-size: 8px;
   }
 
   .login-v30-auth .auth-security-note {
+    margin-top: 14px;
+    padding-top: 13px;
+    font-size: 8px;
+  }
+
+  .login-v31-auth-trust {
     margin-top: auto;
+    padding-top: 14px;
+    gap: 6px;
+  }
+
+  .login-v31-auth-trust span {
+    min-height: 44px;
+    padding: 7px;
+    font-size: 7px;
+  }
+
+  .login-v31-auth-trust strong {
+    font-size: 8px;
+  }
+
+  .login-v30-footer {
+    width: min(1440px, calc(100% - 56px));
+    min-height: 54px;
+    margin-top: 4px;
+    padding: 14px 0 16px;
+  }
+
+  .login-v30-footer p,
+  .login-v30-footer nav a {
+    font-size: 8px;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1180px) {
+  .login-v30-shell {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, .72fr);
+  }
+
+  .login-v30-title {
+    font-size: clamp(44px, 5vw, 56px);
+  }
+
+  .login-v30-floating-tag,
+  .login-v31-rail {
+    display: none !important;
+  }
+
+  .login-v30-stage {
+    padding-bottom: 238px;
   }
 }
 
@@ -59,7 +328,7 @@
   }
 }
 
-/* Celular: o objetivo principal é ENTRAR. O institucional vira apoio abaixo. */
+/* Celular: preservado — login primeiro e conteúdo institucional abaixo. */
 @media (max-width: 640px) {
   .auth-body.auth-2026 {
     background:
@@ -84,31 +353,12 @@
     gap: 10px;
   }
 
-  .login-v30-brand {
-    gap: 8px;
-  }
-
-  .login-v30-brand img {
-    width: 36px;
-    height: 42px;
-  }
-
-  .login-v30-brand-copy small {
-    font-size: 7px;
-    letter-spacing: .14em;
-  }
-
-  .login-v30-brand-copy strong {
-    font-size: 17px;
-  }
-
-  .login-v30-topmeta {
-    gap: 6px;
-  }
-
-  .login-v30-security {
-    display: none;
-  }
+  .login-v30-brand { gap: 8px; }
+  .login-v30-brand img { width: 36px; height: 42px; }
+  .login-v30-brand-copy small { font-size: 7px; letter-spacing: .14em; }
+  .login-v30-brand-copy strong { font-size: 17px; }
+  .login-v30-topmeta { gap: 6px; }
+  .login-v30-security { display: none; }
 
   .login-v30-status {
     min-height: 34px;
@@ -130,21 +380,9 @@
     box-shadow: 0 24px 65px rgba(0,0,0,.42), 0 0 26px rgba(126,34,206,.08);
   }
 
-  .login-v30-auth::before {
-    inset: 6px;
-    border-radius: 21px;
-  }
-
-  .login-v30-auth-inner {
-    min-height: 0;
-    padding: 20px 16px 18px;
-  }
-
-  .login-v30-auth-badge {
-    min-height: 27px;
-    padding: 0 9px;
-    font-size: 8px;
-  }
+  .login-v30-auth::before { inset: 6px; border-radius: 21px; }
+  .login-v30-auth-inner { min-height: 0; padding: 20px 16px 18px; }
+  .login-v30-auth-badge { min-height: 27px; padding: 0 9px; font-size: 8px; }
 
   .login-v30-auth .auth-tabs {
     margin-top: 14px;
@@ -152,14 +390,8 @@
     border-radius: 13px;
   }
 
-  .login-v30-auth .auth-tab {
-    min-height: 38px;
-    font-size: 11px;
-  }
-
-  .login-v30-auth .auth-card-header {
-    margin-top: 22px;
-  }
+  .login-v30-auth .auth-tab { min-height: 38px; font-size: 11px; }
+  .login-v30-auth .auth-card-header { margin-top: 22px; }
 
   .login-v30-auth .auth-card-header h2 {
     font-size: clamp(25px, 8vw, 34px);
@@ -173,28 +405,16 @@
     line-height: 1.5;
   }
 
-  .login-v30-auth .auth-form {
-    margin-top: 22px;
-    gap: 15px;
-  }
-
-  .login-v30-auth .input-group {
-    gap: 7px;
-  }
-
-  .login-v30-auth .input-group > label {
-    font-size: 11px;
-  }
+  .login-v30-auth .auth-form { margin-top: 22px; gap: 15px; }
+  .login-v30-auth .input-group { gap: 7px; }
+  .login-v30-auth .input-group > label { font-size: 11px; }
 
   .login-v30-auth .auth-input-shell {
     min-height: 54px;
     border-radius: 14px;
   }
 
-  .login-v30-auth .auth-input-shell input {
-    height: 52px;
-    font-size: 14px;
-  }
+  .login-v30-auth .auth-input-shell input { height: 52px; font-size: 14px; }
 
   .login-v30-auth .auth-submit {
     min-height: 56px;
@@ -211,10 +431,7 @@
     border: 1px solid rgba(255,255,255,.045);
   }
 
-  .login-v30-form-note span {
-    font-size: 9px;
-    line-height: 1.45;
-  }
+  .login-v30-form-note span { font-size: 9px; line-height: 1.45; }
 
   .login-v30-auth .auth-security-note {
     margin-top: 16px;
@@ -222,7 +439,6 @@
     font-size: 9px;
   }
 
-  /* Remove os cards técnicos redundantes no celular; a mensagem principal fica mais limpa. */
   .login-v31-mobile-trust,
   .login-v30-auth .login-v30-trust-grid,
   .login-v30-auth .login-v30-auth-trust,
@@ -281,7 +497,6 @@
     font-size: 9px;
   }
 
-  /* No mobile a prévia grande estava empurrando o login para muito longe. */
   .login-v30-product,
   .login-v30-floating-tag,
   .login-v30-stage .login-v30-trust-grid,
@@ -299,10 +514,7 @@
     text-align: center;
   }
 
-  .login-v30-footer p {
-    margin: 0;
-    font-size: 9px;
-  }
+  .login-v30-footer p { margin: 0; font-size: 9px; }
 
   .login-v30-footer nav {
     display: flex;
@@ -311,9 +523,7 @@
     gap: 8px 16px;
   }
 
-  .login-v30-footer nav a {
-    font-size: 10px;
-  }
+  .login-v30-footer nav a { font-size: 10px; }
 }
 
 @media (max-width: 380px) {
