@@ -37,6 +37,7 @@ const PREMIUM_ASSET_PREFIXES = [
 ];
 
 const PREMIUM_SCRIPT_PREFIXES = [
+  "/protected-estudo.js",
   "/estudo.js",
   "/estudo-",
   "/study-",
@@ -70,6 +71,7 @@ const PREMIUM_SCRIPT_PREFIXES = [
 ];
 
 const PREMIUM_STYLESHEET_PREFIXES = [
+  "/estudo.css",
   "/estudo-",
   "/study-",
   "/module-lab-",
