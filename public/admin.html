@@ -7,6 +7,7 @@
   <meta name="robots" content="noindex,nofollow" />
   <meta name="description" content="Admin Command Center da Turma do Primo." />
   <title>Admin Command Center | Turma do Primo</title>
+  <!-- Admin v3 é isolado. Estes marcadores impedem o servidor legado de injetar camadas antigas: admin-final-ui.css admin-command-center.css admin-final-ui.js admin-command-center.js responsive-global.css -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -15,78 +16,42 @@
 </head>
 <body class="admin-app-body" data-admin-v3="true">
   <div class="admin-app-loading" id="adminAppLoading" role="status" aria-live="polite">
-    <div>
-      <img src="/assets/turma-primo-logo.svg" alt="" />
-      <strong>Preparando o Command Center</strong>
-      <span>Validando sessão, permissões e dados operacionais…</span>
-    </div>
+    <div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando o Command Center</strong><span>Validando sessão, permissões e dados operacionais…</span></div>
   </div>
-
   <div class="admin-mobile-overlay" id="adminMobileOverlay" hidden></div>
 
   <aside class="admin-sidebar" id="adminSidebar" aria-label="Navegação administrativa">
-    <div class="admin-sidebar-brand">
-      <img src="/assets/turma-primo-logo.svg" alt="Turma do Primo" />
-      <div><small>TURMA DO</small><strong>PRIMO</strong><span>ADMIN COMMAND CENTER</span></div>
-      <button class="admin-sidebar-close" id="adminSidebarClose" type="button" aria-label="Fechar menu">×</button>
-    </div>
-
+    <div class="admin-sidebar-brand"><img src="/assets/turma-primo-logo.svg" alt="Turma do Primo" /><div><small>TURMA DO</small><strong>PRIMO</strong><span>ADMIN COMMAND CENTER</span></div><button class="admin-sidebar-close" id="adminSidebarClose" type="button" aria-label="Fechar menu">×</button></div>
     <nav class="admin-nav" id="adminNav">
-      <a class="admin-nav-item" href="/dashboard" data-permission="dashboard">
-        <span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-crown"></use></svg></span><span>Dashboard Premium</span>
-      </a>
-
+      <a class="admin-nav-item" href="/dashboard" data-permission="dashboard"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-crown"></use></svg></span><span>Dashboard Premium</span></a>
       <span class="admin-nav-label">OPERAÇÃO</span>
       <button class="admin-nav-item active" type="button" data-section="overview" data-permission="painelAdmin"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-home"></use></svg></span><span>Visão Geral</span></button>
       <button class="admin-nav-item" type="button" data-section="students" data-permission="controleAlunos"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-users"></use></svg></span><span>Alunos</span></button>
       <button class="admin-nav-item" type="button" data-section="approvals" data-permission="aprovacoes"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-check"></use></svg></span><span>Aprovações</span><b class="admin-nav-badge" id="approvalMenuBadge" hidden>0</b></button>
       <button class="admin-nav-item" type="button" data-section="support" data-permission="suporte"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-headset"></use></svg></span><span>Suporte</span><b class="admin-nav-badge" id="supportMenuBadge" hidden>0</b></button>
-
       <span class="admin-nav-label">NEGÓCIO</span>
       <button class="admin-nav-item" type="button" data-section="finance" data-permission="financas"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-finance"></use></svg></span><span>Financeiro</span></button>
       <button class="admin-nav-item" type="button" data-section="reports" data-permission="relatorios"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-report"></use></svg></span><span>Relatórios</span></button>
       <a class="admin-nav-item" href="/painel-vendas" data-permission="painelVendas"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-cart"></use></svg></span><span>Painel de Vendas</span></a>
-
       <span class="admin-nav-label">PLATAFORMA</span>
       <button class="admin-nav-item" type="button" data-section="notifications" data-permission="notificacoes"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-bell"></use></svg></span><span>Notificações</span><b class="admin-nav-badge" id="notificationMenuBadge" hidden>0</b></button>
       <button class="admin-nav-item" type="button" data-section="exams" data-permission="provas"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-file"></use></svg></span><span>Resultados de Provas</span></button>
       <button class="admin-nav-item" type="button" data-section="team" data-permission="equipe"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-team"></use></svg></span><span>Equipe & Acessos</span></button>
-
       <span class="admin-nav-label">SISTEMA</span>
       <button class="admin-nav-item" type="button" data-section="logs" data-permission="seguranca"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-shield"></use></svg></span><span>Segurança & Auditoria</span></button>
       <button class="admin-nav-item" type="button" data-section="settings" data-permission="configuracoes"><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-settings"></use></svg></span><span>Configurações</span></button>
-
       <span class="admin-nav-label" data-dev-only hidden>DEV</span>
       <button class="admin-nav-item admin-dev-nav" type="button" data-section="dev" data-dev-only hidden><span class="admin-nav-icon"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-code"></use></svg></span><span>Central Dev</span></button>
     </nav>
-
-    <div class="admin-sidebar-profile">
-      <div class="admin-profile-avatar" data-user-initial>A</div>
-      <div><strong data-user-name>Admin</strong><span data-user-role>Admin</span></div>
-      <button type="button" data-logout aria-label="Sair"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-logout"></use></svg></button>
-    </div>
+    <div class="admin-sidebar-profile"><div class="admin-profile-avatar" data-user-initial>A</div><div><strong data-user-name>Admin</strong><span data-user-role>Admin</span></div><button type="button" data-logout aria-label="Sair"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-logout"></use></svg></button></div>
   </aside>
 
   <main class="admin-main" id="adminMain">
     <header class="admin-topbar">
-      <div class="admin-topbar-left">
-        <button class="admin-menu-toggle" id="adminMenuToggle" type="button" aria-label="Abrir menu">☰</button>
-        <div><span class="admin-breadcrumb">Turma do Primo</span><h1 id="adminPageTitle">Admin Command Center</h1></div>
-      </div>
-      <div class="admin-topbar-center">
-        <label class="admin-global-search" for="adminGlobalSearch">
-          <span><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-search"></use></svg></span>
-          <input id="adminGlobalSearch" type="search" placeholder="Buscar módulo, aluno, e-mail ou ação…" autocomplete="off" />
-          <kbd>CTRL K</kbd>
-        </label>
-      </div>
-      <div class="admin-topbar-actions">
-        <div class="admin-status-pill"><i></i>Sistema operacional</div>
-        <button class="admin-icon-btn" type="button" data-section-trigger="notifications" aria-label="Notificações"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-bell"></use></svg><b id="adminTopBadge" hidden>0</b></button>
-        <div class="admin-top-user"><div class="admin-profile-avatar" data-user-initial>A</div><div><strong data-user-name>Admin</strong><span data-user-role>Admin</span></div></div>
-      </div>
+      <div class="admin-topbar-left"><button class="admin-menu-toggle" id="adminMenuToggle" type="button" aria-label="Abrir menu">☰</button><div><span class="admin-breadcrumb">Turma do Primo</span><h1 id="adminPageTitle">Admin Command Center</h1></div></div>
+      <div class="admin-topbar-center"><label class="admin-global-search" for="adminGlobalSearch"><span><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-search"></use></svg></span><input id="adminGlobalSearch" type="search" placeholder="Buscar módulo, aluno, e-mail ou ação…" autocomplete="off" /><kbd>CTRL K</kbd></label></div>
+      <div class="admin-topbar-actions"><div class="admin-status-pill"><i></i>Sistema operacional</div><button class="admin-icon-btn" type="button" data-section-trigger="notifications" aria-label="Notificações"><svg class="cc-svg" viewBox="0 0 24 24"><use href="/assets/admin-command-icons.svg#i-bell"></use></svg><b id="adminTopBadge" hidden>0</b></button><div class="admin-top-user"><div class="admin-profile-avatar" data-user-initial>A</div><div><strong data-user-name>Admin</strong><span data-user-role>Admin</span></div></div></div>
     </header>
-
     <div class="admin-content">
       <section class="admin-section active" id="section-overview" data-title="Visão Geral" data-permission="painelAdmin"></section>
       <section class="admin-section" id="section-students" data-title="Alunos" data-permission="controleAlunos"></section>
@@ -102,7 +67,6 @@
       <section class="admin-section" id="section-dev" data-title="Central Dev" data-dev-only hidden></section>
     </div>
   </main>
-
   <div class="admin-toast-stack" id="adminToastStack" aria-live="polite" aria-atomic="false"></div>
   <script defer src="/admin-command-center-v3.js?v=20260909-admin-v3"></script>
 </body>
