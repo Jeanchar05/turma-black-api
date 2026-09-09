@@ -5,7 +5,9 @@ const { promisify } = require("util");
 
 const scryptAsync = promisify(crypto.scrypt);
 const FORMAT = "$scrypt$v1$";
-const DEFAULT_N = 16384;
+// OWASP-aligned default for r=8, p=1. Existing hashes remain valid and are
+// transparently marked for rehash after a successful login.
+const DEFAULT_N = 131072;
 const DEFAULT_R = 8;
 const DEFAULT_P = 1;
 const KEY_LENGTH = 32;
@@ -13,6 +15,7 @@ const SALT_LENGTH = 16;
 const MAX_PASSWORD_LENGTH = 256;
 const MIN_USER_PASSWORD_LENGTH = 10;
 const MIN_STAFF_PASSWORD_LENGTH = 12;
+const MIN_SCRYPT_MAXMEM = 192 * 1024 * 1024;
 
 const COMMON_PASSWORDS = new Set([
   "1234567890", "123456789", "12345678", "password", "password1",
@@ -63,12 +66,19 @@ function validatePasswordPolicy(value, options = {}) {
   return { valid: true, reason: "" };
 }
 
+function maxmemFor(N, r) {
+  // crypto.scrypt precisa de memória acima de aproximadamente 128*N*r.
+  // Mantemos margem para overhead e hashes legados com parâmetros válidos.
+  const required = (128 * Number(N || 0) * Number(r || 0)) + (32 * 1024 * 1024);
+  return Math.max(MIN_SCRYPT_MAXMEM, required);
+}
+
 async function deriveKey(password, salt, N = DEFAULT_N, r = DEFAULT_R, p = DEFAULT_P) {
   return scryptAsync(password, salt, KEY_LENGTH, {
     N,
     r,
     p,
-    maxmem: 64 * 1024 * 1024
+    maxmem: maxmemFor(N, r)
   });
 }
 
@@ -91,6 +101,15 @@ async function hashPassword(value) {
     salt.toString("base64url"),
     Buffer.from(derived).toString("base64url")
   ].join("$");
+}
+
+async function ensurePasswordHash(value) {
+  const current = normalizePassword(value);
+  if (!current || current.length > MAX_PASSWORD_LENGTH) {
+    throw new Error("Senha inválida para hash.");
+  }
+  if (isPasswordHash(current)) return current;
+  return hashPassword(current);
 }
 
 function safeCompareStrings(a, b) {
@@ -125,7 +144,10 @@ async function verifyPassword(storedValue, candidateValue) {
   const salt = Buffer.from(parts[6], "base64url");
   const expected = Buffer.from(parts[7], "base64url");
 
-  if (!Number.isInteger(N) || !Number.isInteger(r) || !Number.isInteger(p) || !salt.length || !expected.length) {
+  if (
+    !Number.isInteger(N) || !Number.isInteger(r) || !Number.isInteger(p) ||
+    N < 2 || r < 1 || p < 1 || !salt.length || expected.length !== KEY_LENGTH
+  ) {
     return { valid: false, needsRehash: false };
   }
 
@@ -134,7 +156,9 @@ async function verifyPassword(storedValue, candidateValue) {
     if (actual.length !== expected.length) return { valid: false, needsRehash: false };
 
     const valid = crypto.timingSafeEqual(actual, expected);
-    const needsRehash = valid && (N !== DEFAULT_N || r !== DEFAULT_R || p !== DEFAULT_P || expected.length !== KEY_LENGTH);
+    const needsRehash = valid && (
+      N !== DEFAULT_N || r !== DEFAULT_R || p !== DEFAULT_P || expected.length !== KEY_LENGTH
+    );
     return { valid, needsRehash };
   } catch (_) {
     return { valid: false, needsRehash: false };
@@ -143,10 +167,12 @@ async function verifyPassword(storedValue, candidateValue) {
 
 module.exports = {
   hashPassword,
+  ensurePasswordHash,
   verifyPassword,
   isPasswordHash,
   validatePasswordPolicy,
   MIN_USER_PASSWORD_LENGTH,
   MIN_STAFF_PASSWORD_LENGTH,
-  MAX_PASSWORD_LENGTH
+  MAX_PASSWORD_LENGTH,
+  PASSWORD_HASH_POLICY: Object.freeze({ N: DEFAULT_N, r: DEFAULT_R, p: DEFAULT_P, keyLength: KEY_LENGTH })
 };
