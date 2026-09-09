@@ -71,7 +71,6 @@ async function applyManualEntitlement(sale) {
   if (!user && sale.cliente_email) user = await Usuario.findOne({ email: String(sale.cliente_email).toLowerCase() });
   if (!user) return { applied: false, reason: "user-not-found" };
 
-  // Uma compra manual nunca substitui um entitlement verificado pela Bestfy.
   if (String(user.bestfyTransactionId || "").trim()) {
     return { applied: false, reason: "bestfy-entitlement-present" };
   }
@@ -110,20 +109,15 @@ async function revokeManualEntitlementIfOwned(sale) {
   user.manualSaleGrantedAt = "";
   user.manualSaleRevokedAt = new Date().toISOString();
   user.atualizadoPor = `venda-manual-revogada:${sale.id}`;
-  // Não alteramos suspenso/status/aprovado: revogação comercial não muda sanções administrativas.
   await user.save();
   return { revoked: true, userId: String(user.id || user._id || "") };
 }
 
-// Toda venda digitada manualmente nasce pendente. Confirmação financeira usa
-// exclusivamente a rota dedicada abaixo, com RBAC e auditoria.
 router.post("/vendas", auth, requirePermission("painelVendas"), (req, _res, next) => {
   req.body = { ...(req.body || {}), status: "pendente", origem: "painel-vendas" };
   return next();
 });
 
-// Bestfy é fonte de verdade e não pode ser editada pelo painel manual. Em
-// vendas manuais, status/origem também não podem ser alterados pelo PUT genérico.
 router.put("/vendas/:id", auth, requirePermission("painelVendas"), async (req, res, next) => {
   try {
     const sale = await findSale(req.params.id);
@@ -217,14 +211,15 @@ router.post("/vendas/:id/status", auth, requirePermission("painelVendas"), async
   }
 });
 
-// Vendas Bestfy nunca podem ser apagadas pelo painel, inclusive pelo Dev. O
-// histórico financeiro precisa permanecer auditável e reconciliável.
 router.delete("/vendas/:id", auth, requirePermission("painelVendas"), async (req, res, next) => {
   try {
     const sale = await findSale(req.params.id);
     if (!sale) return res.status(404).json({ erro: "Venda não encontrada." });
     if (String(sale.origem || "").toLowerCase() === "bestfy") {
       return res.status(409).json({ erro: "Transações sincronizadas da Bestfy não podem ser apagadas." });
+    }
+    if (String(sale.status || "").toLowerCase() === "pago") {
+      return res.status(409).json({ erro: "Venda confirmada não pode ser apagada. Registre cancelamento/estorno para preservar a auditoria." });
     }
     return next();
   } catch (error) {
