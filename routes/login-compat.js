@@ -5,6 +5,7 @@ require("../services/password-model-guard");
 const Usuario = require("../models/Usuario");
 const database = require("../config/database");
 const { verifyPassword } = require("../services/passwords");
+const { aplicarCompraPendentePorEmail } = require("../services/bestfy");
 const { loginRateLimit, loginIpRateLimit } = require("../middleware/rate-limit");
 const { gerarToken, montarUsuarioSeguro, definirCookieSessao } = require("../middleware/auth");
 const {
@@ -39,7 +40,6 @@ function normalizarCargo(valor, tipo, contaDev = false) {
   };
 
   const normalizado = mapa[cargo] || cargo;
-  // Cargo Dev sem a flag interna contaDev nunca é reconhecido como privilegiado.
   if (normalizado === "dev") return "aluno";
 
   const permitidos = [
@@ -157,16 +157,30 @@ async function loginCompativel(req, res) {
       await encontrado.save();
     }
 
-    const usuario = montarCompatibilidade(encontrado);
+    if (encontrado.suspenso || encontrado.status === "suspenso") {
+      return res.status(403).json({ erro: "Sua conta está suspensa.", status: "suspenso" });
+    }
+    if (encontrado.status === "bloqueado") {
+      return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
+    }
+
+    // Este é o login efetivamente montado primeiro no servidor; por isso a
+    // revalidação de compra pendente precisa acontecer aqui também.
+    try {
+      await aplicarCompraPendentePorEmail(encontrado);
+    } catch (error) {
+      console.warn("Não foi possível revalidar compra Bestfy pendente no login:", error.message);
+    }
+
+    const atualizado = await Usuario.findById(encontrado._id) || encontrado;
+    const usuario = montarCompatibilidade(atualizado);
 
     if (usuario.suspenso || usuario.status === "suspenso") {
       return res.status(403).json({ erro: "Sua conta está suspensa.", status: "suspenso" });
     }
-
     if (usuario.status === "bloqueado") {
       return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
     }
-
     if (!usuario.aprovado && usuario.cargo !== "dev") {
       return res.status(403).json({
         erro: "Sua conta ainda está pendente de aprovação.",
@@ -176,9 +190,8 @@ async function loginCompativel(req, res) {
     }
 
     const agora = new Date().toISOString();
-
     await Usuario.updateOne(
-      { _id: encontrado._id },
+      { _id: atualizado._id },
       {
         $inc: { acessos: 1 },
         $set: {
@@ -188,7 +201,7 @@ async function loginCompativel(req, res) {
       }
     );
 
-    usuario.acessos = Number(encontrado.acessos || 0) + 1;
+    usuario.acessos = Number(atualizado.acessos || 0) + 1;
     usuario.ultimoLogin = agora;
     usuario.status = usuario.status === "pendente" ? "ativo" : usuario.status;
 
@@ -220,7 +233,6 @@ async function loginCompativel(req, res) {
 
 router.post("/login", loginIpRateLimit, loginRateLimit, loginCompativel);
 router.post("/auth/login", loginIpRateLimit, loginRateLimit, loginCompativel);
-
 router.use("/admin", require("./admin-mysql-core"));
 
 module.exports = router;
