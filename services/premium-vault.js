@@ -8,7 +8,9 @@ let state = {
   initialized: false,
   publicDir: "",
   vaultDir: "",
-  moved: 0
+  moved: 0,
+  degraded: false,
+  error: ""
 };
 
 function inside(root, target) {
@@ -33,8 +35,6 @@ function secureRemoveSource(source) {
     fs.unlinkSync(source);
     return;
   } catch (unlinkError) {
-    // Se a remoção não for possível mas o arquivo ainda for gravável, apague o
-    // conteúdo sensível. Isto evita deixar uma segunda cópia no document root.
     try {
       fs.writeFileSync(source, "", { flag: "w" });
       fs.unlinkSync(source);
@@ -48,37 +48,57 @@ function secureRemoveSource(source) {
 function initializePremiumVault(publicDir, vaultDir) {
   const publicRoot = path.resolve(publicDir);
   const privateRoot = path.resolve(vaultDir);
-  if (publicRoot === privateRoot || inside(publicRoot, privateRoot)) {
-    throw new Error("O cofre Premium precisa ficar fora do diretório público.");
-  }
-
-  fs.mkdirSync(privateRoot, { recursive: true });
   let moved = 0;
 
-  for (const item of walkFiles(publicRoot, publicRoot)) {
-    const urlPath = `/${item.relative.split(path.sep).join("/")}`;
-    if (!isPremiumPath(urlPath)) continue;
-
-    const destination = path.resolve(privateRoot, item.relative);
-    if (!inside(privateRoot, destination)) {
-      throw new Error("Caminho Premium inválido durante preparação do cofre.");
+  try {
+    if (publicRoot === privateRoot || inside(publicRoot, privateRoot)) {
+      throw new Error("O cofre Premium precisa ficar fora do diretório público.");
     }
 
-    fs.mkdirSync(path.dirname(destination), { recursive: true });
-    fs.copyFileSync(item.full, destination);
-    secureRemoveSource(item.full);
-    moved += 1;
+    fs.mkdirSync(privateRoot, { recursive: true });
+
+    for (const item of walkFiles(publicRoot, publicRoot)) {
+      const urlPath = `/${item.relative.split(path.sep).join("/")}`;
+      if (!isPremiumPath(urlPath)) continue;
+
+      const destination = path.resolve(privateRoot, item.relative);
+      if (!inside(privateRoot, destination)) {
+        throw new Error("Caminho Premium inválido durante preparação do cofre.");
+      }
+
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.copyFileSync(item.full, destination);
+      secureRemoveSource(item.full);
+      moved += 1;
+    }
+
+    state = {
+      initialized: true,
+      publicDir: publicRoot,
+      vaultDir: privateRoot,
+      moved,
+      degraded: false,
+      error: ""
+    };
+
+    console.log(`[SECURITY] Cofre Premium preparado fora do document root (${moved} arquivos protegidos).`);
+    return { ...state };
+  } catch (error) {
+    // Importante: uma limitação de escrita da hospedagem não pode derrubar
+    // todo o site com 503. O conteúdo Premium continua fail-closed porque
+    // resolvePremiumFile() retorna null enquanto initialized=false, e o guard
+    // de autenticação permanece montado antes do express.static.
+    state = {
+      initialized: false,
+      publicDir: publicRoot,
+      vaultDir: privateRoot,
+      moved,
+      degraded: true,
+      error: String(error?.message || "Falha ao preparar cofre Premium.").slice(0, 300)
+    };
+    console.error("[SECURITY] Cofre Premium indisponível; servidor continuará online com Premium bloqueado:", state.error);
+    return { ...state };
   }
-
-  state = {
-    initialized: true,
-    publicDir: publicRoot,
-    vaultDir: privateRoot,
-    moved
-  };
-
-  console.log(`[SECURITY] Cofre Premium preparado fora do document root (${moved} arquivos protegidos).`);
-  return { ...state };
 }
 
 function resolvePremiumFile(requestPath) {
