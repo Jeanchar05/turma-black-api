@@ -1,0 +1,23 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Material Premium nunca deve ser entregue diretamente pelo servidor estático.
+# O rewrite mantém a URL visível, mas força a passagem pelo endpoint interno
+# do Node, que exige sessão válida + Premium antes de enviar o arquivo.
+RewriteRule ^(dashboard|atividades|notificacoes|estudo|modulos|minigames|gestao|notas|favoritos|provas|roleta|roleta-reel|estudo-(gemeos|espelhos|fibonacci|magneto|camaleoes|triangulacao|cavalos|eclipse-zero))(\.html)?$ /__premium/$0 [END,QSA,NC]
+
+RewriteRule ^(estudo\.js|estudo-[^/]+\.(js|css)|study-[^/]+\.(js|css)|module-lab-[^/]+\.(js|css)|modules-v16[^/]*\.(js|css)|modules-elite-[^/]*\.(js|css)|modules-images-[^/]*\.js|modules-page-[^/]*\.js|modulos\.(js|css)|gestao-[^/]+\.(js|css)|notas(?:-[^/]+)?\.(js|css)|favorites-[^/]+\.(js|css)|favoritos\.(js|css)|provas(?:-[^/]+)?\.(js|css)|exams-[^/]+\.(js|css)|roleta(?:-reel)?[^/]*\.(js|css)|race-tool\.js|study-race-[^/]+\.js|dashboard-(?:premium|final|lite|controls-[^/]*|notifications-[^/]*|portrait-[^/]*|v20[^/]*|refine-[^/]*|safe-[^/]*|hero-[^/]*|live-[^/]*|character-[^/]*)\.(js|css)|elite-v19(?:-addons)?\.js)$ /__premium/$0 [END,QSA,NC]
+
+RewriteRule ^dashboard-neo/(.+)$ /__premium/dashboard-neo/$1 [END,QSA,NC]
+RewriteRule ^assets/(study|roulette|minigames|gestao|exams|modules-v16|elite-v19/modules|imperial-v14/modules)/(.+)$ /__premium/assets/$1/$2 [END,QSA,NC]
+</IfModule>
+
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "DENY"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-Security-Policy-Version "20260909-2"
+Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self' https://pay.turmablack.com.br; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-src 'none'; worker-src 'self' blob:; media-src 'self' blob: https:; manifest-src 'self'; upgrade-insecure-requests"
+</IfModule>
