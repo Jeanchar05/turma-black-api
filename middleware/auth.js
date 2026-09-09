@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario");
 const database = require("../config/database");
 const { sessionIsValid } = require("../services/sessions");
+const { isDevAccount } = require("./permissions");
 
 const JWT_ISSUER = "turma-do-primo";
 const JWT_AUDIENCE = "turmablack.com.br";
@@ -113,10 +114,9 @@ function limparCookieSessao(res) {
 
 function normalizarCargo(usuario) {
   if (!usuario) return "aluno";
-  if (usuario.contaDev === true) return "dev";
+  if (isDevAccount(usuario)) return "dev";
   if (usuario.cargo) {
     const cargo = String(usuario.cargo).trim().toLowerCase().replaceAll("_", "-");
-    // O cargo Dev só existe quando a flag interna contaDev também está ativa.
     return cargo === "dev" ? "aluno" : cargo;
   }
   if (usuario.tipo === "admin") return "admin";
@@ -260,7 +260,7 @@ function montarUsuarioSeguro(usuario) {
     email: usuario.email || "",
     tipo: usuario.tipo || "aluno",
     cargo,
-    contaDev: Boolean(usuario.contaDev === true && cargo === "dev"),
+    contaDev: Boolean(isDevAccount(usuario) && cargo === "dev"),
     permissoesPersonalizadas: usuario.permissoesPersonalizadas || {},
     vendedor: Boolean(usuario.vendedor || cargo === "vendedor"),
     comissao: Number(usuario.comissao || 20),
@@ -306,7 +306,6 @@ async function localizarUsuarioPorToken(token) {
   let usuario = await Usuario.findById(id);
   if (!usuario && email) usuario = await Usuario.findOne({ email });
 
-  // Um token nunca pode migrar silenciosamente para outra conta com o mesmo e-mail.
   if (usuario && obterId(usuario) !== id) return { erro: "TOKEN_IDENTIDADE_INVALIDA" };
 
   return { usuario, payload: decoded };
@@ -446,7 +445,7 @@ function gerarToken(usuario) {
       nome: usuario.nome || "",
       tipo: usuario.tipo || "aluno",
       cargo,
-      contaDev: Boolean(usuario.contaDev === true && cargo === "dev"),
+      contaDev: Boolean(isDevAccount(usuario) && cargo === "dev"),
       vendedor: Boolean(usuario.vendedor || cargo === "vendedor"),
       plano: usuario.plano || "free",
       tokenVersion: 2
