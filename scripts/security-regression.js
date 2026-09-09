@@ -84,12 +84,14 @@ function testPremiumVault() {
 
   const state = initializePremiumVault(publicDir, vaultDir);
   assert.strictEqual(state.initialized, true);
-  assert.strictEqual(fs.existsSync(path.join(publicDir, "dashboard.html")), false, "dashboard Premium deve sair de public/");
-  assert.strictEqual(fs.existsSync(path.join(publicDir, "estudo-futuro-modulo.html")), false, "estudo Premium deve sair de public/");
-  assert.strictEqual(fs.existsSync(path.join(publicDir, "assets", "study", "segredo.js")), false, "asset Premium deve sair de public/");
+  assert.strictEqual(state.mode, "authenticated-public", "resolver deve usar modo compatível com hospedagem gerenciada");
+  assert.strictEqual(fs.existsSync(path.join(publicDir, "dashboard.html")), true, "boot não deve mover arquivos do pacote");
+  assert.strictEqual(fs.existsSync(path.join(publicDir, "estudo-futuro-modulo.html")), true, "boot não deve mutar o document root");
+  assert.strictEqual(fs.existsSync(path.join(publicDir, "assets", "study", "segredo.js")), true, "asset deve permanecer estável durante o boot");
   assert.strictEqual(fs.existsSync(path.join(publicDir, "index.html")), true, "conteúdo público deve permanecer em public/");
-  assert.ok(resolvePremiumFile("/dashboard"), "rota sem extensão deve resolver HTML dentro do cofre");
-  assert.ok(resolvePremiumFile("/assets/study/segredo.js"), "asset Premium deve resolver somente pelo cofre");
+  assert.ok(resolvePremiumFile("/dashboard"), "rota sem extensão deve resolver HTML Premium autenticado");
+  assert.ok(resolvePremiumFile("/assets/study/segredo.js"), "asset Premium deve ser resolvido pelo handler autenticado");
+  assert.strictEqual(resolvePremiumFile("/../server.js"), null, "resolver deve bloquear traversal");
 
   fs.rmSync(root, { recursive: true, force: true });
 }
@@ -159,11 +161,11 @@ function testWiring() {
   assert.ok(authRoute.includes("../services/bestfy-hardened"), "webhook deve usar wrapper Bestfy recuperável");
   assert.ok(server.includes("support-upload-secure.js"), "upload sanitizado deve ser montado antes do legado");
   assert.ok(server.indexOf("support-upload-secure.js") < server.indexOf('"suporte.js"'), "rota segura deve preceder rota de suporte legada");
-  assert.ok(server.includes("initializePremiumVault"), "servidor deve mover conteúdo Premium para o cofre antes de iniciar");
-  assert.ok(server.includes("resolvePremiumFile"), "entrega Premium deve resolver arquivos apenas pelo cofre");
+  assert.ok(server.includes("initializePremiumVault"), "servidor deve inicializar o resolver Premium antes de servir conteúdo protegido");
+  assert.ok(server.includes("resolvePremiumFile"), "entrega Premium deve passar pelo resolver autenticado");
   assert.ok(server.includes("/__premium"), "servidor deve possuir entrega Premium interna autenticada");
   assert.ok(rootHtaccess.includes("/__premium/") && publicHtaccess.includes("/__premium/"), "camada estática deve reescrever Premium");
-  assert.ok(rootHtaccess.includes(".premium-vault"), "document root raiz deve negar acesso direto ao cofre");
+  assert.ok(rootHtaccess.includes(".premium-vault"), "document root raiz deve negar acesso a eventual diretório privado residual");
   assert.ok(rootHtaccess.includes("X-Security-Policy-Version"), "edge deve publicar marcador da política CSP");
 }
 
