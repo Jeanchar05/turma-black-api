@@ -4,73 +4,113 @@ const crypto = require("crypto");
 const { promisify } = require("util");
 
 const scryptAsync = promisify(crypto.scrypt);
-const PREFIX = "$scrypt$v1$";
-const N = 16384;
-const R = 8;
-const P = 1;
+const FORMAT = "$scrypt$v1$";
+const DEFAULT_N = 16384;
+const DEFAULT_R = 8;
+const DEFAULT_P = 1;
 const KEY_LENGTH = 32;
 const SALT_LENGTH = 16;
 const MAX_PASSWORD_LENGTH = 256;
+const MIN_USER_PASSWORD_LENGTH = 10;
+const MIN_STAFF_PASSWORD_LENGTH = 12;
 
-function normalizarSenha(value) {
-  const password = String(value ?? "");
-  if (!password || password.length > MAX_PASSWORD_LENGTH) return "";
-  return password;
+const COMMON_PASSWORDS = new Set([
+  "1234567890", "123456789", "12345678", "password", "password1",
+  "qwerty123", "qwertyuiop", "admin123", "administrator", "senha123",
+  "senha1234", "turmablack", "turmadoprimo", "123456789a", "abcdef1234"
+]);
+
+function normalizePassword(value) {
+  return String(value ?? "");
 }
 
 function isPasswordHash(value) {
-  return String(value || "").startsWith(PREFIX);
+  return String(value || "").startsWith(FORMAT);
+}
+
+function validatePasswordPolicy(value, options = {}) {
+  const password = normalizePassword(value);
+  const minimumLength = Number(options.minimumLength || MIN_USER_PASSWORD_LENGTH);
+  const email = String(options.email || "").trim().toLowerCase();
+  const name = String(options.name || "").trim().toLowerCase();
+
+  if (password.length < minimumLength) {
+    return { valid: false, reason: `A senha precisa ter pelo menos ${minimumLength} caracteres.` };
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return { valid: false, reason: `A senha deve ter no máximo ${MAX_PASSWORD_LENGTH} caracteres.` };
+  }
+
+  const normalized = password.trim().toLowerCase();
+  if (COMMON_PASSWORDS.has(normalized)) {
+    return { valid: false, reason: "Escolha uma senha menos previsível." };
+  }
+
+  if (/^(.)\1{7,}$/.test(password) || /^(?:0123456789|1234567890|9876543210)+$/.test(password)) {
+    return { valid: false, reason: "A senha é previsível demais." };
+  }
+
+  const emailLocal = email.includes("@") ? email.split("@")[0] : "";
+  if (emailLocal.length >= 4 && normalized.includes(emailLocal)) {
+    return { valid: false, reason: "A senha não deve conter a parte principal do seu e-mail." };
+  }
+
+  const firstName = name.split(/\s+/).filter(Boolean)[0] || "";
+  if (firstName.length >= 4 && normalized.includes(firstName)) {
+    return { valid: false, reason: "A senha não deve conter seu nome." };
+  }
+
+  return { valid: true, reason: "" };
+}
+
+async function deriveKey(password, salt, N = DEFAULT_N, r = DEFAULT_R, p = DEFAULT_P) {
+  return scryptAsync(password, salt, KEY_LENGTH, {
+    N,
+    r,
+    p,
+    maxmem: 64 * 1024 * 1024
+  });
 }
 
 async function hashPassword(value) {
-  const password = normalizarSenha(value);
-  if (!password) {
-    const error = new Error("Senha inválida para armazenamento seguro.");
-    error.code = "PASSWORD_INVALID";
-    throw error;
+  const password = normalizePassword(value);
+  if (!password || password.length > MAX_PASSWORD_LENGTH) {
+    throw new Error("Senha inválida para hash.");
   }
 
-  if (isPasswordHash(password)) return password;
-
   const salt = crypto.randomBytes(SALT_LENGTH);
-  const derivedKey = await scryptAsync(password, salt, KEY_LENGTH, {
-    N,
-    r: R,
-    p: P,
-    maxmem: 64 * 1024 * 1024
-  });
+  const derived = await deriveKey(password, salt);
 
   return [
-    "$scrypt",
+    "",
+    "scrypt",
     "v1",
-    String(N),
-    String(R),
-    String(P),
+    String(DEFAULT_N),
+    String(DEFAULT_R),
+    String(DEFAULT_P),
     salt.toString("base64url"),
-    Buffer.from(derivedKey).toString("base64url")
+    Buffer.from(derived).toString("base64url")
   ].join("$");
 }
 
-function compararSeguro(a, b) {
-  const aa = Buffer.from(String(a ?? ""), "utf8");
-  const bb = Buffer.from(String(b ?? ""), "utf8");
-  const size = Math.max(aa.length, bb.length, 1);
-  const pa = Buffer.alloc(size);
-  const pb = Buffer.alloc(size);
-  aa.copy(pa);
-  bb.copy(pb);
-  return aa.length === bb.length && crypto.timingSafeEqual(pa, pb);
+function safeCompareStrings(a, b) {
+  const left = Buffer.from(String(a || ""), "utf8");
+  const right = Buffer.from(String(b || ""), "utf8");
+  if (left.length !== right.length) return false;
+  return crypto.timingSafeEqual(left, right);
 }
 
 async function verifyPassword(storedValue, candidateValue) {
   const stored = String(storedValue || "");
-  const candidate = normalizarSenha(candidateValue);
-  if (!stored || !candidate) return { valid: false, needsRehash: false };
+  const candidate = normalizePassword(candidateValue);
+  if (!stored || !candidate || candidate.length > MAX_PASSWORD_LENGTH) {
+    return { valid: false, needsRehash: false };
+  }
 
   if (!isPasswordHash(stored)) {
     return {
-      valid: compararSeguro(stored, candidate),
-      needsRehash: compararSeguro(stored, candidate)
+      valid: safeCompareStrings(stored, candidate),
+      needsRehash: true
     };
   }
 
@@ -79,43 +119,34 @@ async function verifyPassword(storedValue, candidateValue) {
     return { valid: false, needsRehash: false };
   }
 
-  const n = Number(parts[3]);
+  const N = Number(parts[3]);
   const r = Number(parts[4]);
   const p = Number(parts[5]);
-  if (!Number.isInteger(n) || !Number.isInteger(r) || !Number.isInteger(p) || n < 2 || r < 1 || p < 1) {
+  const salt = Buffer.from(parts[6], "base64url");
+  const expected = Buffer.from(parts[7], "base64url");
+
+  if (!Number.isInteger(N) || !Number.isInteger(r) || !Number.isInteger(p) || !salt.length || !expected.length) {
     return { valid: false, needsRehash: false };
   }
 
   try {
-    const salt = Buffer.from(parts[6], "base64url");
-    const expected = Buffer.from(parts[7], "base64url");
-    if (!salt.length || expected.length !== KEY_LENGTH) return { valid: false, needsRehash: false };
+    const actual = Buffer.from(await deriveKey(candidate, salt, N, r, p));
+    if (actual.length !== expected.length) return { valid: false, needsRehash: false };
 
-    const actual = Buffer.from(await scryptAsync(candidate, salt, expected.length, {
-      N: n,
-      r,
-      p,
-      maxmem: 64 * 1024 * 1024
-    }));
-
-    const valid = actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
-    return {
-      valid,
-      needsRehash: valid && (n !== N || r !== R || p !== P || expected.length !== KEY_LENGTH)
-    };
+    const valid = crypto.timingSafeEqual(actual, expected);
+    const needsRehash = valid && (N !== DEFAULT_N || r !== DEFAULT_R || p !== DEFAULT_P || expected.length !== KEY_LENGTH);
+    return { valid, needsRehash };
   } catch (_) {
     return { valid: false, needsRehash: false };
   }
 }
 
-async function ensurePasswordHash(value) {
-  return isPasswordHash(value) ? String(value) : hashPassword(value);
-}
-
 module.exports = {
   hashPassword,
   verifyPassword,
-  ensurePasswordHash,
   isPasswordHash,
+  validatePasswordPolicy,
+  MIN_USER_PASSWORD_LENGTH,
+  MIN_STAFF_PASSWORD_LENGTH,
   MAX_PASSWORD_LENGTH
 };
