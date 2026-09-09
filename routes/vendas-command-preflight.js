@@ -70,6 +70,19 @@ async function ensureCommandCenterTables() {
   `);
 
   await database.query(`
+    CREATE TABLE IF NOT EXISTS formas_pagamento (
+      id CHAR(24) NOT NULL PRIMARY KEY,
+      codigo VARCHAR(60) NOT NULL UNIQUE,
+      nome VARCHAR(120) NOT NULL,
+      taxa_percentual DECIMAL(7,3) NOT NULL DEFAULT 0,
+      status TINYINT(1) NOT NULL DEFAULT 1,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      KEY idx_pagamentos_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+  await database.query(`
     CREATE TABLE IF NOT EXISTS vendas (
       id CHAR(24) NOT NULL PRIMARY KEY,
       cliente_id CHAR(24) NOT NULL DEFAULT '',
@@ -135,8 +148,16 @@ async function ensureCommandCenterTables() {
     );
   }
 
-  // Planos históricos ficam preservados para relatórios, mas não podem ser vendidos novamente.
   await database.query("UPDATE produtos_planos SET status=0 WHERE codigo IN ('black90','particular')");
+
+  // Bestfy aparece nos relatórios com um nome amigável, mas status=0 impede
+  // seleção como forma manual no formulário de nova venda.
+  await database.query(
+    `INSERT INTO formas_pagamento(id,codigo,nome,taxa_percentual,status)
+     VALUES(?,?,?,?,0)
+     ON DUPLICATE KEY UPDATE nome=VALUES(nome),status=0`,
+    [id24("payment:bestfy"), "bestfy", "Checkout Bestfy", 0]
+  );
 }
 
 async function syncBestfySales() {
@@ -242,6 +263,36 @@ router.use("/vendas", async (_req, res, next) => {
     console.error("Erro ao preparar Sales Command Center:", error);
     return res.status(503).json({ erro: "O painel de vendas está temporariamente indisponível." });
   }
+});
+
+// Corrige apenas a apresentação do dashboard legado, sem inventar dados: a
+// distribuição passa a refletir status reais e Checkout Bestfy não é tratado
+// como um vendedor humano no ranking.
+router.get("/vendas/dashboard", (_req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = (payload) => {
+    if (payload && typeof payload === "object" && payload.sucesso) {
+      if (Array.isArray(payload.ranking)) {
+        payload.ranking = payload.ranking.filter((item) => String(item?.vendedorId || "").trim());
+        payload.ranking.forEach((item, index) => { item.posicao = index + 1; });
+      }
+
+      const paid = Number(payload.indicadores?.vendasConfirmadas || 0);
+      const pending = Number(payload.indicadores?.vendasPendentes || 0);
+      const legacyCancelled = Array.isArray(payload.funil)
+        ? Number(payload.funil.find((item) => /cancel/i.test(String(item?.etapa || "")))?.total || 0)
+        : 0;
+      const total = paid + pending + legacyCancelled;
+      payload.funil = [
+        { etapa: "Vendas registradas", total },
+        { etapa: "Aguardando pagamento", total: pending },
+        { etapa: "Vendas confirmadas", total: paid },
+        { etapa: "Canceladas / estornadas", total: legacyCancelled }
+      ];
+    }
+    return originalJson(payload);
+  };
+  return next();
 });
 
 module.exports = router;
