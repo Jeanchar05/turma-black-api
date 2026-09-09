@@ -11,11 +11,18 @@ const { authPagina, requirePremiumPagina } = require("./middleware/auth");
 const { corsOptions, securityHeaders } = require("./middleware/security-headers");
 const { premiumContentGuard, isPremiumPath } = require("./middleware/premium-content-guard");
 const { supportWriteRateLimit } = require("./middleware/rate-limit");
+const {
+  initializePremiumVault,
+  resolvePremiumFile
+} = require("./services/premium-vault");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260909-security-hardening-5.0.0";
+const premiumVaultDir = path.resolve(
+  process.env.PREMIUM_VAULT_DIR || path.join(__dirname, ".premium-vault")
+);
+const CACHE_VERSION = "20260909-security-hardening-5.1.0";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -49,32 +56,7 @@ app.use((req, res, next) => {
 });
 
 app.use(premiumContentGuard);
-
-// Destino interno para rewrites da camada Apache/LiteSpeed. O arquivo físico
-// só é enviado depois da validação da sessão e do plano Premium no backend.
-app.get(/^\/__premium\/(.+)$/, authPagina, requirePremiumPagina, (req, res, next) => {
-  try {
-    const relativeRaw = String(req.params?.[0] || "").replace(/^\/+/, "");
-    const publicPath = `/${relativeRaw}`;
-    if (!isPremiumPath(publicPath)) return res.status(404).end();
-
-    const normalized = path.normalize(relativeRaw).replace(/^(?:\.\.(?:[\\/]|$))+/, "");
-    const filePath = path.resolve(publicDir, normalized);
-    const publicRoot = `${path.resolve(publicDir)}${path.sep}`;
-    if (!filePath.startsWith(publicRoot) || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
-      return res.status(404).end();
-    }
-
-    res.setHeader("Cache-Control", "private, no-store, max-age=0");
-    res.setHeader("Pragma", "no-cache");
-    res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
-    res.setHeader("X-Premium-Delivery", "authenticated-v2");
-    return res.sendFile(filePath);
-  } catch (error) {
-    console.error("Falha na entrega Premium autenticada:", error.message);
-    return next(error);
-  }
-});
+app.use(servirPremiumDoCofre);
 
 function servirBundle(arquivos, tipo) {
   return (req, res, next) => {
@@ -144,6 +126,54 @@ function aplicarExtrasAdmin(html) {
 
   return resultado;
 }
+
+function aplicarCabecalhosPremium(res) {
+  res.setHeader("Cache-Control", "private, no-store, max-age=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+  res.setHeader("CDN-Cache-Control", "no-store");
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+  res.setHeader("X-Premium-Delivery", "private-vault-v1");
+  res.setHeader("X-Cache-Version", CACHE_VERSION);
+}
+
+function enviarArquivoPremium(req, res, next, requestPath) {
+  try {
+    const filePath = resolvePremiumFile(requestPath);
+    if (!filePath) return res.status(404).end();
+
+    aplicarCabecalhosPremium(res);
+
+    if (/\.html$/i.test(filePath)) {
+      let html = fs.readFileSync(filePath, "utf8");
+      html = aplicarCamadaResponsiva(html);
+      html = aplicarVersaoNosAssets(html);
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      return res.send(html);
+    }
+
+    return res.sendFile(filePath);
+  } catch (error) {
+    console.error("Falha na entrega Premium pelo cofre:", error.message);
+    return next(error);
+  }
+}
+
+function servirPremiumDoCofre(req, res, next) {
+  if (!req || !["GET", "HEAD"].includes(String(req.method || "").toUpperCase())) return next();
+  if (!isPremiumPath(req.path)) return next();
+  return enviarArquivoPremium(req, res, next, req.path);
+}
+
+// Destino interno para rewrites da camada Apache/LiteSpeed. O arquivo físico
+// fica fora de public/ e só é enviado depois de sessão + Premium validados.
+app.get(/^\/__premium\/(.+)$/, authPagina, requirePremiumPagina, (req, res, next) => {
+  const relativeRaw = String(req.params?.[0] || "").replace(/^\/+/, "");
+  const publicPath = `/${relativeRaw}`;
+  if (!isPremiumPath(publicPath)) return res.status(404).end();
+  return enviarArquivoPremium(req, res, next, publicPath);
+});
 
 function servirPagina(nomeArquivo) {
   return (req, res, next) => {
@@ -342,9 +372,10 @@ app.get("/api/status", async (_req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "5.0.0",
+    versao: "5.1.0",
     release: "security-hardening",
-    banco
+    banco,
+    premium: "private-vault"
   });
 });
 
@@ -424,6 +455,14 @@ async function tentarConectarBanco() {
 }
 
 function iniciarServidor() {
+  try {
+    initializePremiumVault(publicDir, premiumVaultDir);
+  } catch (error) {
+    console.error("[SECURITY] Não foi possível preparar o cofre Premium:", error.message);
+    process.exit(1);
+    return;
+  }
+
   const servidor = app.listen(PORT, () => {
     console.log(`Turma do Primo rodando na porta ${PORT}`);
     tentarConectarBanco();
