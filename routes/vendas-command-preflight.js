@@ -7,6 +7,7 @@ const database = require("../config/database");
 const router = express.Router();
 let preparationPromise = null;
 let lastSyncAt = 0;
+let lastSyncErrorAt = 0;
 
 const OFFICIAL_PLANS = [
   { codigo: "black30", nome: "Mensal", descricao: "Acesso completo por 30 dias", preco: 99.99, dias: 30, ordem: 1 },
@@ -150,8 +151,6 @@ async function ensureCommandCenterTables() {
 
   await database.query("UPDATE produtos_planos SET status=0 WHERE codigo IN ('black90','particular')");
 
-  // Bestfy aparece nos relatórios com um nome amigável, mas status=0 impede
-  // seleção como forma manual no formulário de nova venda.
   await database.query(
     `INSERT INTO formas_pagamento(id,codigo,nome,taxa_percentual,status)
      VALUES(?,?,?,?,0)
@@ -165,8 +164,11 @@ async function syncBestfySales() {
 
   let rows;
   try {
+    // Usamos apenas colunas presentes em todas as versões do ledger. Nome e
+    // telefone foram adicionados depois e não podem derrubar instalações que
+    // ainda possuem a tabela Bestfy antiga.
     rows = await database.query(
-      `SELECT transaction_id,status,customer_email,customer_name,customer_phone,user_id,
+      `SELECT transaction_id,status,customer_email,user_id,
               plan,amount_cents,payment_confirmed_at,verified_at,applied_at,revoked_at,
               created_at,updated_at
          FROM bestfy_transactions
@@ -193,6 +195,7 @@ async function syncBestfySales() {
     const canceledAt = status === "pago" ? null : (sqlDate(row.revoked_at) || null);
     const sourceId = id24(`bestfy:${transactionId}`);
     const note = `Transação Bestfy ${transactionId}`;
+    const customerEmail = String(row.customer_email || "").trim().toLowerCase().slice(0, 190);
 
     await database.query(
       `INSERT INTO vendas
@@ -203,8 +206,8 @@ async function syncBestfySales() {
         pago_em,cancelado_em,observacoes,origem,criado_por,atualizado_por)
        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
        ON DUPLICATE KEY UPDATE
-         cliente_id=VALUES(cliente_id),cliente_nome=VALUES(cliente_nome),cliente_email=VALUES(cliente_email),
-         cliente_telefone=VALUES(cliente_telefone),produto_id=VALUES(produto_id),produto_codigo=VALUES(produto_codigo),
+         cliente_id=VALUES(cliente_id),cliente_email=VALUES(cliente_email),
+         produto_id=VALUES(produto_id),produto_codigo=VALUES(produto_codigo),
          produto_nome=VALUES(produto_nome),valor_bruto=VALUES(valor_bruto),valor=VALUES(valor),
          status=VALUES(status),data_venda=VALUES(data_venda),pago_em=VALUES(pago_em),
          cancelado_em=VALUES(cancelado_em),observacoes=VALUES(observacoes),
@@ -212,9 +215,9 @@ async function syncBestfySales() {
       [
         sourceId,
         String(row.user_id || "").slice(0, 24),
-        String(row.customer_name || "").slice(0, 160),
-        String(row.customer_email || "").trim().toLowerCase().slice(0, 190),
-        String(row.customer_phone || "").slice(0, 40),
+        customerEmail,
+        customerEmail,
+        "",
         "",
         "Checkout Bestfy",
         "",
@@ -252,7 +255,17 @@ async function prepare() {
     });
   }
   await preparationPromise;
-  await syncBestfySales();
+
+  try {
+    await syncBestfySales();
+  } catch (error) {
+    // Reconciliação é enriquecimento do painel. Uma incompatibilidade temporária
+    // do ledger Bestfy não pode transformar todas as rotas /vendas em HTTP 503.
+    if (Date.now() - lastSyncErrorAt > 60000) {
+      lastSyncErrorAt = Date.now();
+      console.error("[SALES] Falha não fatal ao reconciliar Bestfy:", error?.message || error);
+    }
+  }
 }
 
 router.use("/vendas", async (_req, res, next) => {
@@ -260,14 +273,13 @@ router.use("/vendas", async (_req, res, next) => {
     await prepare();
     return next();
   } catch (error) {
-    console.error("Erro ao preparar Sales Command Center:", error);
-    return res.status(503).json({ erro: "O painel de vendas está temporariamente indisponível." });
+    console.error("Erro ao preparar estrutura base do Sales Command Center:", error);
+    // Se o banco estiver fora, as próprias rotas responderão de acordo com sua
+    // disponibilidade. Não derrubamos todo o módulo comercial num preflight.
+    return next();
   }
 });
 
-// Corrige apenas a apresentação do dashboard legado, sem inventar dados: a
-// distribuição passa a refletir status reais e Checkout Bestfy não é tratado
-// como um vendedor humano no ranking.
 router.get("/vendas/dashboard", (_req, res, next) => {
   const originalJson = res.json.bind(res);
   res.json = (payload) => {
