@@ -103,7 +103,7 @@ const PERMISSOES_PADRAO = {
   aluno: {
     ...todas(false),
     dashboard: true,
-    suporte: true
+    suporte: false
   }
 };
 
@@ -134,9 +134,7 @@ function getCargo(usuario) {
 
 function sanitizarPermissoes(valor = {}) {
   return CHAVES_PERMISSAO.reduce((acc, chave) => {
-    if (typeof valor?.[chave] === "boolean") {
-      acc[chave] = valor[chave];
-    }
+    if (typeof valor?.[chave] === "boolean") acc[chave] = valor[chave];
     return acc;
   }, {});
 }
@@ -146,19 +144,16 @@ function getPermissoes(usuario) {
   const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
   const personalizadas = sanitizarPermissoes(usuario?.permissoesPersonalizadas || {});
 
-  if (cargo === CARGOS.DEV) {
-    return { ...PERMISSOES_PADRAO.dev };
-  }
-
-  return { ...base, ...personalizadas };
+  if (cargo === CARGOS.DEV) return { ...PERMISSOES_PADRAO.dev };
+  const resultado = { ...base, ...personalizadas };
+  if (cargo === CARGOS.ALUNO) resultado.suporte = false;
+  return resultado;
 }
 
 async function getPermissoesEfetivas(usuario) {
   const cargo = getCargo(usuario);
 
-  if (cargo === CARGOS.DEV) {
-    return { ...PERMISSOES_PADRAO.dev };
-  }
+  if (cargo === CARGOS.DEV) return { ...PERMISSOES_PADRAO.dev };
 
   const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
   let configuradas = {};
@@ -171,12 +166,9 @@ async function getPermissoesEfetivas(usuario) {
   }
 
   const personalizadas = sanitizarPermissoes(usuario?.permissoesPersonalizadas || {});
-
-  return {
-    ...base,
-    ...configuradas,
-    ...personalizadas
-  };
+  const resultado = { ...base, ...configuradas, ...personalizadas };
+  if (cargo === CARGOS.ALUNO) resultado.suporte = false;
+  return resultado;
 }
 
 function temPermissao(usuario, permissao) {
@@ -202,12 +194,9 @@ function temCargo(usuario, cargosPermitidos = []) {
 function requirePermission(permissao) {
   return async function (req, res, next) {
     try {
-      if (!req.usuario) {
-        return res.status(401).json({ erro: "Usuário não autenticado." });
-      }
+      if (!req.usuario) return res.status(401).json({ erro: "Usuário não autenticado." });
 
       const permitido = await temPermissaoEfetiva(req.usuarioDoc || req.usuario, permissao);
-
       if (!permitido) {
         return res.status(403).json({
           erro: "Você não tem permissão para acessar esta área.",
@@ -226,9 +215,7 @@ function requirePermission(permissao) {
 
 function requireCargo(...cargosPermitidos) {
   return function (req, res, next) {
-    if (!req.usuario) {
-      return res.status(401).json({ erro: "Usuário não autenticado." });
-    }
+    if (!req.usuario) return res.status(401).json({ erro: "Usuário não autenticado." });
 
     if (!temCargo(req.usuario, cargosPermitidos)) {
       return res.status(403).json({
@@ -243,9 +230,7 @@ function requireCargo(...cargosPermitidos) {
 }
 
 function requireDev(req, res, next) {
-  if (!req.usuario) {
-    return res.status(401).json({ erro: "Usuário não autenticado." });
-  }
+  if (!req.usuario) return res.status(401).json({ erro: "Usuário não autenticado." });
 
   const cargo = getCargo(req.usuarioDoc || req.usuario);
   const emailDev = String(process.env.DEV_EMAIL || "dev@turmablack.com").toLowerCase();
@@ -267,21 +252,11 @@ function requireSuperAdmin(req, res, next) {
 }
 
 function requireVendedor(req, res, next) {
-  return requireCargo(
-    CARGOS.DONO,
-    CARGOS.ADMIN,
-    CARGOS.FINANCEIRO,
-    CARGOS.VENDEDOR
-  )(req, res, next);
+  return requireCargo(CARGOS.DONO, CARGOS.ADMIN, CARGOS.FINANCEIRO, CARGOS.VENDEDOR)(req, res, next);
 }
 
 function requireSuporte(req, res, next) {
-  return requireCargo(
-    CARGOS.DONO,
-    CARGOS.ADMIN,
-    CARGOS.MODERADOR,
-    CARGOS.SUPORTE
-  )(req, res, next);
+  return requireCargo(CARGOS.DONO, CARGOS.ADMIN, CARGOS.MODERADOR, CARGOS.SUPORTE)(req, res, next);
 }
 
 module.exports = {
