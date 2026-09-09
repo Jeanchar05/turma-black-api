@@ -78,6 +78,8 @@ async function applyManualEntitlement(sale) {
 
   user.plano = String(sale.produto_codigo);
   user.dataExpiracao = addDays(user.dataExpiracao, plan.dias);
+  user.manualSaleId = String(sale.id);
+  user.manualSaleGrantedAt = new Date().toISOString();
   user.atualizadoPor = `venda-manual:${sale.id}`;
 
   const blocked = Boolean(user.suspenso) || ["suspenso", "bloqueado"].includes(String(user.status || "").toLowerCase());
@@ -98,12 +100,15 @@ async function revokeManualEntitlementIfOwned(sale) {
   if (String(user.bestfyTransactionId || "").trim()) {
     return { revoked: false, reason: "bestfy-entitlement-present" };
   }
-  if (String(user.atualizadoPor || "") !== `venda-manual:${sale.id}`) {
+  if (String(user.manualSaleId || "") !== String(sale.id)) {
     return { revoked: false, reason: "entitlement-owned-by-other-source" };
   }
 
   user.plano = "free";
   user.dataExpiracao = "";
+  user.manualSaleId = "";
+  user.manualSaleGrantedAt = "";
+  user.manualSaleRevokedAt = new Date().toISOString();
   user.atualizadoPor = `venda-manual-revogada:${sale.id}`;
   // Não alteramos suspenso/status/aprovado: revogação comercial não muda sanções administrativas.
   await user.save();
