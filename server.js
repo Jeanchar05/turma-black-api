@@ -7,15 +7,15 @@ const path = require("path");
 
 require("./services/password-model-guard");
 const connectDatabase = require("./config/database");
-const { authPagina } = require("./middleware/auth");
+const { authPagina, requirePremiumPagina } = require("./middleware/auth");
 const { corsOptions, securityHeaders } = require("./middleware/security-headers");
-const { premiumContentGuard } = require("./middleware/premium-content-guard");
+const { premiumContentGuard, isPremiumPath } = require("./middleware/premium-content-guard");
 const { supportWriteRateLimit } = require("./middleware/rate-limit");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260908-admin-command-center-4.8.0";
+const CACHE_VERSION = "20260909-security-hardening-5.0.0";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -49,6 +49,32 @@ app.use((req, res, next) => {
 });
 
 app.use(premiumContentGuard);
+
+// Destino interno para rewrites da camada Apache/LiteSpeed. O arquivo físico
+// só é enviado depois da validação da sessão e do plano Premium no backend.
+app.get(/^\/__premium\/(.+)$/, authPagina, requirePremiumPagina, (req, res, next) => {
+  try {
+    const relativeRaw = String(req.params?.[0] || "").replace(/^\/+/, "");
+    const publicPath = `/${relativeRaw}`;
+    if (!isPremiumPath(publicPath)) return res.status(404).end();
+
+    const normalized = path.normalize(relativeRaw).replace(/^(?:\.\.(?:[\\/]|$))+/, "");
+    const filePath = path.resolve(publicDir, normalized);
+    const publicRoot = `${path.resolve(publicDir)}${path.sep}`;
+    if (!filePath.startsWith(publicRoot) || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+      return res.status(404).end();
+    }
+
+    res.setHeader("Cache-Control", "private, no-store, max-age=0");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+    res.setHeader("X-Premium-Delivery", "authenticated-v2");
+    return res.sendFile(filePath);
+  } catch (error) {
+    console.error("Falha na entrega Premium autenticada:", error.message);
+    return next(error);
+  }
+});
 
 function servirBundle(arquivos, tipo) {
   return (req, res, next) => {
@@ -316,8 +342,8 @@ app.get("/api/status", async (_req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.8.0",
-    release: "admin-command-center",
+    versao: "5.0.0",
+    release: "security-hardening",
     banco
   });
 });
@@ -357,6 +383,7 @@ carregarRota("/", "dashboard.js");
 carregarRota("/", "agenda.js");
 carregarRota("/", "notificacoes-compat.js");
 carregarRota("/", "notificacoes.js");
+carregarRota("/", "support-upload-secure.js");
 carregarRota("/", "suporte.js");
 carregarRota("/", "provas-resultados-lista.js");
 carregarRota("/", "provas-relatorios.js");
