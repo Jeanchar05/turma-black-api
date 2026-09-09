@@ -22,7 +22,7 @@ const publicDir = path.join(__dirname, "public");
 const premiumVaultDir = path.resolve(
   process.env.PREMIUM_VAULT_DIR || path.join(__dirname, ".premium-vault")
 );
-const CACHE_VERSION = "20260909-security-hardening-5.1.0";
+const CACHE_VERSION = "20260909-sales-command-5.1.0";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -166,8 +166,6 @@ function servirPremiumDoCofre(req, res, next) {
   return enviarArquivoPremium(req, res, next, req.path);
 }
 
-// Destino interno para rewrites da camada Apache/LiteSpeed. O arquivo físico
-// fica fora de public/ e só é enviado depois de sessão + Premium validados.
 app.get(/^\/__premium\/(.+)$/, authPagina, requirePremiumPagina, (req, res, next) => {
   const relativeRaw = String(req.params?.[0] || "").replace(/^\/+/, "");
   const publicPath = `/${relativeRaw}`;
@@ -214,6 +212,22 @@ app.get(
   servirBundle(
     ["admin-enhanced.css", "admin-results.css", "admin-hotfix.css", "responsive-global.css"],
     "text/css"
+  )
+);
+
+app.get(
+  "/painel-vendas.css",
+  servirBundle(
+    ["painel-vendas.css", "painel-vendas-command-v5.css", "responsive-global.css"],
+    "text/css"
+  )
+);
+
+app.get(
+  "/painel-vendas.js",
+  servirBundle(
+    ["painel-vendas.js", "painel-vendas-command-v5.js"],
+    "application/javascript"
   )
 );
 
@@ -373,7 +387,7 @@ app.get("/api/status", async (_req, res) => {
     status: "online",
     nome: "Turma do Primo",
     versao: "5.1.0",
-    release: "security-hardening",
+    release: "sales-command-security",
     banco,
     premium: "private-vault"
   });
