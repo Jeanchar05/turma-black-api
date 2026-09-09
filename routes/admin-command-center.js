@@ -3,7 +3,7 @@
 const express = require("express");
 const database = require("../config/database");
 const Usuario = require("../models/Usuario");
-const { auth } = require("../middleware/auth");
+const { authPagina } = require("../middleware/auth");
 const { requirePermission } = require("../middleware/permissions");
 const { ensureAuditTable } = require("../services/security-audit");
 const { ensureStructure: ensureSessionStructure } = require("../services/sessions");
@@ -41,17 +41,27 @@ function percent(current, previous) {
 }
 
 async function tableExists(name) {
-  const rows = await database.query(
-    `SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?`,
-    [name]
-  );
-  return n(rows[0]?.total) > 0;
+  try {
+    const rows = await database.query(
+      `SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?`,
+      [name]
+    );
+    return n(rows[0]?.total) > 0;
+  } catch (error) {
+    console.warn(`[ADMIN_CC] Não foi possível verificar a tabela ${name}:`, error.message);
+    return false;
+  }
 }
 
 async function safeCount(table, where = "1=1", params = []) {
-  if (!(await tableExists(table))) return 0;
-  const rows = await database.query(`SELECT COUNT(*) AS total FROM \`${table}\` WHERE ${where}`, params);
-  return n(rows[0]?.total);
+  try {
+    if (!(await tableExists(table))) return 0;
+    const rows = await database.query(`SELECT COUNT(*) AS total FROM \`${table}\` WHERE ${where}`, params);
+    return n(rows[0]?.total);
+  } catch (error) {
+    console.warn(`[ADMIN_CC] Contagem opcional indisponível em ${table}:`, error.message);
+    return 0;
+  }
 }
 
 function emptySeries(days) {
@@ -94,35 +104,40 @@ async function overviewData(days) {
   `, [dateKey(sevenDays)]);
   const users = userRows[0] || {};
 
-  const currentUsersRows = await database.query(
-    "SELECT COUNT(*) AS total FROM usuarios WHERE conta_dev=0 AND created_at >= ?",
-    [sqlDate(monthStart)]
-  );
-  const previousUsersRows = await database.query(
-    "SELECT COUNT(*) AS total FROM usuarios WHERE conta_dev=0 AND created_at BETWEEN ? AND ?",
-    [sqlDate(previousStart), sqlDate(previousEnd)]
-  );
+  const [currentUsersRows, previousUsersRows] = await Promise.all([
+    database.query(
+      "SELECT COUNT(*) AS total FROM usuarios WHERE conta_dev=0 AND created_at >= ?",
+      [sqlDate(monthStart)]
+    ),
+    database.query(
+      "SELECT COUNT(*) AS total FROM usuarios WHERE conta_dev=0 AND created_at BETWEEN ? AND ?",
+      [sqlDate(previousStart), sqlDate(previousEnd)]
+    )
+  ]);
 
-  const hasSales = await tableExists("vendas");
   let salesCurrent = { pagas: 0, faturamento: 0 };
   let salesPrevious = { pagas: 0, faturamento: 0 };
   let salesSeries = [];
   let topPlans = [];
   let recentSales = [];
 
-  if (hasSales) {
-    const [current, previous, series, plans, recent] = await Promise.all([
-      database.query(`SELECT SUM(status='pago') AS pagas, COALESCE(SUM(CASE WHEN status='pago' THEN valor ELSE 0 END),0) AS faturamento FROM vendas WHERE data_venda >= ?`, [dateKey(monthStart)]),
-      database.query(`SELECT SUM(status='pago') AS pagas, COALESCE(SUM(CASE WHEN status='pago' THEN valor ELSE 0 END),0) AS faturamento FROM vendas WHERE data_venda BETWEEN ? AND ?`, [dateKey(previousStart), dateKey(previousEnd)]),
-      database.query(`SELECT data_venda AS data, SUM(status='pago') AS vendas, COALESCE(SUM(CASE WHEN status='pago' THEN valor ELSE 0 END),0) AS faturamento FROM vendas WHERE data_venda >= ? GROUP BY data_venda ORDER BY data_venda`, [dateKey(seriesStart)]),
-      database.query(`SELECT produto_codigo AS plano, produto_nome AS nome, COUNT(*) AS vendas, COALESCE(SUM(valor),0) AS faturamento FROM vendas WHERE status='pago' GROUP BY produto_codigo,produto_nome ORDER BY faturamento DESC LIMIT 5`),
-      database.query(`SELECT id,cliente_nome,cliente_email,produto_codigo,produto_nome,valor,pago_em,created_at FROM vendas WHERE status='pago' ORDER BY COALESCE(pago_em,created_at) DESC LIMIT 6`)
-    ]);
-    salesCurrent = current[0] || salesCurrent;
-    salesPrevious = previous[0] || salesPrevious;
-    salesSeries = series;
-    topPlans = plans.map((row, index) => ({ posicao: index + 1, plano: row.plano || "", nome: row.nome || row.plano || "Plano", vendas: n(row.vendas), faturamento: money(row.faturamento) }));
-    recentSales = recent;
+  if (await tableExists("vendas")) {
+    try {
+      const [current, previous, series, plans, recent] = await Promise.all([
+        database.query(`SELECT SUM(status='pago') AS pagas, COALESCE(SUM(CASE WHEN status='pago' THEN valor ELSE 0 END),0) AS faturamento FROM vendas WHERE data_venda >= ?`, [dateKey(monthStart)]),
+        database.query(`SELECT SUM(status='pago') AS pagas, COALESCE(SUM(CASE WHEN status='pago' THEN valor ELSE 0 END),0) AS faturamento FROM vendas WHERE data_venda BETWEEN ? AND ?`, [dateKey(previousStart), dateKey(previousEnd)]),
+        database.query(`SELECT data_venda AS data, SUM(status='pago') AS vendas, COALESCE(SUM(CASE WHEN status='pago' THEN valor ELSE 0 END),0) AS faturamento FROM vendas WHERE data_venda >= ? GROUP BY data_venda ORDER BY data_venda`, [dateKey(seriesStart)]),
+        database.query(`SELECT produto_codigo AS plano, produto_nome AS nome, COUNT(*) AS vendas, COALESCE(SUM(valor),0) AS faturamento FROM vendas WHERE status='pago' GROUP BY produto_codigo,produto_nome ORDER BY faturamento DESC LIMIT 5`),
+        database.query(`SELECT id,cliente_nome,cliente_email,produto_codigo,produto_nome,valor,pago_em,created_at FROM vendas WHERE status='pago' ORDER BY COALESCE(pago_em,created_at) DESC LIMIT 6`)
+      ]);
+      salesCurrent = current[0] || salesCurrent;
+      salesPrevious = previous[0] || salesPrevious;
+      salesSeries = series;
+      topPlans = plans.map((row, index) => ({ posicao: index + 1, plano: row.plano || "", nome: row.nome || row.plano || "Plano", vendas: n(row.vendas), faturamento: money(row.faturamento) }));
+      recentSales = recent;
+    } catch (error) {
+      console.warn("[ADMIN_CC] Métricas de vendas indisponíveis; painel continuará com os demais dados:", error.message);
+    }
   }
 
   const series = emptySeries(days);
@@ -142,22 +157,35 @@ async function overviewData(days) {
     }
   }
 
-  const approvals = await safeCount("solicitacoes_liberacao", "status=?", ["pendente"]);
-  const urgentSupport = await safeCount("support_tickets", "prioridade='urgente' AND status NOT IN ('resolvido','fechado')");
-  const openSupport = await safeCount("support_tickets", "status IN ('aberto','em_atendimento','respondido')");
-  const examsReview = await safeCount("provas_resultados", "status='em_analise'");
+  const [approvals, urgentSupport, openSupport, examsReview] = await Promise.all([
+    safeCount("solicitacoes_liberacao", "status=?", ["pendente"]),
+    safeCount("support_tickets", "prioridade='urgente' AND status NOT IN ('resolvido','fechado')"),
+    safeCount("support_tickets", "status IN ('aberto','em_atendimento','respondido')"),
+    safeCount("provas_resultados", "status='em_analise'")
+  ]);
 
   const recentUsers = await database.query(
     "SELECT id,nome,email,plano,status,created_at FROM usuarios WHERE conta_dev=0 ORDER BY created_at DESC LIMIT 6"
   );
-  const recentTickets = (await tableExists("support_tickets"))
-    ? await database.query("SELECT id,assunto,usuario_nome,usuario_email,prioridade,status,updated_at,created_at FROM support_tickets ORDER BY updated_at DESC LIMIT 6")
-    : [];
 
-  await ensureAuditTable();
-  const recentAudit = await database.query(
-    "SELECT event,actor_email,target_email,created_at FROM security_audit_log ORDER BY created_at DESC LIMIT 8"
-  );
+  let recentTickets = [];
+  if (await tableExists("support_tickets")) {
+    try {
+      recentTickets = await database.query("SELECT id,assunto,usuario_nome,usuario_email,prioridade,status,updated_at,created_at FROM support_tickets ORDER BY updated_at DESC LIMIT 6");
+    } catch (error) {
+      console.warn("[ADMIN_CC] Atividades de suporte indisponíveis:", error.message);
+    }
+  }
+
+  let recentAudit = [];
+  try {
+    await ensureAuditTable();
+    recentAudit = await database.query(
+      "SELECT event,actor_email,target_email,created_at FROM security_audit_log ORDER BY created_at DESC LIMIT 8"
+    );
+  } catch (error) {
+    console.warn("[ADMIN_CC] Auditoria opcional indisponível na visão geral:", error.message);
+  }
 
   const activities = [
     ...recentUsers.map((row) => ({ type: "user", title: "Novo usuário", description: `${row.nome || "Usuário"}${row.email ? ` • ${row.email}` : ""}`, createdAt: row.created_at, status: row.status || "ativo" })),
@@ -200,17 +228,19 @@ async function overviewData(days) {
   };
 }
 
-router.get("/command-center/overview", auth, requirePermission("painelAdmin"), async (req, res) => {
+router.get("/command-center/overview", authPagina, requirePermission("painelAdmin"), async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   try {
     const data = await overviewData(clampDays(req.query?.dias, 7));
     return res.json({ sucesso: true, origem: "mysql", ...data });
   } catch (error) {
     console.error("Erro no Admin Command Center:", error);
-    return res.status(500).json({ erro: "Não foi possível carregar a central administrativa." });
+    return res.status(503).json({ erro: "Os dados do Command Center estão temporariamente indisponíveis.", codigo: "ADMIN_CC_DATA_UNAVAILABLE" });
   }
 });
 
-router.get("/command-center/status", auth, requirePermission("painelAdmin"), async (_req, res) => {
+router.get("/command-center/status", authPagina, requirePermission("painelAdmin"), async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   const services = {
     api: { status: "online", label: "API" },
     database: { status: "indisponivel", label: "MySQL" },
@@ -231,7 +261,8 @@ router.get("/command-center/status", auth, requirePermission("painelAdmin"), asy
   return res.json({ sucesso: true, services });
 });
 
-router.get("/command-center/security", auth, requirePermission("seguranca"), async (req, res) => {
+router.get("/command-center/security", authPagina, requirePermission("seguranca"), async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   try {
     await Promise.all([ensureAuditTable(), ensureSessionStructure()]);
     const [suspended, blocked, revokedRows, auditCountRows, criticalRows, events] = await Promise.all([
@@ -262,7 +293,7 @@ router.get("/command-center/security", auth, requirePermission("seguranca"), asy
     });
   } catch (error) {
     console.error("Erro na auditoria do Command Center:", error);
-    return res.status(500).json({ erro: "Não foi possível carregar a auditoria de segurança." });
+    return res.status(503).json({ erro: "A auditoria está temporariamente indisponível.", codigo: "ADMIN_CC_AUDIT_UNAVAILABLE" });
   }
 });
 
