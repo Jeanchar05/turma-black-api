@@ -5,7 +5,7 @@ const DEFAULT_ORIGINS = new Set([
   "https://www.turmablack.com.br",
   "https://pay.turmablack.com.br"
 ]);
-const SECURITY_POLICY_VERSION = "20260909-2";
+const SECURITY_POLICY_VERSION = "20260909-3";
 
 function configuredOrigins() {
   const origins = new Set(DEFAULT_ORIGINS);
@@ -54,8 +54,6 @@ function securityHeaders(req, res, next) {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    // O frontend legado ainda possui scripts inline; conectividade e framing foram fechados
-    // enquanto a migração gradual desses handlers ocorre sem quebrar a plataforma.
     "script-src 'self' 'unsafe-inline'",
     "connect-src 'self'",
     "frame-src 'none'",
