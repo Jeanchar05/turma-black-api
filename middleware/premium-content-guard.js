@@ -14,15 +14,7 @@ const PREMIUM_PAGES = new Set([
   "/favoritos", "/favoritos.html",
   "/provas", "/provas.html",
   "/roleta", "/roleta.html",
-  "/roleta-reel", "/roleta-reel.html",
-  "/estudo-gemeos", "/estudo-gemeos.html",
-  "/estudo-espelhos", "/estudo-espelhos.html",
-  "/estudo-fibonacci", "/estudo-fibonacci.html",
-  "/estudo-magneto", "/estudo-magneto.html",
-  "/estudo-camaleoes", "/estudo-camaleoes.html",
-  "/estudo-triangulacao", "/estudo-triangulacao.html",
-  "/estudo-cavalos", "/estudo-cavalos.html",
-  "/estudo-eclipse-zero", "/estudo-eclipse-zero.html"
+  "/roleta-reel", "/roleta-reel.html"
 ]);
 
 const PREMIUM_ASSET_PREFIXES = [
@@ -116,6 +108,7 @@ function normalizePath(reqOrPath) {
 function isPremiumPath(reqOrPath) {
   const pathname = normalizePath(reqOrPath);
   if (PREMIUM_PAGES.has(pathname)) return true;
+  if (/^\/estudo(?:-[a-z0-9-]+)?(?:\.html)?$/.test(pathname)) return true;
   if (PREMIUM_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return true;
 
   if (pathname.endsWith(".js") && PREMIUM_SCRIPT_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
