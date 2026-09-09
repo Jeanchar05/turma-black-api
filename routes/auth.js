@@ -11,6 +11,7 @@ const {
   MIN_USER_PASSWORD_LENGTH
 } = require("../services/passwords");
 const { revokeToken, revokeAllUserSessions } = require("../services/sessions");
+const { audit } = require("../services/security-audit");
 const {
   loginRateLimit,
   loginIpRateLimit,
@@ -51,7 +52,6 @@ function gerarCodigoAluno() {
   const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const numeros = "0123456789";
   let codigo = "TB-";
-
   for (let i = 0; i < 3; i += 1) codigo += letras[Math.floor(Math.random() * letras.length)];
   codigo += "-";
   for (let i = 0; i < 4; i += 1) codigo += numeros[Math.floor(Math.random() * numeros.length)];
@@ -65,10 +65,27 @@ function compararSegredo(a, b) {
   return crypto.timingSafeEqual(aa, bb);
 }
 
+function segredoSetupSeguro(valor) {
+  const segredo = String(valor || "").trim();
+  if (segredo.length < 32) return false;
+  const lower = segredo.toLowerCase();
+  if (lower.includes("troque-por") || lower.includes("changeme") || lower.includes("example") || lower.includes("placeholder")) return false;
+
+  const outros = [
+    process.env.JWT_SECRET,
+    process.env.DEV_PASSWORD,
+    process.env.DB_PASSWORD,
+    process.env.BESTFY_API_KEY
+  ]
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+
+  return !outros.some((item) => compararSegredo(segredo, item));
+}
+
 async function respostaUsuario(usuario) {
   const seguro = montarUsuarioSeguro(usuario);
   const permissoes = await getPermissoesEfetivas(usuario);
-
   return {
     ...seguro,
     cargo: getCargo(usuario),
@@ -94,24 +111,15 @@ async function criarConta(req, res) {
     if (!nomeTexto || !emailNormalizado || !senhaTexto) {
       return res.status(400).json({ erro: "Nome, e-mail e senha são obrigatórios." });
     }
-
-    if (!emailValido(emailNormalizado)) {
-      return res.status(400).json({ erro: "Informe um e-mail válido." });
-    }
-
-    // A identidade Dev nunca pode nascer pelo cadastro público.
-    if (emailDevReservado(emailNormalizado)) {
-      return res.status(403).json({ erro: "Este e-mail não está disponível para cadastro público." });
-    }
+    if (!emailValido(emailNormalizado)) return res.status(400).json({ erro: "Informe um e-mail válido." });
+    if (emailDevReservado(emailNormalizado)) return res.status(403).json({ erro: "Este e-mail não está disponível para cadastro público." });
 
     const politicaSenha = validatePasswordPolicy(senhaTexto, {
       minimumLength: MIN_USER_PASSWORD_LENGTH,
       email: emailNormalizado,
       name: nomeTexto
     });
-    if (!politicaSenha.valid) {
-      return res.status(400).json({ erro: politicaSenha.reason, codigo: "SENHA_FRACA" });
-    }
+    if (!politicaSenha.valid) return res.status(400).json({ erro: politicaSenha.reason, codigo: "SENHA_FRACA" });
 
     if (await Usuario.exists({ email: emailNormalizado })) {
       return res.status(409).json({ erro: "Já existe uma conta cadastrada com este e-mail." });
@@ -168,19 +176,14 @@ async function login(req, res) {
   try {
     const email = normalizarEmail(req.body?.email);
     const senha = String(req.body?.senha || "");
-
-    if (!email || !senha) {
-      return res.status(400).json({ erro: "E-mail e senha são obrigatórios." });
-    }
+    if (!email || !senha) return res.status(400).json({ erro: "E-mail e senha são obrigatórios." });
 
     const usuario = await Usuario.findOne({ email });
     const passwordCheck = usuario
       ? await verifyPassword(usuario.senha, senha)
       : { valid: false, needsRehash: false };
 
-    if (!usuario || !passwordCheck.valid) {
-      return res.status(401).json({ erro: "E-mail ou senha incorretos." });
-    }
+    if (!usuario || !passwordCheck.valid) return res.status(401).json({ erro: "E-mail ou senha incorretos." });
 
     if (passwordCheck.needsRehash) {
       usuario.senha = senha;
@@ -188,13 +191,8 @@ async function login(req, res) {
       await usuario.save();
     }
 
-    if (usuario.suspenso || usuario.status === "suspenso") {
-      return res.status(403).json({ erro: "Sua conta está suspensa.", status: "suspenso" });
-    }
-
-    if (usuario.status === "bloqueado") {
-      return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
-    }
+    if (usuario.suspenso || usuario.status === "suspenso") return res.status(403).json({ erro: "Sua conta está suspensa.", status: "suspenso" });
+    if (usuario.status === "bloqueado") return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
 
     try {
       await aplicarCompraPendentePorEmail(usuario);
@@ -202,18 +200,14 @@ async function login(req, res) {
       console.warn("Não foi possível aplicar compra Bestfy pendente no login:", error.message);
     }
 
-    if (!usuario.aprovado && usuario.plano === "free" && usuario.cargo === "aluno") {
+    if (!usuario.aprovado && usuario.plano === "free" && getCargo(usuario) === "aluno") {
       usuario.aprovado = true;
       usuario.status = "ativo";
       usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
     }
 
     if (!usuario.aprovado && !usuario.contaDev) {
-      return res.status(403).json({
-        erro: "Sua conta ainda está pendente de aprovação.",
-        status: "pendente",
-        aprovado: false
-      });
+      return res.status(403).json({ erro: "Sua conta ainda está pendente de aprovação.", status: "pendente", aprovado: false });
     }
 
     usuario.acessos = Number(usuario.acessos || 0) + 1;
@@ -224,27 +218,13 @@ async function login(req, res) {
 
     const token = gerarToken(usuario);
     definirCookieSessao(res, token);
-
-    return res.json({
-      sucesso: true,
-      mensagem: "Login realizado com sucesso.",
-      token,
-      usuario: await respostaUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Login realizado com sucesso.", token, usuario: await respostaUsuario(usuario) });
   } catch (error) {
     console.error("Erro no login:", error);
-
     if (error?.code === "JWT_NAO_CONFIGURADO") {
-      return res.status(503).json({
-        erro: "Login temporariamente indisponível: a chave de segurança JWT do servidor precisa ser configurada.",
-        codigo: "JWT_NAO_CONFIGURADO"
-      });
+      return res.status(503).json({ erro: "Login temporariamente indisponível por configuração de segurança.", codigo: "JWT_NAO_CONFIGURADO" });
     }
-
-    return res.status(500).json({
-      erro: "Não foi possível concluir o login. Tente novamente em alguns instantes.",
-      codigo: "LOGIN_INTERNAL_ERROR"
-    });
+    return res.status(500).json({ erro: "Não foi possível concluir o login. Tente novamente em alguns instantes.", codigo: "LOGIN_INTERNAL_ERROR" });
   }
 }
 
@@ -289,7 +269,6 @@ router.post("/login", loginIpRateLimit, loginRateLimit, login);
 router.get("/me", auth, me);
 router.get("/validar-token", auth, validarToken);
 router.post("/logout", auth, logout);
-
 router.post("/auth/criar", signupRateLimit, criarConta);
 router.post("/auth/login", loginIpRateLimit, loginRateLimit, login);
 router.get("/auth/me", auth, me);
@@ -303,18 +282,15 @@ router.post("/webhooks/bestfy", webhookRateLimit, async (req, res) => {
   } catch (error) {
     const codigo = String(error?.code || "BESTFY_WEBHOOK_ERROR");
     console.error(`Erro no webhook Bestfy (${codigo}):`, error?.message || error);
-
     if (codigo === "BESTFY_WEBHOOK_INVALID") return res.status(400).json({ erro: error.message, codigo });
     if (codigo === "BESTFY_COMPANY_MISMATCH") return res.status(403).json({ erro: "Evento rejeitado.", codigo });
     if (codigo === "BESTFY_NOT_CONFIGURED" || codigo === "BESTFY_COMPANY_INVALID") {
       return res.status(503).json({ erro: "Integração Bestfy ainda não configurada no servidor.", codigo });
     }
-
     return res.status(503).json({ erro: "Não foi possível processar o evento Bestfy agora.", codigo });
   }
 });
 
-// Health check propositalmente não informa presença/ausência de chaves secretas.
 router.get("/webhooks/bestfy/status", (_req, res) => {
   return res.json({ status: "online", integracao: "Bestfy", validacaoEstrita: true });
 });
@@ -324,24 +300,19 @@ router.post("/setup/superadmin", setupRateLimit, async (req, res) => {
     const setupEnabled = String(process.env.ENABLE_SETUP_SUPERADMIN || "").trim().toLowerCase() === "true";
     const chaveCorreta = String(process.env.SETUP_SECRET || "").trim();
 
-    if (!setupEnabled || !chaveCorreta || chaveCorreta.length < 32) {
+    // Fail closed quando o segredo é exemplo público, curto ou reutilizado em outra credencial.
+    if (!setupEnabled || !segredoSetupSeguro(chaveCorreta)) {
       return res.status(404).json({ erro: "Rota não encontrada." });
     }
 
-    if (!compararSegredo(req.body?.setupKey, chaveCorreta)) {
-      return res.status(403).json({ erro: "Chave de setup inválida." });
-    }
+    if (!compararSegredo(req.body?.setupKey, chaveCorreta)) return res.status(403).json({ erro: "Chave de setup inválida." });
 
     const email = normalizarEmail(req.body?.email);
-    if (!emailValido(email) || emailDevReservado(email)) {
-      return res.status(400).json({ erro: "Conta inválida para promoção por setup." });
-    }
+    if (!emailValido(email) || emailDevReservado(email)) return res.status(400).json({ erro: "Conta inválida para promoção por setup." });
 
     const usuario = await Usuario.findOne({ email });
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
-    if (usuario.contaDev === true || getCargo(usuario) === "dev") {
-      return res.status(403).json({ erro: "A conta Dev não pode ser alterada por esta rota." });
-    }
+    if (usuario.contaDev === true || getCargo(usuario) === "dev") return res.status(403).json({ erro: "A conta Dev não pode ser alterada por esta rota." });
 
     usuario.tipo = "admin";
     usuario.cargo = "dono";
@@ -356,6 +327,7 @@ router.post("/setup/superadmin", setupRateLimit, async (req, res) => {
     usuario.atualizadoPor = "setup-dono";
     await usuario.save();
     await revokeAllUserSessions(String(usuario._id || usuario.id || ""), "setup-role-change");
+    await audit(req, "setup.owner-promoted", { target: usuario, metadata: { cargo: "dono" } });
 
     return res.json({
       sucesso: true,
@@ -367,7 +339,6 @@ router.post("/setup/superadmin", setupRateLimit, async (req, res) => {
   }
 });
 
-// Health check mínimo: não revela estado da chave JWT, detalhes do fluxo ou configuração de secrets.
 router.get("/auth/status", (_req, res) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
   return res.json({ status: "online", modulo: "auth" });
