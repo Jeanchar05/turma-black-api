@@ -5,6 +5,7 @@ const DEFAULT_ORIGINS = new Set([
   "https://www.turmablack.com.br",
   "https://pay.turmablack.com.br"
 ]);
+const SECURITY_POLICY_VERSION = "20260909-2";
 
 function configuredOrigins() {
   const origins = new Set(DEFAULT_ORIGINS);
@@ -37,6 +38,7 @@ function securityHeaders(req, res, next) {
   res.setHeader("Cross-Origin-Resource-Policy", "same-site");
   res.setHeader("Origin-Agent-Cluster", "?1");
   res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  res.setHeader("X-Security-Policy-Version", SECURITY_POLICY_VERSION);
 
   if (/^\/(?:admin(?:\/|$)|auth(?:\/|$)|me$|validar-token$|logout$|usuarios?(?:\/|$)|usuario(?:\/|$)|webhooks\/bestfy(?:\/|$)|setup(?:\/|$))/i.test(req.path || "")) {
     res.setHeader("Cache-Control", "no-store, max-age=0");
@@ -71,4 +73,4 @@ function securityHeaders(req, res, next) {
   return next();
 }
 
-module.exports = { corsOptions, securityHeaders };
+module.exports = { corsOptions, securityHeaders, SECURITY_POLICY_VERSION };
