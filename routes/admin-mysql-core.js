@@ -3,6 +3,7 @@
 const express = require("express");
 const database = require("../config/database");
 const Usuario = require("../models/Usuario");
+const { syncBestfySales } = require("../services/bestfy-sales-ledger");
 const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 const { CARGOS, getCargo, getPermissoesEfetivas, requirePermission } = require("../middleware/permissions");
 
@@ -41,17 +42,25 @@ function dataChave(data) {
 }
 
 async function tabelaExiste(nome) {
-  const rows = await database.query(
-    `SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?`,
-    [nome]
-  );
-  return numero(rows[0]?.total) > 0;
+  try {
+    const rows = await database.query(
+      "SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?",
+      [nome]
+    );
+    return numero(rows[0]?.total) > 0;
+  } catch (_) {
+    return false;
+  }
 }
 
 async function contarTabela(nome, where = "1 = 1", params = []) {
-  if (!(await tabelaExiste(nome))) return 0;
-  const rows = await database.query(`SELECT COUNT(*) AS total FROM \`${nome}\` WHERE ${where}`, params);
-  return numero(rows[0]?.total);
+  try {
+    if (!(await tabelaExiste(nome))) return 0;
+    const rows = await database.query(`SELECT COUNT(*) AS total FROM \`${nome}\` WHERE ${where}`, params);
+    return numero(rows[0]?.total);
+  } catch (_) {
+    return 0;
+  }
 }
 
 async function listarUltimosUsuarios(limite = 8) {
@@ -68,6 +77,10 @@ router.get(
   requirePermission("painelAdmin"),
   async (req, res) => {
     try {
+      // Mantém a contabilidade do Admin sincronizada com pagamentos Bestfy já
+      // verificados. É fail-soft: uma indisponibilidade pontual não bloqueia o painel.
+      await syncBestfySales();
+
       const usuarioAtual = req.usuarioDoc || req.usuario;
       const permissoes = await getPermissoesEfetivas(usuarioAtual);
       const cargo = getCargo(usuarioAtual);
@@ -76,10 +89,7 @@ router.get(
         Usuario.countDocuments({ contaDev: { $ne: true } }),
         Usuario.countDocuments({ cargo: "aluno", status: "ativo" }),
         Usuario.countDocuments({ cargo: "aluno", status: "pendente" }),
-        Usuario.countDocuments({
-          cargo: { $in: ["dono", "admin", "financeiro", "vendedor", "moderador", "suporte"] },
-          status: "ativo"
-        }),
+        Usuario.countDocuments({ cargo: { $in: ["dono", "admin", "financeiro", "vendedor", "moderador", "suporte"] }, status: "ativo" }),
         listarUltimosUsuarios(8),
         contarTabela("solicitacoes_liberacao", "status = ?", ["pendente"]),
         contarTabela("vendas")
@@ -88,40 +98,30 @@ router.get(
       return res.json({
         sucesso: true,
         origem: "mysql",
+        vendasBestfySincronizadas: true,
         usuario: formatarUsuario(usuarioAtual),
         cargo,
         permissoes,
         centralDev: cargo === CARGOS.DEV,
-        resumo: {
-          totalUsuarios,
-          alunosAtivos,
-          alunosPendentes,
-          codigosPendentes,
-          equipeAtiva,
-          totalVendas
-        },
+        resumo: { totalUsuarios, alunosAtivos, alunosPendentes, codigosPendentes, equipeAtiva, totalVendas },
         ultimosUsuarios,
         ultimasLiberacoes: []
       });
     } catch (error) {
       console.error("Erro MySQL no contexto do painel admin:", error);
-      return res.status(500).json({
-        erro: "Erro interno ao carregar painel administrativo.",
-        codigo: "ADMIN_MYSQL_CONTEXT_ERROR"
-      });
+      return res.status(500).json({ erro: "Erro interno ao carregar painel administrativo.", codigo: "ADMIN_MYSQL_CONTEXT_ERROR" });
     }
   }
 );
 
-// Compatibilidade para o frontend administrativo legado. A nova Visão Geral
-// usa /admin/command-center/overview, porém os módulos antigos ainda consultam
-// este endpoint. Mantemos uma resposta MySQL real e leve para evitar timeouts.
+// Compatibilidade para consumidores administrativos anteriores ao Command Center v3.
 router.get(
   "/dashboard/visao-geral",
   auth,
   requirePermission("painelAdmin"),
   async (req, res) => {
     try {
+      await syncBestfySales();
       const dias = Math.min(Math.max(Number(req.query?.dias || 7), 7), 90);
       const agora = new Date();
       const inicioAtual = new Date(agora.getFullYear(), agora.getMonth(), 1);
@@ -181,21 +181,15 @@ router.get(
           totalUsuarios: numero(totalUsuarios),
           usuariosMes: numero(usuariosMesRows[0]?.total),
           crescimentoUsuarios: percentual(usuariosMesRows[0]?.total, usuariosAnteriorRows[0]?.total),
-          freeAtivos: numero(freeAtivos),
-          premiumAtivos: numero(premiumAtivos),
-          vendasMes,
-          crescimentoVendas: percentual(vendasMes, vendasAnterior),
+          freeAtivos: numero(freeAtivos), premiumAtivos: numero(premiumAtivos),
+          vendasMes, crescimentoVendas: percentual(vendasMes, vendasAnterior),
           faturamentoMes: Number(faturamentoMes.toFixed(2)),
           crescimentoFaturamento: percentual(faturamentoMes, faturamentoAnterior),
           conversao: numero(totalUsuarios) ? Number(((numero(premiumAtivos) / numero(totalUsuarios)) * 100).toFixed(2)) : 0,
-          codigosPendentes,
-          chamadosAbertos,
-          provasAtivas
+          codigosPendentes, chamadosAbertos, provasAtivas
         },
         serieVendas: Array.from(serie.values()),
-        atividades: [],
-        alertas,
-        topPlanos,
+        atividades: [], alertas, topPlanos,
         funil: [
           { etapa: "Contas cadastradas", total: numero(totalUsuarios) },
           { etapa: "Usuários Free ativos", total: numero(freeAtivos) },
