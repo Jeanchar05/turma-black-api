@@ -5,6 +5,7 @@ require("../services/password-model-guard");
 const Usuario = require("../models/Usuario");
 const database = require("../config/database");
 const { verifyPassword } = require("../services/passwords");
+const { loginRateLimit, loginIpRateLimit } = require("../middleware/rate-limit");
 const { gerarToken, montarUsuarioSeguro, definirCookieSessao } = require("../middleware/auth");
 const {
   getPermissoesEfetivas,
@@ -215,8 +216,8 @@ async function loginCompativel(req, res) {
   }
 }
 
-router.post("/login", loginCompativel);
-router.post("/auth/login", loginCompativel);
+router.post("/login", loginIpRateLimit, loginRateLimit, loginCompativel);
+router.post("/auth/login", loginIpRateLimit, loginRateLimit, loginCompativel);
 
 // Carregado antes das rotas administrativas legadas no server.js.
 // Assim, contexto e visão geral usam MySQL e não caem nos modelos antigos do MongoDB.
