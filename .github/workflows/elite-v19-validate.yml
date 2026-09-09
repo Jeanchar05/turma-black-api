@@ -13,7 +13,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,9 +22,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: package.json
 
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install dependencies without project lifecycle scripts
+        run: npm install --ignore-scripts --no-fund
 
       - name: Validate JavaScript syntax
         run: npm run validate
+
+      - name: Dependency security audit
+        run: npm audit --audit-level=high
+
+      - name: Scan repository for committed secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE --exclude-dir=.git --exclude='*.md' --exclude='.env.example' \
+            '(BESTFY_API_KEY|JWT_SECRET|SETUP_SECRET|DB_PASSWORD)[[:space:]]*=[[:space:]]*[^$<{[:space:]]{12,}' .; then
+            echo 'Possible committed secret detected.'
+            exit 1
+          fi
+          echo 'No obvious committed environment secrets found.'
