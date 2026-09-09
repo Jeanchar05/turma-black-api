@@ -19,7 +19,7 @@ function normalizarEmail(email) {
 }
 
 function normalizarCargo(valor, tipo, contaDev = false) {
-  if (contaDev) return "dev";
+  if (contaDev === true) return "dev";
 
   const cargo = String(valor || "")
     .trim()
@@ -39,13 +39,15 @@ function normalizarCargo(valor, tipo, contaDev = false) {
   };
 
   const normalizado = mapa[cargo] || cargo;
+  // Cargo Dev sem a flag interna contaDev nunca é reconhecido como privilegiado.
+  if (normalizado === "dev") return "aluno";
+
   const permitidos = [
     "aluno",
     "vendedor",
     "financeiro",
     "admin",
     "dono",
-    "dev",
     "suporte",
     "moderador",
     "superadmin"
@@ -93,7 +95,7 @@ function montarCompatibilidade(usuario) {
     ...base,
     tipo: administrativo ? "admin" : "aluno",
     cargo,
-    contaDev: Boolean(base.contaDev || cargo === "dev"),
+    contaDev: Boolean(base.contaDev === true && cargo === "dev"),
     plano,
     status: base.status || "ativo",
     aprovado: base.aprovado !== false || plano === "free",
@@ -219,8 +221,6 @@ async function loginCompativel(req, res) {
 router.post("/login", loginIpRateLimit, loginRateLimit, loginCompativel);
 router.post("/auth/login", loginIpRateLimit, loginRateLimit, loginCompativel);
 
-// Carregado antes das rotas administrativas legadas no server.js.
-// Assim, contexto e visão geral usam MySQL e não caem nos modelos antigos do MongoDB.
 router.use("/admin", require("./admin-mysql-core"));
 
 module.exports = router;
