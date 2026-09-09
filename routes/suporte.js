@@ -4,7 +4,7 @@ const express = require("express");
 const crypto = require("crypto");
 const database = require("../config/database");
 const { auth } = require("../middleware/auth");
-const { requirePermission, getCargo } = require("../middleware/permissions");
+const { requirePermission, requireSuporte, getCargo } = require("../middleware/permissions");
 
 const router = express.Router();
 let structureReady = false;
@@ -13,8 +13,9 @@ const VALID_STATUS = ["aberto", "em_atendimento", "respondido", "resolvido", "fe
 const VALID_PRIORITIES = ["baixa", "normal", "alta", "urgente"];
 const VALID_CATEGORIES = ["duvida", "acesso", "pagamento", "prova", "plataforma", "vendas", "bug", "outro"];
 const VALID_FEEDBACK_TYPES = ["sugestao", "elogio", "problema", "outro"];
-const TEAM_ROLES = ["dev", "dono", "superadmin", "admin", "suporte"];
+const TEAM_ROLES = ["dev", "dono", "superadmin", "admin", "suporte", "moderador"];
 const MAX_FILE_SIZE = 4 * 1024 * 1024;
+const SAFE_MIMES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"]);
 
 function id24() { return crypto.randomBytes(12).toString("hex"); }
 function text(value, max = 1000) { return String(value || "").trim().slice(0, max); }
@@ -24,6 +25,18 @@ function role(req) { return String(getCargo(req.usuarioDoc || req.usuario) || "a
 function isTeam(req) { return TEAM_ROLES.includes(role(req)); }
 function valid(value, allowed, fallback) { const normalized = String(value || "").trim().toLowerCase(); return allowed.includes(normalized) ? normalized : fallback; }
 function sqlDate(value) { return value || ""; }
+function safeName(value) { return (text(value, 180) || "arquivo").replace(/[\x00-\x1f\x7f/\\]+/g, "_"); }
+
+function detectMime(buffer) {
+  if (!Buffer.isBuffer(buffer) || buffer.length < 4) return "";
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return "image/jpeg";
+  if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]))) return "image/png";
+  const head6 = buffer.subarray(0, 6).toString("ascii");
+  if (head6 === "GIF87a" || head6 === "GIF89a") return "image/gif";
+  if (buffer.length >= 12 && buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP") return "image/webp";
+  if (buffer.subarray(0, 5).toString("ascii") === "%PDF-") return "application/pdf";
+  return "";
+}
 
 async function ensureStructure() {
   if (structureReady) return;
@@ -99,49 +112,20 @@ async function ensureStructure() {
 
 function formatTicket(row) {
   return {
-    id: row.id,
-    usuarioId: row.usuario_id || "",
-    nome: row.usuario_nome || "",
-    email: row.usuario_email || "",
-    assunto: row.assunto || "",
-    categoria: row.categoria || "duvida",
-    prioridade: row.prioridade || "normal",
-    status: row.status || "aberto",
-    atendenteId: row.atendente_id || "",
-    atendenteNome: row.atendente_nome || "",
-    atendenteEmail: row.atendente_email || "",
-    totalMensagens: Number(row.total_mensagens || 0),
-    ultimaMensagem: row.ultima_mensagem || "",
-    ultimaRespostaEm: sqlDate(row.ultima_mensagem_em),
-    encerradoEm: sqlDate(row.encerrado_em),
-    createdAt: sqlDate(row.created_at),
-    updatedAt: sqlDate(row.updated_at)
+    id: row.id, usuarioId: row.usuario_id || "", nome: row.usuario_nome || "", email: row.usuario_email || "",
+    assunto: row.assunto || "", categoria: row.categoria || "duvida", prioridade: row.prioridade || "normal", status: row.status || "aberto",
+    atendenteId: row.atendente_id || "", atendenteNome: row.atendente_nome || "", atendenteEmail: row.atendente_email || "",
+    totalMensagens: Number(row.total_mensagens || 0), ultimaMensagem: row.ultima_mensagem || "", ultimaRespostaEm: sqlDate(row.ultima_mensagem_em),
+    encerradoEm: sqlDate(row.encerrado_em), createdAt: sqlDate(row.created_at), updatedAt: sqlDate(row.updated_at)
   };
 }
 
 function formatMessage(row) {
-  return {
-    id: row.id,
-    autorId: row.autor_id || "",
-    autorNome: row.autor_nome || "",
-    autorEmail: row.autor_email || "",
-    autorCargo: row.autor_cargo || "aluno",
-    tipo: row.tipo || "usuario",
-    mensagem: row.mensagem || "",
-    criadoEm: sqlDate(row.created_at)
-  };
+  return { id: row.id, autorId: row.autor_id || "", autorNome: row.autor_nome || "", autorEmail: row.autor_email || "", autorCargo: row.autor_cargo || "aluno", tipo: row.tipo || "usuario", mensagem: row.mensagem || "", criadoEm: sqlDate(row.created_at) };
 }
 
 function formatFile(row) {
-  return {
-    id: row.id,
-    nome: row.nome || "arquivo",
-    mime: row.mime || "application/octet-stream",
-    tamanho: Number(row.tamanho || 0),
-    mensagemId: row.mensagem_id || "",
-    createdAt: sqlDate(row.created_at),
-    url: `/suporte/anexos/${row.id}`
-  };
+  return { id: row.id, nome: row.nome || "arquivo", mime: SAFE_MIMES.has(row.mime) ? row.mime : "application/octet-stream", tamanho: Number(row.tamanho || 0), mensagemId: row.mensagem_id || "", createdAt: sqlDate(row.created_at), url: `/suporte/anexos/${row.id}` };
 }
 
 async function getTicket(id) {
@@ -173,9 +157,7 @@ async function addMessage(ticketId, req, message, type) {
   const messageId = id24();
   await database.query(`INSERT INTO support_messages
     (id,ticket_id,autor_id,autor_nome,autor_email,autor_cargo,tipo,mensagem)
-    VALUES (?,?,?,?,?,?,?,?)`, [
-    messageId, ticketId, userId(req) || null, text(req.usuario?.nome, 160), email(req.usuario?.email), role(req), type, text(message, 5000)
-  ]);
+    VALUES (?,?,?,?,?,?,?,?)`, [messageId, ticketId, userId(req) || null, text(req.usuario?.nome, 160), email(req.usuario?.email), role(req), type, text(message, 5000)]);
   await database.query("UPDATE support_tickets SET ultima_mensagem_em=NOW(), updated_at=NOW() WHERE id=?", [ticketId]);
   return messageId;
 }
@@ -191,11 +173,8 @@ router.post("/suporte", auth, async (req, res) => {
     const assunto = text(req.body?.assunto, 180);
     const mensagem = text(req.body?.mensagem, 5000);
     if (!assunto || !mensagem) return res.status(400).json({ erro: "Assunto e mensagem são obrigatórios." });
-
     const id = id24();
-    await database.query(`INSERT INTO support_tickets
-      (id,usuario_id,usuario_nome,usuario_email,assunto,categoria,prioridade,status)
-      VALUES (?,?,?,?,?,?,?,'aberto')`, [
+    await database.query(`INSERT INTO support_tickets (id,usuario_id,usuario_nome,usuario_email,assunto,categoria,prioridade,status) VALUES (?,?,?,?,?,?,?,'aberto')`, [
       id, userId(req) || null, text(req.usuario?.nome, 160), email(req.usuario?.email), assunto,
       valid(req.body?.categoria, VALID_CATEGORIES, "duvida"), valid(req.body?.prioridade, VALID_PRIORITIES, "normal")
     ]);
@@ -213,9 +192,7 @@ router.get("/meus-chamados", auth, async (req, res) => {
     const rows = await database.query(`SELECT t.*,
         (SELECT COUNT(*) FROM support_messages m WHERE m.ticket_id=t.id) AS total_mensagens,
         (SELECT m.mensagem FROM support_messages m WHERE m.ticket_id=t.id ORDER BY m.created_at DESC LIMIT 1) AS ultima_mensagem
-      FROM support_tickets t
-      WHERE (t.usuario_id=? OR t.usuario_email=?)
-      ORDER BY t.ultima_mensagem_em DESC LIMIT 150`, [userId(req), email(req.usuario?.email)]);
+      FROM support_tickets t WHERE (t.usuario_id=? OR t.usuario_email=?) ORDER BY t.ultima_mensagem_em DESC LIMIT 150`, [userId(req), email(req.usuario?.email)]);
     return res.json({ sucesso: true, total: rows.length, chamados: rows.map(formatTicket) });
   } catch (error) {
     console.error("Erro ao listar chamados MySQL:", error);
@@ -230,9 +207,7 @@ router.post("/suporte/feedback", auth, async (req, res) => {
     if (!mensagem) return res.status(400).json({ erro: "Escreva seu feedback." });
     const id = id24();
     const rating = Math.max(1, Math.min(5, Number(req.body?.nota || 5)));
-    await database.query(`INSERT INTO support_feedback
-      (id,usuario_id,usuario_nome,usuario_email,tipo,nota,mensagem)
-      VALUES (?,?,?,?,?,?,?)`, [id, userId(req) || null, text(req.usuario?.nome, 160), email(req.usuario?.email), valid(req.body?.tipo, VALID_FEEDBACK_TYPES, "sugestao"), rating, mensagem]);
+    await database.query(`INSERT INTO support_feedback (id,usuario_id,usuario_nome,usuario_email,tipo,nota,mensagem) VALUES (?,?,?,?,?,?,?)`, [id, userId(req) || null, text(req.usuario?.nome, 160), email(req.usuario?.email), valid(req.body?.tipo, VALID_FEEDBACK_TYPES, "sugestao"), rating, mensagem]);
     return res.status(201).json({ sucesso: true, mensagem: "Feedback enviado. Obrigado por ajudar a melhorar a plataforma!", id });
   } catch (error) {
     console.error("Erro ao enviar feedback:", error);
@@ -243,14 +218,19 @@ router.post("/suporte/feedback", auth, async (req, res) => {
 router.get("/suporte/anexos/:id", auth, async (req, res) => {
   try {
     await ensureStructure();
-    const rows = await database.query(`SELECT f.*,t.usuario_id,t.usuario_email FROM support_files f
-      INNER JOIN support_tickets t ON t.id=f.ticket_id WHERE f.id=? LIMIT 1`, [req.params.id]);
+    const rows = await database.query(`SELECT f.*,t.usuario_id,t.usuario_email FROM support_files f INNER JOIN support_tickets t ON t.id=f.ticket_id WHERE f.id=? LIMIT 1`, [req.params.id]);
     const file = rows[0];
     if (!file) return res.status(404).json({ erro: "Arquivo não encontrado." });
     if (!canAccess(req, file)) return res.status(403).json({ erro: "Acesso negado ao arquivo." });
-    res.setHeader("Content-Type", file.mime || "application/octet-stream");
-    res.setHeader("Content-Length", Number(file.tamanho || 0));
-    res.setHeader("Content-Disposition", `${/^image\//.test(file.mime) || file.mime === "application/pdf" ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(file.nome)}`);
+
+    const detected = detectMime(Buffer.from(file.dados || []));
+    const mime = SAFE_MIMES.has(detected) ? detected : "application/octet-stream";
+    const disposition = /^image\/(jpeg|png|webp|gif)$/.test(mime) ? "inline" : "attachment";
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Security-Policy", "default-src 'none'; sandbox");
+    res.setHeader("Content-Type", mime);
+    res.setHeader("Content-Length", Number(file.tamanho || Buffer.byteLength(file.dados || [])));
+    res.setHeader("Content-Disposition", `${disposition}; filename*=UTF-8''${encodeURIComponent(safeName(file.nome))}`);
     return res.send(file.dados);
   } catch (error) {
     console.error("Erro ao baixar anexo:", error);
@@ -265,17 +245,24 @@ router.post("/suporte/:id/anexos", auth, async (req, res) => {
     if (!ticket) return res.status(404).json({ erro: "Chamado não encontrado." });
     if (!canAccess(req, ticket)) return res.status(403).json({ erro: "Você não pode anexar neste chamado." });
 
-    const name = text(req.body?.nome, 220) || "arquivo";
-    const mime = text(req.body?.mime, 120) || "application/octet-stream";
-    const raw = String(req.body?.base64 || "").replace(/^data:[^;]+;base64,/, "");
-    if (!raw) return res.status(400).json({ erro: "Arquivo inválido." });
+    const name = safeName(req.body?.nome);
+    const raw = String(req.body?.base64 || "").replace(/^data:[^;]+;base64,/, "").replace(/\s+/g, "");
+    if (!raw || !/^[A-Za-z0-9+/]*={0,2}$/.test(raw)) return res.status(400).json({ erro: "Arquivo inválido." });
     const buffer = Buffer.from(raw, "base64");
     if (!buffer.length || buffer.length > MAX_FILE_SIZE) return res.status(400).json({ erro: "O arquivo deve ter no máximo 4 MB." });
 
+    const mime = detectMime(buffer);
+    if (!SAFE_MIMES.has(mime)) {
+      return res.status(415).json({ erro: "Tipo de arquivo não permitido. Envie JPG, PNG, WEBP, GIF ou PDF." });
+    }
+
+    const informedMime = text(req.body?.mime, 120).toLowerCase();
+    if (informedMime && informedMime !== mime && !(informedMime === "image/jpg" && mime === "image/jpeg")) {
+      return res.status(415).json({ erro: "O conteúdo do arquivo não corresponde ao tipo informado." });
+    }
+
     const id = id24();
-    await database.query(`INSERT INTO support_files
-      (id,ticket_id,mensagem_id,usuario_id,nome,mime,tamanho,dados)
-      VALUES (?,?,?,?,?,?,?,?)`, [id, ticket.id, req.body?.mensagemId || null, userId(req) || null, name, mime, buffer.length, buffer]);
+    await database.query(`INSERT INTO support_files (id,ticket_id,mensagem_id,usuario_id,nome,mime,tamanho,dados) VALUES (?,?,?,?,?,?,?,?)`, [id, ticket.id, req.body?.mensagemId || null, userId(req) || null, name, mime, buffer.length, buffer]);
     return res.status(201).json({ sucesso: true, arquivo: { id, nome: name, mime, tamanho: buffer.length, url: `/suporte/anexos/${id}` } });
   } catch (error) {
     console.error("Erro ao anexar arquivo:", error);
@@ -314,29 +301,21 @@ router.post("/suporte/:id/responder", auth, async (req, res) => {
   }
 });
 
-router.get("/admin/suporte/resumo", auth, requirePermission("suporte"), async (_req, res) => {
+const adminSupport = [auth, requireSuporte, requirePermission("suporte")];
+
+router.get("/admin/suporte/resumo", ...adminSupport, async (_req, res) => {
   try {
     await ensureStructure();
-    const rows = await database.query(`SELECT
-      COUNT(*) AS total,
-      SUM(status='aberto') AS abertos,
-      SUM(status='em_atendimento') AS atendimento,
-      SUM(status='respondido') AS respondidos,
-      SUM(status IN ('resolvido','fechado')) AS resolvidos,
-      SUM(prioridade='urgente' AND status NOT IN ('resolvido','fechado')) AS urgentes
-      FROM support_tickets`);
+    const rows = await database.query(`SELECT COUNT(*) AS total, SUM(status='aberto') AS abertos, SUM(status='em_atendimento') AS atendimento, SUM(status='respondido') AS respondidos, SUM(status IN ('resolvido','fechado')) AS resolvidos, SUM(prioridade='urgente' AND status NOT IN ('resolvido','fechado')) AS urgentes FROM support_tickets`);
     const summary = rows[0] || {};
-    return res.json({ sucesso: true, resumo: {
-      total: Number(summary.total || 0), abertos: Number(summary.abertos || 0), atendimento: Number(summary.atendimento || 0),
-      respondidos: Number(summary.respondidos || 0), resolvidos: Number(summary.resolvidos || 0), urgentes: Number(summary.urgentes || 0)
-    }});
+    return res.json({ sucesso: true, resumo: { total: Number(summary.total || 0), abertos: Number(summary.abertos || 0), atendimento: Number(summary.atendimento || 0), respondidos: Number(summary.respondidos || 0), resolvidos: Number(summary.resolvidos || 0), urgentes: Number(summary.urgentes || 0) }});
   } catch (error) {
     console.error("Erro no resumo de suporte:", error);
     return res.status(500).json({ erro: "Erro interno ao gerar resumo de suporte." });
   }
 });
 
-router.get("/admin/suporte/feedback", auth, requirePermission("suporte"), async (req, res) => {
+router.get("/admin/suporte/feedback", ...adminSupport, async (req, res) => {
   try {
     await ensureStructure();
     const status = text(req.query?.status, 30);
@@ -344,15 +323,11 @@ router.get("/admin/suporte/feedback", auth, requirePermission("suporte"), async 
     let where = "";
     if (status) { where = "WHERE status=?"; params.push(status); }
     const rows = await database.query(`SELECT * FROM support_feedback ${where} ORDER BY created_at DESC LIMIT 300`, params);
-    return res.json({ sucesso: true, feedbacks: rows.map((row) => ({
-      id: row.id, nome: row.usuario_nome, email: row.usuario_email, tipo: row.tipo, nota: Number(row.nota || 0), mensagem: row.mensagem, status: row.status, createdAt: row.created_at
-    })) });
-  } catch (error) {
-    return res.status(500).json({ erro: "Erro ao carregar feedbacks." });
-  }
+    return res.json({ sucesso: true, feedbacks: rows.map((row) => ({ id: row.id, nome: row.usuario_nome, email: row.usuario_email, tipo: row.tipo, nota: Number(row.nota || 0), mensagem: row.mensagem, status: row.status, createdAt: row.created_at })) });
+  } catch (_) { return res.status(500).json({ erro: "Erro ao carregar feedbacks." }); }
 });
 
-router.post("/admin/suporte/feedback/:id/status", auth, requirePermission("suporte"), async (req, res) => {
+router.post("/admin/suporte/feedback/:id/status", ...adminSupport, async (req, res) => {
   try {
     await ensureStructure();
     const status = ["novo", "lido", "planejado", "concluido", "arquivado"].includes(req.body?.status) ? req.body.status : "lido";
@@ -362,7 +337,7 @@ router.post("/admin/suporte/feedback/:id/status", auth, requirePermission("supor
   } catch (_) { return res.status(500).json({ erro: "Erro ao atualizar feedback." }); }
 });
 
-router.get("/admin/suporte", auth, requirePermission("suporte"), async (req, res) => {
+router.get("/admin/suporte", ...adminSupport, async (req, res) => {
   try {
     await ensureStructure();
     const conditions = [];
@@ -377,11 +352,7 @@ router.get("/admin/suporte", auth, requirePermission("suporte"), async (req, res
     if (VALID_CATEGORIES.includes(category)) { conditions.push("t.categoria=?"); params.push(category); }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const limit = Math.min(Math.max(Number(req.query?.limite || 200), 1), 500);
-    const rows = await database.query(`SELECT t.*,
-        (SELECT COUNT(*) FROM support_messages m WHERE m.ticket_id=t.id) AS total_mensagens,
-        (SELECT m.mensagem FROM support_messages m WHERE m.ticket_id=t.id ORDER BY m.created_at DESC LIMIT 1) AS ultima_mensagem
-      FROM support_tickets t ${where}
-      ORDER BY FIELD(t.prioridade,'urgente','alta','normal','baixa'), t.ultima_mensagem_em DESC LIMIT ${limit}`, params);
+    const rows = await database.query(`SELECT t.*, (SELECT COUNT(*) FROM support_messages m WHERE m.ticket_id=t.id) AS total_mensagens, (SELECT m.mensagem FROM support_messages m WHERE m.ticket_id=t.id ORDER BY m.created_at DESC LIMIT 1) AS ultima_mensagem FROM support_tickets t ${where} ORDER BY FIELD(t.prioridade,'urgente','alta','normal','baixa'), t.ultima_mensagem_em DESC LIMIT ${limit}`, params);
     return res.json({ sucesso: true, total: rows.length, chamados: rows.map(formatTicket) });
   } catch (error) {
     console.error("Erro ao listar chamados admin:", error);
@@ -389,7 +360,7 @@ router.get("/admin/suporte", auth, requirePermission("suporte"), async (req, res
   }
 });
 
-router.get("/admin/suporte/:id", auth, requirePermission("suporte"), async (req, res) => {
+router.get("/admin/suporte/:id", ...adminSupport, async (req, res) => {
   try {
     await ensureStructure();
     const payload = await ticketPayload(req.params.id);
@@ -398,20 +369,18 @@ router.get("/admin/suporte/:id", auth, requirePermission("suporte"), async (req,
   } catch (_) { return res.status(500).json({ erro: "Erro interno ao buscar chamado." }); }
 });
 
-router.post("/admin/suporte/:id/assumir", auth, requirePermission("suporte"), async (req, res) => {
+router.post("/admin/suporte/:id/assumir", ...adminSupport, async (req, res) => {
   try {
     await ensureStructure();
     const ticket = await getTicket(req.params.id);
     if (!ticket) return res.status(404).json({ erro: "Chamado não encontrado." });
-    await database.query(`UPDATE support_tickets SET atendente_id=?,atendente_nome=?,atendente_email=?,status='em_atendimento',updated_at=NOW() WHERE id=?`, [
-      userId(req) || null, text(req.usuario?.nome,160)||"Equipe", email(req.usuario?.email), ticket.id
-    ]);
+    await database.query(`UPDATE support_tickets SET atendente_id=?,atendente_nome=?,atendente_email=?,status='em_atendimento',updated_at=NOW() WHERE id=?`, [userId(req) || null, text(req.usuario?.nome,160)||"Equipe", email(req.usuario?.email), ticket.id]);
     await addMessage(ticket.id, req, `${text(req.usuario?.nome,160)||"Equipe"} iniciou o atendimento.`, "sistema");
     return res.json({ sucesso: true, mensagem: "Atendimento assumido.", chamado: await ticketPayload(ticket.id) });
   } catch (_) { return res.status(500).json({ erro: "Erro ao assumir atendimento." }); }
 });
 
-router.post("/admin/suporte/:id/responder", auth, requirePermission("suporte"), async (req, res) => {
+router.post("/admin/suporte/:id/responder", ...adminSupport, async (req, res) => {
   try {
     await ensureStructure();
     const ticket = await getTicket(req.params.id);
@@ -420,9 +389,7 @@ router.post("/admin/suporte/:id/responder", auth, requirePermission("suporte"), 
     if (!mensagem) return res.status(400).json({ erro: "Digite uma resposta." });
     const messageId = await addMessage(ticket.id, req, mensagem, "equipe");
     const newStatus = valid(req.body?.status, VALID_STATUS, "respondido");
-    await database.query(`UPDATE support_tickets SET status=?,atendente_id=COALESCE(atendente_id,?),atendente_nome=IF(atendente_nome='',?,atendente_nome),atendente_email=IF(atendente_email='',?,atendente_email),encerrado_em=?,updated_at=NOW() WHERE id=?`, [
-      newStatus, userId(req) || null, text(req.usuario?.nome,160)||"Equipe", email(req.usuario?.email), ["resolvido","fechado"].includes(newStatus) ? new Date() : null, ticket.id
-    ]);
+    await database.query(`UPDATE support_tickets SET status=?,atendente_id=COALESCE(atendente_id,?),atendente_nome=IF(atendente_nome='',?,atendente_nome),atendente_email=IF(atendente_email='',?,atendente_email),encerrado_em=?,updated_at=NOW() WHERE id=?`, [newStatus, userId(req) || null, text(req.usuario?.nome,160)||"Equipe", email(req.usuario?.email), ["resolvido","fechado"].includes(newStatus) ? new Date() : null, ticket.id]);
     return res.json({ sucesso: true, mensagem: "Resposta enviada ao usuário.", mensagemId: messageId, chamado: await ticketPayload(ticket.id) });
   } catch (error) {
     console.error("Erro ao responder chamado admin:", error);
@@ -430,7 +397,7 @@ router.post("/admin/suporte/:id/responder", auth, requirePermission("suporte"), 
   }
 });
 
-router.post("/admin/suporte/:id/status", auth, requirePermission("suporte"), async (req, res) => {
+router.post("/admin/suporte/:id/status", ...adminSupport, async (req, res) => {
   try {
     await ensureStructure();
     const ticket = await getTicket(req.params.id);
