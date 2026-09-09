@@ -126,11 +126,26 @@ function normalizarCargo(valor) {
   return mapa[cargo] || cargo;
 }
 
+function devEmailConfigurado() {
+  return String(process.env.DEV_EMAIL || "dev@turmablack.com")
+    .trim()
+    .toLowerCase();
+}
+
+function isDevAccount(usuario) {
+  if (!usuario || usuario.contaDev !== true) return false;
+  const esperado = devEmailConfigurado();
+  const atual = String(usuario.email || "").trim().toLowerCase();
+  return Boolean(esperado && atual && atual === esperado);
+}
+
 function getCargo(usuario) {
   if (!usuario) return CARGOS.ALUNO;
-  if (usuario.contaDev === true) return CARGOS.DEV;
+  if (isDevAccount(usuario)) return CARGOS.DEV;
 
   const cargo = normalizarCargo(usuario.cargo || usuario.tipo);
+  // A string pública/armazenada "dev" nunca concede Dev sem a identidade
+  // interna completa (flag + e-mail reservado).
   if (cargo === CARGOS.DEV) return CARGOS.ALUNO;
   return PERMISSOES_PADRAO[cargo] ? cargo : CARGOS.ALUNO;
 }
@@ -147,7 +162,7 @@ function getPermissoes(usuario) {
   const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
   const personalizadas = sanitizarPermissoes(usuario?.permissoesPersonalizadas || {});
 
-  if (cargo === CARGOS.DEV && usuario?.contaDev === true) return { ...PERMISSOES_PADRAO.dev };
+  if (cargo === CARGOS.DEV && isDevAccount(usuario)) return { ...PERMISSOES_PADRAO.dev };
   const resultado = { ...base, ...personalizadas };
   if (cargo === CARGOS.ALUNO) resultado.suporte = false;
   return resultado;
@@ -156,7 +171,7 @@ function getPermissoes(usuario) {
 async function getPermissoesEfetivas(usuario) {
   const cargo = getCargo(usuario);
 
-  if (cargo === CARGOS.DEV && usuario?.contaDev === true) return { ...PERMISSOES_PADRAO.dev };
+  if (cargo === CARGOS.DEV && isDevAccount(usuario)) return { ...PERMISSOES_PADRAO.dev };
 
   const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
   let configuradas;
@@ -180,13 +195,13 @@ async function getPermissoesEfetivas(usuario) {
 
 function temPermissao(usuario, permissao) {
   if (!usuario || !permissao) return false;
-  if (getCargo(usuario) === CARGOS.DEV && usuario?.contaDev === true) return true;
+  if (isDevAccount(usuario)) return true;
   return Boolean(getPermissoes(usuario)[permissao]);
 }
 
 async function temPermissaoEfetiva(usuario, permissao) {
   if (!usuario || !permissao) return false;
-  if (getCargo(usuario) === CARGOS.DEV && usuario?.contaDev === true) return true;
+  if (isDevAccount(usuario)) return true;
   const permissoes = await getPermissoesEfetivas(usuario);
   return Boolean(permissoes[permissao]);
 }
@@ -194,7 +209,7 @@ async function temPermissaoEfetiva(usuario, permissao) {
 function temCargo(usuario, cargosPermitidos = []) {
   if (!usuario) return false;
   const cargo = getCargo(usuario);
-  if (cargo === CARGOS.DEV && usuario?.contaDev === true) return true;
+  if (isDevAccount(usuario)) return true;
   return cargosPermitidos.map(normalizarCargo).includes(cargo);
 }
 
@@ -231,16 +246,7 @@ function requireCargo(...cargosPermitidos) {
 function requireDev(req, res, next) {
   if (!req.usuario || !req.usuarioDoc) return res.status(401).json({ erro: "Usuário não autenticado." });
 
-  const cargo = getCargo(req.usuarioDoc);
-  const emailDev = String(process.env.DEV_EMAIL || "dev@turmablack.com").trim().toLowerCase();
-  const emailAtual = String(req.usuarioDoc.email || "").trim().toLowerCase();
-
-  if (
-    cargo !== CARGOS.DEV ||
-    req.usuarioDoc.contaDev !== true ||
-    !emailDev ||
-    emailAtual !== emailDev
-  ) {
+  if (!isDevAccount(req.usuarioDoc) || getCargo(req.usuarioDoc) !== CARGOS.DEV) {
     return res.status(403).json({ erro: "Área exclusiva da conta Dev." });
   }
 
@@ -268,6 +274,8 @@ module.exports = {
   CHAVES_PERMISSAO,
   PERMISSOES_PADRAO,
   normalizarCargo,
+  devEmailConfigurado,
+  isDevAccount,
   sanitizarPermissoes,
   getCargo,
   getPermissoes,
