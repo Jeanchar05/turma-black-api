@@ -1,8 +1,10 @@
+"use strict";
+
 const express = require("express");
 const mongoose = require("mongoose");
 
 const Usuario = require("../models/Usuario");
-
+const { revokeAllUserSessions } = require("../services/sessions");
 const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 const {
   requirePermission,
@@ -12,9 +14,15 @@ const {
 
 const router = express.Router();
 
-/* ===============================
-   HELPERS
-=============================== */
+const PLANOS_DIAS = Object.freeze({
+  free: 0,
+  black30: 30,
+  black90: 90,
+  black180: 180,
+  black360: 365,
+  admin: 0
+});
+const STATUS_VALIDOS = new Set(["ativo", "pendente", "suspenso", "bloqueado"]);
 
 function normalizarEmail(email) {
   return String(email || "").toLowerCase().trim();
@@ -24,84 +32,56 @@ function hojeISO() {
   return new Date().toISOString();
 }
 
-function hojeData() {
-  return new Date().toISOString().split("T")[0];
+function somarDiasSeguro(dataBase, dias) {
+  const quantidade = Number(dias);
+  if (!Number.isInteger(quantidade) || quantidade <= 0 || !Object.values(PLANOS_DIAS).includes(quantidade)) {
+    throw new Error("Quantidade de dias não autorizada.");
+  }
+  const data = new Date(dataBase);
+  if (Number.isNaN(data.getTime())) throw new Error("Data base inválida.");
+  data.setUTCDate(data.getUTCDate() + quantidade);
+  return data.toISOString();
 }
 
-function somarDias(dataBase, dias) {
-  const data = new Date(`${dataBase}T00:00:00`);
-  data.setDate(data.getDate() + Number(dias || 0));
-  return data.toISOString().split("T")[0];
-}
-
-function diasPorPlano(plano) {
-  const mapa = {
-    free: 0,
-    black30: 30,
-    black90: 90,
-    black180: 180,
-    black360: 360,
-    admin: 0
-  };
-
-  return mapa[plano] || 30;
+function dataBasePlano(usuario) {
+  const agora = new Date();
+  const atual = new Date(usuario?.dataExpiracao || "");
+  if (!Number.isNaN(atual.getTime()) && atual > agora) return atual;
+  return agora;
 }
 
 function normalizarPlano(plano) {
   const valor = String(plano || "").toLowerCase().trim();
-
   const mapa = {
     free: "free",
     gratis: "free",
     gratuito: "free",
-
     premium: "black30",
     black: "black30",
     turma_black: "black30",
-    turmaBlack: "black30",
-
+    turmablack: "black30",
     mensal: "black30",
     black30: "black30",
-
     trimestral: "black90",
     black90: "black90",
-
     semestral: "black180",
     black180: "black180",
-
     anual: "black360",
     black360: "black360",
-
     admin: "admin"
   };
-
-  return mapa[valor] || "black30";
+  return mapa[valor] || "";
 }
 
 function normalizarCargo(cargo) {
   const valor = String(cargo || "").toLowerCase().trim();
-
-  const permitidos = [
-    "aluno",
-    "vendedor",
-    "suporte",
-    "moderador",
-    "admin",
-    "superadmin"
-  ];
-
-  if (permitidos.includes(valor)) {
-    return valor;
-  }
-
-  return "aluno";
+  const permitidos = ["aluno", "vendedor", "suporte", "moderador", "admin", "superadmin"];
+  return permitidos.includes(valor) ? valor : "aluno";
 }
 
 function limparUsuario(usuario) {
   if (!usuario) return null;
-
   const seguro = montarUsuarioSeguro(usuario);
-
   return {
     ...seguro,
     codigo: usuario.codigo || "",
@@ -116,7 +96,6 @@ function limparUsuario(usuario) {
 
 async function buscarUsuarioPorIdentificador(identificador) {
   const valor = String(identificador || "").trim();
-
   if (!valor) return null;
 
   if (mongoose.Types.ObjectId.isValid(valor)) {
@@ -125,61 +104,43 @@ async function buscarUsuarioPorIdentificador(identificador) {
   }
 
   const email = normalizarEmail(valor);
-
   if (email.includes("@")) {
     const porEmail = await Usuario.findOne({ email });
     if (porEmail) return porEmail;
   }
 
-  const porCodigo = await Usuario.findOne({
-    codigo: valor
-  });
-
-  if (porCodigo) return porCodigo;
-
-  return null;
+  return Usuario.findOne({ codigo: valor });
 }
 
 function gerarCodigoAluno() {
   const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const numeros = "0123456789";
-
   let codigo = "TB-";
-
-  for (let i = 0; i < 3; i++) {
-    codigo += letras[Math.floor(Math.random() * letras.length)];
-  }
-
+  for (let i = 0; i < 3; i += 1) codigo += letras[Math.floor(Math.random() * letras.length)];
   codigo += "-";
-
-  for (let i = 0; i < 4; i++) {
-    codigo += numeros[Math.floor(Math.random() * numeros.length)];
-  }
-
+  for (let i = 0; i < 4; i += 1) codigo += numeros[Math.floor(Math.random() * numeros.length)];
   return codigo;
 }
 
-/* ===============================
-   LISTAR USUÁRIOS
-   GET /usuarios
-=============================== */
+function contaRestrita(usuario) {
+  return Boolean(usuario?.suspenso) || ["suspenso", "bloqueado"].includes(String(usuario?.status || "").toLowerCase());
+}
+
+async function revogarSessoes(usuario, motivo) {
+  try {
+    await revokeAllUserSessions(String(usuario?._id || usuario?.id || ""), motivo);
+  } catch (error) {
+    console.error("Falha ao revogar sessões do usuário:", error.message);
+    throw error;
+  }
+}
 
 router.get("/usuarios", auth, requirePermission("usuarios"), async (req, res) => {
   try {
-    const {
-      busca = "",
-      status = "",
-      cargo = "",
-      plano = "",
-      aprovado = "",
-      limite = 200
-    } = req.query;
-
+    const { busca = "", status = "", cargo = "", plano = "", aprovado = "", limite = 200 } = req.query;
     const filtro = {};
-
     if (busca) {
-      const termo = String(busca).trim();
-
+      const termo = String(busca).trim().slice(0, 160);
       filtro.$or = [
         { nome: { $regex: termo, $options: "i" } },
         { email: { $regex: termo, $options: "i" } },
@@ -187,63 +148,26 @@ router.get("/usuarios", auth, requirePermission("usuarios"), async (req, res) =>
         { telefone: { $regex: termo, $options: "i" } }
       ];
     }
-
-    if (status) {
-      filtro.status = status;
-    }
-
-    if (cargo) {
-      filtro.cargo = cargo;
-    }
-
-    if (plano) {
-      filtro.plano = plano;
-    }
-
-    if (aprovado === "true") {
-      filtro.aprovado = true;
-    }
-
-    if (aprovado === "false") {
-      filtro.aprovado = false;
-    }
+    if (status) filtro.status = String(status).slice(0, 30);
+    if (cargo) filtro.cargo = String(cargo).slice(0, 30);
+    if (plano) filtro.plano = String(plano).slice(0, 30);
+    if (aprovado === "true") filtro.aprovado = true;
+    if (aprovado === "false") filtro.aprovado = false;
 
     const usuarios = await Usuario.find(filtro)
       .sort({ createdAt: -1 })
-      .limit(Number(limite) || 200);
+      .limit(Math.min(Math.max(Number(limite) || 200, 1), 500));
 
-    return res.json({
-      sucesso: true,
-      total: usuarios.length,
-      usuarios: usuarios.map(limparUsuario)
-    });
+    return res.json({ sucesso: true, total: usuarios.length, usuarios: usuarios.map(limparUsuario) });
   } catch (error) {
     console.error("Erro ao listar usuários:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao listar usuários."
-    });
+    return res.status(500).json({ erro: "Erro interno ao listar usuários." });
   }
 });
 
-/* ===============================
-   RESUMO DE USUÁRIOS
-   GET /usuarios/resumo
-=============================== */
-
-router.get("/usuarios/resumo", auth, requirePermission("usuarios"), async (req, res) => {
+router.get("/usuarios/resumo", auth, requirePermission("usuarios"), async (_req, res) => {
   try {
-    const [
-      total,
-      aprovados,
-      pendentes,
-      suspensos,
-      bloqueados,
-      admins,
-      vendedores,
-      suporte,
-      moderadores
-    ] = await Promise.all([
+    const [total, aprovados, pendentes, suspensos, bloqueados, admins, vendedores, suporte, moderadores] = await Promise.all([
       Usuario.countDocuments(),
       Usuario.countDocuments({ aprovado: true }),
       Usuario.countDocuments({ status: "pendente" }),
@@ -254,466 +178,234 @@ router.get("/usuarios/resumo", auth, requirePermission("usuarios"), async (req, 
       Usuario.countDocuments({ cargo: "suporte" }),
       Usuario.countDocuments({ cargo: "moderador" })
     ]);
-
-    return res.json({
-      sucesso: true,
-      resumo: {
-        total,
-        aprovados,
-        pendentes,
-        suspensos,
-        bloqueados,
-        admins,
-        vendedores,
-        suporte,
-        moderadores
-      }
-    });
+    return res.json({ sucesso: true, resumo: { total, aprovados, pendentes, suspensos, bloqueados, admins, vendedores, suporte, moderadores } });
   } catch (error) {
     console.error("Erro ao gerar resumo de usuários:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao gerar resumo."
-    });
+    return res.status(500).json({ erro: "Erro interno ao gerar resumo." });
   }
 });
-
-/* ===============================
-   BUSCAR UM USUÁRIO
-   GET /usuario/:identificador
-=============================== */
 
 router.get("/usuario/:identificador", auth, requirePermission("usuarios"), async (req, res) => {
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.params.identificador);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
-    }
-
-    return res.json({
-      sucesso: true,
-      usuario: limparUsuario(usuario)
-    });
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    return res.json({ sucesso: true, usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao buscar usuário:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao buscar usuário."
-    });
+    return res.status(500).json({ erro: "Erro interno ao buscar usuário." });
   }
 });
-
-/* ===============================
-   APROVAR USUÁRIO
-   POST /aprovar
-=============================== */
 
 router.post("/aprovar", auth, requirePermission("aprovacoes"), async (req, res) => {
   try {
-    const { email, id, codigo, plano, dias } = req.body;
-
-    const identificador = email || id || codigo;
-
-    const usuario = await buscarUsuarioPorIdentificador(identificador);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
+    const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    if (contaRestrita(usuario)) {
+      return res.status(409).json({ erro: "A conta está suspensa ou bloqueada. Use a ação explícita de reativação antes de aprovar." });
     }
 
-    const planoFinal = normalizarPlano(plano || usuario.plano || "black30");
-    const diasPlano = Number(dias || diasPorPlano(planoFinal));
+    const planoFinal = normalizarPlano(req.body?.plano || usuario.plano || "black30");
+    if (!planoFinal) return res.status(400).json({ erro: "Plano inválido." });
+    const diasPlano = PLANOS_DIAS[planoFinal];
 
     usuario.aprovado = true;
-    usuario.suspenso = false;
     usuario.status = "ativo";
-    usuario.aprovadoEm = hojeISO();
-
+    usuario.aprovadoEm = usuario.aprovadoEm || hojeISO();
     usuario.plano = planoFinal;
 
-    if (planoFinal !== "free" && planoFinal !== "admin") {
-      usuario.dataExpiracao = somarDias(hojeData(), diasPlano);
-    }
+    if (diasPlano > 0) usuario.dataExpiracao = somarDiasSeguro(dataBasePlano(usuario), diasPlano);
+    else usuario.dataExpiracao = "";
 
-    if (!usuario.codigo) {
-      usuario.codigo = gerarCodigoAluno();
-    }
-
+    if (!usuario.codigo) usuario.codigo = gerarCodigoAluno();
     usuario.atualizadoPor = req.usuario.email;
-
     await usuario.save();
 
-    return res.json({
-      sucesso: true,
-      mensagem: "Usuário aprovado com sucesso.",
-      usuario: limparUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Usuário aprovado com sucesso.", diasLiberados: diasPlano, usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao aprovar usuário:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao aprovar usuário."
-    });
+    return res.status(500).json({ erro: "Erro interno ao aprovar usuário." });
   }
 });
-
-/* ===============================
-   ALTERAR PLANO
-   POST /usuario/plano
-=============================== */
 
 router.post("/usuario/plano", auth, requirePermission("planos"), async (req, res) => {
   try {
-    const { email, id, codigo, plano, dias } = req.body;
+    const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
 
-    const usuario = await buscarUsuarioPorIdentificador(email || id || codigo);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
-    }
-
-    const planoFinal = normalizarPlano(plano);
-    const diasPlano = Number(dias || diasPorPlano(planoFinal));
+    const planoFinal = normalizarPlano(req.body?.plano);
+    if (!planoFinal) return res.status(400).json({ erro: "Plano inválido." });
+    const diasPlano = PLANOS_DIAS[planoFinal];
 
     usuario.plano = planoFinal;
-
-    if (planoFinal === "free") {
-      usuario.dataExpiracao = "";
-    } else if (planoFinal === "admin") {
-      usuario.dataExpiracao = "";
+    if (diasPlano > 0) {
+      usuario.dataExpiracao = somarDiasSeguro(dataBasePlano(usuario), diasPlano);
       usuario.aprovado = true;
-      usuario.status = "ativo";
     } else {
-      usuario.dataExpiracao = somarDias(hojeData(), diasPlano);
-      usuario.aprovado = true;
-      usuario.status = "ativo";
+      usuario.dataExpiracao = "";
+      if (planoFinal === "admin") usuario.aprovado = true;
     }
 
+    // Alterar assinatura nunca remove suspensão/bloqueio. Estado disciplinar é separado.
     usuario.atualizadoPor = req.usuario.email;
-
     await usuario.save();
 
-    return res.json({
-      sucesso: true,
-      mensagem: "Plano atualizado com sucesso.",
-      usuario: limparUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Plano atualizado com sucesso.", diasLiberados: diasPlano, usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao alterar plano:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao alterar plano."
-    });
+    return res.status(500).json({ erro: "Erro interno ao alterar plano." });
   }
 });
 
-/* ===============================
-   SUSPENDER USUÁRIO
-   POST /suspender
-=============================== */
-
 router.post("/suspender", auth, requirePermission("usuarios"), async (req, res) => {
   try {
-    const { email, id, codigo, motivo } = req.body;
-
-    const usuario = await buscarUsuarioPorIdentificador(email || id || codigo);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
-    }
-
-    if (usuario.cargo === "superadmin") {
-      return res.status(403).json({
-        erro: "Não é permitido suspender um Super Admin."
-      });
+    const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    if (["superadmin", "dono", "dev"].includes(String(usuario.cargo || "").toLowerCase())) {
+      return res.status(403).json({ erro: "Não é permitido suspender esta conta administrativa por esta rota." });
     }
 
     usuario.suspenso = true;
     usuario.status = "suspenso";
     usuario.atualizadoPor = req.usuario.email;
-
-    if (motivo) {
-      usuario.observacaoSuspensao = String(motivo);
-    }
-
+    if (req.body?.motivo) usuario.observacaoSuspensao = String(req.body.motivo).slice(0, 1000);
     await usuario.save();
+    await revogarSessoes(usuario, "account-suspended");
 
-    return res.json({
-      sucesso: true,
-      mensagem: "Usuário suspenso com sucesso.",
-      usuario: limparUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Usuário suspenso com sucesso e sessões encerradas.", usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao suspender usuário:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao suspender usuário."
-    });
+    return res.status(500).json({ erro: "Erro interno ao suspender usuário." });
   }
 });
 
-/* ===============================
-   REATIVAR USUÁRIO
-   POST /reativar
-=============================== */
-
 router.post("/reativar", auth, requirePermission("usuarios"), async (req, res) => {
   try {
-    const { email, id, codigo } = req.body;
-
-    const usuario = await buscarUsuarioPorIdentificador(email || id || codigo);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
-    }
+    const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
 
     usuario.suspenso = false;
     usuario.status = "ativo";
     usuario.aprovado = true;
     usuario.atualizadoPor = req.usuario.email;
-
-    if (!usuario.aprovadoEm) {
-      usuario.aprovadoEm = hojeISO();
-    }
-
+    if (!usuario.aprovadoEm) usuario.aprovadoEm = hojeISO();
     await usuario.save();
 
-    return res.json({
-      sucesso: true,
-      mensagem: "Usuário reativado com sucesso.",
-      usuario: limparUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Usuário reativado com sucesso. Um novo login será necessário.", usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao reativar usuário:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao reativar usuário."
-    });
+    return res.status(500).json({ erro: "Erro interno ao reativar usuário." });
   }
 });
 
-/* ===============================
-   BLOQUEAR USUÁRIO
-   POST /usuario/bloquear
-=============================== */
-
 router.post("/usuario/bloquear", auth, requirePermission("usuarios"), async (req, res) => {
   try {
-    const { email, id, codigo } = req.body;
-
-    const usuario = await buscarUsuarioPorIdentificador(email || id || codigo);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
-    }
-
-    if (usuario.cargo === "superadmin") {
-      return res.status(403).json({
-        erro: "Não é permitido bloquear um Super Admin."
-      });
+    const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    if (["superadmin", "dono", "dev"].includes(String(usuario.cargo || "").toLowerCase())) {
+      return res.status(403).json({ erro: "Não é permitido bloquear esta conta administrativa por esta rota." });
     }
 
     usuario.status = "bloqueado";
     usuario.suspenso = true;
     usuario.atualizadoPor = req.usuario.email;
-
     await usuario.save();
+    await revogarSessoes(usuario, "account-blocked");
 
-    return res.json({
-      sucesso: true,
-      mensagem: "Usuário bloqueado com sucesso.",
-      usuario: limparUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Usuário bloqueado com sucesso e sessões encerradas.", usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao bloquear usuário:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao bloquear usuário."
-    });
+    return res.status(500).json({ erro: "Erro interno ao bloquear usuário." });
   }
 });
-
-/* ===============================
-   ATUALIZAR USUÁRIO
-   PUT /usuario/:identificador
-=============================== */
 
 router.put("/usuario/:identificador", auth, requirePermission("usuarios"), async (req, res) => {
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.params.identificador);
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
 
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
+    if (req.body?.nome !== undefined) usuario.nome = String(req.body.nome).trim().slice(0, 160);
+    if (req.body?.telefone !== undefined) usuario.telefone = String(req.body.telefone).trim().slice(0, 40);
+    if (req.body?.foto !== undefined) usuario.foto = String(req.body.foto).trim().slice(0, 2000);
+    if (req.body?.codigo !== undefined) usuario.codigo = String(req.body.codigo).trim().slice(0, 80);
+    if (req.body?.aprovado !== undefined) usuario.aprovado = Boolean(req.body.aprovado);
+
+    let securityStateChanged = false;
+    if (req.body?.status !== undefined) {
+      const status = String(req.body.status).toLowerCase();
+      if (!STATUS_VALIDOS.has(status)) return res.status(400).json({ erro: "Status inválido." });
+      usuario.status = status;
+      usuario.suspenso = status === "suspenso" || status === "bloqueado";
+      securityStateChanged = usuario.suspenso;
+    } else if (req.body?.suspenso !== undefined) {
+      usuario.suspenso = Boolean(req.body.suspenso);
+      if (usuario.suspenso) {
+        usuario.status = "suspenso";
+        securityStateChanged = true;
+      }
     }
 
-    const camposPermitidos = [
-      "nome",
-      "telefone",
-      "foto",
-      "codigo",
-      "status",
-      "aprovado",
-      "suspenso"
-    ];
-
-    camposPermitidos.forEach((campo) => {
-      if (req.body[campo] !== undefined) {
-        usuario[campo] = req.body[campo];
-      }
-    });
-
     usuario.atualizadoPor = req.usuario.email;
-
     await usuario.save();
+    if (securityStateChanged) await revogarSessoes(usuario, "account-security-state-change");
 
-    return res.json({
-      sucesso: true,
-      mensagem: "Usuário atualizado com sucesso.",
-      usuario: limparUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Usuário atualizado com sucesso.", usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao atualizar usuário:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao atualizar usuário."
-    });
+    return res.status(500).json({ erro: "Erro interno ao atualizar usuário." });
   }
 });
 
-/* ===============================
-   ALTERAR CARGO
-   POST /usuario/cargo
-   Somente Super Admin
-=============================== */
-
 router.post("/usuario/cargo", auth, requireSuperAdmin, async (req, res) => {
   try {
-    const { email, id, codigo, cargo, vendedor, comissao } = req.body;
+    const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
 
-    const usuario = await buscarUsuarioPorIdentificador(email || id || codigo);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
-    }
-
-    const cargoFinal = normalizarCargo(cargo);
-
+    const cargoFinal = normalizarCargo(req.body?.cargo);
     usuario.cargo = cargoFinal;
     usuario.tipo = cargoFinal === "aluno" || cargoFinal === "vendedor" ? "aluno" : "admin";
+    usuario.vendedor = cargoFinal === "vendedor" ? true : req.body?.vendedor !== undefined ? Boolean(req.body.vendedor) : usuario.vendedor;
+    if (req.body?.comissao !== undefined) usuario.comissao = Number(req.body.comissao || 20);
 
-    if (cargoFinal === "vendedor") {
-      usuario.vendedor = true;
-    } else if (vendedor !== undefined) {
-      usuario.vendedor = Boolean(vendedor);
-    }
-
-    if (comissao !== undefined) {
-      usuario.comissao = Number(comissao || 20);
-    }
-
-    if (cargoFinal !== "aluno") {
+    if (cargoFinal !== "aluno" && !contaRestrita(usuario)) {
       usuario.aprovado = true;
       usuario.status = "ativo";
       usuario.aprovadoEm = usuario.aprovadoEm || hojeISO();
     }
-
-    if (cargoFinal === "admin" || cargoFinal === "superadmin") {
+    if (["admin", "superadmin"].includes(cargoFinal)) {
       usuario.plano = "admin";
       usuario.dataExpiracao = "";
     }
 
     usuario.atualizadoPor = req.usuario.email;
-
     await usuario.save();
+    await revogarSessoes(usuario, "role-changed");
 
-    return res.json({
-      sucesso: true,
-      mensagem: "Cargo atualizado com sucesso.",
-      usuario: limparUsuario(usuario)
-    });
+    return res.json({ sucesso: true, mensagem: "Cargo atualizado. Sessões anteriores foram encerradas.", usuario: limparUsuario(usuario) });
   } catch (error) {
     console.error("Erro ao alterar cargo:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao alterar cargo."
-    });
+    return res.status(500).json({ erro: "Erro interno ao alterar cargo." });
   }
 });
-
-/* ===============================
-   EXCLUIR USUÁRIO
-   DELETE /usuario/:email
-=============================== */
 
 router.delete("/usuario/:identificador", auth, requireSuperAdmin, async (req, res) => {
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.params.identificador);
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado."
-      });
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    if (["superadmin", "dono", "dev"].includes(String(usuario.cargo || "").toLowerCase())) {
+      return res.status(403).json({ erro: "Não é permitido excluir esta conta administrativa por esta rota." });
     }
 
-    if (usuario.cargo === "superadmin") {
-      return res.status(403).json({
-        erro: "Não é permitido excluir um Super Admin."
-      });
-    }
-
+    await revogarSessoes(usuario, "account-deleted");
     await Usuario.deleteOne({ _id: usuario._id });
-
-    return res.json({
-      sucesso: true,
-      mensagem: "Usuário excluído com sucesso."
-    });
+    return res.json({ sucesso: true, mensagem: "Usuário excluído com sucesso." });
   } catch (error) {
     console.error("Erro ao excluir usuário:", error);
-
-    return res.status(500).json({
-      erro: "Erro interno ao excluir usuário."
-    });
+    return res.status(500).json({ erro: "Erro interno ao excluir usuário." });
   }
 });
 
-/* ===============================
-   STATUS DO MÓDULO
-=============================== */
-
-router.get("/usuarios/status", (req, res) => {
-  res.json({
-    status: "online",
-    modulo: "usuarios",
-    rotas: [
-      "GET /usuarios",
-      "GET /usuarios/resumo",
-      "GET /usuario/:identificador",
-      "POST /aprovar",
-      "POST /usuario/plano",
-      "POST /suspender",
-      "POST /reativar",
-      "POST /usuario/bloquear",
-      "POST /usuario/cargo",
-      "PUT /usuario/:identificador",
-      "DELETE /usuario/:identificador"
-    ]
-  });
+router.get("/usuarios/status", (_req, res) => {
+  res.json({ status: "online", modulo: "usuarios" });
 });
 
 module.exports = router;
