@@ -31,7 +31,7 @@ const { getPermissoesEfetivas, getCargo } = require("../middleware/permissions")
 const {
   processarWebhookBestfy,
   aplicarCompraPendentePorEmail
-} = require("../services/bestfy");
+} = require("../services/bestfy-hardened");
 
 const router = express.Router();
 
@@ -206,7 +206,7 @@ async function login(req, res) {
       usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
     }
 
-    if (!usuario.aprovado && !usuario.contaDev) {
+    if (!usuario.aprovado && getCargo(usuario) !== "dev") {
       return res.status(403).json({ erro: "Sua conta ainda está pendente de aprovação.", status: "pendente", aprovado: false });
     }
 
@@ -292,7 +292,7 @@ router.post("/webhooks/bestfy", webhookRateLimit, async (req, res) => {
 });
 
 router.get("/webhooks/bestfy/status", (_req, res) => {
-  return res.json({ status: "online", integracao: "Bestfy", validacaoEstrita: true });
+  return res.json({ status: "online", integracao: "Bestfy", validacaoEstrita: true, revogacaoRecuperavel: true });
 });
 
 router.post("/setup/superadmin", setupRateLimit, async (req, res) => {
@@ -300,7 +300,6 @@ router.post("/setup/superadmin", setupRateLimit, async (req, res) => {
     const setupEnabled = String(process.env.ENABLE_SETUP_SUPERADMIN || "").trim().toLowerCase() === "true";
     const chaveCorreta = String(process.env.SETUP_SECRET || "").trim();
 
-    // Fail closed quando o segredo é exemplo público, curto ou reutilizado em outra credencial.
     if (!setupEnabled || !segredoSetupSeguro(chaveCorreta)) {
       return res.status(404).json({ erro: "Rota não encontrada." });
     }
