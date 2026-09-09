@@ -14,13 +14,29 @@ const DEV_EMAIL = String(process.env.DEV_EMAIL || "dev@turmablack.com")
   .trim()
   .toLowerCase();
 
+function segredoDevSeguro(valor) {
+  const senha = String(valor || "");
+  const lower = senha.trim().toLowerCase();
+  if (!senha || lower.includes("troque-por") || lower.includes("changeme") || lower.includes("placeholder") || lower.includes("example")) {
+    return false;
+  }
+
+  const outros = [
+    process.env.JWT_SECRET,
+    process.env.SETUP_SECRET,
+    process.env.DB_PASSWORD,
+    process.env.BESTFY_API_KEY
+  ]
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+
+  return !outros.includes(senha.trim());
+}
+
 async function garantirMatrizOperacional() {
   const registro = await PermissaoSistema.obter();
   const matrizAtual = registro.matriz && typeof registro.matriz === "object" ? registro.matriz : {};
 
-  // O bootstrap não concede privilégios adicionais a cargos comuns. Ele apenas
-  // garante uma matriz existente. Permissões operacionais são alteradas pela
-  // Central Dev auditável, não durante cada inicialização do servidor.
   if (!registro.matriz || typeof registro.matriz !== "object") {
     registro.matriz = { ...matrizAtual };
     registro.atualizadoPor = "bootstrap-permissoes-seguro";
@@ -36,8 +52,8 @@ async function garantirContaDev() {
     name: "Dev Turma do Primo"
   });
 
-  if (!politica.valid) {
-    console.warn(`Conta Dev automática não criada/alterada: ${politica.reason || "configure DEV_PASSWORD forte e exclusiva."}`);
+  if (!segredoDevSeguro(senhaDev) || !politica.valid) {
+    console.warn(`Conta Dev automática não criada/alterada: ${politica.reason || "configure DEV_PASSWORD forte, exclusiva e diferente dos valores de exemplo."}`);
     return;
   }
 
@@ -77,8 +93,6 @@ async function garantirContaDev() {
     Object.assign(atual, dados);
     await atual.save();
 
-    // Se a identidade foi promovida a Dev ou a credencial Dev foi rotacionada,
-    // nenhuma sessão anterior continua válida.
     if (!eraDevValido || !senhaAtualValida) {
       await revokeAllUserSessions(String(atual._id || atual.id || ""), "dev-bootstrap-security-change");
     }
