@@ -10,6 +10,25 @@
   function token() { for (const key of TOKEN_KEYS) { try { const value = sessionStorage.getItem(key); if (value) return value; } catch (_) {} } return ""; }
   function clearSession() { TOKEN_KEYS.forEach((key) => { try { sessionStorage.removeItem(key); } catch (_) {} }); }
 
+  async function logout() {
+    const jwt = token();
+    try {
+      if (jwt) {
+        await fetch("/logout", {
+          method: "POST",
+          headers: { Accept: "application/json", Authorization: `Bearer ${jwt}` },
+          cache: "no-store",
+          keepalive: true
+        });
+      }
+    } catch (_) {
+      // O estado local também é removido; tokens válidos ainda são checados no servidor.
+    } finally {
+      clearSession();
+      location.replace("/");
+    }
+  }
+
   async function api(endpoint, options = {}) {
     const jwt = token();
     if (!jwt) throw new Error("Sessão expirada.");
@@ -50,9 +69,10 @@
 
   function setAvatar(user) {
     const photo = String(user?.foto || "").trim();
+    const safePhoto = photo.replaceAll('"', "%22");
     $$('[data-user-avatar]').forEach((element) => {
       element.textContent = photo ? "" : firstName(user?.nome).charAt(0).toUpperCase();
-      element.style.backgroundImage = photo ? `url("${photo.replaceAll('"', "%22')}")` : "";
+      element.style.backgroundImage = photo ? `url("${safePhoto}")` : "";
     });
   }
 
@@ -107,7 +127,7 @@
       if (file) downloadFile(file.dataset.downloadFile, file.dataset.fileName);
       const rating = event.target.closest("[data-rating]");
       if (rating) setRating(Number(rating.dataset.rating));
-      if (event.target.closest("[data-logout]")) { clearSession(); location.replace("/"); }
+      if (event.target.closest("[data-logout]")) { event.preventDefault(); logout(); }
     });
 
     document.addEventListener("keydown", (event) => {
