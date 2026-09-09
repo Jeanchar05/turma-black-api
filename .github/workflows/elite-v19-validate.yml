@@ -34,6 +34,40 @@ jobs:
       - name: Run security regression tests
         run: npm run security:regression
 
+      - name: Smoke test real server startup
+        shell: bash
+        env:
+          PORT: "3999"
+          NODE_ENV: "test"
+        run: |
+          set -euo pipefail
+          node server.js > /tmp/turma-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          READY=0
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:3999/api/status > /tmp/turma-status.json; then
+              READY=1
+              break
+            fi
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              echo "Servidor encerrou antes do health-check."
+              cat /tmp/turma-server.log
+              exit 1
+            fi
+            sleep 0.5
+          done
+
+          if [ "$READY" -ne 1 ]; then
+            echo "Servidor não respondeu ao health-check dentro do prazo."
+            cat /tmp/turma-server.log
+            exit 1
+          fi
+
+          grep -q '"status":"online"' /tmp/turma-status.json
+          echo "Server startup smoke test: OK"
+
       - name: Dependency security audit
         run: npm audit --audit-level=high
 
