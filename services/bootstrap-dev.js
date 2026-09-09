@@ -1,7 +1,9 @@
 "use strict";
 
+require("./password-model-guard");
 const Usuario = require("../models/Usuario");
 const PermissaoSistema = require("../models/PermissaoSistema");
+const { verifyPassword } = require("./passwords");
 
 const DEV_EMAIL = String(process.env.DEV_EMAIL || "dev@turmablack.com")
   .trim()
@@ -9,10 +11,7 @@ const DEV_EMAIL = String(process.env.DEV_EMAIL || "dev@turmablack.com")
 
 async function garantirMatrizOperacional() {
   const registro = await PermissaoSistema.obter();
-  const matrizAtual =
-    registro.matriz && typeof registro.matriz === "object"
-      ? registro.matriz
-      : {};
+  const matrizAtual = registro.matriz && typeof registro.matriz === "object" ? registro.matriz : {};
 
   registro.matriz = {
     ...matrizAtual,
@@ -31,26 +30,21 @@ async function garantirMatrizOperacional() {
 }
 
 async function garantirContaDev() {
-  const senhaDev = String(
-    process.env.DEV_PASSWORD ||
-    process.env.SETUP_SECRET ||
-    ""
-  );
+  const senhaDev = String(process.env.DEV_PASSWORD || "");
 
-  if (!senhaDev) {
-    console.warn(
-      "Conta Dev automática não criada: configure DEV_PASSWORD ou SETUP_SECRET. " +
-      "O cadastro normal e a rota /setup/superadmin continuam disponíveis."
-    );
+  if (!senhaDev || senhaDev.length < 12) {
+    console.warn("Conta Dev automática não criada/alterada: configure DEV_PASSWORD com pelo menos 12 caracteres.");
     return;
   }
 
   const atual = await Usuario.findOne({ email: DEV_EMAIL });
+  const senhaAtualValida = atual
+    ? (await verifyPassword(atual.senha, senhaDev)).valid
+    : false;
 
   const dados = {
     nome: atual?.nome || "Dev Turma do Primo",
     email: DEV_EMAIL,
-    senha: senhaDev,
     telefone: atual?.telefone || "",
     tipo: "admin",
     cargo: "dev",
@@ -59,8 +53,8 @@ async function garantirContaDev() {
     vendedor: true,
     comissao: Number(atual?.comissao || 20),
     aprovado: true,
-    suspenso: false,
-    status: "ativo",
+    suspenso: Boolean(atual?.suspenso),
+    status: atual?.status === "suspenso" || atual?.status === "bloqueado" ? atual.status : "ativo",
     codigo: atual?.codigo || "TB-DEV-2026",
     plano: "admin",
     dataExpiracao: "",
@@ -72,6 +66,8 @@ async function garantirContaDev() {
     atualizadoPor: "bootstrap-dev-mysql"
   };
 
+  if (!senhaAtualValida) dados.senha = senhaDev;
+
   if (atual) {
     Object.assign(atual, dados);
     await atual.save();
@@ -79,7 +75,7 @@ async function garantirContaDev() {
     return;
   }
 
-  await Usuario.create(dados);
+  await Usuario.create({ ...dados, senha: senhaDev });
   console.log(`Conta Dev MySQL criada: ${DEV_EMAIL}`);
 }
 
