@@ -22,7 +22,7 @@ const publicDir = path.join(__dirname, "public");
 const premiumVaultDir = path.resolve(
   process.env.PREMIUM_VAULT_DIR || path.join(__dirname, ".premium-vault")
 );
-const CACHE_VERSION = "20260909-sales-command-5.1.0";
+const CACHE_VERSION = "20260909-sales-command-5.3.0";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -218,7 +218,7 @@ app.get(
 app.get(
   "/painel-vendas.css",
   servirBundle(
-    ["painel-vendas.css", "painel-vendas-command-v5.css", "responsive-global.css"],
+    ["painel-vendas.css", "painel-vendas-command-v5.css", "painel-vendas-polish-v53.css", "responsive-global.css"],
     "text/css"
   )
 );
@@ -226,7 +226,7 @@ app.get(
 app.get(
   "/painel-vendas.js",
   servirBundle(
-    ["painel-vendas.js", "painel-vendas-command-v5.js"],
+    ["painel-vendas.js", "painel-vendas-command-v5.js", "painel-vendas-polish-v53.js"],
     "application/javascript"
   )
 );
@@ -386,8 +386,8 @@ app.get("/api/status", async (_req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "5.1.0",
-    release: "sales-command-security",
+    versao: "5.3.0",
+    release: "sales-command-polish",
     banco,
     premium: "private-vault"
   });
