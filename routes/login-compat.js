@@ -10,7 +10,8 @@ const { loginRateLimit, loginIpRateLimit } = require("../middleware/rate-limit")
 const { gerarToken, montarUsuarioSeguro, definirCookieSessao } = require("../middleware/auth");
 const {
   getPermissoesEfetivas,
-  getCargo
+  getCargo,
+  isDevAccount
 } = require("../middleware/permissions");
 
 const router = express.Router();
@@ -19,8 +20,8 @@ function normalizarEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
 
-function normalizarCargo(valor, tipo, contaDev = false) {
-  if (contaDev === true) return "dev";
+function normalizarCargo(valor, tipo, contaDev = false, email = "") {
+  if (isDevAccount({ cargo: valor, tipo, contaDev, email })) return "dev";
 
   const cargo = String(valor || "")
     .trim()
@@ -87,7 +88,7 @@ function montarCompatibilidade(usuario) {
     ? usuario.toObject()
     : { ...usuario };
 
-  const cargo = normalizarCargo(base.cargo, base.tipo, base.contaDev);
+  const cargo = normalizarCargo(base.cargo, base.tipo, base.contaDev, base.email);
   const plano = normalizarPlano(base.plano, cargo);
   const administrativo = cargo !== "aluno";
 
@@ -95,7 +96,7 @@ function montarCompatibilidade(usuario) {
     ...base,
     tipo: administrativo ? "admin" : "aluno",
     cargo,
-    contaDev: Boolean(base.contaDev === true && cargo === "dev"),
+    contaDev: Boolean(isDevAccount(base) && cargo === "dev"),
     plano,
     status: base.status || "ativo",
     aprovado: base.aprovado !== false || plano === "free",
@@ -164,8 +165,6 @@ async function loginCompativel(req, res) {
       return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
     }
 
-    // Este é o login efetivamente montado primeiro no servidor; por isso a
-    // revalidação de compra pendente precisa acontecer aqui também.
     try {
       await aplicarCompraPendentePorEmail(encontrado);
     } catch (error) {
