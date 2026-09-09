@@ -1,3 +1,5 @@
+"use strict";
+
 const PermissaoSistema = require("../models/PermissaoSistema");
 
 const CARGOS = {
@@ -144,7 +146,7 @@ function getPermissoes(usuario) {
   const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
   const personalizadas = sanitizarPermissoes(usuario?.permissoesPersonalizadas || {});
 
-  if (cargo === CARGOS.DEV) return { ...PERMISSOES_PADRAO.dev };
+  if (cargo === CARGOS.DEV && usuario?.contaDev === true) return { ...PERMISSOES_PADRAO.dev };
   const resultado = { ...base, ...personalizadas };
   if (cargo === CARGOS.ALUNO) resultado.suporte = false;
   return resultado;
@@ -153,16 +155,21 @@ function getPermissoes(usuario) {
 async function getPermissoesEfetivas(usuario) {
   const cargo = getCargo(usuario);
 
-  if (cargo === CARGOS.DEV) return { ...PERMISSOES_PADRAO.dev };
+  if (cargo === CARGOS.DEV && usuario?.contaDev === true) return { ...PERMISSOES_PADRAO.dev };
 
   const base = PERMISSOES_PADRAO[cargo] || PERMISSOES_PADRAO.aluno;
-  let configuradas = {};
+  let configuradas;
 
   try {
     const registro = await PermissaoSistema.obter();
     configuradas = sanitizarPermissoes(registro?.matriz?.[cargo] || {});
   } catch (error) {
-    console.warn("Falha ao carregar matriz dinâmica de permissões:", error.message);
+    console.error("Falha ao carregar matriz dinâmica de permissões; acesso administrativo negado por segurança:", error.message);
+    // Fail closed: em caso de erro na fonte de autorização, só a navegação básica permanece.
+    return {
+      ...todas(false),
+      dashboard: cargo === CARGOS.ALUNO || cargo === CARGOS.VENDEDOR
+    };
   }
 
   const personalizadas = sanitizarPermissoes(usuario?.permissoesPersonalizadas || {});
@@ -173,13 +180,13 @@ async function getPermissoesEfetivas(usuario) {
 
 function temPermissao(usuario, permissao) {
   if (!usuario || !permissao) return false;
-  if (getCargo(usuario) === CARGOS.DEV) return true;
+  if (getCargo(usuario) === CARGOS.DEV && usuario?.contaDev === true) return true;
   return Boolean(getPermissoes(usuario)[permissao]);
 }
 
 async function temPermissaoEfetiva(usuario, permissao) {
   if (!usuario || !permissao) return false;
-  if (getCargo(usuario) === CARGOS.DEV) return true;
+  if (getCargo(usuario) === CARGOS.DEV && usuario?.contaDev === true) return true;
   const permissoes = await getPermissoesEfetivas(usuario);
   return Boolean(permissoes[permissao]);
 }
@@ -187,7 +194,7 @@ async function temPermissaoEfetiva(usuario, permissao) {
 function temCargo(usuario, cargosPermitidos = []) {
   if (!usuario) return false;
   const cargo = getCargo(usuario);
-  if (cargo === CARGOS.DEV) return true;
+  if (cargo === CARGOS.DEV && usuario?.contaDev === true) return true;
   return cargosPermitidos.map(normalizarCargo).includes(cargo);
 }
 
@@ -198,11 +205,7 @@ function requirePermission(permissao) {
 
       const permitido = await temPermissaoEfetiva(req.usuarioDoc || req.usuario, permissao);
       if (!permitido) {
-        return res.status(403).json({
-          erro: "Você não tem permissão para acessar esta área.",
-          permissaoNecessaria: permissao,
-          cargoAtual: getCargo(req.usuario)
-        });
+        return res.status(403).json({ erro: "Você não tem permissão para acessar esta área." });
       }
 
       next();
@@ -217,12 +220,8 @@ function requireCargo(...cargosPermitidos) {
   return function (req, res, next) {
     if (!req.usuario) return res.status(401).json({ erro: "Usuário não autenticado." });
 
-    if (!temCargo(req.usuario, cargosPermitidos)) {
-      return res.status(403).json({
-        erro: "Cargo sem permissão para acessar esta área.",
-        cargosPermitidos,
-        cargoAtual: getCargo(req.usuario)
-      });
+    if (!temCargo(req.usuarioDoc || req.usuario, cargosPermitidos)) {
+      return res.status(403).json({ erro: "Cargo sem permissão para acessar esta área." });
     }
 
     next();
@@ -230,13 +229,18 @@ function requireCargo(...cargosPermitidos) {
 }
 
 function requireDev(req, res, next) {
-  if (!req.usuario) return res.status(401).json({ erro: "Usuário não autenticado." });
+  if (!req.usuario || !req.usuarioDoc) return res.status(401).json({ erro: "Usuário não autenticado." });
 
-  const cargo = getCargo(req.usuarioDoc || req.usuario);
-  const emailDev = String(process.env.DEV_EMAIL || "dev@turmablack.com").toLowerCase();
-  const emailAtual = String(req.usuario.email || "").toLowerCase();
+  const cargo = getCargo(req.usuarioDoc);
+  const emailDev = String(process.env.DEV_EMAIL || "dev@turmablack.com").trim().toLowerCase();
+  const emailAtual = String(req.usuarioDoc.email || "").trim().toLowerCase();
 
-  if (cargo !== CARGOS.DEV && emailAtual !== emailDev) {
+  if (
+    cargo !== CARGOS.DEV ||
+    req.usuarioDoc.contaDev !== true ||
+    !emailDev ||
+    emailAtual !== emailDev
+  ) {
     return res.status(403).json({ erro: "Área exclusiva da conta Dev." });
   }
 
