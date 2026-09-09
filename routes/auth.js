@@ -1,11 +1,25 @@
+"use strict";
+
+const crypto = require("crypto");
 const express = require("express");
+require("../services/password-model-guard");
 const Usuario = require("../models/Usuario");
+const { hashPassword, verifyPassword } = require("../services/passwords");
+const { revokeToken } = require("../services/sessions");
+const {
+  loginRateLimit,
+  loginIpRateLimit,
+  signupRateLimit,
+  webhookRateLimit
+} = require("../middleware/rate-limit");
 
 const {
   auth,
   gerarToken,
   montarUsuarioSeguro,
-  statusJwtConfiguracao
+  statusJwtConfiguracao,
+  definirCookieSessao,
+  limparCookieSessao
 } = require("../middleware/auth");
 const { getPermissoesEfetivas, getCargo } = require("../middleware/permissions");
 const {
@@ -25,17 +39,17 @@ function gerarCodigoAluno() {
   const numeros = "0123456789";
   let codigo = "TB-";
 
-  for (let i = 0; i < 3; i += 1) {
-    codigo += letras[Math.floor(Math.random() * letras.length)];
-  }
-
+  for (let i = 0; i < 3; i += 1) codigo += letras[Math.floor(Math.random() * letras.length)];
   codigo += "-";
-
-  for (let i = 0; i < 4; i += 1) {
-    codigo += numeros[Math.floor(Math.random() * numeros.length)];
-  }
-
+  for (let i = 0; i < 4; i += 1) codigo += numeros[Math.floor(Math.random() * numeros.length)];
   return codigo;
+}
+
+function compararSegredo(a, b) {
+  const aa = Buffer.from(String(a || ""));
+  const bb = Buffer.from(String(b || ""));
+  if (!aa.length || aa.length !== bb.length) return false;
+  return crypto.timingSafeEqual(aa, bb);
 }
 
 async function respostaUsuario(usuario) {
@@ -59,15 +73,16 @@ async function respostaUsuario(usuario) {
 
 async function criarConta(req, res) {
   try {
-    const { nome, email, senha, telefone } = req.body;
+    const { nome, email, senha, telefone } = req.body || {};
     const emailNormalizado = normalizarEmail(email);
+    const senhaTexto = String(senha || "");
 
-    if (!nome || !emailNormalizado || !senha) {
+    if (!nome || !emailNormalizado || !senhaTexto) {
       return res.status(400).json({ erro: "Nome, e-mail e senha são obrigatórios." });
     }
 
-    if (String(senha).length < 6) {
-      return res.status(400).json({ erro: "A senha precisa ter pelo menos 6 caracteres." });
+    if (senhaTexto.length < 6 || senhaTexto.length > 256) {
+      return res.status(400).json({ erro: "A senha precisa ter entre 6 e 256 caracteres." });
     }
 
     if (await Usuario.exists({ email: emailNormalizado })) {
@@ -76,10 +91,10 @@ async function criarConta(req, res) {
 
     const agora = new Date().toISOString();
     const usuario = await Usuario.create({
-      nome: String(nome).trim(),
+      nome: String(nome).trim().slice(0, 160),
       email: emailNormalizado,
-      senha: String(senha),
-      telefone: telefone || "",
+      senha: await hashPassword(senhaTexto),
+      telefone: String(telefone || "").slice(0, 40),
       tipo: "aluno",
       cargo: "aluno",
       contaDev: false,
@@ -131,9 +146,18 @@ async function login(req, res) {
     }
 
     const usuario = await Usuario.findOne({ email });
+    const passwordCheck = usuario
+      ? await verifyPassword(usuario.senha, senha)
+      : { valid: false, needsRehash: false };
 
-    if (!usuario || String(usuario.senha) !== senha) {
+    if (!usuario || !passwordCheck.valid) {
       return res.status(401).json({ erro: "E-mail ou senha incorretos." });
+    }
+
+    if (passwordCheck.needsRehash) {
+      usuario.senha = senha;
+      usuario.atualizadoPor = "migracao-senha-segura";
+      await usuario.save();
     }
 
     if (usuario.suspenso || usuario.status === "suspenso") {
@@ -171,6 +195,7 @@ async function login(req, res) {
     await usuario.save({ validateModifiedOnly: true });
 
     const token = gerarToken(usuario);
+    definirCookieSessao(res, token);
 
     return res.json({
       sucesso: true,
@@ -197,14 +222,8 @@ async function login(req, res) {
 
 async function me(req, res) {
   try {
-    if (!req.usuarioDoc) {
-      return res.status(401).json({ erro: "Usuário não encontrado." });
-    }
-
-    return res.json({
-      sucesso: true,
-      usuario: await respostaUsuario(req.usuarioDoc)
-    });
+    if (!req.usuarioDoc) return res.status(401).json({ erro: "Usuário não encontrado." });
+    return res.json({ sucesso: true, usuario: await respostaUsuario(req.usuarioDoc) });
   } catch (error) {
     console.error("Erro na rota /me:", error);
     return res.status(500).json({ erro: "Erro interno ao buscar usuário." });
@@ -213,32 +232,43 @@ async function me(req, res) {
 
 async function validarToken(req, res) {
   try {
-    return res.json({
-      valido: true,
-      usuario: await respostaUsuario(req.usuarioDoc)
-    });
+    return res.json({ valido: true, usuario: await respostaUsuario(req.usuarioDoc) });
   } catch (_) {
     return res.status(500).json({ valido: false, erro: "Erro ao validar token." });
   }
 }
 
-function logout(req, res) {
-  return res.json({ sucesso: true, mensagem: "Logout realizado com sucesso." });
+async function logout(req, res) {
+  try {
+    const payload = req.authPayload || {};
+    await revokeToken({
+      jti: payload.jti,
+      userId: req.usuario?.id || req.usuario?._id || "",
+      exp: payload.exp,
+      reason: "logout"
+    });
+    limparCookieSessao(res);
+    return res.json({ sucesso: true, mensagem: "Logout realizado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao revogar sessão no logout:", error);
+    limparCookieSessao(res);
+    return res.status(500).json({ erro: "Não foi possível encerrar a sessão com segurança." });
+  }
 }
 
-router.post("/criar", criarConta);
-router.post("/login", login);
+router.post("/criar", signupRateLimit, criarConta);
+router.post("/login", loginIpRateLimit, loginRateLimit, login);
 router.get("/me", auth, me);
 router.get("/validar-token", auth, validarToken);
-router.post("/logout", logout);
+router.post("/logout", auth, logout);
 
-router.post("/auth/criar", criarConta);
-router.post("/auth/login", login);
+router.post("/auth/criar", signupRateLimit, criarConta);
+router.post("/auth/login", loginIpRateLimit, loginRateLimit, login);
 router.get("/auth/me", auth, me);
 router.get("/auth/validar-token", auth, validarToken);
-router.post("/auth/logout", logout);
+router.post("/auth/logout", auth, logout);
 
-router.post("/webhooks/bestfy", async (req, res) => {
+router.post("/webhooks/bestfy", webhookRateLimit, async (req, res) => {
   try {
     const resultado = await processarWebhookBestfy(req.body || {});
     return res.status(200).json({ sucesso: true, ...resultado });
@@ -246,58 +276,49 @@ router.post("/webhooks/bestfy", async (req, res) => {
     const codigo = String(error?.code || "BESTFY_WEBHOOK_ERROR");
     console.error(`Erro no webhook Bestfy (${codigo}):`, error?.message || error);
 
-    if (codigo === "BESTFY_WEBHOOK_INVALID") {
-      return res.status(400).json({ erro: error.message, codigo });
-    }
-
-    if (codigo === "BESTFY_COMPANY_MISMATCH") {
-      return res.status(403).json({ erro: "Evento rejeitado.", codigo });
-    }
-
+    if (codigo === "BESTFY_WEBHOOK_INVALID") return res.status(400).json({ erro: error.message, codigo });
+    if (codigo === "BESTFY_COMPANY_MISMATCH") return res.status(403).json({ erro: "Evento rejeitado.", codigo });
     if (codigo === "BESTFY_NOT_CONFIGURED" || codigo === "BESTFY_COMPANY_INVALID") {
       return res.status(503).json({ erro: "Integração Bestfy ainda não configurada no servidor.", codigo });
     }
 
-    return res.status(503).json({
-      erro: "Não foi possível processar o evento Bestfy agora.",
-      codigo
-    });
+    return res.status(503).json({ erro: "Não foi possível processar o evento Bestfy agora.", codigo });
   }
 });
 
-router.get("/webhooks/bestfy/status", (req, res) => {
+router.get("/webhooks/bestfy/status", (_req, res) => {
+  const status = statusConfiguracaoBestfy();
   return res.json({
     status: "online",
     integracao: "Bestfy",
-    ...statusConfiguracaoBestfy()
+    apiKeyConfigurada: Boolean(status.apiKeyConfigurada),
+    validacaoEstrita: true
   });
 });
 
 router.post("/setup/superadmin", async (req, res) => {
   try {
-    const chaveCorreta =
-      process.env.SETUP_SECRET ||
-      process.env.JWT_SECRET ||
-      "turma_black_secret_dev";
+    const setupEnabled = String(process.env.ENABLE_SETUP_SUPERADMIN || "").trim().toLowerCase() === "true";
+    const chaveCorreta = String(process.env.SETUP_SECRET || "").trim();
 
-    if (!req.body?.setupKey || req.body.setupKey !== chaveCorreta) {
+    if (!setupEnabled || !chaveCorreta || chaveCorreta.length < 32) {
+      return res.status(404).json({ erro: "Rota não encontrada." });
+    }
+
+    if (!compararSegredo(req.body?.setupKey, chaveCorreta)) {
       return res.status(403).json({ erro: "Chave de setup inválida." });
     }
 
     const email = normalizarEmail(req.body?.email);
     const usuario = await Usuario.findOne({ email });
-
-    if (!usuario) {
-      return res.status(404).json({ erro: "Usuário não encontrado." });
-    }
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
 
     usuario.tipo = "admin";
     usuario.cargo = "dono";
     usuario.contaDev = false;
     usuario.vendedor = true;
     usuario.aprovado = true;
-    usuario.suspenso = false;
-    usuario.status = "ativo";
+    usuario.status = usuario.status === "suspenso" || usuario.status === "bloqueado" ? usuario.status : "ativo";
     usuario.plano = "admin";
     usuario.dataExpiracao = "";
     usuario.codigo = usuario.codigo || gerarCodigoAluno();
@@ -305,12 +326,9 @@ router.post("/setup/superadmin", async (req, res) => {
     usuario.atualizadoPor = "setup-dono";
     await usuario.save();
 
-    const token = gerarToken(usuario);
-
     return res.json({
       sucesso: true,
-      mensagem: "Usuário promovido para Dono com sucesso.",
-      token,
+      mensagem: "Usuário promovido para Dono com sucesso. Faça login novamente.",
       usuario: await respostaUsuario(usuario)
     });
   } catch (error) {
@@ -319,7 +337,7 @@ router.post("/setup/superadmin", async (req, res) => {
   }
 });
 
-router.get("/auth/status", (req, res) => {
+router.get("/auth/status", (_req, res) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
   res.json({
     status: "online",
