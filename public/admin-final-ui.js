@@ -4,7 +4,7 @@
     if (document.querySelector('link[data-global-responsive]')) return;
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/responsive-global.css?v=20260801-push";
+    link.href = "/responsive-global.css?v=20260909-command-center-recovery";
     link.dataset.globalResponsive = "true";
     document.head.appendChild(link);
   }
@@ -44,9 +44,10 @@
     applyPeriodSwitch();
     setTimeout(applyPeriodSwitch, 250);
     try {
-      await import("./admin-push-bridge.js?v=20260801-push");
-      await import("./admin-support-center.js?v=20260801-push");
-      await import("./admin-support-live.js?v=20260801-push");
+      await import("./admin-push-bridge.js?v=20260909-command-center-recovery");
+      await import("./admin-support-center.js?v=20260909-command-center-recovery");
+      await import("./admin-support-live.js?v=20260909-command-center-recovery");
+      await import("./admin-command-center-recovery.js?v=20260909-command-center-recovery");
     } catch (error) { console.error("Falha ao carregar extras do admin:", error); }
   }
   installResponsiveLayer();
