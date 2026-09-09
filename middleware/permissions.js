@@ -131,6 +131,7 @@ function getCargo(usuario) {
   if (usuario.contaDev === true) return CARGOS.DEV;
 
   const cargo = normalizarCargo(usuario.cargo || usuario.tipo);
+  if (cargo === CARGOS.DEV) return CARGOS.ALUNO;
   return PERMISSOES_PADRAO[cargo] ? cargo : CARGOS.ALUNO;
 }
 
@@ -165,7 +166,6 @@ async function getPermissoesEfetivas(usuario) {
     configuradas = sanitizarPermissoes(registro?.matriz?.[cargo] || {});
   } catch (error) {
     console.error("Falha ao carregar matriz dinâmica de permissões; acesso administrativo negado por segurança:", error.message);
-    // Fail closed: em caso de erro na fonte de autorização, só a navegação básica permanece.
     return {
       ...todas(false),
       dashboard: cargo === CARGOS.ALUNO || cargo === CARGOS.VENDEDOR
