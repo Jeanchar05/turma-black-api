@@ -4,34 +4,47 @@ const crypto = require("crypto");
 const express = require("express");
 require("../services/password-model-guard");
 const Usuario = require("../models/Usuario");
-const { hashPassword, verifyPassword } = require("../services/passwords");
-const { revokeToken } = require("../services/sessions");
+const {
+  hashPassword,
+  verifyPassword,
+  validatePasswordPolicy,
+  MIN_USER_PASSWORD_LENGTH
+} = require("../services/passwords");
+const { revokeToken, revokeAllUserSessions } = require("../services/sessions");
 const {
   loginRateLimit,
   loginIpRateLimit,
   signupRateLimit,
-  webhookRateLimit
+  webhookRateLimit,
+  setupRateLimit
 } = require("../middleware/rate-limit");
 
 const {
   auth,
   gerarToken,
   montarUsuarioSeguro,
-  statusJwtConfiguracao,
   definirCookieSessao,
   limparCookieSessao
 } = require("../middleware/auth");
 const { getPermissoesEfetivas, getCargo } = require("../middleware/permissions");
 const {
   processarWebhookBestfy,
-  aplicarCompraPendentePorEmail,
-  statusConfiguracaoBestfy
+  aplicarCompraPendentePorEmail
 } = require("../services/bestfy");
 
 const router = express.Router();
 
 function normalizarEmail(email) {
   return String(email || "").toLowerCase().trim();
+}
+
+function emailValido(email) {
+  return email.length <= 190 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function emailDevReservado(email) {
+  const dev = normalizarEmail(process.env.DEV_EMAIL || "dev@turmablack.com");
+  return Boolean(dev && email === dev);
 }
 
 function gerarCodigoAluno() {
@@ -74,15 +87,30 @@ async function respostaUsuario(usuario) {
 async function criarConta(req, res) {
   try {
     const { nome, email, senha, telefone } = req.body || {};
+    const nomeTexto = String(nome || "").trim().slice(0, 160);
     const emailNormalizado = normalizarEmail(email);
     const senhaTexto = String(senha || "");
 
-    if (!nome || !emailNormalizado || !senhaTexto) {
+    if (!nomeTexto || !emailNormalizado || !senhaTexto) {
       return res.status(400).json({ erro: "Nome, e-mail e senha são obrigatórios." });
     }
 
-    if (senhaTexto.length < 6 || senhaTexto.length > 256) {
-      return res.status(400).json({ erro: "A senha precisa ter entre 6 e 256 caracteres." });
+    if (!emailValido(emailNormalizado)) {
+      return res.status(400).json({ erro: "Informe um e-mail válido." });
+    }
+
+    // A identidade Dev nunca pode nascer pelo cadastro público.
+    if (emailDevReservado(emailNormalizado)) {
+      return res.status(403).json({ erro: "Este e-mail não está disponível para cadastro público." });
+    }
+
+    const politicaSenha = validatePasswordPolicy(senhaTexto, {
+      minimumLength: MIN_USER_PASSWORD_LENGTH,
+      email: emailNormalizado,
+      name: nomeTexto
+    });
+    if (!politicaSenha.valid) {
+      return res.status(400).json({ erro: politicaSenha.reason, codigo: "SENHA_FRACA" });
     }
 
     if (await Usuario.exists({ email: emailNormalizado })) {
@@ -91,10 +119,10 @@ async function criarConta(req, res) {
 
     const agora = new Date().toISOString();
     const usuario = await Usuario.create({
-      nome: String(nome).trim().slice(0, 160),
+      nome: nomeTexto,
       email: emailNormalizado,
       senha: await hashPassword(senhaTexto),
-      telefone: String(telefone || "").slice(0, 40),
+      telefone: String(telefone || "").trim().slice(0, 40),
       tipo: "aluno",
       cargo: "aluno",
       contaDev: false,
@@ -286,17 +314,12 @@ router.post("/webhooks/bestfy", webhookRateLimit, async (req, res) => {
   }
 });
 
+// Health check propositalmente não informa presença/ausência de chaves secretas.
 router.get("/webhooks/bestfy/status", (_req, res) => {
-  const status = statusConfiguracaoBestfy();
-  return res.json({
-    status: "online",
-    integracao: "Bestfy",
-    apiKeyConfigurada: Boolean(status.apiKeyConfigurada),
-    validacaoEstrita: true
-  });
+  return res.json({ status: "online", integracao: "Bestfy", validacaoEstrita: true });
 });
 
-router.post("/setup/superadmin", async (req, res) => {
+router.post("/setup/superadmin", setupRateLimit, async (req, res) => {
   try {
     const setupEnabled = String(process.env.ENABLE_SETUP_SUPERADMIN || "").trim().toLowerCase() === "true";
     const chaveCorreta = String(process.env.SETUP_SECRET || "").trim();
@@ -310,8 +333,15 @@ router.post("/setup/superadmin", async (req, res) => {
     }
 
     const email = normalizarEmail(req.body?.email);
+    if (!emailValido(email) || emailDevReservado(email)) {
+      return res.status(400).json({ erro: "Conta inválida para promoção por setup." });
+    }
+
     const usuario = await Usuario.findOne({ email });
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    if (usuario.contaDev === true || getCargo(usuario) === "dev") {
+      return res.status(403).json({ erro: "A conta Dev não pode ser alterada por esta rota." });
+    }
 
     usuario.tipo = "admin";
     usuario.cargo = "dono";
@@ -325,11 +355,11 @@ router.post("/setup/superadmin", async (req, res) => {
     usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
     usuario.atualizadoPor = "setup-dono";
     await usuario.save();
+    await revokeAllUserSessions(String(usuario._id || usuario.id || ""), "setup-role-change");
 
     return res.json({
       sucesso: true,
-      mensagem: "Usuário promovido para Dono com sucesso. Faça login novamente.",
-      usuario: await respostaUsuario(usuario)
+      mensagem: "Usuário promovido para Dono com sucesso. Sessões anteriores foram encerradas; faça login novamente."
     });
   } catch (error) {
     console.error("Erro no setup dono:", error);
@@ -337,18 +367,10 @@ router.post("/setup/superadmin", async (req, res) => {
   }
 });
 
+// Health check mínimo: não revela estado da chave JWT, detalhes do fluxo ou configuração de secrets.
 router.get("/auth/status", (_req, res) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
-  res.json({
-    status: "online",
-    modulo: "auth",
-    ...statusJwtConfiguracao(),
-    fluxo: {
-      cadastro: "Conta FREE criada automaticamente",
-      premium: "Pagamento Bestfy aprovado libera o Premium automaticamente pelo e-mail da compra",
-      login: "Permissões efetivas carregadas por cargo"
-    }
-  });
+  return res.json({ status: "online", modulo: "auth" });
 });
 
 module.exports = router;
