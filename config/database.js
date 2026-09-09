@@ -9,12 +9,6 @@ let ultimoDiagnostico = {
   carregadoEm: "",
   host: "",
   port: 3306,
-  passwordSource: "DB_PASSWORD",
-  passwordRawLength: 0,
-  passwordLength: 0,
-  passwordInvisibleCharsRemoved: 0,
-  passwordHadOuterQuotes: false,
-  passwordHadEdgeWhitespace: false,
   lastErrorCode: "",
   lastErrorMessage: ""
 };
@@ -86,14 +80,7 @@ function lerSenha() {
       throw error;
     }
 
-    return {
-      password: normalizada.valor,
-      source: "DB_PASSWORD_BASE64",
-      rawLength: senha.length,
-      invisibleCharsRemoved: normalizada.removidos,
-      hadOuterQuotes: false,
-      hadEdgeWhitespace: /^\s|\s$/.test(normalizada.valor)
-    };
+    return { password: normalizada.valor };
   }
 
   const bruto = process.env.DB_PASSWORD;
@@ -106,7 +93,6 @@ function lerSenha() {
 
   const original = String(bruto);
   const semInvisiveis = removerCaracteresInvisiveis(original);
-  const hadEdgeWhitespace = /^\s|\s$/.test(semInvisiveis.valor);
   const semEspacosExternos = semInvisiveis.valor.trim();
   const resultadoAspas = removerAspasExternas(semEspacosExternos);
 
@@ -116,20 +102,11 @@ function lerSenha() {
     throw error;
   }
 
-  return {
-    password: resultadoAspas.valor,
-    source: "DB_PASSWORD",
-    rawLength: original.length,
-    invisibleCharsRemoved: semInvisiveis.removidos,
-    hadOuterQuotes: resultadoAspas.removidas,
-    hadEdgeWhitespace
-  };
+  return { password: resultadoAspas.valor };
 }
 
 function getPool() {
-  if (!pool) {
-    throw new Error("Banco MySQL ainda não inicializado.");
-  }
+  if (!pool) throw new Error("Banco MySQL ainda não inicializado.");
   return pool;
 }
 
@@ -224,8 +201,7 @@ function traduzirErroConexao(error, dados) {
 async function connectDatabase() {
   const host = normalizarHost(process.env.DB_HOST || "localhost");
   const user = obrigatoria("DB_USER");
-  const senhaInfo = lerSenha();
-  const password = senhaInfo.password;
+  const password = lerSenha().password;
   const database = obrigatoria("DB_NAME");
   const port = Number(process.env.DB_PORT || 3306);
 
@@ -234,12 +210,6 @@ async function connectDatabase() {
     carregadoEm: new Date().toISOString(),
     host,
     port,
-    passwordSource: senhaInfo.source,
-    passwordRawLength: senhaInfo.rawLength,
-    passwordLength: password.length,
-    passwordInvisibleCharsRemoved: senhaInfo.invisibleCharsRemoved,
-    passwordHadOuterQuotes: senhaInfo.hadOuterQuotes,
-    passwordHadEdgeWhitespace: senhaInfo.hadEdgeWhitespace,
     lastErrorCode: "",
     lastErrorMessage: ""
   };
@@ -254,7 +224,7 @@ async function connectDatabase() {
       password,
       database,
       waitForConnections: true,
-      connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
+      connectionLimit: Math.min(Math.max(Number(process.env.DB_CONNECTION_LIMIT || 10), 2), 50),
       queueLimit: 0,
       enableKeepAlive: true,
       keepAliveInitialDelay: 0,
@@ -262,11 +232,10 @@ async function connectDatabase() {
       timezone: "Z",
       dateStrings: true,
       decimalNumbers: true,
-      connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT || 10000)
+      connectTimeout: Math.min(Math.max(Number(process.env.DB_CONNECT_TIMEOUT || 10000), 3000), 30000)
     });
 
     const conexao = await pool.getConnection();
-
     try {
       await conexao.ping();
     } finally {
@@ -279,15 +248,23 @@ async function connectDatabase() {
     const bootstrapDevAccount = require("../services/bootstrap-dev");
     await bootstrapDevAccount();
 
+    // Converte automaticamente qualquer credencial legada ainda armazenada em texto puro.
+    // A aplicação só é considerada totalmente inicializada depois dessa etapa.
+    const { migratePlaintextPasswords } = require("../services/password-migration");
+    const migration = await migratePlaintextPasswords();
+    if (migration && migration.invalid > 0) {
+      const migrationError = new Error("Existem senhas legadas que não puderam ser migradas com segurança.");
+      migrationError.code = "PASSWORD_MIGRATION_INCOMPLETE";
+      throw migrationError;
+    }
+
     console.log(`MySQL conectado com sucesso em ${host}:${port}`);
     return pool;
   } catch (error) {
     conectado = false;
 
     if (pool) {
-      try {
-        await pool.end();
-      } catch (_) {}
+      try { await pool.end(); } catch (_) {}
       pool = null;
     }
 
