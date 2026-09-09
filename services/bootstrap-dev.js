@@ -3,7 +3,12 @@
 require("./password-model-guard");
 const Usuario = require("../models/Usuario");
 const PermissaoSistema = require("../models/PermissaoSistema");
-const { verifyPassword } = require("./passwords");
+const {
+  verifyPassword,
+  validatePasswordPolicy,
+  MIN_STAFF_PASSWORD_LENGTH
+} = require("./passwords");
+const { revokeAllUserSessions } = require("./sessions");
 
 const DEV_EMAIL = String(process.env.DEV_EMAIL || "dev@turmablack.com")
   .trim()
@@ -13,27 +18,26 @@ async function garantirMatrizOperacional() {
   const registro = await PermissaoSistema.obter();
   const matrizAtual = registro.matriz && typeof registro.matriz === "object" ? registro.matriz : {};
 
-  registro.matriz = {
-    ...matrizAtual,
-    financeiro: {
-      ...(matrizAtual.financeiro || {}),
-      dashboard: true,
-      painelAdmin: true,
-      painelVendas: true,
-      financas: true,
-      relatorios: true
-    }
-  };
-
-  registro.atualizadoPor = "bootstrap-permissoes-mysql-v4.2";
-  await registro.save();
+  // O bootstrap não concede privilégios adicionais a cargos comuns. Ele apenas
+  // garante uma matriz existente. Permissões operacionais são alteradas pela
+  // Central Dev auditável, não durante cada inicialização do servidor.
+  if (!registro.matriz || typeof registro.matriz !== "object") {
+    registro.matriz = { ...matrizAtual };
+    registro.atualizadoPor = "bootstrap-permissoes-seguro";
+    await registro.save();
+  }
 }
 
 async function garantirContaDev() {
   const senhaDev = String(process.env.DEV_PASSWORD || "");
+  const politica = validatePasswordPolicy(senhaDev, {
+    minimumLength: MIN_STAFF_PASSWORD_LENGTH,
+    email: DEV_EMAIL,
+    name: "Dev Turma do Primo"
+  });
 
-  if (!senhaDev || senhaDev.length < 12) {
-    console.warn("Conta Dev automática não criada/alterada: configure DEV_PASSWORD com pelo menos 12 caracteres.");
+  if (!politica.valid) {
+    console.warn(`Conta Dev automática não criada/alterada: ${politica.reason || "configure DEV_PASSWORD forte e exclusiva."}`);
     return;
   }
 
@@ -42,6 +46,7 @@ async function garantirContaDev() {
     ? (await verifyPassword(atual.senha, senhaDev)).valid
     : false;
 
+  const eraDevValido = Boolean(atual?.contaDev === true && String(atual?.cargo || "").toLowerCase() === "dev");
   const dados = {
     nome: atual?.nome || "Dev Turma do Primo",
     email: DEV_EMAIL,
@@ -63,7 +68,7 @@ async function garantirContaDev() {
     ultimoLogin: atual?.ultimoLogin || "",
     aprovadoEm: atual?.aprovadoEm || new Date().toISOString(),
     criadoPor: atual?.criadoPor || "bootstrap-dev-mysql",
-    atualizadoPor: "bootstrap-dev-mysql"
+    atualizadoPor: "bootstrap-dev-mysql-seguro"
   };
 
   if (!senhaAtualValida) dados.senha = senhaDev;
@@ -71,11 +76,19 @@ async function garantirContaDev() {
   if (atual) {
     Object.assign(atual, dados);
     await atual.save();
+
+    // Se a identidade foi promovida a Dev ou a credencial Dev foi rotacionada,
+    // nenhuma sessão anterior continua válida.
+    if (!eraDevValido || !senhaAtualValida) {
+      await revokeAllUserSessions(String(atual._id || atual.id || ""), "dev-bootstrap-security-change");
+    }
+
     console.log(`Conta Dev MySQL validada: ${DEV_EMAIL}`);
     return;
   }
 
-  await Usuario.create({ ...dados, senha: senhaDev });
+  const criada = await Usuario.create({ ...dados, senha: senhaDev });
+  await revokeAllUserSessions(String(criada._id || criada.id || ""), "dev-account-created");
   console.log(`Conta Dev MySQL criada: ${DEV_EMAIL}`);
 }
 
