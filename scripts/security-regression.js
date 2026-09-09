@@ -2,6 +2,7 @@
 
 const assert = require("assert");
 const crypto = require("crypto");
+const os = require("os");
 const { promisify } = require("util");
 const fs = require("fs");
 const path = require("path");
@@ -56,6 +57,7 @@ function testPremiumGuard() {
   const protectedPaths = [
     "/estudo-gemeos.html",
     "/estudo-gemeos",
+    "/estudo-futuro-modulo.html",
     "/estudo.js",
     "/modulos.js",
     "/dashboard.html",
@@ -67,6 +69,29 @@ function testPremiumGuard() {
   protectedPaths.forEach((value) => assert.strictEqual(isPremiumPath(value), true, `${value} deve ser Premium`));
   assert.strictEqual(isPremiumPath("/dashboard-free.html"), false, "dashboard Free não pode ser classificado como Premium");
   assert.strictEqual(isPremiumPath("/index.html"), false, "login deve continuar público");
+}
+
+function testPremiumVault() {
+  const { initializePremiumVault, resolvePremiumFile } = require("../services/premium-vault");
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "tp-vault-test-"));
+  const publicDir = path.join(root, "public");
+  const vaultDir = path.join(root, "private-vault");
+  fs.mkdirSync(path.join(publicDir, "assets", "study"), { recursive: true });
+  fs.writeFileSync(path.join(publicDir, "dashboard.html"), "<html>premium</html>");
+  fs.writeFileSync(path.join(publicDir, "estudo-futuro-modulo.html"), "<html>study</html>");
+  fs.writeFileSync(path.join(publicDir, "assets", "study", "segredo.js"), "window.__premium=1;");
+  fs.writeFileSync(path.join(publicDir, "index.html"), "<html>publico</html>");
+
+  const state = initializePremiumVault(publicDir, vaultDir);
+  assert.strictEqual(state.initialized, true);
+  assert.strictEqual(fs.existsSync(path.join(publicDir, "dashboard.html")), false, "dashboard Premium deve sair de public/");
+  assert.strictEqual(fs.existsSync(path.join(publicDir, "estudo-futuro-modulo.html")), false, "estudo Premium deve sair de public/");
+  assert.strictEqual(fs.existsSync(path.join(publicDir, "assets", "study", "segredo.js")), false, "asset Premium deve sair de public/");
+  assert.strictEqual(fs.existsSync(path.join(publicDir, "index.html")), true, "conteúdo público deve permanecer em public/");
+  assert.ok(resolvePremiumFile("/dashboard"), "rota sem extensão deve resolver HTML dentro do cofre");
+  assert.ok(resolvePremiumFile("/assets/study/segredo.js"), "asset Premium deve resolver somente pelo cofre");
+
+  fs.rmSync(root, { recursive: true, force: true });
 }
 
 async function testUploads() {
@@ -86,7 +111,6 @@ async function testUploads() {
     "PDF com ação ativa deve ser rejeitado"
   );
 
-  // PNG 1x1 conhecido: precisa ser realmente decodificado e reprocessado.
   const onePixelPng = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
     "base64"
@@ -106,8 +130,11 @@ function testWiring() {
   assert.ok(authRoute.includes("../services/bestfy-hardened"), "webhook deve usar wrapper Bestfy recuperável");
   assert.ok(server.includes("support-upload-secure.js"), "upload sanitizado deve ser montado antes do legado");
   assert.ok(server.indexOf("support-upload-secure.js") < server.indexOf('"suporte.js"'), "rota segura deve preceder rota de suporte legada");
+  assert.ok(server.includes("initializePremiumVault"), "servidor deve mover conteúdo Premium para o cofre antes de iniciar");
+  assert.ok(server.includes("resolvePremiumFile"), "entrega Premium deve resolver arquivos apenas pelo cofre");
   assert.ok(server.includes("/__premium"), "servidor deve possuir entrega Premium interna autenticada");
   assert.ok(rootHtaccess.includes("/__premium/") && publicHtaccess.includes("/__premium/"), "camada estática deve reescrever Premium");
+  assert.ok(rootHtaccess.includes(".premium-vault"), "document root raiz deve negar acesso direto ao cofre");
   assert.ok(rootHtaccess.includes("X-Security-Policy-Version"), "edge deve publicar marcador da política CSP");
 }
 
@@ -115,6 +142,7 @@ function testWiring() {
   await testPasswords();
   testDevIdentity();
   testPremiumGuard();
+  testPremiumVault();
   await testUploads();
   testWiring();
   console.log("Security regression suite: OK");
