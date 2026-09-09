@@ -10,7 +10,7 @@
     reports: "i-report",
     dev: "i-dev"
   };
-
+  const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   const FULL_ROLE_LABELS = new Set([
     "desenvolvedor",
     "dono",
@@ -23,6 +23,22 @@
     return `<svg class="sales-command-icon" aria-hidden="true"><use href="/assets/sales-command-icons.svg#${id}"></use></svg>`;
   }
 
+  function currentToken() {
+    for (const key of TOKEN_KEYS) {
+      try {
+        const value = sessionStorage.getItem(key);
+        if (value) return value;
+      } catch (_) {}
+    }
+    return "";
+  }
+
+  function clearLocalSession() {
+    for (const key of TOKEN_KEYS) {
+      try { sessionStorage.removeItem(key); } catch (_) {}
+    }
+  }
+
   function enhanceNavigation() {
     document.querySelectorAll(".sales-nav-item[data-view]").forEach((item) => {
       const iconId = ICONS[item.dataset.view];
@@ -32,8 +48,7 @@
       else item.insertAdjacentHTML("afterbegin", svgIcon(iconId));
     });
 
-    const accessLinks = document.querySelectorAll(".sales-nav-item[href]");
-    accessLinks.forEach((item) => {
+    document.querySelectorAll(".sales-nav-item[href]").forEach((item) => {
       if (item.querySelector(".sales-command-icon")) return;
       const iconId = /admin/i.test(item.getAttribute("href") || "") ? "i-admin" : "i-study";
       const old = item.querySelector("i");
@@ -93,8 +108,8 @@
   function protectRenderedRows() {
     const fullRole = isFullRole();
     document.querySelectorAll(".sales-table tbody tr").forEach((row) => {
-      const text = String(row.textContent || "");
-      const bestfy = /Checkout Bestfy/i.test(text);
+      const renderedText = String(row.textContent || "");
+      const bestfy = /Checkout Bestfy/i.test(renderedText);
       if (bestfy) {
         row.classList.add("sales-source-bestfy");
         const actions = row.querySelector(".sales-actions");
@@ -123,6 +138,33 @@
       if (row?.classList.contains("sales-source-bestfy")) {
         event.preventDefault();
         event.stopImmediatePropagation();
+      }
+    }, true);
+  }
+
+  function secureLogoutAtCapture() {
+    document.addEventListener("click", async (event) => {
+      const logout = event.target.closest("[data-logout]");
+      if (!logout) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      logout.disabled = true;
+
+      const token = currentToken();
+      try {
+        if (token) {
+          await fetch("/logout", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+            cache: "no-store"
+          });
+        }
+      } catch (_) {
+        // Mesmo com falha de rede, eliminamos a credencial local. O servidor
+        // revoga a sessão quando recebe a chamada e também expira o cookie.
+      } finally {
+        clearLocalSession();
+        window.location.replace("/");
       }
     }, true);
   }
@@ -158,6 +200,7 @@
     addOperationalDetails();
     lockSaleStatusField();
     protectBestfyActionsAtCapture();
+    secureLogoutAtCapture();
     protectRenderedRows();
     observeDynamicUI();
   }
