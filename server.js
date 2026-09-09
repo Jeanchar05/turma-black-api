@@ -15,7 +15,7 @@ const { supportWriteRateLimit } = require("./middleware/rate-limit");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260908-security-4.7.0";
+const CACHE_VERSION = "20260908-admin-command-center-4.8.0";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -30,8 +30,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb", strict: true }));
 app.use(express.urlencoded({ extended: true, limit: "10mb", parameterLimit: 500 }));
 
-// Limite adicional para endpoints de escrita de suporte/anexos, antes mesmo de
-// consultar o banco. Isso reduz spam, flood e abuso de payloads grandes.
 app.use((req, res, next) => {
   const unsafe = !["GET", "HEAD", "OPTIONS"].includes(String(req.method || "").toUpperCase());
   const supportPath = /^\/(?:suporte(?:\/|$)|admin\/suporte(?:\/|$))/i.test(req.path || "");
@@ -50,9 +48,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Guard obrigatório ANTES de qualquer rota de página e do express.static.
-// HTML, JS de aulas e assets didáticos Premium só são entregues após sessão
-// e assinatura serem validadas pelo backend.
 app.use(premiumContentGuard);
 
 function servirBundle(arquivos, tipo) {
@@ -100,10 +95,24 @@ function aplicarExtrasAdmin(html) {
     );
   }
 
+  if (!resultado.includes("admin-command-center.css")) {
+    resultado = resultado.replace(
+      "</head>",
+      `  <link rel="stylesheet" href="admin-command-center.css" />\n</head>`
+    );
+  }
+
   if (!resultado.includes("admin-final-ui.js")) {
     resultado = resultado.replace(
       "</body>",
       `  <script defer src="admin-final-ui.js"></script>\n</body>`
+    );
+  }
+
+  if (!resultado.includes("admin-command-center.js")) {
+    resultado = resultado.replace(
+      "</body>",
+      `  <script defer src="admin-command-center.js"></script>\n</body>`
     );
   }
 
@@ -174,7 +183,7 @@ app.get("/limpar-cache", (req, res) => {
   <main class="box">
     <div class="ring"></div>
     <h1>Carregando a nova versão…</h1>
-    <p>Removendo arquivos antigos e aplicando a atualização de segurança.</p>
+    <p>Removendo arquivos antigos e aplicando a atualização.</p>
     <small>Versão ${CACHE_VERSION}</small>
   </main>
   <script>
@@ -249,7 +258,6 @@ app.get("/limpar-cache-suporte", (req, res) => {
 </html>`);
 });
 
-// Login continua público. Áreas de conta Free/equipe exigem sessão válida já no servidor.
 app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
 app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
 app.get(["/dashboard-free", "/dashboard-free.html"], authPagina, servirPagina("dashboard-free.html"));
@@ -308,8 +316,8 @@ app.get("/api/status", async (_req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.7.0",
-    release: "security-hardened",
+    versao: "4.8.0",
+    release: "admin-command-center",
     banco
   });
 });
@@ -333,9 +341,9 @@ carregarRota("/", "usuarios.js");
 carregarRota("/", "liberacoes.js");
 
 carregarRota("/admin", "admin-mysql-core.js");
+carregarRota("/admin", "admin-command-center.js");
 carregarRota("/admin", "admin-provas-mysql.js");
 carregarRota("/admin", "admin-dashboard.js");
-// Sobrescreve mutações legadas sensíveis ANTES dos módulos antigos.
 carregarRota("/admin", "admin-security-core.js");
 carregarRota("/admin", "admin-panel.js");
 carregarRota("/admin", "dev-delete.js");
