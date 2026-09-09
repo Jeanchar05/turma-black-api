@@ -31,6 +31,9 @@ jobs:
       - name: Validate JavaScript syntax
         run: npm run validate
 
+      - name: Run security regression tests
+        run: npm run security:regression
+
       - name: Dependency security audit
         run: npm audit --audit-level=high
 
