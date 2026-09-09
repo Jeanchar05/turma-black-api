@@ -5,12 +5,16 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
+require("./services/password-model-guard");
 const connectDatabase = require("./config/database");
+const { authPagina } = require("./middleware/auth");
+const { corsOptions, securityHeaders } = require("./middleware/security-headers");
+const { premiumContentGuard } = require("./middleware/premium-content-guard");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260728-responsive-support-7";
+const CACHE_VERSION = "20260908-security-4.6.0";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -19,7 +23,9 @@ let ultimoErroBanco = "";
 let ultimaTentativaBanco = "";
 
 app.disable("x-powered-by");
-app.use(cors({ origin: "*" }));
+app.set("trust proxy", 1);
+app.use(securityHeaders);
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
@@ -33,6 +39,11 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+// Este guard precisa vir antes de qualquer rota de página e do express.static.
+// Assim HTML, JS de aulas e assets didáticos Premium nunca são entregues antes
+// de a sessão e a assinatura serem validadas no servidor.
+app.use(premiumContentGuard);
 
 function servirBundle(arquivos, tipo) {
   return (req, res, next) => {
@@ -95,9 +106,7 @@ function servirPagina(nomeArquivo) {
     if (!fs.existsSync(arquivo)) return next();
 
     let html = fs.readFileSync(arquivo, "utf8");
-    if (nomeArquivo === "admin.html") {
-      html = aplicarExtrasAdmin(html);
-    }
+    if (nomeArquivo === "admin.html") html = aplicarExtrasAdmin(html);
     html = aplicarCamadaResponsiva(html);
     html = aplicarVersaoNosAssets(html);
 
@@ -155,7 +164,7 @@ app.get("/limpar-cache", (req, res) => {
   <main class="box">
     <div class="ring"></div>
     <h1>Carregando a nova versão…</h1>
-    <p>Removendo arquivos antigos e aplicando a versão responsiva.</p>
+    <p>Removendo arquivos antigos e aplicando a atualização de segurança.</p>
     <small>Versão ${CACHE_VERSION}</small>
   </main>
   <script>
@@ -165,7 +174,6 @@ app.get("/limpar-cache", (req, res) => {
           const nomes = await caches.keys();
           await Promise.all(nomes.map((nome) => caches.delete(nome)));
         }
-
         if ("serviceWorker" in navigator) {
           const registros = await navigator.serviceWorker.getRegistrations();
           await Promise.all(registros.map((registro) => registro.unregister()));
@@ -173,11 +181,7 @@ app.get("/limpar-cache", (req, res) => {
       } catch (erro) {
         console.warn("Não foi possível limpar todo o cache:", erro);
       }
-
-      setTimeout(
-        () => window.location.replace("/dashboard?fresh=${CACHE_VERSION}&t=" + Date.now()),
-        700
-      );
+      setTimeout(() => window.location.replace("/?fresh=${CACHE_VERSION}&t=" + Date.now()), 700);
     })();
   </script>
 </body>
@@ -209,7 +213,7 @@ app.get("/limpar-cache-suporte", (req, res) => {
   <main class="box">
     <div class="ring"></div>
     <h1>Atualizando a Central de Suporte…</h1>
-    <p>Removendo o FAQ antigo e carregando o painel interno corrigido.</p>
+    <p>Aplicando a versão protegida do atendimento.</p>
     <small>Versão ${CACHE_VERSION}</small>
   </main>
   <script>
@@ -228,27 +232,25 @@ app.get("/limpar-cache-suporte", (req, res) => {
       } catch (erro) {
         console.warn("Não foi possível limpar todo o cache:", erro);
       }
-      setTimeout(
-        () => window.location.replace("/suporte?fresh=${CACHE_VERSION}&t=" + Date.now()),
-        850
-      );
+      setTimeout(() => window.location.replace("/suporte?fresh=${CACHE_VERSION}&t=" + Date.now()), 850);
     })();
   </script>
 </body>
 </html>`);
 });
 
+// Login continua público. Áreas de conta Free/equipe exigem sessão válida já no servidor.
 app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
 app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
-app.get(["/dashboard-free", "/dashboard-free.html"], servirPagina("dashboard-free.html"));
-app.get(["/admin", "/admin.html"], servirPagina("admin.html"));
-app.get(["/painel-vendas", "/painel-vendas.html"], servirPagina("painel-vendas.html"));
+app.get(["/dashboard-free", "/dashboard-free.html"], authPagina, servirPagina("dashboard-free.html"));
+app.get(["/admin", "/admin.html"], authPagina, servirPagina("admin.html"));
+app.get(["/painel-vendas", "/painel-vendas.html"], authPagina, servirPagina("painel-vendas.html"));
 app.get(["/notas", "/notas.html"], servirPagina("notas.html"));
-app.get(["/suporte", "/suporte.html"], servirPagina("suporte.html"));
+app.get(["/suporte", "/suporte.html"], authPagina, servirPagina("suporte.html"));
 app.get(["/minigames", "/minigames.html"], servirPagina("minigames.html"));
 app.get(["/estudo", "/estudo.html"], servirPagina("estudo.html"));
 app.get(["/modulos", "/modulos.html"], servirPagina("modulos.html"));
-app.get(["/perfil", "/perfil.html"], servirPagina("perfil.html"));
+app.get(["/perfil", "/perfil.html"], authPagina, servirPagina("perfil.html"));
 app.get(["/roleta", "/roleta.html"], servirPagina("roleta.html"));
 app.get(["/provas", "/provas.html"], servirPagina("provas.html"));
 app.get(["/favoritos", "/favoritos.html"], servirPagina("favoritos.html"));
@@ -276,9 +278,8 @@ if (fs.existsSync(publicDir)) {
   );
 }
 
-app.get("/api/status", async (req, res) => {
+app.get("/api/status", async (_req, res) => {
   let banco = "desconectado";
-
   try {
     if (connectDatabase.isConnected()) {
       await connectDatabase.query("SELECT 1 AS ok");
@@ -289,40 +290,16 @@ app.get("/api/status", async (req, res) => {
       banco = "indisponivel";
     }
   } catch (_) {
-    banco = "erro";
+    banco = "indisponivel";
   }
-
-  const diagnostico =
-    typeof connectDatabase.getDiagnostics === "function"
-      ? connectDatabase.getDiagnostics()
-      : {};
 
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.5.0",
-    release: "responsive-support-7",
-    cacheVersion: CACHE_VERSION,
-    frontend: fs.existsSync(publicDir) ? "integrado" : "não encontrado",
-    backend: "Node.js + Express",
-    banco,
-    bancoTipo: "MySQL",
-    ultimaTentativaBanco,
-    detalheBanco: ultimoErroBanco || "",
-    diagnosticoBanco: {
-      carregadoEm: diagnostico.carregadoEm || "",
-      host: diagnostico.host || "",
-      porta: diagnostico.port || 3306,
-      fonteSenha: diagnostico.passwordSource || "",
-      tamanhoSenhaCarregada: Number(diagnostico.passwordLength || 0),
-      senhaComAspasExternas: Boolean(diagnostico.passwordHadOuterQuotes),
-      senhaComEspacoNasPontas: Boolean(diagnostico.passwordHadEdgeWhitespace),
-      codigoErro: diagnostico.lastErrorCode || ""
-    },
-    estrutura: "frontend, API, notificações e banco na Hostinger",
-    responsivo: true,
-    faqModalLegado: false
+    versao: "4.6.0",
+    release: "security-hardened",
+    banco
   });
 });
 
@@ -379,9 +356,7 @@ function agendarNovaTentativa() {
     tentarConectarBanco();
   }, DB_RETRY_MS);
 
-  if (typeof temporizadorReconexao.unref === "function") {
-    temporizadorReconexao.unref();
-  }
+  if (typeof temporizadorReconexao.unref === "function") temporizadorReconexao.unref();
 }
 
 async function tentarConectarBanco() {
