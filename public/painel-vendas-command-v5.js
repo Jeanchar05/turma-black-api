@@ -27,6 +27,15 @@
     timers: {}
   };
 
+  function ensureCommandStyles() {
+    if (document.querySelector('link[data-sales-command-sections]')) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/painel-vendas-command-sections.css?v=5.2.0";
+    link.dataset.salesCommandSections = "true";
+    document.head.appendChild(link);
+  }
+
   function currentToken() {
     for (const key of TOKEN_KEYS) {
       try {
@@ -488,7 +497,6 @@
   }
 
   function applyAccess(access) {
-    const canManage = Boolean(access.podeGerenciar);
     const goalButton = document.getElementById("openGoalModal");
     if (goalButton) goalButton.hidden = !Boolean(access.podeGerenciarMetas);
     const devProducts = document.getElementById("productsDevButton");
@@ -630,6 +638,7 @@
   }
 
   async function start() {
+    ensureCommandStyles();
     enhanceNavigation();
     injectViews();
     enhanceHeader();
