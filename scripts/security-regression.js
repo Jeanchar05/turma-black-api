@@ -120,6 +120,35 @@ async function testUploads() {
   assert.ok(sanitized.buffer.length > 20);
 }
 
+function testSalesCommandCenter() {
+  const root = path.resolve(__dirname, "..");
+  const router = fs.readFileSync(path.join(root, "routes", "vendas.js"), "utf8");
+  const preflight = fs.readFileSync(path.join(root, "routes", "vendas-command-preflight.js"), "utf8");
+  const security = fs.readFileSync(path.join(root, "routes", "vendas-security-overrides.js"), "utf8");
+  const server = fs.readFileSync(path.join(root, "server.js"), "utf8");
+
+  const preflightIndex = router.indexOf('require("./vendas-command-preflight")');
+  const securityIndex = router.indexOf('require("./vendas-security-overrides")');
+  const legacyIndex = router.indexOf('require("./vendas-mysql")');
+  assert.ok(preflightIndex >= 0 && securityIndex > preflightIndex && legacyIndex > securityIndex, "preflight e segurança comercial devem preceder o router legado");
+
+  assert.ok(preflight.includes('preco: 99.99'), "Mensal deve usar R$ 99,99");
+  assert.ok(preflight.includes('preco: 249.99'), "6 meses deve usar R$ 249,99");
+  assert.ok(preflight.includes('preco: 397.00'), "Anual deve usar R$ 397,00");
+  assert.ok(preflight.includes("bestfy_transactions"), "painel deve reconciliar o ledger Bestfy verificado");
+  assert.ok(preflight.includes('origem,criado_por,atualizado_por'), "sincronização deve persistir a origem da venda");
+  assert.ok(preflight.includes('Checkout Bestfy'), "origem Bestfy deve ser identificável no painel");
+
+  assert.ok(security.includes('status: "pendente"'), "nova venda manual deve nascer pendente");
+  assert.ok(security.includes('Vendas da Bestfy são somente leitura'), "transações Bestfy devem ser somente leitura");
+  assert.ok(security.includes('Boolean(user.suspenso)'), "concessão manual deve preservar suspensão");
+  assert.ok(security.includes('bestfyTransactionId'), "venda manual não pode sobrescrever entitlement Bestfy");
+  assert.ok(security.includes('venda-manual:'), "entitlement manual deve registrar sua origem");
+
+  assert.ok(server.includes('painel-vendas-command-v5.css'), "bundle visual do Sales Command Center deve estar ativo");
+  assert.ok(server.includes('painel-vendas-command-v5.js'), "bundle UX do Sales Command Center deve estar ativo");
+}
+
 function testWiring() {
   const root = path.resolve(__dirname, "..");
   const authRoute = fs.readFileSync(path.join(root, "routes", "auth.js"), "utf8");
@@ -144,6 +173,7 @@ function testWiring() {
   testPremiumGuard();
   testPremiumVault();
   await testUploads();
+  testSalesCommandCenter();
   testWiring();
   console.log("Security regression suite: OK");
 })().catch((error) => {
