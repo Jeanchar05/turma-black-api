@@ -6,12 +6,18 @@ const Usuario = require("../models/Usuario");
 const database = require("../config/database");
 const { sessionIsValid } = require("../services/sessions");
 
+const JWT_ISSUER = "turma-do-primo";
+const JWT_AUDIENCE = "turmablack.com.br";
+const JWT_EXPIRES_IN = "24h";
+const SESSION_MAX_AGE_SECONDS = 24 * 60 * 60;
+
 function carregarJwtConfig() {
   const secret = String(process.env.JWT_SECRET || "").trim();
   const producao = String(process.env.NODE_ENV || "").trim().toLowerCase() === "production";
   const placeholders = new Set([
     "turma_black_secret_dev",
     "troque-por-uma-chave-segura-e-unica",
+    "troque-por-uma-chave-aleatoria-segura-com-32-ou-mais-caracteres",
     "changeme",
     "secret"
   ]);
@@ -38,7 +44,6 @@ function carregarJwtConfig() {
 const JWT_CONFIG = carregarJwtConfig();
 const SECRET = JWT_CONFIG.secret;
 const SESSION_COOKIE = "tp_page_session";
-const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 
 const PLANOS_PREMIUM = new Set(["black30", "black90", "black180", "black360"]);
 const PLANOS_BESTFY = Object.freeze({
@@ -109,13 +114,27 @@ function limparCookieSessao(res) {
 function normalizarCargo(usuario) {
   if (!usuario) return "aluno";
   if (usuario.contaDev === true) return "dev";
-  if (usuario.cargo) return String(usuario.cargo).trim().toLowerCase().replaceAll("_", "-");
+  if (usuario.cargo) {
+    const cargo = String(usuario.cargo).trim().toLowerCase().replaceAll("_", "-");
+    // O cargo Dev só existe quando a flag interna contaDev também está ativa.
+    return cargo === "dev" ? "aluno" : cargo;
+  }
   if (usuario.tipo === "admin") return "admin";
   return "aluno";
 }
 
 function obterId(usuario) {
   return String(usuario?._id || usuario?.id || "");
+}
+
+function semPremium(motivo, expirado = false) {
+  return {
+    acessoPremium: false,
+    planoAtivo: "free",
+    planoExpirado: Boolean(expirado),
+    diasRestantes: 0,
+    motivoAcesso: motivo
+  };
 }
 
 function estadoAcessoPremium(usuario, agoraMs = Date.now()) {
@@ -132,38 +151,17 @@ function estadoAcessoPremium(usuario, agoraMs = Date.now()) {
     };
   }
 
-  if (!PLANOS_PREMIUM.has(plano)) {
-    return {
-      acessoPremium: false,
-      planoAtivo: "free",
-      planoExpirado: false,
-      diasRestantes: 0,
-      motivoAcesso: "free"
-    };
+  if (cargo === "aluno" && usuario?.aprovado !== true) {
+    return semPremium("nao-aprovado");
   }
+
+  if (!PLANOS_PREMIUM.has(plano)) return semPremium("free");
 
   const expiracaoMs = new Date(usuario?.dataExpiracao || "").getTime();
-
-  if (!Number.isFinite(expiracaoMs)) {
-    return {
-      acessoPremium: false,
-      planoAtivo: "free",
-      planoExpirado: true,
-      diasRestantes: 0,
-      motivoAcesso: "validade-invalida"
-    };
-  }
+  if (!Number.isFinite(expiracaoMs)) return semPremium("validade-invalida", true);
 
   const restanteMs = expiracaoMs - agoraMs;
-  if (restanteMs <= 0) {
-    return {
-      acessoPremium: false,
-      planoAtivo: "free",
-      planoExpirado: true,
-      diasRestantes: 0,
-      motivoAcesso: "expirado"
-    };
-  }
+  if (restanteMs <= 0) return semPremium("expirado", true);
 
   return {
     acessoPremium: true,
@@ -242,7 +240,7 @@ async function sincronizarExpiracaoPremium(usuario) {
 
   estado = estadoAcessoPremium(usuario);
 
-  if (cargo === "aluno" && PLANOS_PREMIUM.has(plano) && !estado.acessoPremium) {
+  if (cargo === "aluno" && PLANOS_PREMIUM.has(plano) && !estado.acessoPremium && estado.planoExpirado) {
     await revogarAcessoInvalido(usuario, "PLAN_EXPIRED");
     return estadoAcessoPremium(usuario);
   }
@@ -262,7 +260,7 @@ function montarUsuarioSeguro(usuario) {
     email: usuario.email || "",
     tipo: usuario.tipo || "aluno",
     cargo,
-    contaDev: Boolean(usuario.contaDev || cargo === "dev"),
+    contaDev: Boolean(usuario.contaDev === true && cargo === "dev"),
     permissoesPersonalizadas: usuario.permissoesPersonalizadas || {},
     vendedor: Boolean(usuario.vendedor || cargo === "vendedor"),
     comissao: Number(usuario.comissao || 20),
@@ -286,7 +284,11 @@ async function localizarUsuarioPorToken(token) {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, SECRET, { algorithms: ["HS256"] });
+    decoded = jwt.verify(token, SECRET, {
+      algorithms: ["HS256"],
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE
+    });
   } catch (_) {
     return { erro: "TOKEN_INVALIDO" };
   }
@@ -296,14 +298,16 @@ async function localizarUsuarioPorToken(token) {
   const email = String(payload.email || "").toLowerCase().trim();
   const jti = String(decoded.jti || payload.jti || "").trim();
 
-  if (!jti) return { erro: "TOKEN_LEGADO_RELOGIN" };
+  if (!jti || !id) return { erro: "TOKEN_LEGADO_RELOGIN" };
 
   const sessaoValida = await sessionIsValid({ jti, userId: id, iat: decoded.iat });
   if (!sessaoValida) return { erro: "TOKEN_REVOGADO" };
 
-  let usuario = null;
-  if (id) usuario = await Usuario.findById(id);
+  let usuario = await Usuario.findById(id);
   if (!usuario && email) usuario = await Usuario.findOne({ email });
+
+  // Um token nunca pode migrar silenciosamente para outra conta com o mesmo e-mail.
+  if (usuario && obterId(usuario) !== id) return { erro: "TOKEN_IDENTIDADE_INVALIDA" };
 
   return { usuario, payload: decoded };
 }
@@ -316,6 +320,7 @@ async function prepararUsuarioAutenticado(req, token) {
   if (!usuario) return { erro: "USUARIO_NAO_ENCONTRADO" };
   if (usuario.suspenso || usuario.status === "suspenso") return { erro: "USUARIO_SUSPENSO", status: 403 };
   if (usuario.status === "bloqueado") return { erro: "USUARIO_BLOQUEADO", status: 403 };
+  if (usuario.cargo === "aluno" && usuario.aprovado !== true) return { erro: "USUARIO_NAO_APROVADO", status: 403 };
 
   await sincronizarExpiracaoPremium(usuario);
   req.usuarioDoc = usuario;
@@ -426,6 +431,12 @@ function gerarToken(usuario) {
 
   const cargo = normalizarCargo(usuario);
   const id = obterId(usuario);
+  if (!id) {
+    const error = new Error("Não foi possível emitir sessão sem identidade de usuário.");
+    error.code = "USUARIO_SEM_ID";
+    throw error;
+  }
+
   const jti = crypto.randomUUID();
 
   return jwt.sign(
@@ -435,12 +446,20 @@ function gerarToken(usuario) {
       nome: usuario.nome || "",
       tipo: usuario.tipo || "aluno",
       cargo,
-      contaDev: Boolean(usuario.contaDev || cargo === "dev"),
+      contaDev: Boolean(usuario.contaDev === true && cargo === "dev"),
       vendedor: Boolean(usuario.vendedor || cargo === "vendedor"),
-      plano: usuario.plano || "free"
+      plano: usuario.plano || "free",
+      tokenVersion: 2
     },
     SECRET,
-    { expiresIn: "7d", algorithm: "HS256", jwtid: jti }
+    {
+      expiresIn: JWT_EXPIRES_IN,
+      algorithm: "HS256",
+      jwtid: jti,
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+      subject: id
+    }
   );
 }
 
