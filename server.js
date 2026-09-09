@@ -10,11 +10,12 @@ const connectDatabase = require("./config/database");
 const { authPagina } = require("./middleware/auth");
 const { corsOptions, securityHeaders } = require("./middleware/security-headers");
 const { premiumContentGuard } = require("./middleware/premium-content-guard");
+const { supportWriteRateLimit } = require("./middleware/rate-limit");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, "public");
-const CACHE_VERSION = "20260908-security-4.6.0";
+const CACHE_VERSION = "20260908-security-4.7.0";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -26,8 +27,17 @@ app.disable("x-powered-by");
 app.set("trust proxy", 1);
 app.use(securityHeaders);
 app.use(cors(corsOptions));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "10mb", strict: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb", parameterLimit: 500 }));
+
+// Limite adicional para endpoints de escrita de suporte/anexos, antes mesmo de
+// consultar o banco. Isso reduz spam, flood e abuso de payloads grandes.
+app.use((req, res, next) => {
+  const unsafe = !["GET", "HEAD", "OPTIONS"].includes(String(req.method || "").toUpperCase());
+  const supportPath = /^\/(?:suporte(?:\/|$)|admin\/suporte(?:\/|$))/i.test(req.path || "");
+  if (unsafe && supportPath) return supportWriteRateLimit(req, res, next);
+  return next();
+});
 
 app.use((req, res, next) => {
   if (/\.(?:html|css|js)$/i.test(req.path) || req.path === "/") {
@@ -40,9 +50,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Este guard precisa vir antes de qualquer rota de página e do express.static.
-// Assim HTML, JS de aulas e assets didáticos Premium nunca são entregues antes
-// de a sessão e a assinatura serem validadas no servidor.
+// Guard obrigatório ANTES de qualquer rota de página e do express.static.
+// HTML, JS de aulas e assets didáticos Premium só são entregues após sessão
+// e assinatura serem validadas pelo backend.
 app.use(premiumContentGuard);
 
 function servirBundle(arquivos, tipo) {
@@ -265,6 +275,7 @@ if (fs.existsSync(publicDir)) {
       maxAge: 0,
       etag: false,
       lastModified: false,
+      dotfiles: "deny",
       setHeaders(res, filePath) {
         if (/\.(html|js|css)$/i.test(filePath)) {
           res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
@@ -297,7 +308,7 @@ app.get("/api/status", async (_req, res) => {
   return res.json({
     status: "online",
     nome: "Turma do Primo",
-    versao: "4.6.0",
+    versao: "4.7.0",
     release: "security-hardened",
     banco
   });
@@ -324,6 +335,8 @@ carregarRota("/", "liberacoes.js");
 carregarRota("/admin", "admin-mysql-core.js");
 carregarRota("/admin", "admin-provas-mysql.js");
 carregarRota("/admin", "admin-dashboard.js");
+// Sobrescreve mutações legadas sensíveis ANTES dos módulos antigos.
+carregarRota("/admin", "admin-security-core.js");
 carregarRota("/admin", "admin-panel.js");
 carregarRota("/admin", "dev-delete.js");
 carregarRota("/admin", "admin-alunos.js");
@@ -342,10 +355,7 @@ carregarRota("/", "provas-relatorios.js");
 carregarRota("/", "provas.js");
 
 app.use((req, res) => {
-  res.status(404).json({
-    erro: "Rota não encontrada.",
-    rota: req.originalUrl
-  });
+  res.status(404).json({ erro: "Rota não encontrada." });
 });
 
 function agendarNovaTentativa() {
