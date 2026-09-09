@@ -1,9 +1,11 @@
 "use strict";
 
 const express = require("express");
+require("../services/password-model-guard");
 const Usuario = require("../models/Usuario");
 const database = require("../config/database");
-const { gerarToken, montarUsuarioSeguro } = require("../middleware/auth");
+const { verifyPassword } = require("../services/passwords");
+const { gerarToken, montarUsuarioSeguro, definirCookieSessao } = require("../middleware/auth");
 const {
   getPermissoesEfetivas,
   getCargo
@@ -58,18 +60,7 @@ function normalizarPlano(valor, cargo) {
     .toLowerCase()
     .replace(/\s+/g, "");
 
-  if (
-    [
-      "dev",
-      "dono",
-      "superadmin",
-      "admin",
-      "moderador",
-      "suporte",
-      "financeiro",
-      "vendedor"
-    ].includes(cargo)
-  ) {
+  if (["dev", "dono", "superadmin", "admin", "moderador", "suporte", "financeiro", "vendedor"].includes(cargo)) {
     return "admin";
   }
 
@@ -149,9 +140,18 @@ async function loginCompativel(req, res) {
     }
 
     const encontrado = await Usuario.findOne({ email });
+    const passwordCheck = encontrado
+      ? await verifyPassword(encontrado.senha, senha)
+      : { valid: false, needsRehash: false };
 
-    if (!encontrado || String(encontrado.senha) !== senha) {
+    if (!encontrado || !passwordCheck.valid) {
       return res.status(401).json({ erro: "E-mail ou senha incorretos." });
+    }
+
+    if (passwordCheck.needsRehash) {
+      encontrado.senha = senha;
+      encontrado.atualizadoPor = "migracao-senha-segura";
+      await encontrado.save();
     }
 
     const usuario = montarCompatibilidade(encontrado);
@@ -190,6 +190,7 @@ async function loginCompativel(req, res) {
     usuario.status = usuario.status === "pendente" ? "ativo" : usuario.status;
 
     const token = gerarToken(usuario);
+    definirCookieSessao(res, token);
 
     return res.json({
       sucesso: true,
@@ -199,6 +200,13 @@ async function loginCompativel(req, res) {
     });
   } catch (error) {
     console.error("Erro no login MySQL:", error);
+
+    if (error?.code === "JWT_NAO_CONFIGURADO") {
+      return res.status(503).json({
+        erro: "Login temporariamente indisponível: a chave de segurança JWT do servidor precisa ser configurada.",
+        codigo: "JWT_NAO_CONFIGURADO"
+      });
+    }
 
     return res.status(500).json({
       erro: "Não foi possível concluir o login. Tente novamente em alguns instantes.",
