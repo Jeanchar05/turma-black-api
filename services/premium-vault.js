@@ -10,7 +10,8 @@ let state = {
   vaultDir: "",
   moved: 0,
   degraded: false,
-  error: ""
+  error: "",
+  mode: "authenticated-public"
 };
 
 function inside(root, target) {
@@ -19,101 +20,63 @@ function inside(root, target) {
   return resolved.startsWith(base);
 }
 
-function walkFiles(dir, root, output = []) {
-  if (!fs.existsSync(dir)) return output;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isSymbolicLink()) continue;
-    if (entry.isDirectory()) walkFiles(full, root, output);
-    else if (entry.isFile()) output.push({ full, relative: path.relative(root, full) });
-  }
-  return output;
-}
-
-function secureRemoveSource(source) {
-  try {
-    fs.unlinkSync(source);
-    return;
-  } catch (unlinkError) {
-    try {
-      fs.writeFileSync(source, "", { flag: "w" });
-      fs.unlinkSync(source);
-      return;
-    } catch (_) {
-      throw unlinkError;
-    }
-  }
-}
-
 function initializePremiumVault(publicDir, vaultDir) {
   const publicRoot = path.resolve(publicDir);
-  const privateRoot = path.resolve(vaultDir);
-  let moved = 0;
+  const privateRoot = path.resolve(vaultDir || path.join(path.dirname(publicRoot), ".premium-vault"));
 
-  try {
-    if (publicRoot === privateRoot || inside(publicRoot, privateRoot)) {
-      throw new Error("O cofre Premium precisa ficar fora do diretório público.");
-    }
-
-    fs.mkdirSync(privateRoot, { recursive: true });
-
-    for (const item of walkFiles(publicRoot, publicRoot)) {
-      const urlPath = `/${item.relative.split(path.sep).join("/")}`;
-      if (!isPremiumPath(urlPath)) continue;
-
-      const destination = path.resolve(privateRoot, item.relative);
-      if (!inside(privateRoot, destination)) {
-        throw new Error("Caminho Premium inválido durante preparação do cofre.");
-      }
-
-      fs.mkdirSync(path.dirname(destination), { recursive: true });
-      fs.copyFileSync(item.full, destination);
-      secureRemoveSource(item.full);
-      moved += 1;
-    }
-
-    state = {
-      initialized: true,
-      publicDir: publicRoot,
-      vaultDir: privateRoot,
-      moved,
-      degraded: false,
-      error: ""
-    };
-
-    console.log(`[SECURITY] Cofre Premium preparado fora do document root (${moved} arquivos protegidos).`);
-    return { ...state };
-  } catch (error) {
-    // Importante: uma limitação de escrita da hospedagem não pode derrubar
-    // todo o site com 503. O conteúdo Premium continua fail-closed porque
-    // resolvePremiumFile() retorna null enquanto initialized=false, e o guard
-    // de autenticação permanece montado antes do express.static.
+  if (!fs.existsSync(publicRoot)) {
     state = {
       initialized: false,
       publicDir: publicRoot,
       vaultDir: privateRoot,
-      moved,
+      moved: 0,
       degraded: true,
-      error: String(error?.message || "Falha ao preparar cofre Premium.").slice(0, 300)
+      error: "Diretório público não encontrado.",
+      mode: "authenticated-public"
     };
-    console.error("[SECURITY] Cofre Premium indisponível; servidor continuará online com Premium bloqueado:", state.error);
+    console.error("[SECURITY] Premium resolver indisponível: diretório público não encontrado.");
     return { ...state };
   }
+
+  // Não movemos, copiamos nem apagamos arquivos durante o boot. Em hospedagem
+  // gerenciada isso pode atrasar o health-check e provocar 503. A proteção
+  // continua em duas camadas: .htaccess reescreve recursos Premium para
+  // /__premium e o Express exige sessão + acesso Premium antes de entregar.
+  state = {
+    initialized: true,
+    publicDir: publicRoot,
+    vaultDir: privateRoot,
+    moved: 0,
+    degraded: false,
+    error: "",
+    mode: "authenticated-public"
+  };
+
+  console.log("[SECURITY] Premium resolver pronto sem mutação do filesystem.");
+  return { ...state };
+}
+
+function normalizeRelative(requestPath) {
+  let pathname = String(requestPath || "").split("?")[0];
+  try { pathname = decodeURIComponent(pathname); } catch (_) {}
+  pathname = pathname.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
+  const parts = pathname.replace(/^\/+/, "").split("/").filter(Boolean);
+  if (!parts.length || parts.some((part) => part === "." || part === "..")) return "";
+  return parts.join(path.sep);
 }
 
 function resolvePremiumFile(requestPath) {
   if (!state.initialized || !isPremiumPath(requestPath)) return null;
-  let pathname = String(requestPath || "").split("?")[0];
-  try { pathname = decodeURIComponent(pathname); } catch (_) {}
-  const relative = pathname.replace(/^\/+/, "").split("/").filter(Boolean).join(path.sep);
-  if (!relative || relative.includes(`..${path.sep}`) || relative === "..") return null;
+
+  const relative = normalizeRelative(requestPath);
+  if (!relative) return null;
 
   const candidates = [relative];
   if (!path.extname(relative)) candidates.push(`${relative}.html`);
 
   for (const candidate of candidates) {
-    const full = path.resolve(state.vaultDir, candidate);
-    if (!inside(state.vaultDir, full)) continue;
+    const full = path.resolve(state.publicDir, candidate);
+    if (!inside(state.publicDir, full)) continue;
     try {
       const stat = fs.statSync(full);
       if (stat.isFile()) return full;
