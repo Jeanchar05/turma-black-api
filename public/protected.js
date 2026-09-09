@@ -2,8 +2,8 @@
 
 (() => {
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
-  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
   let validationStarted = false;
+  let logoutInProgress = false;
 
   function installResponsiveLayer() {
     const addStyle = (src, marker) => {
@@ -23,16 +23,16 @@
       document.head.appendChild(script);
     };
 
-    addStyle("/responsive-global.css?v=20260812-shell-v24", "globalResponsive");
-    addStyle("/theme-global-v2.css?v=20260812-shell-v24", "globalThemeCss");
-    addStyle("/student-shell-v23.css?v=20260812-shell-v24", "studentShellCss");
-    addStyle("/platform-eight-modules-fix.css?v=20260812-shell-v24", "eightModulesFix");
-    addScript("/theme-global-v2.js?v=20260812-shell-v24", "globalThemeV2");
-    addScript("/navigation-final.js?v=20260812-shell-v24", "navigationFinal");
-    addScript("/student-shell-v23.js?v=20260812-shell-v24", "studentShellJs");
-    addScript("/performance-optimization.js?v=20260812-performance-v24", "performanceOptimization");
-    addScript("/study-platform-sync.js?v=20260812-sync-v24", "studyPlatformSync");
-    addScript("/platform-eight-modules-fix.js?v=20260812-eight-v24", "eightModulesFix");
+    addStyle("/responsive-global.css?v=20260908-security-v1", "globalResponsive");
+    addStyle("/theme-global-v2.css?v=20260908-security-v1", "globalThemeCss");
+    addStyle("/student-shell-v23.css?v=20260908-security-v1", "studentShellCss");
+    addStyle("/platform-eight-modules-fix.css?v=20260908-security-v1", "eightModulesFix");
+    addScript("/theme-global-v2.js?v=20260908-security-v1", "globalThemeV2");
+    addScript("/navigation-final.js?v=20260908-security-v1", "navigationFinal");
+    addScript("/student-shell-v23.js?v=20260908-security-v1", "studentShellJs");
+    addScript("/performance-optimization.js?v=20260908-security-v1", "performanceOptimization");
+    addScript("/study-platform-sync.js?v=20260908-security-v1", "studyPlatformSync");
+    addScript("/platform-eight-modules-fix.js?v=20260908-security-v1", "eightModulesFix");
   }
 
   function getToken() {
@@ -48,6 +48,38 @@
       try { sessionStorage.removeItem(key); } catch (_) {}
       try { localStorage.removeItem(key); } catch (_) {}
     });
+  }
+
+  async function logoutSafely(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+    }
+    if (logoutInProgress) return;
+    logoutInProgress = true;
+
+    const token = getToken();
+    document.querySelectorAll("[data-logout]").forEach((button) => {
+      try { button.disabled = true; } catch (_) {}
+    });
+
+    try {
+      if (token) {
+        await fetch("/logout", {
+          method: "POST",
+          headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+          cache: "no-store",
+          keepalive: true
+        });
+      }
+    } catch (_) {
+      // Mesmo quando a rede falha, o token local é removido. O servidor também
+      // recusa tokens legados/sem JTI e valida revogação nas próximas requisições.
+    } finally {
+      clearSession();
+      window.location.replace("/");
+    }
   }
 
   function revealPage(detail = {}) {
@@ -76,7 +108,7 @@
   }
 
   async function cleanupLegacyBrowserState() {
-    const marker = "legacy-render-cleanup-v3";
+    const marker = "legacy-render-cleanup-v4";
     try { if (sessionStorage.getItem(marker) === "ok") return; } catch (_) {}
     try {
       if ("serviceWorker" in navigator) {
@@ -120,7 +152,7 @@
       const user = data.usuario;
       const required = document.body?.dataset.requiredAccess || "dashboard";
       if (!hasAccess(user, required)) {
-        window.location.replace("/dashboard");
+        window.location.replace("/dashboard-free");
         return;
       }
       revealPage({ user });
@@ -138,6 +170,11 @@
     installResponsiveLayer();
     validatePage();
   }
+
+  document.addEventListener("click", (event) => {
+    const control = event.target?.closest?.("[data-logout]");
+    if (control) logoutSafely(event);
+  }, true);
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startValidation, { once: true });
   else startValidation();
