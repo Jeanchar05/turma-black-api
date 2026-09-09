@@ -8,6 +8,7 @@ const { requirePermission, getCargo } = require("../middleware/permissions");
 
 const router = express.Router();
 const FULL_ROLES = new Set(["dev", "dono", "superadmin", "admin", "financeiro"]);
+let ensurePromise = null;
 
 function text(value, max = 190) {
   return String(value ?? "").trim().slice(0, max);
@@ -83,15 +84,26 @@ async function ensureTables() {
   `);
 }
 
-router.use("/vendas", async (_req, res, next) => {
+async function prepareCommandCenter(req, res, next) {
   try {
-    await ensureTables();
+    if (!ensurePromise) {
+      ensurePromise = ensureTables().catch((error) => {
+        ensurePromise = null;
+        throw error;
+      });
+    }
+    await ensurePromise;
     return next();
   } catch (error) {
     console.error("Erro ao preparar metas do Sales Command Center:", error);
     return res.status(503).json({ erro: "Não foi possível preparar o Sales Command Center." });
   }
-});
+}
+
+// Não intercepta mais o módulo /vendas inteiro. Apenas as rotas exclusivas do
+// Command Center dependem desta tabela auxiliar, evitando que uma falha em
+// metas torne listagem/registro de vendas indisponível.
+router.use(["/vendas/command-center", "/vendas/metas"], prepareCommandCenter);
 
 router.get("/vendas/command-center", auth, requirePermission("painelVendas"), async (req, res) => {
   try {
@@ -103,7 +115,6 @@ router.get("/vendas/command-center", auth, requirePermission("painelVendas"), as
     const currentScope = scope(req, "v");
     const currentUserId = userId(req);
     const manager = canManage(req);
-
     const metaSellerId = manager ? "" : currentUserId;
 
     const [summaryRows, planRows, sourceRows, statusRows, monthRows, metaRows, paymentRows, bestfyRows, logRows] = await Promise.all([
