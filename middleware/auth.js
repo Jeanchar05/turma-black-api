@@ -1,8 +1,10 @@
 "use strict";
 
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario");
 const database = require("../config/database");
+const { sessionIsValid } = require("../services/sessions");
 
 function carregarJwtConfig() {
   const secret = String(process.env.JWT_SECRET || "").trim();
@@ -35,6 +37,8 @@ function carregarJwtConfig() {
 
 const JWT_CONFIG = carregarJwtConfig();
 const SECRET = JWT_CONFIG.secret;
+const SESSION_COOKIE = "tp_page_session";
+const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 
 const PLANOS_PREMIUM = new Set(["black30", "black90", "black180", "black360"]);
 const PLANOS_BESTFY = Object.freeze({
@@ -65,6 +69,41 @@ function extrairToken(req) {
   }
 
   return null;
+}
+
+function lerCookies(req) {
+  const header = String(req.headers?.cookie || "");
+  const cookies = {};
+  for (const part of header.split(";")) {
+    const index = part.indexOf("=");
+    if (index <= 0) continue;
+    const key = part.slice(0, index).trim();
+    const value = part.slice(index + 1).trim();
+    if (!key) continue;
+    try { cookies[key] = decodeURIComponent(value); }
+    catch (_) { cookies[key] = value; }
+  }
+  return cookies;
+}
+
+function extrairTokenPagina(req) {
+  return String(lerCookies(req)[SESSION_COOKIE] || "").trim() || null;
+}
+
+function definirCookieSessao(res, token) {
+  const secure = JWT_CONFIG.producao ? "; Secure" : "";
+  res.append(
+    "Set-Cookie",
+    `${SESSION_COOKIE}=${encodeURIComponent(String(token || ""))}; Path=/; Max-Age=${SESSION_MAX_AGE_SECONDS}; HttpOnly; SameSite=Lax${secure}; Priority=High`
+  );
+}
+
+function limparCookieSessao(res) {
+  const secure = JWT_CONFIG.producao ? "; Secure" : "";
+  res.append(
+    "Set-Cookie",
+    `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${secure}; Priority=High`
+  );
 }
 
 function normalizarCargo(usuario) {
@@ -153,7 +192,6 @@ async function validarLedgerBestfyLocal(usuario) {
 
   const registro = rows[0] || null;
   if (!registro) return false;
-
   if (String(registro.status || "").trim().toUpperCase() !== "PAID") return false;
   if (!registro.verified_at || !registro.applied_at || registro.revoked_at) return false;
   if (String(registro.plan || "").trim().toLowerCase() !== plano) return false;
@@ -170,11 +208,7 @@ async function validarLedgerBestfyLocal(usuario) {
   if (expLedger <= agora - 60000 || expUsuario <= agora) return false;
 
   const origem = String(usuario?.atualizadoPor || "").trim().toLowerCase();
-
-  if (origem === "bestfy-webhook") {
-    return Math.abs(expLedger - expUsuario) <= 60000;
-  }
-
+  if (origem === "bestfy-webhook") return Math.abs(expLedger - expUsuario) <= 60000;
   return expUsuario + 60000 >= expLedger;
 }
 
@@ -208,11 +242,7 @@ async function sincronizarExpiracaoPremium(usuario) {
 
   estado = estadoAcessoPremium(usuario);
 
-  if (
-    cargo === "aluno" &&
-    PLANOS_PREMIUM.has(plano) &&
-    !estado.acessoPremium
-  ) {
+  if (cargo === "aluno" && PLANOS_PREMIUM.has(plano) && !estado.acessoPremium) {
     await revogarAcessoInvalido(usuario, "PLAN_EXPIRED");
     return estadoAcessoPremium(usuario);
   }
@@ -252,14 +282,11 @@ function montarUsuarioSeguro(usuario) {
 }
 
 async function localizarUsuarioPorToken(token) {
-  if (!JWT_CONFIG.valido || !SECRET) {
-    return { erro: "JWT_NAO_CONFIGURADO" };
-  }
+  if (!JWT_CONFIG.valido || !SECRET) return { erro: "JWT_NAO_CONFIGURADO" };
 
   let decoded;
-
   try {
-    decoded = jwt.verify(token, SECRET);
+    decoded = jwt.verify(token, SECRET, { algorithms: ["HS256"] });
   } catch (_) {
     return { erro: "TOKEN_INVALIDO" };
   }
@@ -267,80 +294,55 @@ async function localizarUsuarioPorToken(token) {
   const payload = decoded.usuario || decoded.user || decoded;
   const id = String(payload.id || payload._id || payload.usuarioId || "").trim();
   const email = String(payload.email || "").toLowerCase().trim();
+  const jti = String(decoded.jti || payload.jti || "").trim();
+
+  if (!jti) return { erro: "TOKEN_LEGADO_RELOGIN" };
+
+  const sessaoValida = await sessionIsValid({ jti, userId: id, iat: decoded.iat });
+  if (!sessaoValida) return { erro: "TOKEN_REVOGADO" };
 
   let usuario = null;
+  if (id) usuario = await Usuario.findById(id);
+  if (!usuario && email) usuario = await Usuario.findOne({ email });
 
-  if (id) {
-    usuario = await Usuario.findById(id);
-  }
+  return { usuario, payload: decoded };
+}
 
-  if (!usuario && email) {
-    usuario = await Usuario.findOne({ email });
-  }
+async function prepararUsuarioAutenticado(req, token) {
+  const resultado = await localizarUsuarioPorToken(token);
+  if (resultado.erro) return resultado;
 
+  const usuario = resultado.usuario;
+  if (!usuario) return { erro: "USUARIO_NAO_ENCONTRADO" };
+  if (usuario.suspenso || usuario.status === "suspenso") return { erro: "USUARIO_SUSPENSO", status: 403 };
+  if (usuario.status === "bloqueado") return { erro: "USUARIO_BLOQUEADO", status: 403 };
+
+  await sincronizarExpiracaoPremium(usuario);
+  req.usuarioDoc = usuario;
+  req.usuario = montarUsuarioSeguro(usuario);
+  req.authToken = token;
+  req.authPayload = resultado.payload || null;
   return { usuario };
 }
 
 async function auth(req, res, next) {
   try {
     if (!JWT_CONFIG.valido) {
-      return res.status(503).json({
-        erro: "Autenticação temporariamente indisponível por configuração de segurança do servidor.",
-        codigo: "JWT_NAO_CONFIGURADO"
-      });
+      return res.status(503).json({ erro: "Autenticação temporariamente indisponível por configuração de segurança do servidor.", codigo: "JWT_NAO_CONFIGURADO" });
     }
 
     const token = extrairToken(req);
+    if (!token) return res.status(401).json({ erro: "Token não informado.", codigo: "TOKEN_AUSENTE" });
 
-    if (!token) {
-      return res.status(401).json({
-        erro: "Token não informado.",
-        codigo: "TOKEN_AUSENTE"
-      });
-    }
-
-    const resultado = await localizarUsuarioPorToken(token);
-
+    const resultado = await prepararUsuarioAutenticado(req, token);
     if (resultado.erro) {
-      if (resultado.erro === "JWT_NAO_CONFIGURADO") {
-        return res.status(503).json({
-          erro: "Autenticação temporariamente indisponível por configuração de segurança do servidor.",
-          codigo: resultado.erro
-        });
-      }
-      return res.status(401).json({
-        erro: "Token inválido ou expirado.",
+      const status = resultado.status || (resultado.erro === "JWT_NAO_CONFIGURADO" ? 503 : 401);
+      return res.status(status).json({
+        erro: status === 403 ? "Acesso à conta negado." : "Token inválido, expirado ou revogado.",
         codigo: resultado.erro
       });
     }
 
-    const usuario = resultado.usuario;
-
-    if (!usuario) {
-      return res.status(401).json({
-        erro: "Usuário não encontrado.",
-        codigo: "USUARIO_NAO_ENCONTRADO"
-      });
-    }
-
-    if (usuario.suspenso || usuario.status === "suspenso") {
-      return res.status(403).json({
-        erro: "Usuário suspenso.",
-        codigo: "USUARIO_SUSPENSO"
-      });
-    }
-
-    if (usuario.status === "bloqueado") {
-      return res.status(403).json({
-        erro: "Usuário bloqueado.",
-        codigo: "USUARIO_BLOQUEADO"
-      });
-    }
-
-    await sincronizarExpiracaoPremium(usuario);
-
-    req.usuarioDoc = usuario;
-    req.usuario = montarUsuarioSeguro(usuario);
     return next();
   } catch (error) {
     console.error("Erro no middleware auth:", error);
@@ -357,25 +359,17 @@ async function authOpcional(req, res, next) {
     }
 
     const token = extrairToken(req);
-
     if (!token) {
       req.usuario = null;
       req.usuarioDoc = null;
       return next();
     }
 
-    const resultado = await localizarUsuarioPorToken(token);
-    const usuario = resultado.usuario;
-
-    if (!usuario) {
+    const resultado = await prepararUsuarioAutenticado(req, token);
+    if (resultado.erro) {
       req.usuario = null;
       req.usuarioDoc = null;
-      return next();
     }
-
-    await sincronizarExpiracaoPremium(usuario);
-    req.usuarioDoc = usuario;
-    req.usuario = montarUsuarioSeguro(usuario);
     return next();
   } catch (_) {
     req.usuario = null;
@@ -384,12 +378,26 @@ async function authOpcional(req, res, next) {
   }
 }
 
+async function authPagina(req, res, next) {
+  try {
+    if (!JWT_CONFIG.valido) return res.redirect(302, "/");
+    const token = extrairTokenPagina(req);
+    if (!token) return res.redirect(302, "/");
+    const resultado = await prepararUsuarioAutenticado(req, token);
+    if (resultado.erro) {
+      limparCookieSessao(res);
+      return res.redirect(302, "/");
+    }
+    return next();
+  } catch (_) {
+    limparCookieSessao(res);
+    return res.redirect(302, "/");
+  }
+}
+
 function requirePremium(req, res, next) {
   if (!req.usuario) {
-    return res.status(401).json({
-      erro: "Usuário não autenticado.",
-      codigo: "USUARIO_NAO_AUTENTICADO"
-    });
+    return res.status(401).json({ erro: "Usuário não autenticado.", codigo: "USUARIO_NAO_AUTENTICADO" });
   }
 
   if (!req.usuario.acessoPremium) {
@@ -404,17 +412,21 @@ function requirePremium(req, res, next) {
   return next();
 }
 
+function requirePremiumPagina(req, res, next) {
+  if (!req.usuario?.acessoPremium) return res.redirect(302, "/dashboard-free#premium");
+  return next();
+}
+
 function gerarToken(usuario) {
   if (!JWT_CONFIG.valido || !SECRET) {
-    const error = new Error(
-      "JWT_SECRET precisa ser configurado com pelo menos 32 caracteres seguros no ambiente de produção."
-    );
+    const error = new Error("JWT_SECRET precisa ser configurado com pelo menos 32 caracteres seguros no ambiente de produção.");
     error.code = "JWT_NAO_CONFIGURADO";
     throw error;
   }
 
   const cargo = normalizarCargo(usuario);
   const id = obterId(usuario);
+  const jti = crypto.randomUUID();
 
   return jwt.sign(
     {
@@ -428,7 +440,7 @@ function gerarToken(usuario) {
       plano: usuario.plano || "free"
     },
     SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: "7d", algorithm: "HS256", jwtid: jti }
   );
 }
 
@@ -436,18 +448,21 @@ function statusJwtConfiguracao() {
   return {
     jwtConfigurado: Boolean(JWT_CONFIG.valido && SECRET),
     producao: Boolean(JWT_CONFIG.producao),
-    comprimentoMinimoAtendido: JWT_CONFIG.producao
-      ? Number(JWT_CONFIG.tamanho || 0) >= 32
-      : true
+    comprimentoMinimoAtendido: JWT_CONFIG.producao ? Number(JWT_CONFIG.tamanho || 0) >= 32 : true
   };
 }
 
 module.exports = {
   auth,
   authOpcional,
+  authPagina,
   requirePremium,
+  requirePremiumPagina,
   gerarToken,
   extrairToken,
+  extrairTokenPagina,
+  definirCookieSessao,
+  limparCookieSessao,
   normalizarCargo,
   montarUsuarioSeguro,
   estadoAcessoPremium,
