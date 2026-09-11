@@ -1,138 +1,31 @@
-<!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#02050a" />
-  <meta name="robots" content="noindex,nofollow" />
-  <title>Dashboard | Turma do Primo</title>
-  <script>if(location.pathname.toLowerCase()==='/dashboard.html')location.replace('/dashboard'+location.search+location.hash);</script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="/assets/turma-primo-logo.svg" />
-  <link rel="stylesheet" href="/theme-global-v2.css?v=20260812-shell-v23" />
-  <link rel="stylesheet" href="/student-shell-v23.css?v=20260812-shell-v23" />
-  <script defer src="/dashboard-premium-safe.js?v=20260812-dashboard-v23"></script>
-</head>
-<body class="student-dashboard dashboard-reference" data-required-access="dashboard">
-  <div class="dash-loading" id="dashLoading"><div><img src="/assets/turma-primo-logo.svg" alt="" /><strong>Preparando sua experiência</strong><small>Carregando seu painel…</small></div></div>
-  <div class="dash-mobile-overlay" id="dashMobileOverlay" hidden></div>
-
-  <aside class="dash-sidebar" id="dashSidebar">
-    <a class="dash-brand" href="/dashboard"><img src="/assets/turma-primo-logo.svg" alt="Turma do Primo" /><span><small>TURMA DO</small><strong>PRIMO</strong></span></a>
-    <nav class="dash-nav" aria-label="Navegação principal">
-      <a class="dash-nav-item active" href="/dashboard"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><b>Dashboard</b></a>
-      <a class="dash-nav-item" href="/notas"><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg><b>Anotações</b></a>
-      <a class="dash-nav-item" href="/minigames"><svg><use href="/assets/dashboard-icons.svg#i-game"></use></svg><b>Minigames</b></a>
-      <a class="dash-nav-item" href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><b>Estudo</b></a>
-      <a class="dash-nav-item" href="/modulos"><svg><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><b>Módulos</b></a>
-      <a class="dash-nav-item" href="/gestao"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Gestão</b></a>
-      <a class="dash-nav-item" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><b>Suporte</b></a>
-      <a class="dash-nav-item" href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><b>Perfil</b></a>
-      <a class="dash-nav-item" href="/roleta"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><b>Roleta</b></a>
-      <a class="dash-nav-item" href="/provas"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><b>Provas</b></a>
-      <a class="dash-nav-item" href="/favoritos"><svg><use href="/assets/dashboard-icons.svg#i-star"></use></svg><b>Favoritos</b></a>
-    </nav>
-    <div class="tp14-sidebar-spacer"></div>
-    <div class="dash-profile-card">
-      <a href="/perfil" class="dash-profile-link"><span class="dash-avatar" data-user-avatar>P</span><span><strong data-user-name>Dev</strong><small>Nível 42 <b>PRO</b></small></span></a>
-      <div class="dash-profile-level"><i></i></div>
-    </div>
-    <button class="dash-logout" type="button" data-logout><svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg><span>Sair da conta</span></button>
-  </aside>
-
-  <main class="dash-main">
-    <header class="dash-topbar">
-      <button class="dash-menu-toggle" id="dashMenuToggle" type="button" aria-label="Abrir menu"><svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg></button>
-      <button class="dash-search-trigger" id="dashSearchTrigger" type="button"><svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg><em>Buscar módulos, anotações e estratégias…</em><kbd>Ctrl K</kbd></button>
-      <div class="dash-top-actions">
-        <button class="dash-theme-toggle" data-global-theme type="button" aria-label="Alternar tema"><svg><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button>
-        <button class="dash-notification-btn" id="notificationButton" type="button" aria-label="Abrir notificações"><svg><use href="/assets/dashboard-icons.svg#i-bell"></use></svg><b id="notificationBadge">3</b></button>
-        <a class="dash-user-menu" href="/perfil"><span class="dash-avatar" data-user-avatar>P</span><span><strong data-user-name>Dev</strong><small>PRO</small></span></a>
-      </div>
-    </header>
-
-    <aside class="dash-notification-panel" id="notificationPanel" hidden><div class="dash-notification-head"><h3>Notificações</h3><button id="markNotificationsRead" type="button">Marcar como lidas</button></div><div class="dash-notification-list" id="notificationList"></div></aside>
-
-    <div class="dash-content dash-reference-content">
-      <section class="dash-hero reference-hero">
-        <div class="dash-hero-copy">
-          <span class="dash-eyebrow">♛ &nbsp; BEM-VINDO DE VOLTA, <b data-user-name>DEV</b></span>
-          <h1>Estude. Jogue. <strong>Evolua e conquiste.</strong></h1>
-          <p>Aqui você transforma conhecimento em resultado. Foco, disciplina e estratégia te levam ao próximo nível.</p>
-          <div class="dash-hero-actions"><button class="dash-primary-btn" type="button" data-nav="estudo">Continuar estudando <span>→</span></button><button class="dash-secondary-btn" type="button" data-nav="modulos"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg> Ver meus módulos</button></div>
-        </div>
-        <img class="dash-reference-character" src="/assets/imperial-v14/dashboard-art.svg" alt="Personagem da Turma do Primo" />
-        <div class="dash-reference-crest" aria-hidden="true"><img src="/assets/turma-primo-logo.svg" alt="" /></div>
-      </section>
-
-      <section class="dash-stat-grid reference-stats" aria-label="Resumo da evolução">
-        <article><span class="dash-stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg></span><div><small>Média geral</small><strong id="statAverage">0,0</strong><em><b>↑ 0,7</b> desde a semana passada</em></div></article>
-        <article><span class="dash-stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg></span><div><small>Módulos concluídos</small><strong id="statModules">1 / 8</strong><em><b>66%</b> do caminho percorrido</em></div></article>
-        <article><span class="dash-stat-icon dash-progress-icon"><i id="statProgressRing"></i></span><div><small>Progresso geral</small><strong id="statProgress">25%</strong><em>Faltam módulos para 100%</em></div></article>
-        <article><span class="dash-stat-icon dash-focus-icon">🔥</span><div><small>Dias de foco</small><strong id="statFocus">3</strong><em id="focusLabel">Sequência atual 🔥</em></div></article>
-      </section>
-
-      <section class="dash-reference-grid">
-        <article class="dash-panel reference-card reference-actions">
-          <div class="reference-card-title"><h2>⚡ Acesso rápido</h2></div>
-          <div class="reference-action-list">
-            <a href="/notas"><span><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg></span><div><b>Nova anotação</b><small>Capture ideias e estratégias</small></div><i>›</i></a>
-            <a href="/estudo"><span><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg></span><div><b>Continuar estudando</b><small>Retome de onde parou</small></div><i>›</i></a>
-            <a href="/roleta"><span><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg></span><div><b>Entrar na Roleta</b><small>Acesse suas ferramentas</small></div><i>›</i></a>
-            <a href="/provas"><span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg></span><div><b>Resolver provas</b><small>Pratique e evolua sempre</small></div><i>›</i></a>
-          </div>
-        </article>
-
-        <article class="dash-panel reference-card reference-chart-card">
-          <div class="reference-card-title"><h2>Evolução da jornada</h2><button type="button">Últimos 7 dias⌄</button></div>
-          <div class="reference-mini-stats"><div><small>Desempenho médio</small><strong>7,8</strong></div><div><small>Anotações criadas</small><strong>18</strong></div><div><small>Horas de estudo</small><strong>26h 40m</strong></div></div>
-          <div class="reference-chart" role="img" aria-label="Gráfico de evolução semanal"><svg viewBox="0 0 760 260" preserveAspectRatio="none"><defs><linearGradient id="refLine" x1="0" x2="1"><stop stop-color="#8f34f0"/><stop offset="1" stop-color="#d06fff"/></linearGradient><linearGradient id="refArea" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#7f29da" stop-opacity=".48"/><stop offset="1" stop-color="#7f29da" stop-opacity="0"/></linearGradient></defs><g class="reference-grid-lines"><line x1="0" y1="48" x2="760" y2="48"/><line x1="0" y1="110" x2="760" y2="110"/><line x1="0" y1="172" x2="760" y2="172"/><line x1="0" y1="232" x2="760" y2="232"/></g><path class="reference-chart-area" d="M0 220 L90 160 L180 178 L270 126 L360 145 L450 112 L540 118 L630 72 L760 126 L760 260 L0 260Z"/><path class="reference-chart-line" d="M0 220 L90 160 L180 178 L270 126 L360 145 L450 112 L540 118 L630 72 L760 126"/></svg></div>
-          <p class="reference-positive">↑ 15% <span>de evolução em relação à semana anterior</span></p>
-        </article>
-
-        <article class="dash-panel reference-card reference-progress-card">
-          <div class="reference-card-title"><h2>Progresso nos módulos</h2><a href="/estudo">Ver todos</a></div>
-          <div class="reference-progress-list" id="tpV10ModuleProgress"></div>
-        </article>
-
-        <article class="dash-panel reference-card reference-premium-card">
-          <div class="reference-card-title"><h2>♛ Atalhos Premium</h2></div>
-          <div class="reference-premium-list">
-            <a href="/gestao"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><div><b>Minha evolução</b><small>Acompanhe seus gráficos</small></div><i>›</i></a>
-            <a href="/provas"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><div><b>Ranking premium</b><small>Veja sua posição geral</small></div><i>›</i></a>
-            <a href="/minigames"><svg><use href="/assets/dashboard-icons.svg#i-game"></use></svg><div><b>Missões diárias</b><small>Complete e ganhe bônus</small></div><i>›</i></a>
-            <a href="/favoritos"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg><div><b>Clube de elite</b><small>Conteúdos e benefícios</small></div><i>›</i></a>
-          </div>
-          <a class="reference-pro-banner" href="/perfil">♛ Seja PRO e desbloqueie todos os recursos! <span>›</span></a>
-        </article>
-      </section>
-
-      <section class="dash-modules-shelf">
-        <header><div><h2><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg> Seus módulos</h2><small>8 módulos</small></div><a href="/estudo">Ver todos os módulos →</a></header>
-        <div class="dash-modules-track">
-          <a href="/estudo-gemeos" class="dash-module-tile"><img src="/assets/imperial-v14/modules/gemeos.svg" alt="Gêmeos" /><span><b>Gêmeos</b><small>75%</small><i style="--p:75%"></i></span></a>
-          <a href="/estudo-espelhos" class="dash-module-tile"><img src="/assets/imperial-v14/modules/espelhos.svg" alt="Espelhos" /><span><b>Espelhos</b><small>60%</small><i style="--p:60%"></i></span></a>
-          <a href="/estudo-fibonacci" class="dash-module-tile"><img src="/assets/imperial-v14/modules/fibonacci.svg" alt="Fibonacci" /><span><b>Fibonacci</b><small>80%</small><i style="--p:80%"></i></span></a>
-          <a href="/estudo-magneto" class="dash-module-tile"><img src="/assets/imperial-v14/modules/magneto.svg" alt="Magneto" /><span><b>Magneto</b><small>65%</small><i style="--p:65%"></i></span></a>
-          <a href="/estudo-camaleoes" class="dash-module-tile"><img src="/assets/imperial-v14/modules/camaleoes.svg" alt="Camaleões" /><span><b>Camaleões</b><small>70%</small><i style="--p:70%"></i></span></a>
-          <a href="/estudo-pitagoras" class="dash-module-tile"><img src="/assets/imperial-v14/modules/pitagoras.svg" alt="Pitágoras" /><span><b>Pitágoras</b><small>55%</small><i style="--p:55%"></i></span></a>
-          <a href="/estudo-cavalos" class="dash-module-tile"><img src="/assets/imperial-v14/modules/cavalo.svg" alt="Cavalo" /><span><b>Cavalo</b><small>65%</small><i style="--p:65%"></i></span></a>
-          <a href="/estudo-eclipse-zero" class="dash-module-tile"><img src="/assets/imperial-v14/modules/eclipse-zero.svg" alt="Eclipse Zero" /><span><b>Eclipse Zero</b><small>30%</small><i style="--p:30%"></i></span></a>
-        </div>
-      </section>
-
-      <div hidden><div id="dashboardModuleList"></div><div id="recentActivityList"></div><div id="progressRing"><span id="progressValue">0%</span></div><span id="legendDone">0/8</span><span id="legendStarted">0</span></div>
-    </div>
-  </main>
-
-  <nav class="dash-mobile-bottom" aria-label="Navegação mobile">
-    <a class="active" href="/dashboard"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><span>Início</span></a>
-    <a href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><span>Estudos</span></a>
-    <a href="/modulos"><svg><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><span>Módulos</span></a>
-    <a href="/gestao"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><span>Gestão</span></a>
-    <a href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg><span>Perfil</span></a>
-  </nav>
-</body>
-</html>
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#09090e"><meta name="robots" content="noindex,nofollow">
+<title>Meu espaço | Turma do Primo</title>
+<link rel="icon" href="/assets/turma-primo-logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="/dashboard-premium-appearance.js"></script><link rel="stylesheet" href="/dashboard-premium-workspace.css"><link rel="stylesheet" href="/dashboard-premium-themes.css"><link rel="stylesheet" href="/dashboard-premium-polish.css"><script defer src="/dashboard-premium-workspace.js"></script><script defer src="/dashboard-notifications-live.js"></script>
+</head><body>
+<button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar"><svg><use href="/assets/dashboard-icons.svg#i-menu"></use></svg></button>
+<button class="menu-backdrop" id="menuBackdrop" tabindex="-1" aria-label="Fechar menu" hidden></button><aside class="sidebar" id="sidebar">
+<a class="brand" href="/dashboard"><img src="/assets/turma-primo-logo.svg" alt=""><span>TURMA DO<strong>PRIMO<span class="brand-dot">.</span></strong></span></a>
+<div class="workspace-label"><span class="workspace-icon">P</span><div>Plataforma de estudos<small>Área do aluno</small></div></div>
+<button class="sidebar-collapse" id="sidebarCollapse" aria-label="Recolher menu lateral" aria-expanded="true">«</button><p class="nav-label">APRENDIZADO</p><nav aria-label="Principal" id="mainNav"></nav>
+<div class="sidebar-bottom"><a href="/suporte" class="help-link"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><div>Conte com a gente<span>Central de suporte</span></div><b>↗</b></a><button id="logout" class="logout"><svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg>Sair da conta</button><small class="sidebar-signature">TURMA BLACK · MEMBER EXPERIENCE</small></div>
+</aside>
+<div class="page">
+<header class="topbar"><div class="breadcrumb"><span>Plataforma</span><span>›</span><strong>Meu espaço</strong></div><button id="globalSearch" class="global-search"><svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg><span>O que você quer estudar?</span><kbd>Ctrl K</kbd></button><div class="topbar-actions"><button class="theme-toggle" id="themeToggle" aria-label="Ativar tema claro" aria-pressed="false"><span aria-hidden="true">☀</span><span class="theme-label">Tema claro</span></button><button class="notification-toggle" id="notificationButton" aria-label="Abrir notificações" aria-expanded="false" aria-controls="notificationPanel"><svg><use href="/assets/dashboard-icons.svg#i-bell"></use></svg><span id="notificationBadge" hidden></span></button><a href="/perfil" class="account"><span class="avatar" id="avatar">P</span><span><strong id="accountName">Minha conta</strong><small>Membro Premium</small></span><span>↗</span></a></div></header>
+<aside class="notification-panel" id="notificationPanel" hidden aria-label="Notificações"><div class="notification-heading"><h2>Notificações</h2><button id="markNotificationsRead">Marcar como lidas</button></div><div id="notificationList"><p class="empty">Carregando avisos…</p></div></aside>
+<main>
+<div class="heading"><div><span class="eyebrow">SEU ESPAÇO DE EVOLUÇÃO</span><h1>Bem-vindo de volta, <span id="firstName">Primo</span><span class="greeting-dot">.</span></h1></div><span class="date-label" id="today">SUA JORNADA CONTINUA</span></div>
+<div class="feature-grid">
+<section class="hero"><div class="hero-copy"><span class="hero-badge"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg> A EXPERIÊNCIA TURMA DO PRIMO</span><h2>Estude com método.<br><em>Pratique com clareza.</em></h2><p>Um espaço para aprofundar sua leitura,<br> explorar estratégias e construir conhecimento.</p><div class="hero-actions"><a class="primary" href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg>Explorar meus estudos <span>↗</span></a><a class="hero-secondary" href="/modulos">Conhecer os módulos</a></div><div class="hero-foot"><span><b>08</b> módulos de estudo</span><i></i><span>Seu ritmo. Sua jornada.</span></div></div><img class="hero-art hero-member-portrait" id="heroArtwork" src="/assets/primo-cartoon-login.webp" alt="Primo, da Turma do Primo" fetchpriority="high"><span class="hero-edition" aria-hidden="true">BLACK EDITION <i></i> SEU PRÓXIMO NÍVEL</span></section>
+<aside class="resume-card"><div class="card-overline"><span>SEU PRÓXIMO PASSO</span><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg></div><div class="resume-art"><img id="resumeImage" src="/assets/modules-v4/gemeos-dark.webp" alt=""><span class="resume-play"><svg><use href="/assets/dashboard-icons.svg#i-chevron"></use></svg></span></div><div class="resume-body"><small id="resumeLabel">COMECE A EXPLORAR</small><h2 id="resumeTitle">Módulo Gêmeos</h2><p id="resumeDescription">Famílias e conexões. Um ponto de partida para seus estudos.</p><a id="resumeLink" href="/estudo-gemeos">Abrir módulo <span>→</span></a></div></aside>
+</div>
+<div id="loadStatus" class="status" role="status">Carregando seus dados…</div><button id="retry" class="retry" hidden>Tentar novamente</button>
+<section class="stats" aria-label="Seu resumo"><article><span class="stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg></span><div><span>Anotações</span><strong id="notesStat">—</strong></div><small>Ideias salvas</small></article><article><span class="stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg></span><div><span>Média nas provas</span><strong id="averageStat">—</strong></div><small id="examLabel">Sem resultados</small></article><article><span class="stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg></span><div><span>Dias com atividade</span><strong id="focusStat">—</strong></div><small>Últimos 30 dias</small></article><article class="plan-stat"><span class="stat-icon"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg></span><div><span>Seu plano</span><strong id="planStat">—</strong></div><small id="planLabel">Consultando acesso</small></article></section>
+<section class="library-section" id="librarySection"><div class="section-heading"><div><span class="eyebrow">CONHECIMENTO QUE SE CONSTRÓI</span><h2>Sua biblioteca de estratégias <span class="count">8 módulos</span></h2><p>Escolha um tema. Aprofunde seu conhecimento.</p></div><a href="/modulos" class="section-link">Explorar biblioteca <span>↗</span></a></div><div class="library-toolbar"><div class="filter-tabs" role="group" aria-label="Filtrar módulos"><button class="selected" data-filter="all" aria-pressed="true">Todos os módulos <b>08</b></button><button data-filter="recent" aria-pressed="false">Acessados por aqui</button></div><label class="search"><svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg><input id="moduleSearch" type="search" placeholder="Buscar na biblioteca" aria-label="Buscar módulos"></label></div><div id="moduleGrid" class="module-grid"></div><p id="emptySearch" class="empty" hidden>Nenhum módulo encontrado. Tente outro nome.</p></section>
+<section class="tools-section"><div class="section-heading"><div><span class="eyebrow">CONHECIMENTO EM MOVIMENTO</span><h2>Da teoria à prática.</h2></div><span class="muted">Tudo que você precisa, conectado.</span></div><div class="tool-grid"><a class="tool-card" href="/provas"><div class="tool-icon"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg></div><div><small>TESTE SEUS CONHECIMENTOS</small><h3>Desafie sua leitura</h3><p>Resolva provas e consulte seus resultados.</p></div><span>↗</span></a><a class="tool-card" href="/gestao"><div class="tool-icon"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg></div><div><small>ORGANIZAÇÃO E DISCIPLINA</small><h3>Gestão da banca</h3><p>Registre e acompanhe suas operações.</p></div><span>↗</span></a><a class="tool-card" href="/notas"><div class="tool-icon"><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg></div><div><small>SEU REPERTÓRIO PESSOAL</small><h3>Guarde suas ideias</h3><p>Conecte anotações, leituras e estratégias.</p></div><span>↗</span></a></div></section>
+<section class="focus-section" aria-labelledby="focusHeading"><div class="focus-intro"><span class="eyebrow">UM MOMENTO PARA VOCÊ</span><h2 id="focusHeading">Menos distração.<br>Mais presença.</h2><p>Reserve um tempo para estudar no seu ritmo.</p></div><div class="focus-controls"><label for="focusDuration">Duração da sessão<select id="focusDuration"><option value="15">15 minutos</option><option value="25" selected>25 minutos</option><option value="45">45 minutos</option></select></label><div class="timer-display" id="focusTimer" role="timer" aria-label="Tempo restante">25:00</div><progress id="focusProgress" class="timer-progress" value="0" max="1500" aria-label="Progresso da sessão de foco"></progress><div class="timer-actions"><button id="focusStart" class="primary">Iniciar foco</button><button id="focusReset" class="quiet-button">Reiniciar</button></div><p id="focusStatus" role="status">O temporizador funciona enquanto esta página estiver aberta.</p></div></section><section class="activity-section"><div class="section-heading"><div><span class="eyebrow">CADA PASSO CONTA</span><h2>Sua jornada, em movimento.</h2></div><span class="muted">Atividade recente</span></div><div id="activityList" class="activity-list"><p class="empty">Carregando atividades…</p></div></section>
+<footer><a class="footer-brand" href="/dashboard"><img src="/assets/turma-primo-logo.svg" alt="">TURMA DO PRIMO</a><p>Aprendizado. Prática. Disciplina.</p><a href="/suporte">Precisa de ajuda? ↗</a></footer>
+</main></div><nav class="mobile-dock" aria-label="Atalhos do celular"><a href="/dashboard" aria-current="page"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg>Início</a><a href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg>Estudar</a><a href="/notas"><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg>Notas</a><a href="/perfil"><svg><use href="/assets/dashboard-icons.svg#i-user"></use></svg>Perfil</a></nav></body></html>

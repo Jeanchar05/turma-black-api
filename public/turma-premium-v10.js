@@ -5,7 +5,7 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const route = (location.pathname.replace(/\/$/, "") || "/").toLowerCase();
+  const route = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").toLowerCase();
   const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
   const nav = [

@@ -47,7 +47,7 @@
   }
 
   function fixInternalHero() {
-    const path = normalize(location.pathname);
+    const path = normalize((window.TurmaNavigation?.pathname ?? location.pathname));
     const item = modules.find(module => module.names.some(name => path.includes(normalize(name))));
     if (!item) return;
     const hero = $(".strategy-hero,.strategy-head,.module-hero");

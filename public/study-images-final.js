@@ -2,7 +2,7 @@
 (() => {
   if (window.__TURMA_STUDY_IMAGES_STABLE_V25__) return;
   window.__TURMA_STUDY_IMAGES_STABLE_V25__ = true;
-  const path=location.pathname.replace(/\/$/,"")||"/";
+  const path=(window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/,"")||"/";
   if(path==="/estudo"||path==="/estudo.html") return;
   const modules={
     gemeos:{routes:["/estudo-gemeos","/estudo-gemeos.html"],name:"Gêmeos",internal:"/assets/study/gemeos-hero-v2.svg"},

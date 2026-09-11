@@ -2,7 +2,7 @@
 (() => {
   if (window.__TURMA_STUDY_RACE_INJECTOR__) return;
   window.__TURMA_STUDY_RACE_INJECTOR__ = true;
-  const path=(location.pathname.replace(/\/$/,"")||"/").toLowerCase();
+  const path=((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/,"")||"/").toLowerCase();
   if(!path.startsWith("/estudo-")||path==="/estudo.html")return;
   function inject(){
     if(document.querySelector(".tp-study-race-card"))return;

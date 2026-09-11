@@ -1,0 +1,95 @@
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert/strict');
+const repo = path.resolve(__dirname, '..');
+const outputDir = process.env.WORKSPACE_PREVIEW_DIR || path.join(require('os').tmpdir(), 'turma-workspace-v3-previews');
+fs.mkdirSync(outputDir, {recursive:true});
+const express = require(path.join(repo, 'node_modules/express'));
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const { siteNavigation, canonicalPage } = require(path.join(repo, 'middleware/site-navigation'));
+const { securityHeaders } = require(path.join(repo, 'middleware/security-headers'));
+const publicDir = path.join(repo, 'public');
+const app = express();
+let fail = false;
+const user = { nome:'Primo', acessoPremium:true, cargo:'aluno', plano:'black30', id:'test-fixture-user' };
+app.use(securityHeaders);
+app.use(siteNavigation);
+app.get('/me', (req,res) => res.json({ usuario:user }));
+app.get('/dashboard-premium/home', (req,res) => fail ? res.status(503).json({ erro:'Fixture unavailable' }) : res.json({ usuario:user, estatisticas:{ totalNotas:0,totalAvaliacoes:0,diasFoco:0 }, plano:{nome:'Mensal',validadeTexto:'Acesso ativo'},atividades:[] }));
+app.post('/logout',(req,res)=>res.json({sucesso:true}));
+app.use((req,res,next)=>{
+  const page=canonicalPage(req.path);
+  if(page===null) return next();
+  const filename=page==='/'?'index.html':page==='/painel-admin'?'admin.html':`${page.slice(1)}.html`;
+  const filepath=path.join(publicDir,filename);
+  if(!fs.existsSync(filepath))return next();
+  let html=fs.readFileSync(filepath,'utf8').replace(/<head>/i,'<head><script src="/page-navigation.js"></script><link rel="stylesheet" href="/content-protection.css"><script defer src="/content-protection.js"></script>');
+  if(page==='/dashboard') html=html.replace('<body>','<body data-protected-content>');
+  res.type('html').send(html);
+});
+app.use(express.static(publicDir));
+app.use((req,res)=>res.status(404).json({erro:'Fixture route unavailable'}));
+(async()=>{
+ const server=await new Promise(resolve=>{const s=app.listen(0,'127.0.0.1',()=>resolve(s))});let browser;
+ try {
+ browser=await chromium.launch({channel:'chrome',headless:true});
+ let page=await browser.newPage({viewport:{width:1440,height:1050}}), errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ const base='http://127.0.0.1:'+server.address().port;
+ await page.goto(base+'/dashboard');await page.locator('#planStat').filter({hasText:'Mensal'}).waitFor();
+ assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
+ await page.locator('#themeToggle').click();
+ assert.equal(await page.locator('html').getAttribute('data-theme'),'light');
+ await page.locator('#moduleGrid').scrollIntoViewIfNeeded();
+ await page.waitForFunction(()=>[...document.querySelectorAll('.module-cover img')].every(img=>img.complete&&img.naturalWidth>0));
+ assert.equal(await page.locator('#heroArtwork').getAttribute('src'),'/assets/primo-portrait-light-v5.webp');
+ assert.ok((await page.locator('.module-cover img').first().getAttribute('src')).includes('-light.webp'));
+ await page.reload();await page.locator('#planStat').filter({hasText:'Mensal'}).waitFor();
+ assert.equal(await page.locator('html').getAttribute('data-theme'),'light');
+ await page.locator('#sidebarCollapse').click();
+ await page.waitForFunction(()=>Math.round(document.getElementById("sidebar").getBoundingClientRect().width)===86);
+ await page.reload();await page.locator('#planStat').filter({hasText:'Mensal'}).waitFor();
+ assert.equal(await page.locator('#sidebarCollapse').getAttribute('aria-expanded'),'false');
+ await page.locator('#sidebarCollapse').click();
+ await page.locator('#focusDuration').selectOption('15');
+ assert.equal(await page.locator('#focusTimer').textContent(),'15:00');
+ await page.clock.install(); await page.clock.pauseAt(new Date());
+ await page.locator('#focusStart').click();await page.clock.fastForward('00:05');
+ assert.equal(await page.locator('#focusProgress').evaluate(el=>el.value),5);
+ assert.equal(await page.locator('#focusTimer').textContent(),'14:55');
+ await page.locator('#focusStart').click();await page.clock.fastForward('00:05');
+ assert.equal(await page.locator('#focusProgress').evaluate(el=>el.value),5);
+ assert.equal(await page.locator('#focusTimer').textContent(),'14:55');
+ await page.locator('#focusStart').click();await page.clock.fastForward('15:00');
+ assert.equal(await page.locator('#focusTimer').textContent(),'00:00');
+ assert.match(await page.locator('#focusStatus').textContent(),/concluída/);
+ await page.locator('#focusReset').click();assert.equal(await page.locator('#focusTimer').textContent(),'15:00');
+ assert.equal(await page.locator('#focusProgress').evaluate(el=>el.value),0);
+ await page.locator('#focusDuration').selectOption('25');
+ await page.clock.resume(); console.log("Timer checks passed"); for(const width of [360,390,768,1024,1440]){
+ await page.setViewportSize({width,height:900});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Overflow ${width}`);
+ }
+ await page.setViewportSize({width:390,height:844});await page.locator('#menuToggle').click();
+ assert.equal(await page.locator('#menuBackdrop').isVisible(),true);
+ await page.keyboard.press('Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'menuToggle');
+ await page.keyboard.press('Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'logout');
+ await page.keyboard.press('Escape');assert.equal(await page.locator('#menuBackdrop').isVisible(),false);
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'menuToggle');
+ console.log("Responsive and menu checks passed"); await page.close(); page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"}); page.on("pageerror",e=>errors.push(e.message)); await page.goto(base+"/dashboard");
+ await page.reload();await page.locator('#planStat').filter({hasText:'Mensal'}).waitFor();
+ assert.equal(await page.locator('.reveal').count(),0);
+ for(const theme of ['light','dark']){
+ if(await page.locator('html').getAttribute('data-theme')!==theme)await page.locator('#themeToggle').click();
+ assert.equal(await page.locator('#heroArtwork').getAttribute('src'),theme==='light'?'/assets/primo-portrait-light-v5.webp':'/assets/primo-cartoon-login.webp');
+ await page.setViewportSize({width:1440,height:1050});
+ await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].map(img=>{img.loading='eager';return img.decode().catch(()=>{})}));window.scrollTo(0,0)});
+ await page.screenshot({path:path.join(outputDir,`dashboard-${theme}-previa.png`)});
+ await page.screenshot({path:path.join(outputDir,`dashboard-${theme}-desktop.png`),fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:path.join(outputDir,`dashboard-${theme}-mobile-previa.png`)}); await page.screenshot({path:path.join(outputDir,`dashboard-${theme}-mobile.png`),fullPage:true});
+ }
+ assert.deepEqual(errors,[]);
+ console.log('V3 OK: theme persistence + art loading, compact sidebar persistence, timer countdown/pause/completion/reset, 5 viewport widths, mobile focus trap, reduced motion. Previews saved.');
+ }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
+})().catch(e=>{console.error(e);process.exitCode=1});

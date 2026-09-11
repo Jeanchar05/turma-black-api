@@ -5,7 +5,7 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const route = (location.pathname.replace(/\/$/, "") || "/").toLowerCase();
+  const route = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").toLowerCase();
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
   const STUDY_KEYS = [
     ["study_espelhos_gemeos_v1", "gemeos"],

@@ -2,7 +2,7 @@
 (() => {
   if (window.__TURMA_STUDENT_SHELL_V23__) return;
   window.__TURMA_STUDENT_SHELL_V23__ = true;
-  const path=(location.pathname.replace(/\/$/,"")||"/").toLowerCase();
+  const path=((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/,"")||"/").toLowerCase();
   if (/^\/(admin|painel-vendas)(?:\/|$)/.test(path)) return;
   const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const icon=id=>`<svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#${id}"></use></svg>`;

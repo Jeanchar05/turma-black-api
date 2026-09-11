@@ -5,7 +5,7 @@
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const route = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
+  const route = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
   const nav = [
     ["/dashboard", "Início", "i-home"],
     ["/estudo", "Estudos", "i-book"],

@@ -97,14 +97,14 @@
     }, true);
 
     window.addEventListener("hashchange", () => {
-      setView(location.hash.replace("#", ""), false);
+      setView((window.TurmaNavigation?.hash ?? location.hash).replace("#", ""), false);
     });
   }
 
   function init() {
     installIcons();
     bindHardNavigation();
-    setView(location.hash.replace("#", ""), false);
+    setView((window.TurmaNavigation?.hash ?? location.hash).replace("#", ""), false);
     document.documentElement.classList.add("free-v12-ready");
   }
 

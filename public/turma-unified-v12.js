@@ -5,7 +5,7 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const path = (location.pathname.replace(/\/$/, "") || "/").toLowerCase();
+  const path = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").toLowerCase();
 
   const navItems = [
     ["/dashboard", "Dashboard", "i-home"],

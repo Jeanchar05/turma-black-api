@@ -2,7 +2,7 @@
 (() => {
   if (window.__MODULES_PAGE_V16_FIX__) return;
   window.__MODULES_PAGE_V16_FIX__ = true;
-  const path=(location.pathname.replace(/\/$/,"")||"/").replace(/\.html$/,"").toLowerCase();
+  const path=((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/,"")||"/").replace(/\.html$/,"").toLowerCase();
   if(path!=="/modulos")return;
   const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const covers={gemeos:"gemeos.svg",espelhos:"espelhos.svg",fibonacci:"fibonacci.svg",magneto:"magneto.svg",camaleoes:"camaleoes.svg",pitagoras:"pitagoras.svg",cavalos:"cavalo.svg",cavalo:"cavalo.svg","eclipse-zero":"eclipse-zero.svg"};

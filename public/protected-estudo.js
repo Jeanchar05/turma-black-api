@@ -14,7 +14,7 @@
     load("/platform-final.css?v=20260812-shell-v26","style","platformFinalCss");
     load("/navigation-final.js?v=20260812-shell-v26","script","navigationFinalJs");
     load("/student-shell-v23.js?v=20260812-shell-v26","script","studentShellJs");
-    const route=location.pathname.replace(/\/$/,"")||"/";
+    const route=(window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/,"")||"/";
     if(route==="/estudo"||route==="/estudo.html"||route.startsWith("/estudo-"))load("/study-images-final.js?v=20260812-study-v26","script","studyImagesFinalJs");
     if(route.startsWith("/estudo-")&&route!=="/estudo.html"){
       load("/study-module-shell-v25.css?v=20260812-study-v26","style","studyModuleShellV25");
