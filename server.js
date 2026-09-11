@@ -24,7 +24,7 @@ const publicDir = path.join(__dirname, "public");
 const premiumVaultDir = path.resolve(
   process.env.PREMIUM_VAULT_DIR || path.join(__dirname, ".premium-vault")
 );
-const CACHE_VERSION = "20260910-student-workspace-6";
+const CACHE_VERSION = "20260911-roleta-real-1";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;

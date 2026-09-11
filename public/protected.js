@@ -6,6 +6,7 @@
   let logoutInProgress = false;
 
   function installResponsiveLayer() {
+    if (document.body?.dataset.workspaceShell === "true") return;
     const addStyle = (src, marker) => {
       if (document.querySelector(`link[data-${marker}]`)) return;
       const link = document.createElement("link");

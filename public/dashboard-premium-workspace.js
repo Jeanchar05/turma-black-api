@@ -11,7 +11,7 @@
     ["Cavalos", "Movimentos e combinações", "cavalos", "i-game", "#d5b391"],
     ["Eclipse Zero", "Terminal zero e proteção", "eclipse-zero", "i-moon", "#a2b4db"]
   ];
-  const nav = [["Meu espaço","dashboard","i-home"],["Estudo","estudo","i-book"],["Módulos","modulos","i-layers"],["Anotações","notas","i-note"],["Minigames","minigames","i-game"],["Gestão","gestao","i-activity"],["Roleta","roleta","i-roulette"],["Provas","provas","i-exam"],["Favoritos","favoritos","i-star"],["Perfil","perfil","i-user"]];
+  const nav = window.TurmaWorkspaceNav;
   const icon = name => `<svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#${name}"></use></svg>`;
   $("mainNav").innerHTML = nav.map(([label, route, symbol]) => `<a href="/${route}" title="${label}" ${route === "dashboard" ? 'class="active" aria-current="page"' : ""}>${icon(symbol)}<span>${label}</span></a>`).join("");
   const artwork = ["gemeos", "espelhos", "fibonacci", "magneto", "camaleoes", "pitagoras", "cavalo", "eclipse-zero"];

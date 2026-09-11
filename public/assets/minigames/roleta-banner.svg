@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
-  <title id="title">Roleta Reel — minigame exclusivo da Turma do Primo</title>
+  <title id="title">Roleta Real — minigame exclusivo da Turma do Primo</title>
   <desc id="desc">Banner premium preto, roxo e dourado com roleta europeia.</desc>
   <defs>
     <radialGradient id="bg" cx="72%" cy="38%" r="82%"><stop stop-color="#371052"/><stop offset=".45" stop-color="#160621"/><stop offset="1" stop-color="#050208"/></radialGradient>
@@ -25,7 +25,7 @@
   <g transform="translate(118 292)" font-family="Arial">
     <text x="0" y="0" font-size="18" letter-spacing="7" fill="#f0c45a">ESTRATÉGIA · DISCIPLINA · LEITURA</text>
     <text x="0" y="116" font-family="Georgia" font-weight="700" font-size="154" letter-spacing="4" fill="url(#silver)" filter="url(#shadow)">ROLETA</text>
-    <text x="7" y="170" font-size="24" letter-spacing="9" fill="#f0c45a">REEL</text>
+    <text x="7" y="170" font-size="24" letter-spacing="9" fill="#f0c45a">REAL</text>
     <text x="7" y="222" font-size="21" fill="#c8bbce">Treine suas estratégias, interprete cada giro</text>
     <text x="7" y="254" font-size="21" fill="#c8bbce">e evolua com inteligência, controle e disciplina.</text>
   </g>
