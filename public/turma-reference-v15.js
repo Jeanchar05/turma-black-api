@@ -5,7 +5,7 @@
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const path = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
+  const path = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
   const isFree = path === "/dashboard-free" || document.body.classList.contains("free-dashboard-page");
   const premiumNav = [
     ["/dashboard", "Início", "i-home"],

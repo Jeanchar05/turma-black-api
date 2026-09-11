@@ -1,0 +1,3 @@
+[data-protected-content]{-webkit-user-select:none;user-select:none}
+[data-protected-content] input,[data-protected-content] textarea,[data-protected-content] [contenteditable],[data-allow-copy]{-webkit-user-select:text;user-select:text}
+@media print{body:has([data-protected-content])>*{display:none!important}body:has([data-protected-content])::after{display:block;content:'Conteúdo reservado da Turma do Primo';color:#000;font:18px sans-serif}}

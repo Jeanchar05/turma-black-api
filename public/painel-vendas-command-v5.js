@@ -631,7 +631,7 @@
   }
 
   function openInitialHash() {
-    const hash = String(location.hash || "").replace(/^#/, "");
+    const hash = String((window.TurmaNavigation?.hash ?? location.hash) || "").replace(/^#/, "");
     if (!hash) return;
     const button = document.querySelector(`[data-view="${CSS.escape(hash)}"]`);
     if (button) setTimeout(() => button.click(), 120);

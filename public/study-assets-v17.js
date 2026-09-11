@@ -4,7 +4,7 @@
   window.__STUDY_ASSETS_V17__ = true;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const route = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
+  const route = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
   if (route !== "/estudo" && route !== "/modulos") return;
 
   const base = "/assets/imperial-v14/modules/";

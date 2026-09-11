@@ -3,6 +3,11 @@ Options -Indexes
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
+# Canonical public addresses; all authorization stays in Express.
+RewriteRule ^(index|admin|painel-admin|painel-vendas|dashboard(?:-free)?|estudo(?:-[a-z0-9-]+)?|modulos|minigames|gestao|notas|favoritos|provas|roleta(?:-reel)?|perfil|suporte|privacidade|termos|seguranca)\.html$ /$1 [R=308,L,NC]
+RewriteRule ^(admin|painel-admin|painel-vendas)/?$ /__staff/$1 [END,QSA,NC]
+RewriteRule ^(dashboard-premium-[a-z0-9-]+\.(js|css))$ /__premium/$1 [END,QSA,NC]
+
 # O cofre nunca pode ser servido diretamente caso o document root seja a raiz do app.
 RewriteRule ^\.premium-vault(?:/|$) - [R=404,L,NC]
 

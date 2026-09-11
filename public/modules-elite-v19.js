@@ -5,7 +5,7 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const path = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
+  const path = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
   const BASE = "/assets/elite-v19/modules/";
   const routes = {
     "/estudo-gemeos": ["gemeos.svg", "Gêmeos"],

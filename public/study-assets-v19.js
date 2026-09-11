@@ -99,7 +99,7 @@
   }
 
   function applyInternal() {
-    const path = normalize(location.pathname);
+    const path = normalize((window.TurmaNavigation?.pathname ?? location.pathname));
     const item = modules.find((module) => module.names.some((name) => path.includes(normalize(name)))) || (path.includes("triangulacao") ? modules.find((m) => m.key === "pitagoras") : null);
     if (!item) return;
     setImage($(".m16-hero-art"), item);

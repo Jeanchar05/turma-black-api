@@ -37,6 +37,9 @@ jobs:
       - name: Run Sales Command Center regression tests
         run: npm run sales:regression
 
+      - name: Run navigation and page access regression tests
+        run: npm run navigation:regression
+
       - name: Smoke test real server startup
         shell: bash
         env:

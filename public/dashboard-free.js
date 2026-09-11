@@ -232,13 +232,13 @@
       $("premiumResources")?.scrollIntoView({ behavior:"smooth", block:"start" });
     }));
 
-    window.addEventListener("hashchange", () => setView(location.hash.replace("#", ""), { skipHash:true, instant:true }));
+    window.addEventListener("hashchange", () => setView((window.TurmaNavigation?.hash ?? location.hash).replace("#", ""), { skipHash:true, instant:true }));
   }
 
   async function init() {
     renderLessons();
     bind();
-    setView(location.hash.replace("#", ""), { skipHash:true, instant:true });
+    setView((window.TurmaNavigation?.hash ?? location.hash).replace("#", ""), { skipHash:true, instant:true });
     applyLessonFilters();
     await Promise.allSettled([loadUser()]);
     $("freeLoading")?.remove();

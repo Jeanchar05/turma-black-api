@@ -11,6 +11,8 @@ const { authPagina, requirePremiumPagina } = require("./middleware/auth");
 const { corsOptions, securityHeaders } = require("./middleware/security-headers");
 const { premiumContentGuard, isPremiumPath } = require("./middleware/premium-content-guard");
 const { supportWriteRateLimit } = require("./middleware/rate-limit");
+const { siteNavigation } = require("./middleware/site-navigation");
+const { requirePermission } = require("./middleware/permissions");
 const {
   initializePremiumVault,
   resolvePremiumFile
@@ -22,7 +24,7 @@ const publicDir = path.join(__dirname, "public");
 const premiumVaultDir = path.resolve(
   process.env.PREMIUM_VAULT_DIR || path.join(__dirname, ".premium-vault")
 );
-const CACHE_VERSION = "20260909-sales-command-5.3.0";
+const CACHE_VERSION = "20260910-student-workspace-6";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -55,6 +57,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(siteNavigation);
 app.use(premiumContentGuard);
 app.use(servirPremiumDoCofre);
 
@@ -84,7 +87,11 @@ function aplicarVersaoNosAssets(html) {
 
 function aplicarCamadaResponsiva(html) {
   let resultado = String(html);
-  if (!resultado.includes("responsive-global.css")) {
+  if (!resultado.includes('src="/page-navigation.js"')) resultado = resultado.replace(/<head>/i, '<head><script src="/page-navigation.js"></script>');
+  if (!resultado.includes('src="/content-protection.js"')) {
+    resultado = resultado.replace("</head>", '<link rel="stylesheet" href="/content-protection.css"><script defer src="/content-protection.js"></script></head>');
+  }
+  if (!resultado.includes("responsive-global.css") && !resultado.includes("dashboard-premium-workspace.css")) {
     resultado = resultado.replace(
       "</head>",
       `  <link rel="stylesheet" href="/responsive-global.css" data-global-responsive />\n</head>`
@@ -147,6 +154,7 @@ function enviarArquivoPremium(req, res, next, requestPath) {
 
     if (/\.html$/i.test(filePath)) {
       let html = fs.readFileSync(filePath, "utf8");
+      html = html.replace(/<body\b/, '<body data-protected-content');
       html = aplicarCamadaResponsiva(html);
       html = aplicarVersaoNosAssets(html);
       res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -331,8 +339,14 @@ app.get("/limpar-cache-suporte", (req, res) => {
 app.get(["/", "/index", "/index.html"], servirPagina("index.html"));
 app.get(["/dashboard", "/dashboard.html"], servirPagina("dashboard.html"));
 app.get(["/dashboard-free", "/dashboard-free.html"], authPagina, servirPagina("dashboard-free.html"));
-app.get(["/admin", "/admin.html"], authPagina, servirPagina("admin.html"));
-app.get(["/painel-vendas", "/painel-vendas.html"], authPagina, servirPagina("painel-vendas.html"));
+app.get(["/admin", "/admin.html", "/painel-admin"], authPagina, requirePermission("painelAdmin"), servirPagina("admin.html"));
+app.get(["/painel-vendas", "/painel-vendas.html"], authPagina, requirePermission("painelVendas"), servirPagina("painel-vendas.html"));
+app.get("/__staff/:page", authPagina, (req, res, next) => {
+  const page = String(req.params.page || "").toLowerCase();
+  if (!["admin", "painel-admin", "painel-vendas"].includes(page)) return res.status(404).end();
+  const sales = page === "painel-vendas";
+  return requirePermission(sales ? "painelVendas" : "painelAdmin")(req, res, () => servirPagina(sales ? "painel-vendas.html" : "admin.html")(req, res, next));
+});
 app.get(["/notas", "/notas.html"], servirPagina("notas.html"));
 app.get(["/suporte", "/suporte.html"], authPagina, servirPagina("suporte.html"));
 app.get(["/minigames", "/minigames.html"], servirPagina("minigames.html"));
@@ -344,6 +358,9 @@ app.get(["/provas", "/provas.html"], servirPagina("provas.html"));
 app.get(["/favoritos", "/favoritos.html"], servirPagina("favoritos.html"));
 app.get(["/atividades", "/atividades.html"], servirPagina("dashboard.html"));
 app.get(["/notificacoes", "/notificacoes.html"], servirPagina("dashboard.html"));
+app.get("/privacidade", servirPagina("privacidade.html"));
+app.get("/termos", servirPagina("termos.html"));
+app.get("/seguranca", servirPagina("seguranca.html"));
 
 if (fs.existsSync(publicDir)) {
   app.use(

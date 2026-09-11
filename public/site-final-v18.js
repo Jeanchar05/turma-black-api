@@ -5,7 +5,7 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const route = (location.pathname.replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
+  const route = ((window.TurmaNavigation?.pathname ?? location.pathname).replace(/\/$/, "") || "/").replace(/\.html$/, "").toLowerCase();
   const THEME_KEY = "turma_global_theme_v2";
 
   const routeClass = {
