@@ -24,6 +24,9 @@ function pageContext(url, state = null, type = "navigate") {
 }
 
 async function main() {
+  assert.equal(canonicalPage("/roleta-real.html"), "/roleta-real");
+  assert.equal(require("../middleware/premium-content-guard").isPremiumPath("/roleta-real"), true);
+  assert.equal(require("../middleware/premium-content-guard").isPremiumPath("/roleta-real.html"), true);
   assert.equal(canonicalPage("/ADMIN%2ehtml"), "/admin");
   assert.equal(canonicalPage("/dashboard.html/"), "/dashboard");
   assert.equal(canonicalPage("/index.html"), "/");

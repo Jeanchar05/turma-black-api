@@ -14,6 +14,7 @@ const PREMIUM_PAGES = new Set([
   "/favoritos", "/favoritos.html",
   "/provas", "/provas.html",
   "/roleta", "/roleta.html",
+  "/roleta-real", "/roleta-real.html",
   "/roleta-reel", "/roleta-reel.html"
 ]);
 

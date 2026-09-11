@@ -11,7 +11,7 @@
   const LEGACY_KEYS = ["turma_roleta_reel_history_v3", "turma_roleta_reel_history_v2"];
   const CONTEXT_KEY = "turma_roleta_reel_context_v2";
   const THEME_KEY = "turma_global_theme_v2";
-  const duration = 3900;
+  const spinDuration = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? 150 : 3900;
 
   let history = loadHistory();
   let spinning = false;
@@ -78,6 +78,7 @@
     document.documentElement.style.colorScheme = theme;
     try {
       localStorage.setItem(THEME_KEY, theme);
+      localStorage.setItem("turma.workspace.theme", theme);
       localStorage.setItem("theme", theme);
     } catch (_) {}
     window.dispatchEvent(new CustomEvent("turma:theme-change", { detail: { theme } }));
@@ -118,7 +119,7 @@
     const ball = $("#reelBall"), wheelEl = $("#reelWheel");
     if (!ball || !wheelEl) return;
     const radius = wheelEl.clientWidth * 0.392;
-    ball.style.transition = transition ? `transform ${duration}ms cubic-bezier(.10,.78,.12,1)` : "none";
+    ball.style.transition = transition ? `transform ${spinDuration()}ms cubic-bezier(.10,.78,.12,1)` : "none";
     ball.style.transform = `rotate(${angle}deg) translateY(-${radius}px)`;
   }
 
@@ -146,7 +147,7 @@
     const terminal = x => Math.abs(Number(x)) % 10;
     const cavalos = [[1,4,7],[2,5,8],[3,6,9]];
     if (cavalos.some(g => centers.filter(c => g.includes(terminal(c))).length >= 2) || cavalos.some(g => g.includes(terminal(n)))) add("cavalo", "Cavalo", "/estudo-cavalos");
-    if (centers.some(c => [0,9].includes(terminal(c))) || [0,9].includes(terminal(n))) add("eclipse", "Eclipse Zero", "/estudo-eclipse-zero");
+    if (centers.some(c => [0,9].includes(terminal(c))) || (n !== null && [0,9].includes(terminal(n)))) add("eclipse", "Eclipse Zero", "/estudo-eclipse-zero");
     if (!out.length) add("race", "Leitura Race", "/estudo");
     return out.slice(0, 4);
   }
@@ -162,7 +163,9 @@
   function lockRace(locked) {
     const host = $("[data-race-tool]");
     if (!host) return;
+    host.inert = locked;
     host.style.pointerEvents = locked ? "none" : "";
+    if ($("#reelClear")) $("#reelClear").disabled = locked;
     host.style.opacity = locked ? ".72" : "";
     host.setAttribute("aria-busy", locked ? "true" : "false");
   }
@@ -191,7 +194,7 @@
     currentAngle += 360 * 8 + diff;
     $("#reelBall")?.classList.add("spinning");
     setBall(currentAngle, true);
-    setTimeout(() => finish(n, pendingSnapshot), duration + 130);
+    setTimeout(() => finish(n, pendingSnapshot), spinDuration() + 130);
   }
 
   function finish(n, snapshot) {
@@ -305,6 +308,9 @@
   }
 
   function clearHistory() {
+    if (spinning) return;
+    $(".reel-wheel-card")?.classList.remove("race-hit", "race-miss", "race-neutral");
+    if ($("#reelStatus")) { $("#reelStatus").textContent = "Pronta para girar"; $("#reelStatus").className = ""; }
     history = [];
     saveHistory();
     try { localStorage.removeItem(CONTEXT_KEY); } catch (_) {}
@@ -321,23 +327,15 @@
   }
 
   function bind() {
+    window.addEventListener("turma:theme-change", event => {
+      try { localStorage.setItem("turma.workspace.theme", event.detail.theme === "light" ? "light" : "dark"); } catch (_) {}
+    });
     $("#reelSpin")?.addEventListener("click", spin);
     $("#reelClear")?.addEventListener("click", clearHistory);
     $("#reelThemeToggle")?.addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light"));
-    $("#reelMenuToggle")?.addEventListener("click", () => {
-      $("#reelSidebar")?.classList.add("open");
-      if ($("#reelMobileOverlay")) $("#reelMobileOverlay").hidden = false;
-    });
-    $("#reelMobileOverlay")?.addEventListener("click", () => {
-      $("#reelSidebar")?.classList.remove("open");
-      $("#reelMobileOverlay").hidden = true;
-    });
     window.addEventListener("resize", () => setBall(currentAngle, false));
     window.addEventListener("turma:race-selection", updateConnection);
-    window.addEventListener("turma:race-ready", () => {
-      window.TurmaRace?.mountAll?.();
-      updateConnection();
-    });
+    window.addEventListener("turma:race-ready", updateConnection);
   }
 
   function release() {
@@ -349,7 +347,7 @@
 
   function init() {
     let theme = "dark";
-    try { theme = localStorage.getItem(THEME_KEY) || localStorage.getItem("theme") || "dark"; } catch (_) {}
+    try { theme = localStorage.getItem("turma.workspace.theme") || localStorage.getItem(THEME_KEY) || localStorage.getItem("theme") || "dark"; } catch (_) {}
     applyTheme(theme);
     createCells();
     renderHistory();
