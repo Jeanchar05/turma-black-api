@@ -1,0 +1,170 @@
+.floating-focus,
+.focus-bubble {
+  --focus-bg: #19151f;
+  --focus-text: #f5efff;
+  --focus-line: #3e324e;
+  --focus-accent: #d6b6ff;
+  --focus-muted: #b6a9c6;
+  box-sizing: border-box;
+  position: fixed;
+  z-index: 850;
+  color: var(--focus-text);
+  background: var(--focus-bg);
+  border: 1px solid var(--focus-line);
+  box-shadow: 0 16px 50px #0003;
+  font:
+    13px Inter,
+    system-ui,
+    sans-serif;
+}
+[data-theme="light"] .floating-focus,
+[data-theme="light"] .focus-bubble {
+  --focus-bg: #fff;
+  --focus-text: #2e213d;
+  --focus-line: #dfd4eb;
+  --focus-accent: #7146a4;
+  --focus-muted: #766387;
+  box-shadow: 0 12px 40px #44236624;
+}
+.floating-focus[hidden],
+.focus-bubble[hidden] {
+  display: none !important;
+}
+.floating-focus {
+  width: min(276px, calc(100vw - 16px));
+  border-radius: 18px;
+  padding: 12px 16px 14px;
+  overflow: hidden;
+}
+.floating-focus header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.floating-focus button {
+  font: inherit;
+  cursor: pointer;
+}
+.floating-focus-handle,
+.floating-focus-close {
+  color: var(--focus-muted);
+  border: 0;
+  background: transparent;
+  min-height: 36px;
+}
+.floating-focus-handle {
+  touch-action: none;
+  cursor: grab !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.floating-focus-handle:active {
+  cursor: grabbing !important;
+}
+.floating-focus-handle span {
+  font-size: 24px;
+  line-height: 1;
+}
+.floating-focus-close {
+  font-size: 24px !important;
+  padding: 0 4px;
+  min-width: 36px;
+}
+.floating-focus-clock {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 7px 0 13px;
+  gap: 8px;
+}
+.floating-focus-clock strong {
+  font:
+    600 34px Sora,
+    Inter,
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1.5px;
+}
+.floating-focus-clock span {
+  font-size: 10px;
+  color: var(--focus-muted);
+}
+.floating-focus progress {
+  width: 100%;
+  height: 4px;
+  display: block;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  accent-color: var(--focus-accent);
+  background: var(--focus-line);
+}
+.floating-focus progress::-webkit-progress-bar {
+  background: var(--focus-line);
+}
+.floating-focus progress::-webkit-progress-value {
+  background: var(--focus-accent);
+}
+.floating-focus-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+}
+.floating-focus-actions button {
+  border: 1px solid var(--focus-line);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--focus-text);
+  padding: 9px 14px;
+  min-height: 38px;
+}
+.floating-focus-actions a {
+  font-size: 10px;
+  color: var(--focus-muted);
+  text-decoration: none;
+}
+.floating-focus-actions button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.floating-focus p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--focus-muted);
+  margin: 12px 0 0;
+}
+.focus-bubble {
+  bottom: 90px;
+  right: 18px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-radius: 30px;
+  padding: 12px 17px;
+  cursor: pointer;
+  min-height: 46px;
+}
+.focus-bubble strong {
+  font-variant-numeric: tabular-nums;
+}
+.focus-bubble > span:last-child {
+  color: var(--focus-muted);
+  font-size: 11px;
+}
+.floating-focus :focus-visible,
+.focus-bubble:focus-visible {
+  outline: 2px solid var(--focus-accent);
+  outline-offset: 3px;
+}
+body.menu-open .floating-focus,
+body.menu-open .focus-bubble {
+  visibility: hidden;
+}

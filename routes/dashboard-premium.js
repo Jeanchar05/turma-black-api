@@ -5,6 +5,8 @@ const crypto = require("crypto");
 const database = require("../config/database");
 const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 
+const studyService = require("../services/study-state");
+const studyModel = require("../public/study-state-model");
 const router = express.Router();
 let estruturaGarantida = false;
 
@@ -165,10 +167,6 @@ async function getTheme(userId) {
   const rows = await database.query("SELECT tema FROM dashboard_preferencias WHERE usuario_id = ? LIMIT 1", [userId]);
   return rows[0]?.tema || "dark";
 }
-async function countDistinctFocusDays(userId) {
-  const rows = await database.query("SELECT DISTINCT DATE(created_at) AS dia FROM dashboard_atividades WHERE usuario_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) ORDER BY dia DESC", [userId]);
-  return rows.length;
-}
 async function getExamStats(userId) {
   if (!(await tableExists("provas_resultados"))) return { media: 0, total: 0 };
   const rows = await database.query("SELECT COALESCE(AVG(nota), 0) AS media, COUNT(*) AS total FROM provas_resultados WHERE usuario_id = ?", [userId]);
@@ -179,16 +177,15 @@ router.get("/home", auth, async (req, res) => {
   try {
     await ensureStructure();
     const userId = usuarioId(req);
-    const [theme, noteRows, favoriteRows, activityRows, focusDays, exams] = await Promise.all([
+    const [theme, noteRows, favoriteRows, activityRows, study, exams] = await Promise.all([
       getTheme(userId),
       database.query("SELECT COUNT(*) AS total FROM dashboard_notas WHERE usuario_id = ? AND excluida = 0", [userId]),
       database.query("SELECT * FROM dashboard_favoritos WHERE usuario_id = ? ORDER BY created_at DESC LIMIT 50", [userId]),
       database.query("SELECT * FROM dashboard_atividades WHERE usuario_id = ? ORDER BY created_at DESC LIMIT 30", [userId]),
-      countDistinctFocusDays(userId), getExamStats(userId)
+      studyService.update(userId), getExamStats(userId)
     ]);
-    const completedModules = Math.min(6, new Set(activityRows.filter((row) => row.tipo === "modulo").map((row) => row.titulo)).size);
-    const progress = Math.round((completedModules / 6) * 100);
-    return res.json({ sucesso: true, origem: "mysql", usuario: montarUsuarioSeguro(req.usuarioDoc || req.usuario), preferencias: { tema: theme }, plano: planInfo(req.usuarioDoc || req.usuario), estatisticas: { mediaGeral: Number((exams.media / 10).toFixed(1)), totalAvaliacoes: exams.total, modulosConcluidos: completedModules, totalModulos: 6, progressoGeral: progress, diasFoco: focusDays, totalNotas: Number(noteRows[0]?.total || 0), grafico: [12, 22, 28, 35, 42, 52, Math.max(12, progress)] }, favoritos: favoriteRows.map((row) => ({ id: row.id, type: row.tipo, key: row.chave, title: row.titulo, description: row.descricao, target: row.destino, icon: row.icone })), atividades: activityRows.map(formatActivity), notificacoes: [], notificacoesNaoLidas: 0 });
+    const studyStats = studyModel.summary(study.state);
+    return res.json({ sucesso: true, origem: "mysql", usuario: montarUsuarioSeguro(req.usuarioDoc || req.usuario), preferencias: { tema: theme }, plano: planInfo(req.usuarioDoc || req.usuario), estatisticas: { mediaGeral: Number((exams.media / 10).toFixed(1)), totalAvaliacoes: exams.total, ...studyStats, totalNotas: Number(noteRows[0]?.total || 0), grafico: [] }, favoritos: favoriteRows.map((row) => ({ id: row.id, type: row.tipo, key: row.chave, title: row.titulo, description: row.descricao, target: row.destino, icon: row.icone })), atividades: activityRows.map(formatActivity), notificacoes: [], notificacoesNaoLidas: 0 });
   } catch (error) {
     console.error("Erro no dashboard premium:", error);
     return res.status(500).json({ erro: "Erro interno ao carregar o dashboard." });

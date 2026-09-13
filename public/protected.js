@@ -66,14 +66,13 @@
     });
 
     try {
-      if (token) {
-        await fetch("/logout", {
-          method: "POST",
-          headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
-          cache: "no-store",
-          keepalive: true
-        });
-      }
+      await fetch("/logout", {
+        method: "POST",
+        headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        credentials: "same-origin",
+        cache: "no-store",
+        keepalive: true
+      });
     } catch (_) {
       // Mesmo quando a rede falha, o token local é removido. O servidor também
       // recusa tokens legados/sem JTI e valida revogação nas próximas requisições.
@@ -134,17 +133,13 @@
   async function validatePage() {
     cleanupLegacyBrowserState().catch(() => {});
     const token = getToken();
-    if (!token) {
-      window.location.replace("/");
-      return;
-    }
-
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
 
     try {
       const response = await fetch(`${window.location.origin}/me`, {
-        headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+        headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        credentials: "same-origin",
         cache: "no-store",
         signal: controller.signal
       });

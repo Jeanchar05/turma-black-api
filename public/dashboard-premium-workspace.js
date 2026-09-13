@@ -32,7 +32,7 @@
       card.hidden = !normalize(card.dataset.name).includes(query) || (selectedFilter === "recent" && !visited.includes(card.dataset.module));
       if (!card.hidden) count++;
     });
-    $("emptySearch").textContent = selectedFilter === "recent" && !visited.length ? "Os módulos que você abrir por aqui aparecerão nesta seleção." : "Nenhum módulo encontrado. Tente outro nome.";
+    $("emptySearch").textContent = selectedFilter === "recent" && !visited.length ? "Os módulos acessados nesta conta aparecerão aqui, em todos os seus dispositivos." : "Nenhum módulo encontrado. Tente outro nome.";
     $("emptySearch").hidden = count > 0;
   }
   $("moduleSearch").addEventListener("input", filterModules);
@@ -47,28 +47,33 @@
   };
   $("globalSearch").addEventListener("click", focusSearch);
   document.addEventListener("keydown", event => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); focusSearch(); } });
-  function restoreRecent(user) {
-    memberId = String(user.id || user._id || "");
-    visited = [];
-    if (memberId) try { const saved = JSON.parse(localStorage.getItem(`turma.workspace.visited.${memberId}`) || "[]"); if (Array.isArray(saved)) visited = saved.filter(route => modules.some(item => item[2] === route)).slice(0, 8); } catch {}
-    const index = modules.findIndex(item => item[2] === visited[0]);
-    if (index >= 0) {
-      $("resumeTitle").textContent = `Módulo ${modules[index][0]}`;
-      $("resumeDescription").textContent = "Último módulo aberto por esta conta neste dispositivo.";
-      $("resumeImage").src = cover(index);
-      $("resumeLink").href = `/estudo-${modules[index][2]}`;
-      $("resumeLabel").textContent = "RETOME SUA EXPLORAÇÃO";
-    }
+  const studyIds = ["gemeos","espelhos","fibonacci","magneto","camaleoes","pitagoras","cavalo","eclipse"];
+  function restoreRecent(user) { memberId=String(user.id||user._id||""); }
+  function paintStudy() {
+    const S=window.TurmaStudySync;if(!S?.status.userId||S.status.userId!==memberId)return;
+    const state=S.state;
+    visited=studyIds.filter(id=>state.modules[id]?.visitedAt).sort((a,b)=>state.modules[b].visitedAt-state.modules[a].visitedAt).map(id=>modules[studyIds.indexOf(id)][2]);
+    document.querySelectorAll(".module-card").forEach((card,index)=>{
+      const e=state.modules[studyIds[index]], count=e?.steps.length||0;
+      card.querySelector(".module-bottom>span").textContent=count===3?"Módulo concluído":`${count} de 3 etapas`;
+      let progress=card.querySelector(".dashboard-study-progress");
+      if(!progress){progress=document.createElement("progress");progress.className="dashboard-study-progress";progress.max=3;progress.setAttribute("aria-label","Progresso do módulo");card.querySelector(".module-copy").append(progress);}
+      progress.value=count;
+      card.href=`/estudo-${modules[index][2]}#${e?.lastStep||"explicacao"}`;
+    });
+    let id=state.lastModule;
+    if(!studyIds.includes(id))id=studyIds[0];
+    const index=studyIds.indexOf(id),e=state.modules[id];
+    $("resumeTitle").textContent=`Módulo ${modules[index][0]}`;
+    $("resumeDescription").textContent=e?.game&&e.lastStep==="minigame"&&e.game.answers.length<5?`Seu jogo está no desafio ${e.game.answers.length+1} de 5. Continue de onde parou.`:`${e?.steps.length||0} de 3 etapas concluídas. Progresso vinculado à sua conta.`;
+    $("resumeImage").src=cover(index);$("resumeLink").href=`/estudo-${modules[index][2]}#${e?.lastStep||"explicacao"}`;
+    $("resumeLabel").textContent=e?.visitedAt?"CONTINUE DE ONDE PAROU":"COMECE SUA TRILHA";
+    const stats=window.TurmaStudyState.summary(state);
+    if($("studyOverview"))$("studyOverview").textContent=`${stats.etapasConcluidas} de 24 etapas · ${stats.modulosConcluidos} de 8 módulos concluídos`;
+    $("focusStat").textContent=String(stats.diasFoco);
     filterModules();
   }
-  document.addEventListener("click", event => {
-    const link = event.target.closest("a[data-module],#resumeLink");
-    if (!link || !memberId) return;
-    const route = link.dataset.module || new URL(link.href).pathname.replace("/estudo-", "");
-    if (!modules.some(item => item[2] === route)) return;
-    visited = [route, ...visited.filter(item => item !== route)].slice(0, 8);
-    try { localStorage.setItem(`turma.workspace.visited.${memberId}`, JSON.stringify(visited)); } catch {}
-  });
+  window.addEventListener("turma:study-change",paintStudy);
   const closeMenu = () => { $("sidebar").classList.remove("open"); $("menuToggle").setAttribute("aria-expanded", "false"); $("menuBackdrop").hidden = true; document.body.classList.remove("menu-open"); };
   $("menuToggle").addEventListener("click", () => { const open = $("sidebar").classList.toggle("open"); $("menuToggle").setAttribute("aria-expanded", String(open)); $("menuBackdrop").hidden = !open; document.body.classList.toggle("menu-open",open); if(open) $("sidebar").querySelector("a").focus(); });
   $("menuBackdrop").addEventListener("click", () => { closeMenu(); $("menuToggle").focus(); });
@@ -130,7 +135,8 @@
       restoreRecent(usuario);
       const name = String(usuario.nome || "Primo").trim().split(/\s+/)[0];
       $("firstName").textContent = name; $("accountName").textContent = name; $("avatar").textContent = name.charAt(0).toUpperCase();
-      const data = await api("/dashboard-premium/home");
+      const [data] = await Promise.all([api("/dashboard-premium/home"), window.TurmaStudySync.init(usuario)]);
+      paintStudy();
       const stats = data.estatisticas || {};
       $("notesStat").textContent = Number.isFinite(stats.totalNotas) ? stats.totalNotas.toLocaleString("pt-BR") : "—";
       $("averageStat").textContent = stats.totalAvaliacoes > 0 && Number.isFinite(stats.mediaGeral) ? stats.mediaGeral.toLocaleString("pt-BR", { minimumFractionDigits:1, maximumFractionDigits:1 }) : "—";

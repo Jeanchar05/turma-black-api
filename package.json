@@ -9,7 +9,10 @@
     "validate": "node scripts/validate.js",
     "security:regression": "node scripts/security-regression.js",
     "sales:regression": "node scripts/sales-regression.js",
-    "navigation:regression": "node scripts/navigation-regression.js"
+    "navigation:regression": "node scripts/navigation-regression.js",
+    "study:regression": "node scripts/study-regression.js",
+    "study:browser": "node scripts/study-browser-regression.cjs",
+    "study:accounts": "node scripts/study-account-regression.cjs"
   },
   "engines": {
     "node": "22.x"

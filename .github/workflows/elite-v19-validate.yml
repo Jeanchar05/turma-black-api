@@ -40,6 +40,12 @@ jobs:
       - name: Run navigation and page access regression tests
         run: npm run navigation:regression
 
+      - name: Run study curriculum regression tests
+        run: npm run study:regression
+
+      - name: Run study account and timer regression tests
+        run: npm run study:accounts
+
       - name: Smoke test real server startup
         shell: bash
         env:
