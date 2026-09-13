@@ -167,10 +167,6 @@ async function getTheme(userId) {
   const rows = await database.query("SELECT tema FROM dashboard_preferencias WHERE usuario_id = ? LIMIT 1", [userId]);
   return rows[0]?.tema || "dark";
 }
-async function countDistinctFocusDays(userId) {
-  const rows = await database.query("SELECT DISTINCT DATE(created_at) AS dia FROM dashboard_atividades WHERE usuario_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) ORDER BY dia DESC", [userId]);
-  return rows.length;
-}
 async function getExamStats(userId) {
   if (!(await tableExists("provas_resultados"))) return { media: 0, total: 0 };
   const rows = await database.query("SELECT COALESCE(AVG(nota), 0) AS media, COUNT(*) AS total FROM provas_resultados WHERE usuario_id = ?", [userId]);
