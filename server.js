@@ -24,7 +24,7 @@ const publicDir = path.join(__dirname, "public");
 const premiumVaultDir = path.resolve(
   process.env.PREMIUM_VAULT_DIR || path.join(__dirname, ".premium-vault")
 );
-const CACHE_VERSION = "20260911-roleta-real-1";
+const CACHE_VERSION = "20260913-estudo-conta-1";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -85,17 +85,21 @@ function aplicarVersaoNosAssets(html) {
   );
 }
 
-function aplicarCamadaResponsiva(html) {
+function aplicarCamadaResponsiva(html, allowFocus = false) {
   let resultado = String(html);
   if (!resultado.includes('src="/page-navigation.js"')) resultado = resultado.replace(/<head>/i, '<head><script src="/page-navigation.js"></script>');
   if (!resultado.includes('src="/content-protection.js"')) {
     resultado = resultado.replace("</head>", '<link rel="stylesheet" href="/content-protection.css"><script defer src="/content-protection.js"></script></head>');
   }
-  if (!resultado.includes("responsive-global.css") && !resultado.includes("dashboard-premium-workspace.css")) {
+  if (!resultado.includes("responsive-global.css") && !resultado.includes("dashboard-premium-workspace.css") && !resultado.includes("study-workspace.css")) {
     resultado = resultado.replace(
       "</head>",
       `  <link rel="stylesheet" href="/responsive-global.css" data-global-responsive />\n</head>`
     );
+  }
+  if (allowFocus && !resultado.includes("free-dashboard-page") && (resultado.includes('data-required-access="dashboard"') || resultado.includes('student-dashboard')) && !resultado.includes('src="/study-sync.js')) {
+    const estudoScripts = ["study-curriculum","study-games","study-state-model","study-sync","study-focus"].map(name => `<script defer src="/${name}.js?v=20260913-2"></script>`).join("");
+    resultado = resultado.replace(/<head>/i, `<head>${estudoScripts}<link rel="stylesheet" href="/study-focus.css?v=20260913-2">`);
   }
   return resultado;
 }
@@ -155,7 +159,7 @@ function enviarArquivoPremium(req, res, next, requestPath) {
     if (/\.html$/i.test(filePath)) {
       let html = fs.readFileSync(filePath, "utf8");
       html = html.replace(/<body\b/, '<body data-protected-content');
-      html = aplicarCamadaResponsiva(html);
+      html = aplicarCamadaResponsiva(html, true);
       html = aplicarVersaoNosAssets(html);
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.send(html);
@@ -188,7 +192,7 @@ function servirPagina(nomeArquivo) {
 
     let html = fs.readFileSync(arquivo, "utf8");
     if (nomeArquivo === "admin.html") html = aplicarExtrasAdmin(html);
-    html = aplicarCamadaResponsiva(html);
+    html = aplicarCamadaResponsiva(html, Boolean(req.usuario?.acessoPremium));
     html = aplicarVersaoNosAssets(html);
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -439,6 +443,7 @@ carregarRota("/admin", "admin-alunos.js");
 carregarRota("/admin", "admin.js");
 
 carregarRota("/dashboard-premium", "dashboard-premium.js");
+carregarRota("/study", "study-state.js");
 carregarRota("/", "alunos.js");
 carregarRota("/", "vendas.js");
 carregarRota("/", "dashboard.js");

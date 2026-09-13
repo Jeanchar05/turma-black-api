@@ -35,42 +35,6 @@
       updateCollapse();
     });
     updateCollapse(); applyTheme();
-    let remaining = 25 * 60, deadline = 0, running = false, interval;
-    function renderTimer() {
-      $("focusTimer").textContent = `${String(Math.floor(remaining / 60)).padStart(2,"0")}:${String(remaining % 60).padStart(2,"0")}`;
-      $("focusStart").textContent = running ? "Pausar" : remaining === 0 ? "Nova sessão" : "Iniciar foco";
-      $("focusDuration").disabled = running;
-      $("focusProgress").max = Number($("focusDuration").value) * 60;
-      $("focusProgress").value = $("focusProgress").max - remaining;
-      document.querySelector(".focus-section").classList.toggle("is-running", running);
-    }
-    function tick() {
-      if (!running) return;
-      remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-      if (remaining === 0) {
-        running = false; clearInterval(interval);
-        $("focusStatus").textContent = "Sessão concluída. Faça uma pausa antes de continuar.";
-      }
-      renderTimer();
-    }
-    $("focusStart").addEventListener("click", () => {
-      if (running) { tick(); running = false; clearInterval(interval); $("focusStatus").textContent = "Sessão pausada. Continue quando quiser."; }
-      else {
-        if (!remaining) remaining = Number($("focusDuration").value) * 60;
-        running = true; deadline = Date.now() + remaining * 1000;
-        interval = setInterval(tick, 250);
-        $("focusStatus").textContent = "Seu tempo de estudo começou. Uma coisa de cada vez.";
-      }
-      renderTimer();
-    });
-    function resetTimer() {
-      clearInterval(interval); running = false; remaining = Number($("focusDuration").value) * 60;
-      $("focusStatus").textContent = "O temporizador funciona enquanto esta página estiver aberta.";
-      renderTimer();
-    }
-    $("focusReset").addEventListener("click",resetTimer);
-    $("focusDuration").addEventListener("change",resetTimer);
-    document.addEventListener("visibilitychange",tick);
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
       const observer = new IntersectionObserver(entries => entries.forEach(entry => {
         if (entry.isIntersecting) { entry.target.classList.add("revealed"); observer.unobserve(entry.target); }
