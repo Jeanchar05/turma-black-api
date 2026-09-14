@@ -49,6 +49,9 @@ jobs:
       - name: Run learning content, Race and PDF regression tests
         run: npm run learning:regression
 
+      - name: Run notes, account isolation and PDF regression tests
+        run: npm run notes:regression
+
       - name: Smoke test real server startup
         shell: bash
         env:

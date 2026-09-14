@@ -22,7 +22,7 @@ export const shortcuts=[
  {title:"Módulos",description:"Trilha de aprendizado",icon:"i-layers",target:"modulos",keywords:"reflexivos gatilhos camaleoes magnetismo fibonacci pitagoras"},
  {title:"Suporte",description:"Abrir ou acompanhar chamado",icon:"i-support",target:"suporte",keywords:"ajuda atendimento problema"},
  {title:"Perfil",description:"Conta, foto e aparência",icon:"i-user",target:"perfil",keywords:"usuario telefone tema claro escuro"},
- {title:"Roleta",description:"Race, Racetrack e ferramentas",icon:"i-roulette",target:"roleta",keywords:"race racetrack operacional"},
+ {title:"Roleta Operacional",description:"Race, Racetrack e ferramentas",icon:"i-roulette",target:"roleta",keywords:"race racetrack operacional"},
  {title:"Provas",description:"Avaliações e resultados",icon:"i-exam",target:"provas",keywords:"teste avaliacao resultado nota"},
  {title:"Favoritos",description:"Conteúdos salvos",icon:"i-star",target:"favoritos",keywords:"salvos estrela"}
 ];

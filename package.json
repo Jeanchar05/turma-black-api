@@ -14,7 +14,9 @@
     "study:browser": "node scripts/study-browser-regression.cjs",
     "study:accounts": "node scripts/study-account-regression.cjs",
     "learning:regression": "node scripts/learning-regression.cjs",
-    "learning:browser": "node scripts/learning-browser-regression.cjs"
+    "learning:browser": "node scripts/learning-browser-regression.cjs",
+    "notes:regression": "node scripts/notes-regression.cjs",
+    "notes:browser": "node scripts/notes-browser-regression.cjs"
   },
   "engines": {
     "node": "22.x"

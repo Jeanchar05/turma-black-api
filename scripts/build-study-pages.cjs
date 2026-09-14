@@ -16,7 +16,7 @@ const nav = [
   ["Dashboard", "dashboard", "home"],
   ["Estudo", "estudo", "book"],
   ["Módulos", "modulos", "layers"],
-  
+
   ["Anotações", "notas", "note"],
   ["Favoritos", "favoritos", "star"],
   ["Roleta Operacional", "roleta", "roulette"],
@@ -81,7 +81,7 @@ for (const [route, name] of pages) {
   <nav class="learn-dock" id="studyDock" aria-label="Atalhos no celular">${[
     ["Início", "dashboard", "home"],
     ["Estudo", "estudo", "book"],
-    
+    ["Módulos", "modulos", "layers"],
     ["Anotações", "notas", "note"],
   ]
     .map(

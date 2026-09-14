@@ -11,3 +11,6 @@
 .real-race-selection{padding:18px 22px;border-top:1px solid var(--reel-border)}.real-race-selection h3{font-size:12px;margin:0 0 12px}.real-selection-chips{display:flex;flex-wrap:wrap;gap:6px}.real-selection-chips span{display:grid;place-items:center;min-width:32px;height:30px;border-radius:7px;background:var(--reel-card2);border:1px solid var(--reel-border);font-size:11px;color:var(--reel-text)}.real-selection-chips p{font-size:12px;color:var(--reel-muted);margin:0}
 .roulette-reel-page #reelRace button:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:720px){.roulette-reel-page #reelRace .tp-race-head{padding:18px 14px;display:block}.roulette-reel-page #reelRace .tp-race-toolbar{display:flex;width:100%;margin-top:18px;justify-content:space-between}.roulette-reel-page #reelRace .tp-race-tabs{width:100%;display:flex}.roulette-reel-page #reelRace .tp-race-tabs button{flex:1}.roulette-reel-page #reelRace .tp-neighbor{flex:1;justify-content:space-between}.roulette-reel-page #reelRace .tp-race-body{padding:10px 5px}.roulette-reel-page #reelRace .tp-race-foot{grid-template-columns:1fr;padding:16px}.real-race-legend,.real-race-selection{padding:16px 14px}}
+
+.roulette-reel-page #reelRace .tp-race-tabs button.active{background:#64408d;color:#fff}
+html[data-theme="light"] .roulette-reel-page #reelRace .tp-neighbor strong{color:#745197}

@@ -31,7 +31,7 @@
 
   async function api(endpoint, options={}){
     const t=token();
-    if(!t) throw Object.assign(new Error("Sessão expirada. Entre novamente."),{status:401});
+
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),options.timeout||22000);
     const headers={Accept:"application/json"};if(t)headers.Authorization=`Bearer ${t}`;if(endpoint.startsWith("/learning"))headers["X-Study-Account"]=String(state.user?.id||state.user?._id||"");
     if(options.body!==undefined)headers["Content-Type"]="application/json";

@@ -1,10 +1,129 @@
 "use strict";
-const sanitize=require("sanitize-html"),crypto=require("node:crypto");
-const error=(message,status=400,extra={})=>Object.assign(new Error(message),{status,...extra});
-function html(v){return sanitize(String(v||""),{allowedTags:["p","div","br","h1","h2","h3","h4","strong","b","em","i","u","s","strike","ul","ol","li","blockquote","a","span","mark","hr"],allowedAttributes:{a:["href","target","rel"],"*":["style"]},allowedSchemes:["https","http","mailto"],allowProtocolRelative:false,allowedStyles:{"*":{"background-color":[/^#(?:fff2b3|d9c7ff|d0eddc)$/i,/^rgb\(\s*(?:255,\s*242,\s*179|217,\s*199,\s*255|208,\s*237,\s*220)\s*\)$/i],"text-align":[/^(left|center|right)$/],"font-weight":[/^(bold|700)$/],"font-style":[/^italic$/],"text-decoration":[/^(underline|line-through)$/]}},transformTags:{a:sanitize.simpleTransform("a",{target:"_blank",rel:"noopener noreferrer"})},nestingLimit:16});}
-const text=(v,n)=>String(v||"").trim().slice(0,n),bool=v=>v===true||v===1||v==="1"||v==="true";
-function array(v){if(Array.isArray(v))return v;try{const a=JSON.parse(v);return Array.isArray(a)?a:[];}catch{return [];}}
-function link(v){try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)&&!u.username&&!u.password?u.href.slice(0,2000):"";}catch{return "";}}
-function normalize(b={}){if(typeof b.conteudo!=="string"||b.conteudo.length>60000)throw error("Use até 60 mil caracteres por nota. Divida o conteúdo em mais notas.");return {titulo:text(b.titulo,160)||"Nota sem título",conteudo:html(b.conteudo),categoria:text(b.categoria,80)||"Geral",cor:["purple","gold","blue","green","pink"].includes(b.cor)?b.cor:"purple",favorita:bool(b.favorita),fixada:bool(b.fixada),arquivada:bool(b.arquivada),excluida:bool(b.excluida),tags:array(b.tags).slice(0,12).map(v=>text(v,50).replace(/^#/,"")).filter(Boolean),checklist:array(b.checklist).slice(0,100).map(v=>({id:text(v.id,80)||crypto.randomBytes(12).toString("hex"),texto:text(v.texto,500),concluido:bool(v.concluido)})),anexos:array(b.anexos).slice(0,50).map(v=>({id:text(v.id,80),nome:text(v.nome,190),url:link(v.url),tipo:"link"})).filter(v=>v.url)};}
-function format(r){return {id:r.id,...normalize({...r,conteudo:String(r.conteudo||"").slice(0,60000)}),revision:Number(r.revisao||1),createdAt:r.created_at,updatedAt:r.updated_at};}
-module.exports={html,normalize,format,error,link};
+const sanitize = require("sanitize-html"),
+  crypto = require("node:crypto");
+const error = (message, status = 400, extra = {}) =>
+  Object.assign(new Error(message), { status, ...extra });
+function html(v) {
+  return sanitize(String(v || ""), {
+    allowedTags: [
+      "p",
+      "div",
+      "br",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "strong",
+      "b",
+      "em",
+      "i",
+      "u",
+      "s",
+      "strike",
+      "ul",
+      "ol",
+      "li",
+      "blockquote",
+      "a",
+      "span",
+      "mark",
+      "hr",
+    ],
+    allowedAttributes: { a: ["href", "target", "rel"], "*": ["style"] },
+    allowedSchemes: ["https", "http", "mailto"],
+    allowProtocolRelative: false,
+    allowedStyles: {
+      "*": {
+        "background-color": [
+          /^#(?:fff2b3|d9c7ff|d0eddc)$/i,
+          /^rgb\(\s*(?:255,\s*242,\s*179|217,\s*199,\s*255|208,\s*237,\s*220)\s*\)$/i,
+        ],
+        "text-align": [/^(left|center|right)$/],
+        "font-weight": [/^(bold|700)$/],
+        "font-style": [/^italic$/],
+        "text-decoration": [/^(underline|line-through)$/],
+      },
+    },
+    transformTags: {
+      a: sanitize.simpleTransform("a", {
+        target: "_blank",
+        rel: "noopener noreferrer",
+      }),
+    },
+    nestingLimit: 16,
+  });
+}
+const text = (v, n) =>
+    String(v || "")
+      .trim()
+      .slice(0, n),
+  bool = (v) => v === true || v === 1 || v === "1" || v === "true";
+function array(v) {
+  if (Array.isArray(v)) return v;
+  try {
+    const a = JSON.parse(v);
+    return Array.isArray(a) ? a : [];
+  } catch {
+    return [];
+  }
+}
+function link(v) {
+  try {
+    const u = new URL(v);
+    return ["http:", "https:"].includes(u.protocol) &&
+      !u.username &&
+      !u.password
+      ? u.href.slice(0, 2000)
+      : "";
+  } catch {
+    return "";
+  }
+}
+function normalize(b = {}) {
+  if (typeof b.conteudo !== "string" || b.conteudo.length > 60000)
+    throw error(
+      "Use até 60 mil caracteres por nota. Divida o conteúdo em mais notas.",
+    );
+  return {
+    titulo: text(b.titulo, 160) || "Nota sem título",
+    conteudo: html(b.conteudo),
+    categoria: text(b.categoria, 80) || "Geral",
+    cor: ["purple", "gold", "blue", "green", "pink"].includes(b.cor)
+      ? b.cor
+      : "purple",
+    favorita: bool(b.favorita),
+    fixada: bool(b.fixada),
+    arquivada: bool(b.arquivada),
+    excluida: bool(b.excluida),
+    tags: array(b.tags)
+      .slice(0, 12)
+      .map((v) => text(v, 50).replace(/^#/, ""))
+      .filter(Boolean),
+    checklist: array(b.checklist)
+      .slice(0, 100)
+      .map((v) => ({
+        id: text(v.id, 80) || crypto.randomBytes(12).toString("hex"),
+        texto: text(v.texto, 500),
+        concluido: bool(v.concluido),
+      })),
+    anexos: array(b.anexos)
+      .slice(0, 50)
+      .map((v) => ({
+        id: text(v.id, 80),
+        nome: text(v.nome, 190),
+        url: link(v.url),
+        tipo: "link",
+      }))
+      .filter((v) => v.url),
+  };
+}
+function format(r) {
+  return {
+    id: r.id,
+    ...normalize({ ...r, conteudo: String(r.conteudo || "").slice(0, 60000) }),
+    revision: Number(r.revisao || 1),
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+module.exports = { html, normalize, format, error, link };

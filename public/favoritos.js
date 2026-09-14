@@ -136,7 +136,7 @@
       };
     });
 
-    const noteItems = state.notes.filter((note) => note.favorita).map((note) => ({
+    const noteItems = state.notes.filter((note) => note.favorita && !note.excluida).map((note) => ({
       id: String(note.id),
       type: "anotacao",
       title: note.titulo || "Anotação favorita",
