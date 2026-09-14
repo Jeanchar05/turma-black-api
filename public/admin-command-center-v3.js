@@ -33,7 +33,7 @@
     const t=token();
     if(!t) throw Object.assign(new Error("Sessão expirada. Entre novamente."),{status:401});
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),options.timeout||22000);
-    const headers={Accept:"application/json",Authorization:`Bearer ${t}`};
+    const headers={Accept:"application/json"};if(t)headers.Authorization=`Bearer ${t}`;if(endpoint.startsWith("/learning"))headers["X-Study-Account"]=String(state.user?.id||state.user?._id||"");
     if(options.body!==undefined)headers["Content-Type"]="application/json";
     try{
       const response=await fetch(`${window.location.origin}${endpoint}`,{method:options.method||"GET",headers,credentials:"same-origin",cache:"no-store",signal:controller.signal,body:options.body!==undefined?JSON.stringify(options.body):undefined});
@@ -48,7 +48,7 @@
   }
 
   function setIdentity(){const name=firstName(),initial=name.charAt(0).toUpperCase();$$('[data-user-name]').forEach(el=>el.textContent=name);$$('[data-user-role]').forEach(el=>el.textContent=roleLabel(state.role));$$('[data-user-initial]').forEach(el=>el.textContent=initial);}
-  function applyPermissions(){$$('[data-permission]').forEach(el=>el.hidden=!state.permissions[el.dataset.permission]);$$('[data-dev-only]').forEach(el=>el.hidden=!state.dev);}
+  function applyPermissions(){$$('[data-permission]').forEach(el=>el.hidden=!state.permissions[el.dataset.permission]);$$('[data-content-manager]').forEach(el=>el.hidden=!state.permissions.painelAdmin||!["dev","dono","superadmin","admin"].includes(state.role));$$('[data-dev-only]').forEach(el=>el.hidden=!state.dev);}
   function hideLoading(){const el=$("adminAppLoading");if(!el)return;el.classList.add("hide");setTimeout(()=>el.remove(),260);document.body.classList.add("admin-ready");}
   function pageHero(kicker,title,description,side=""){return`<section class="cc-hero"><div class="cc-hero-copy"><span class="cc-kicker">${esc(kicker)}</span><h2>${title}</h2><p>${esc(description)}</p></div>${side?`<div class="cc-hero-side">${side}</div>`:""}</section>`;}
   function card(title,subtitle,body,id="",extraHead=""){return`<article class="cc-card"${id?` id="${id}"`:""}><header class="cc-card-head"><div class="cc-card-title"><span class="cc-card-icon">${icon("activity")}</span><div><strong>${esc(title)}</strong><small>${esc(subtitle||"")}</small></div></div>${extraHead}</header>${body}</article>`;}
@@ -186,7 +186,7 @@
 
   async function logout(){const t=token();try{if(t)await fetch("/logout",{method:"POST",headers:{Authorization:`Bearer ${t}`},credentials:"same-origin",keepalive:true});}catch(_){}TOKEN_KEYS.forEach(k=>{try{sessionStorage.removeItem(k);localStorage.removeItem(k);}catch(_){}});window.location.replace("/");}
 
-  async function openSection(section){const el=$(`section-${section}`);if(!el||el.hidden)return;state.active=section;$$('.admin-section').forEach(s=>s.classList.toggle("active",s===el));$$('[data-section]').forEach(b=>b.classList.toggle("active",b.dataset.section===section));$("adminPageTitle").textContent=el.dataset.title||"Admin Command Center";closeSidebar();try{if(section==="overview")await loadOverview();if(section==="students")await loadStudents();if(section==="approvals")await loadApprovals();if(section==="support")await loadSupport();if(section==="finance")await loadFinance();if(section==="reports")await loadReports();if(section==="notifications")await loadNotifications();if(section==="exams")await loadExams();if(section==="team")await loadTeam();if(section==="logs")await loadSecurity();if(section==="settings")await loadSettings();if(section==="dev")await loadDev();}catch(e){toast(e.message||"Erro ao carregar área.","error");}}
+  async function openSection(section){const el=$(`section-${section}`);if(!el||el.hidden)return;state.active=section;$$('.admin-section').forEach(s=>s.classList.toggle("active",s===el));$$('[data-section]').forEach(b=>b.classList.toggle("active",b.dataset.section===section));$("adminPageTitle").textContent=el.dataset.title||"Admin Command Center";closeSidebar();try{if(section==="instagram")await window.TurmaInstagramAdmin.open(el,{api,toast});if(section==="overview")await loadOverview();if(section==="students")await loadStudents();if(section==="approvals")await loadApprovals();if(section==="support")await loadSupport();if(section==="finance")await loadFinance();if(section==="reports")await loadReports();if(section==="notifications")await loadNotifications();if(section==="exams")await loadExams();if(section==="team")await loadTeam();if(section==="logs")await loadSecurity();if(section==="settings")await loadSettings();if(section==="dev")await loadDev();}catch(e){toast(e.message||"Erro ao carregar área.","error");}}
   function openSidebar(){$("adminSidebar")?.classList.add("open");const o=$("adminMobileOverlay");if(o){o.hidden=false;}}
   function closeSidebar(){$("adminSidebar")?.classList.remove("open");const o=$("adminMobileOverlay");if(o)o.hidden=true;}
 
@@ -214,7 +214,7 @@
     window.addEventListener("resize",()=>debounce("resize",()=>{if(state.active==="overview")drawOverview();if(state.active==="finance")drawFinanceChart();if(state.active==="reports")drawReportCharts();},150));
   }
 
-  async function init(){renderStaticSections();registerEvents();try{const c=await api("/admin/painel/contexto");state.context=c;state.user=c.usuario||{};state.permissions=c.permissoes||{};state.role=c.cargo||"aluno";state.dev=Boolean(c.centralDev);setIdentity();applyPermissions();hideLoading();await openSection("overview");}catch(e){if([401,403].includes(e.status)){window.location.replace("/");return;}const loading=$("adminAppLoading");if(loading)loading.innerHTML=`<div><img src="/assets/turma-primo-logo.svg" alt=""><strong>Não foi possível abrir o painel</strong><span>${esc(e.message)}</span></div>`;}}
+  async function init(){renderStaticSections();registerEvents();try{const c=await api("/admin/painel/contexto");state.context=c;state.user=c.usuario||{};state.permissions=c.permissoes||{};state.role=c.cargo||"aluno";state.dev=Boolean(c.centralDev);setIdentity();applyPermissions();hideLoading();await openSection((window.TurmaNavigation?.hash||location.hash)==="#instagram"&&!$("section-instagram").hidden?"instagram":"overview");}catch(e){if([401,403].includes(e.status)){window.location.replace("/");return;}const loading=$("adminAppLoading");if(loading)loading.innerHTML=`<div><img src="/assets/turma-primo-logo.svg" alt=""><strong>Não foi possível abrir o painel</strong><span>${esc(e.message)}</span></div>`;}}
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();

@@ -25,7 +25,11 @@ function validate(id, body) {
   if ((body.url.trim() || body.published) && !media) throw error(type === "instagram" ? "Use o link de uma publicação ou Reel público do Instagram." : "Use um link do YouTube ou de um arquivo HTTPS .mp4 ou .webm.");
   const moduleId = type === "module" ? id : body.moduleId || "";
   if (moduleId && !C.modules.some(m=>m.id===moduleId)) throw error("Módulo relacionado inválido.");
-  return {id,type,title:body.title.trim(),description:body.description.trim(),url:media?.url || "",summary:body.summary.trim(),duration:body.duration.trim(),published:body.published,moduleId};
+  const action=body.action||{kind:"none"},label=String(action.label||"").trim();
+  if(!["none","study","pdf","link"].includes(action.kind)||label.length>40)throw error("Ação inválida.");
+  if(["study","pdf"].includes(action.kind)&&!C.modules.some(m=>m.id===action.moduleId))throw error("Selecione o módulo da ação.");
+  if(action.kind==="link"){let u;try{u=new URL(action.url);}catch{throw error("Link inválido.");}if(u.protocol!=="https:"||u.username||u.password||u.href.length>2000)throw error("Use um link HTTPS na ação.");}
+  return {id,type,title:body.title.trim(),description:body.description.trim(),url:media?.url || "",summary:body.summary.trim(),duration:body.duration.trim(),published:body.published,moduleId,action:{kind:action.kind,label,moduleId:["study","pdf"].includes(action.kind)?action.moduleId:"",url:action.kind==="link"?action.url:""}};
 }
 async function list(manage=false) {
   await ensureStructure();

@@ -87,6 +87,7 @@ function aplicarVersaoNosAssets(html) {
 
 function aplicarCamadaResponsiva(html, allowFocus = false) {
   let resultado = String(html);
+  if (!resultado.includes('src="/site-navigation-menu.js"')) resultado=resultado.replace("</head>",'<script defer src="/site-navigation-menu.js"></script></head>');
   if (!resultado.includes('src="/page-navigation.js"')) resultado = resultado.replace(/<head>/i, '<head><script src="/page-navigation.js"></script>');
   if (!resultado.includes('src="/content-protection.js"')) {
     resultado = resultado.replace("</head>", '<link rel="stylesheet" href="/content-protection.css"><script defer src="/content-protection.js"></script></head>');

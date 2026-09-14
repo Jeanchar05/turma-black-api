@@ -16,10 +16,10 @@ const nav = [
   ["Dashboard", "dashboard", "home"],
   ["Estudo", "estudo", "book"],
   ["Módulos", "modulos", "layers"],
-  ["Minigames", "minigames", "game"],
+  
   ["Anotações", "notas", "note"],
   ["Favoritos", "favoritos", "star"],
-  ["Roleta", "roleta", "roulette"],
+  ["Roleta Operacional", "roleta", "roulette"],
   ["Roleta Real", "roleta-real", "roulette"],
   ["Provas", "provas", "exam"],
   ["Gestão", "gestao", "activity"],
@@ -81,7 +81,7 @@ for (const [route, name] of pages) {
   <nav class="learn-dock" id="studyDock" aria-label="Atalhos no celular">${[
     ["Início", "dashboard", "home"],
     ["Estudo", "estudo", "book"],
-    ["Minigames", "minigames", "game"],
+    
     ["Anotações", "notas", "note"],
   ]
     .map(
