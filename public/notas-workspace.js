@@ -313,7 +313,7 @@
   function renderList() {
     if (!$("notesGrid")) return;
     const active = notes.filter((n) => !n.excluida),
-      cats = [...new Set(active.map((n) => n.categoria))].sort(),
+      cats = [...new Set((scope === "trash" ? notes.filter(n => n.excluida) : active).map((n) => n.categoria))].sort(),
       cat = $("notesCategoryFilter").value;
     $("notesCategoryFilter").innerHTML =
       '<option value="">Todas as categorias</option>' +
@@ -321,7 +321,7 @@
     $("notesCategoryFilter").value = cats.includes(cat) ? cat : "";
     $("notesCount").textContent = active.length;
     $("notesFavorites").textContent = active.filter((n) => n.favorita).length;
-    $("notesCategoriesCount").textContent = cats.length;
+    $("notesCategoriesCount").textContent = new Set(active.map(n => n.categoria)).size;
     $("notesTrashCount").textContent = notes.filter((n) => n.excluida).length;
     const q = norm($("notesSearch").value),
       category = $("notesCategoryFilter").value,
@@ -419,7 +419,7 @@
     activeId = id;
     selection = null;
     $("noteEditor").innerHTML =
-      `<header class="notes-editor-head"><div><span class="learn-eyebrow">MEU CADERNO</span><h2 id="noteEditorLabel">${n.revision ? "Editar anotação" : "Nova anotação"}</h2></div><div><button type="button" class="learn-icon-button" id="noteFavorite" aria-label="Favoritar nota" aria-pressed="${n.favorita}">${n.favorita ? "★" : "☆"}</button><button type="button" class="learn-icon-button" id="notePin" aria-label="Destacar nota" aria-pressed="${n.fixada}">◇</button><button type="button" class="learn-icon-button" data-close-editor aria-label="Fechar editor">×</button></div></header><div class="notes-editor-body"><input id="noteTitle" class="notes-title-input" aria-label="Título da anotação" maxlength="160" value="${esc(n.titulo)}" placeholder="Dê um título à sua ideia"><div class="notes-editor-meta"><label>Categoria<input id="noteCategory" list="noteCategories" maxlength="80" value="${esc(n.categoria)}"><datalist id="noteCategories">${[...new Set(["Geral", ...window.TurmaStudy.modules.map((m) => m.name), ...notes.map((v) => v.categoria)])].map((c) => `<option value="${esc(c)}"></option>`).join("")}</datalist></label><label>Etiquetas<input id="noteTags" maxlength="611" value="${esc(n.tags.join(", "))}" placeholder="Separe por vírgulas"></label><label>Cor<select id="noteColor"><option value="purple">Lilás</option><option value="gold">Dourado</option><option value="blue">Azul</option><option value="green">Verde</option><option value="pink">Rosa</option></select></label></div><div class="notes-toolbar" role="toolbar" aria-label="Formatação do texto"><select id="noteBlock" aria-label="Estilo do texto"><option value="p">Texto normal</option><option value="h2">Título</option><option value="h3">Subtítulo</option><option value="blockquote">Citação</option></select>${[
+      `<header class="notes-editor-head"><div><span class="learn-eyebrow">MEU CADERNO</span><h2 id="noteEditorLabel">${n.revision ? "Editar anotação" : "Nova anotação"}</h2></div><div><button type="button" class="learn-icon-button" id="noteFavorite" aria-label="Favoritar nota" aria-pressed="${n.favorita}">${n.favorita ? "★" : "☆"}</button><button type="button" class="learn-icon-button" id="notePin" aria-label="Destacar nota" aria-pressed="${n.fixada}">◇</button><button type="button" class="learn-icon-button" data-close-editor aria-label="Fechar editor">×</button></div></header><div class="notes-editor-body"><input id="noteTitle" class="notes-title-input" aria-label="Título da anotação" maxlength="160" value="${esc(n.titulo)}" placeholder="Dê um título à sua ideia"><div class="notes-editor-meta"><div class="notes-category-control"><label for="noteCategory">Categoria</label><div class="notes-category-row"><select id="noteCategory" aria-label="Categoria da nota"></select><button type="button" id="noteNewCategory" aria-expanded="false" aria-controls="noteCategoryCreate">+ Nova</button></div><div id="noteCategoryCreate" hidden><label for="noteCategoryName">Nome da nova categoria</label><input id="noteCategoryName" maxlength="80" placeholder="Ex.: Revisão das aulas" autocomplete="off"><div><button type="button" id="noteCategoryAdd">Criar categoria</button><button type="button" id="noteCategoryCancel">Cancelar</button></div></div></div><label>Etiquetas<input id="noteTags" maxlength="611" value="${esc(n.tags.join(", "))}" placeholder="Separe por vírgulas"></label><label>Cor<select id="noteColor"><option value="purple">Lilás</option><option value="gold">Dourado</option><option value="blue">Azul</option><option value="green">Verde</option><option value="pink">Rosa</option></select></label></div><div class="notes-toolbar" role="toolbar" aria-label="Formatação do texto"><select id="noteBlock" aria-label="Estilo do texto"><option value="p">Texto normal</option><option value="h2">Título</option><option value="h3">Subtítulo</option><option value="blockquote">Citação</option></select>${[
         ["bold", "<b>B</b>", "Negrito"],
         ["italic", "<i>I</i>", "Itálico"],
         ["underline", "<u>U</u>", "Sublinhado"],
@@ -449,8 +449,42 @@
     renderChecklist();
     if (!$("noteEditor").open) $("noteEditor").showModal();
     $("noteTitle").oninput = (e) => dirty({ titulo: e.target.value });
-    $("noteCategory").oninput = (e) =>
-      dirty({ categoria: e.target.value.trim() || "Geral" });
+    const populateCategories = (selected) => {
+      const categories = [...new Set(["Geral", ...window.TurmaStudy.modules.map(m => m.name), ...notes.map(v => v.categoria), selected])].filter(Boolean).sort((a,b) => a.localeCompare(b, "pt-BR"));
+      $("noteCategory").replaceChildren(...categories.map(value => new Option(value, value)));
+      $("noteCategory").value = selected || "Geral";
+    };
+    populateCategories(n.categoria);
+    $("noteCategory").onchange = e => dirty({ categoria: e.target.value });
+    const closeCategory = () => {
+      $("noteCategoryCreate").hidden = true;
+      $("noteNewCategory").setAttribute("aria-expanded", "false");
+      $("noteCategoryName").setCustomValidity("");
+      $("noteNewCategory").focus();
+    };
+    $("noteNewCategory").onclick = () => {
+      $("noteCategoryCreate").hidden = false;
+      $("noteNewCategory").setAttribute("aria-expanded", "true");
+      $("noteCategoryName").value = "";
+      $("noteCategoryName").focus();
+    };
+    const addCategory = () => {
+      const input = $("noteCategoryName"), value = input.value.trim().replace(/\s+/g, " ");
+      if (!value) { input.setCustomValidity("Digite um nome para a categoria."); input.reportValidity(); return; }
+      const match = [...$("noteCategory").options].find(o => norm(o.value) === norm(value));
+      const category = match ? match.value : value;
+      populateCategories(category);
+      dirty({ categoria: category });
+      closeCategory();
+      $("noteCategory").focus();
+    };
+    $("noteCategoryName").oninput = () => $("noteCategoryName").setCustomValidity("");
+    $("noteCategoryName").onkeydown = e => {
+      if (e.key === "Enter") { e.preventDefault(); addCategory(); }
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); closeCategory(); }
+    };
+    $("noteCategoryAdd").onclick = addCategory;
+    $("noteCategoryCancel").onclick = closeCategory;
     $("noteTags").oninput = (e) =>
       dirty({
         tags: e.target.value
