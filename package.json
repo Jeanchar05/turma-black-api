@@ -12,7 +12,9 @@
     "navigation:regression": "node scripts/navigation-regression.js",
     "study:regression": "node scripts/study-regression.js",
     "study:browser": "node scripts/study-browser-regression.cjs",
-    "study:accounts": "node scripts/study-account-regression.cjs"
+    "study:accounts": "node scripts/study-account-regression.cjs",
+    "learning:regression": "node scripts/learning-regression.cjs",
+    "learning:browser": "node scripts/learning-browser-regression.cjs"
   },
   "engines": {
     "node": "22.x"

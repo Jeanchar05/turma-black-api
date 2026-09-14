@@ -38,8 +38,8 @@
     demoValues = [],
     demoDirty = false;
   const boardModes = {
-    demo: matchMedia("(max-width:650px)").matches ? "grid" : "race",
-    game: matchMedia("(max-width:650px)").matches ? "grid" : "race",
+    demo: "race",
+    game: "race",
   };
   const S = window.TurmaStudySync,
     G = window.TurmaStudyGames;
@@ -405,6 +405,10 @@
       }[raw] || raw
     );
   }
+  function teachingGuide() {
+    const g = window.TurmaStudyGuides.guides[module.id];
+    return `<div class="learn-objective"><span>AO FINAL DESTA AULA</span><p>${escape(g.goal)}</p></div><section class="learn-worked"><span class="learn-eyebrow">UM EXEMPLO RESOLVIDO</span><h3>Acompanhe o raciocínio</h3><ol>${g.steps.map(([title, text])=>`<li><strong>${escape(title)}</strong><p>${escape(text)}</p></li>`).join("")}</ol></section><div class="learn-mistake"><strong>Uma confusão comum</strong><p>${escape(g.mistake)}</p></div><section class="learn-quick-check"><span class="learn-eyebrow">CONFIRA SE ENTENDEU</span><h3>${escape(g.check.question)}</h3><div>${g.check.options.map((text,i)=>`<button class="learn-button learn-button-secondary" type="button" data-guide-answer="${i}">${escape(text)}</button>`).join("")}</div><p id="guideAnswer" role="status" hidden></p></section>`;
+  }
   function renderLesson() {
     const requested = requestedStep();
     activeStep = steps.includes(requested) ? requested : entry().lastStep;
@@ -418,7 +422,7 @@
       `<div class="learn-module-heading"><a class="learn-back" href="/estudo">← Voltar para a biblioteca</a><button id="studyModuleFavorite" class="learn-icon-button" type="button" data-favorite="${module.id}" aria-label="Salvar módulo na trilha" aria-pressed="false">${icon("star")}</button></div>
       <section class="learn-module-hero"><div class="learn-module-intro"><span class="learn-eyebrow">${module.category} · ${module.focus}</span><h1>${module.name}</h1><p>${module.summary}</p><div class="learn-module-tags"><span>${icon("book")}3 etapas de aprendizado</span><span>${icon("game")}5 desafios de fixação</span></div></div>${art(module, 'fetchpriority="high" width="480" height="320"')}</section>
       <div class="learn-lesson-grid"><div class="learn-lesson"><div class="learn-tabs" id="studyTabs" role="tablist" aria-label="Etapas do módulo">${steps.map((s, i) => `<button type="button" id="tab-${s}" role="tab" data-step="${s}" aria-controls="panel-${s}" aria-selected="false" tabindex="-1"><span>${i + 1}</span><span>${stepNames[i]}</span></button>`).join("")}</div>
-      <section class="learn-panel" id="panel-explicacao" role="tabpanel" aria-labelledby="tab-explicacao" tabindex="0" hidden><span class="learn-eyebrow">ENTENDA O CONCEITO</span><h2>Como funciona ${module.name}</h2><p class="learn-panel-lead">${module.intro}</p><div class="learn-rules">${module.rules.map(([title, copy], i) => `<article class="learn-rule"><span>${i + 1}</span><div><h3>${title}</h3><p>${copy}</p></div></article>`).join("")}</div><div class="learn-example-callout"><strong>UM EXEMPLO PARA COMEÇAR</strong><p>${module.example}</p></div>${reference()}<div class="learn-remember">${icon("shield")}<p>${module.remember}</p></div><div class="learn-panel-actions"><span>Entendeu a ideia? Vamos visualizar.</span><button class="learn-button" type="button" data-action="complete-explanation">Concluir e ver exemplo →</button></div></section>
+      <section class="learn-panel" id="panel-explicacao" role="tabpanel" aria-labelledby="tab-explicacao" tabindex="0" hidden><span class="learn-eyebrow">ENTENDA O CONCEITO</span><h2>Como funciona ${module.name}</h2><p class="learn-panel-lead">${module.intro}</p><div class="learn-rules">${module.rules.map(([title, copy], i) => `<article class="learn-rule"><span>${i + 1}</span><div><h3>${title}</h3><p>${copy}</p></div></article>`).join("")}</div>${teachingGuide()}${reference()}<div class="learn-remember">${icon("shield")}<p>${module.remember}</p></div><div class="learn-panel-actions"><span>Entendeu a ideia? Vamos visualizar.</span><button class="learn-button" type="button" data-action="complete-explanation">Concluir e ver exemplo →</button></div></section>
       <section class="learn-panel" id="panel-exemplo" role="tabpanel" aria-labelledby="tab-exemplo" tabindex="0" hidden></section>
       <section class="learn-panel" id="panel-minigame" role="tabpanel" aria-labelledby="tab-minigame" tabindex="0" hidden></section>
       <p class="learn-education-note">Exercícios educacionais, sem apostas ou dinheiro real. Os exemplos demonstram as regras do material; não preveem o próximo giro.</p></div>
@@ -524,41 +528,11 @@
     );
     storageStatus();
   }
-  // Pontos igualmente espaçados pelo comprimento da elipse, na ordem europeia.
-  const wheelPoints = (() => {
-    const samples = [],
-      count = 1600;
-    let distance = 0,
-      previous = null;
-    for (let i = 0; i <= count; i++) {
-      const angle = (i / count) * Math.PI * 2,
-        x = 50 + 43 * Math.sin(angle),
-        y = 50 - 38 * Math.cos(angle);
-      if (previous)
-        distance += Math.hypot((x - previous.x) * 6.4, (y - previous.y) * 3.6);
-      samples.push({ x, y, distance });
-      previous = { x, y };
-    }
-    return C.wheel.map((n, i) => {
-      const point = samples.find((p) => p.distance >= (distance * i) / 37);
-      return { n, x: point.x, y: point.y };
-    });
-  })();
-  const red = new Set([
-    1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36,
-  ]);
   function mountBoard(name) {
-    const mode = boardModes[name],
-      numbers = mode === "grid" ? [...C.wheel].sort((a, b) => a - b) : C.wheel;
-    $(name + "BoardMount").innerHTML =
-      `<div class="learn-board-wrap"><div class="learn-board-head"><h3>${name === "demo" ? "Visualize a leitura" : "Faça sua marcação"}</h3><div class="learn-board-modes" aria-label="Visualização dos números"><button type="button" data-board-mode="race" data-board-name="${name}" aria-pressed="${mode === "race"}">Race</button><button type="button" data-board-mode="grid" data-board-name="${name}" aria-pressed="${mode === "grid"}">Números</button></div></div><div class="learn-board-scroll"><div id="${name}Board" class="learn-board is-${mode}" role="group" aria-label="${name === "demo" ? "Números do exemplo" : "Selecione sua resposta"}"><svg class="learn-triangle" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none"></svg><div class="learn-board-center"><strong>RACE</strong>RODA EUROPEIA · 37 NÚMEROS</div>${numbers
-        .map((n) => {
-          const p = wheelPoints.find((p) => p.n === n);
-          return `<button type="button" class="learn-number ${red.has(n) ? "is-red" : n === 0 ? "is-zero" : ""}" data-number="${n}" data-board="${name}" style="left:${p.x}%;top:${p.y}%" aria-label="Número ${n}" aria-pressed="false">${n}</button>`;
-        })
-        .join(
-          "",
-        )}</div></div><div class="learn-board-legend" id="${name}Legend"></div><p class="learn-board-hint">${mode === "race" ? "Ordem real da roda europeia. Deslize para os lados se necessário." : "Números de 0 a 36. Alterne para Race para ver as posições na roda."}</p></div>`;
+    const mode = boardModes[name];
+    window.TurmaBoard.destroy($(name + "Board"));
+    $(name + "BoardMount").innerHTML = `<div class="learn-board-wrap"><div class="learn-board-head"><h3>${name === "demo" ? "A regra no mapa" : "Complete sua marcação"}</h3><div class="learn-board-modes" aria-label="Visualização dos números"><button type="button" data-board-mode="race" data-board-name="${name}" aria-pressed="${mode === "race"}">Race</button><button type="button" data-board-mode="grid" data-board-name="${name}" aria-pressed="${mode === "grid"}">Números</button></div></div>${window.TurmaBoard.markup({mode, name, id: name + "Board"})}<div class="learn-board-legend" id="${name}Legend"></div><p class="learn-board-hint">${mode === "race" ? "Siga a pista para encontrar os vizinhos. A sequência é a mesma da roda europeia." : "Mesa com três colunas. As cores são as da roleta; os destaques mostram a regra do módulo."}</p></div>`;
+    window.TurmaBoard.mount($(name + "Board"));
     if (name === "demo") {
       $(name + "BoardMount").insertAdjacentHTML(
         "beforeend",
@@ -632,16 +606,7 @@
         button.disabled = checked;
       }
     });
-    const svg = root.querySelector("svg"),
-      points = triangle
-        .map((n) => wheelPoints.find((p) => p.n === n))
-        .filter(Boolean)
-        .map((p) => `${p.x},${p.y}`)
-        .join(" ");
-    svg.innerHTML =
-      triangle.length > 1
-        ? `<${triangle.length > 2 ? "polygon" : "polyline"} points="${points}"/>`
-        : "";
+    window.TurmaBoard.connect(root, triangle);
   }
   function updateDemoBoard() {
     const reading = C.reading(module.id, demoValues, demoStage);
@@ -745,7 +710,7 @@
         '<p class="learn-panel-lead" style="margin:0">Avance as etapas abaixo para revelar os dois terminais. Os números são um exemplo didático.</p>';
     }
     $("panel-exemplo").innerHTML =
-      `<span class="learn-eyebrow">VEJA O CONCEITO EM AÇÃO</span><h2>Explore. Altere. Entenda.</h2><p class="learn-panel-lead">${module.id === "eclipse" ? "Acompanhe a construção da órbita, uma etapa por vez." : "Altere o exemplo e avance pelas três etapas para acompanhar cada marcação."}</p><div class="learn-demo-controls"><div class="learn-fields" id="studyDemoFields">${fields}</div>${module.id !== "eclipse" ? '<div class="learn-demo-actions"><small>Use apenas números inteiros entre 0 e 36.</small><button class="learn-button learn-button-secondary" type="button" data-action="demo-apply">Atualizar exemplo</button></div>' : ""}<p class="learn-field-error" id="demoFieldError" role="status" hidden></p></div><div class="learn-demo-walk"><small id="demoStageLabel"></small><p id="demoStageText" aria-live="polite"></p><div class="learn-demo-buttons"><button id="demoPrev" class="learn-button learn-button-quiet" type="button" data-action="demo-prev">← Anterior</button><div class="learn-demo-dots" aria-hidden="true"><i></i><i></i><i></i></div><button id="demoNext" class="learn-button learn-button-secondary" type="button" data-action="demo-next">Próximo →</button></div></div><div id="demoBoardMount"></div><ul class="learn-demo-results" id="demoResults"></ul>${module.id === "gemeos" ? '<details class="learn-reference"><summary>Experimente o reset da leitura</summary><p class="learn-panel-lead">Cenário didático após as duas entradas iniciais. Avance rodadas sem gêmeos ou simule um gêmeo para encerrar a leitura.</p><p id="demoResetStatus" class="learn-panel-lead" role="status"></p><div class="learn-game-controls"><button class="learn-button learn-button-secondary" data-action="reset-neutral" type="button">+ Rodada sem gêmeo</button><button class="learn-button learn-button-quiet" data-action="reset-twin" type="button">Simular gêmeo</button><button class="learn-button learn-button-quiet" data-action="reset-restart" type="button">Reiniciar</button></div></details>' : ""}<div class="learn-panel-actions"><span id="demoCompletionHint">Veja as três etapas para concluir o exemplo.</span><button id="demoComplete" class="learn-button" type="button" data-action="complete-demo" disabled>Concluir e praticar →</button></div>`;
+      `<span class="learn-eyebrow">VEJA O CONCEITO EM AÇÃO</span><h2>Explore. Altere. Entenda.</h2><p class="learn-panel-lead">${module.id === "eclipse" ? "Acompanhe a construção da órbita, uma etapa por vez." : "Altere o exemplo e avance pelas três etapas para acompanhar cada marcação."}</p><div class="learn-demo-controls"><div class="learn-fields" id="studyDemoFields">${fields}</div>${module.id !== "eclipse" ? '<div class="learn-demo-actions"><small>Use apenas números inteiros entre 0 e 36.</small><button class="learn-button learn-button-secondary" type="button" data-action="demo-apply">Atualizar exemplo</button></div>' : ""}<p class="learn-field-error" id="demoFieldError" role="status" hidden></p></div><div class="learn-demo-walk"><small id="demoStageLabel"></small><p id="demoStageText" aria-live="polite"></p><div class="learn-demo-buttons"><button id="demoPrev" class="learn-button learn-button-quiet" type="button" data-action="demo-prev">← Anterior</button><div class="learn-demo-dots" aria-hidden="true"><i></i><i></i><i></i></div><button id="demoNext" class="learn-button learn-button-secondary" type="button" data-action="demo-next">Próximo →</button></div></div><div id="demoTrace" class="learn-trace"></div><div id="demoBoardMount"></div><ul class="learn-demo-results" id="demoResults"></ul>${module.id === "gemeos" ? '<details class="learn-reference"><summary>Experimente o reset da leitura</summary><p class="learn-panel-lead">Cenário didático após as duas entradas iniciais. Avance rodadas sem gêmeos ou simule um gêmeo para encerrar a leitura.</p><p id="demoResetStatus" class="learn-panel-lead" role="status"></p><div class="learn-game-controls"><button class="learn-button learn-button-secondary" data-action="reset-neutral" type="button">+ Rodada sem gêmeo</button><button class="learn-button learn-button-quiet" data-action="reset-twin" type="button">Simular gêmeo</button><button class="learn-button learn-button-quiet" data-action="reset-restart" type="button">Reiniciar</button></div></details>' : ""}<div class="learn-panel-actions"><span id="demoCompletionHint">Veja as três etapas para concluir o exemplo.</span><button id="demoComplete" class="learn-button" type="button" data-action="complete-demo" disabled>Concluir e praticar →</button></div>`;
     if (G.validDemo(module.id, savedDemo)) {
       demoValues = [...savedDemo.values];
       demoStage = savedDemo.stage;
@@ -837,7 +802,8 @@
   }
   function updateDemo() {
     const r = C.reading(module.id, demoValues, demoStage);
-    $("demoStageLabel").textContent = `ETAPA ${demoStage + 1} DE 3`;
+    $("demoStageLabel").textContent = `${["01 · OBSERVE A ORIGEM", "02 · APLIQUE A REGRA", "03 · CONFIRA O CONJUNTO"][demoStage]}`;
+    $("demoTrace").innerHTML = `<div class="learn-trace-head"><span>Entrada</span><span>Como ler</span><span>Resultado</span></div>${window.TurmaStudyGuides.trace(module.id,demoValues,demoStage).map(row=>`<div class="learn-trace-row">${row.map(text=>`<span>${escape(text)}</span>`).join("")}</div>`).join("")}`;
     $("demoStageText").textContent = r.lines[demoStage];
     $("demoPrev").disabled = demoStage === 0 || demoDirty;
     $("demoNext").disabled = demoStage === 2 || demoDirty;
@@ -1011,6 +977,15 @@
   $("studyApp").addEventListener("click", (event) => {
     const button = event.target.closest("button");
     if (!button || button.disabled) return;
+    if (button.dataset.guideAnswer !== undefined) {
+      const check = window.TurmaStudyGuides.guides[module.id].check;
+      const ok = Number(button.dataset.guideAnswer) === check.answer;
+      $("guideAnswer").hidden = false;
+      $("guideAnswer").textContent = `${ok ? "Isso mesmo!" : "Vamos revisar:"} ${check.why}`;
+      $("guideAnswer").className = ok ? "is-correct" : "";
+      all("[data-guide-answer]").forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
+      return;
+    }
     if (button.dataset.favorite) {
       const id = button.dataset.favorite;
       if (!C.modules.some((m) => m.id === id)) return;

@@ -46,6 +46,9 @@ jobs:
       - name: Run study account and timer regression tests
         run: npm run study:accounts
 
+      - name: Run learning content, Race and PDF regression tests
+        run: npm run learning:regression
+
       - name: Smoke test real server startup
         shell: bash
         env:

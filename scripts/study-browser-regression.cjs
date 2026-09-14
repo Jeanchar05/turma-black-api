@@ -402,7 +402,7 @@ app.use(express.static(root));
       );
       assert.equal(
         await page.locator("#demoStageLabel").textContent(),
-        "ETAPA 3 DE 3",
+        "03 · CONFIRA O CONJUNTO",
       );
     } else {
       const done = M.empty();
