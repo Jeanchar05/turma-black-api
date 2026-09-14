@@ -1,0 +1,43 @@
+"use strict";
+const fs = require("node:fs"),
+  path = require("node:path"),
+  root = path.resolve(__dirname, "../public");
+let html = fs.readFileSync(path.join(root, "modulos.html"), "utf8");
+html = html
+  .replace("<title>Módulos |", "<title>Anotações |")
+  .replace("library-page", "notes-page")
+  .replace(
+    /<link rel="stylesheet" href="\/modulos\.css[^>]*>/g,
+    '<link rel="stylesheet" href="/notas-workspace.css">',
+  )
+  .replace(
+    /<script defer src="\/(?:study-media|modulos)\.js[^>]*><\/script>/g,
+    "",
+  )
+  .replace(
+    "</head>",
+    '<script defer src="/vendor/dompurify.min.js"></script><script defer src="/notas-workspace.js"></script></head>',
+  );
+html = html
+  .replace(
+    'href="/modulos" class="is-active" aria-current="page"',
+    'href="/modulos"',
+  )
+  .replace('href="/modulos" aria-current="page"', 'href="/modulos"')
+  .replace(
+    'href="/notas"><svg',
+    'href="/notas" class="is-active" aria-current="page"><svg',
+  )
+  .replace(
+    /(<nav class="learn-dock"[\s\S]*?)(<a href="\/notas")/,
+    '$1$2 aria-current="page"',
+  )
+  .replace("<strong>Módulos</strong></div>", "<strong>Anotações</strong></div>")
+  .replace('id="modulesApp"', 'id="notesApp"')
+  .replace("Preparando suas aulas", "Abrindo seu caderno")
+  .replace("Central de aulas", "Meu caderno")
+  .replace(
+    /<dialog class="lib-dialog"[\s\S]*?<\/dialog>/,
+    '<dialog id="noteEditor" class="notes-editor-dialog" aria-labelledby="noteEditorLabel"></dialog><dialog id="notesAction" class="notes-dialog" aria-labelledby="notesActionTitle"></dialog>',
+  );
+fs.writeFileSync(path.join(root, "notas.html"), html);

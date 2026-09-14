@@ -5,7 +5,7 @@
     const legend=document.createElement('div');legend.className='real-race-legend';legend.innerHTML='<span><i></i>Centro escolhido</span><span><i></i>Vizinhos incluídos</span><span><i></i>Último resultado</span>';tool.querySelector('.tp-race-body').before(legend);
     const selection=document.createElement('section');selection.className='real-race-selection';selection.innerHTML='<h3 id="realSelectionTitle">Sua seleção</h3><div class="real-selection-chips" aria-labelledby="realSelectionTitle"></div>';tool.querySelector('.tp-race-foot').before(selection);
     tool.querySelector('[data-neighbor-step="-1"]').setAttribute('aria-label','Diminuir vizinhos');tool.querySelector('[data-neighbor-step="1"]').setAttribute('aria-label','Aumentar vizinhos');tool.querySelector('[data-race-summary]').setAttribute('role','status');
-    const grid=tool.querySelector('[data-racetrack-grid]');[...grid.children].sort((a,b)=>Number(a.dataset.number)-Number(b.dataset.number)).forEach((el,index)=>el.style.setProperty('--mobile-order',index));
+
     function sync(){
       const state=window.TurmaRace.getState(), numbers=window.TurmaRace.getSelectedNumbers();
       selection.querySelector('h3').textContent=`Sua seleção · ${numbers.length} de 37 números`;

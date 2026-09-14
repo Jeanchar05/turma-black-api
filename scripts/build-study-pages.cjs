@@ -16,10 +16,10 @@ const nav = [
   ["Dashboard", "dashboard", "home"],
   ["Estudo", "estudo", "book"],
   ["Módulos", "modulos", "layers"],
-  ["Minigames", "minigames", "game"],
+
   ["Anotações", "notas", "note"],
   ["Favoritos", "favoritos", "star"],
-  ["Roleta", "roleta", "roulette"],
+  ["Roleta Operacional", "roleta", "roulette"],
   ["Roleta Real", "roleta-real", "roulette"],
   ["Provas", "provas", "exam"],
   ["Gestão", "gestao", "activity"],
@@ -42,6 +42,9 @@ for (const [route, name] of pages) {
   <script src="/study-appearance.js?v=20260913-1"></script>
   <link rel="stylesheet" href="/study-workspace.css?v=20260913-1">
   <script defer src="/study-curriculum.js?v=20260913-1"></script>
+  <script defer src="/study-board.js?v=20260914-1"></script>
+  <link rel="stylesheet" href="/study-board.css?v=20260914-1">
+  <script defer src="/study-guides.js?v=20260914-1"></script>
   <script defer src="/study-games.js?v=20260913-2"></script>
   <script defer src="/study-state-model.js?v=20260913-2"></script>
   <script defer src="/study-sync.js?v=20260913-2"></script>
@@ -78,7 +81,7 @@ for (const [route, name] of pages) {
   <nav class="learn-dock" id="studyDock" aria-label="Atalhos no celular">${[
     ["Início", "dashboard", "home"],
     ["Estudo", "estudo", "book"],
-    ["Minigames", "minigames", "game"],
+    ["Módulos", "modulos", "layers"],
     ["Anotações", "notas", "note"],
   ]
     .map(

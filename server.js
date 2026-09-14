@@ -24,7 +24,7 @@ const publicDir = path.join(__dirname, "public");
 const premiumVaultDir = path.resolve(
   process.env.PREMIUM_VAULT_DIR || path.join(__dirname, ".premium-vault")
 );
-const CACHE_VERSION = "20260913-estudo-conta-1";
+const CACHE_VERSION = "20260914-race-video-1";
 const DB_RETRY_MS = Math.max(15000, Number(process.env.DB_RETRY_MS || 30000));
 
 let tentativaBancoEmAndamento = false;
@@ -87,6 +87,7 @@ function aplicarVersaoNosAssets(html) {
 
 function aplicarCamadaResponsiva(html, allowFocus = false) {
   let resultado = String(html);
+  if (!resultado.includes('src="/site-navigation-menu.js"')) resultado=resultado.replace("</head>",'<script defer src="/site-navigation-menu.js"></script></head>');
   if (!resultado.includes('src="/page-navigation.js"')) resultado = resultado.replace(/<head>/i, '<head><script src="/page-navigation.js"></script>');
   if (!resultado.includes('src="/content-protection.js"')) {
     resultado = resultado.replace("</head>", '<link rel="stylesheet" href="/content-protection.css"><script defer src="/content-protection.js"></script></head>');
@@ -444,6 +445,7 @@ carregarRota("/admin", "admin.js");
 
 carregarRota("/dashboard-premium", "dashboard-premium.js");
 carregarRota("/study", "study-state.js");
+carregarRota("/learning", "learning-content.js");
 carregarRota("/", "alunos.js");
 carregarRota("/", "vendas.js");
 carregarRota("/", "dashboard.js");

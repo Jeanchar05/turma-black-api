@@ -1,0 +1,112 @@
+"use strict";
+(() => {
+  const esc = (v) =>
+    String(v ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  let catalog, host, api, notify;
+  async function open(root, options) {
+    host = root;
+    api = options.api;
+    notify = options.toast;
+    host.innerHTML = '<div class="cc-empty">Carregando vídeos…</div>';
+    catalog = await api("/learning/catalog");
+    if (!catalog.canManage) {
+      host.innerHTML =
+        '<div class="cc-empty">Sua conta não pode publicar conteúdos.</div>';
+      return;
+    }
+    render();
+  }
+  function render() {
+    host.innerHTML = `<section class="cc-hero"><div class="cc-hero-copy"><span class="cc-kicker">CONTEÚDO DA PLATAFORMA</span><h2>Instagram <em>da turma</em></h2><p>Publique um vídeo e escolha a ação do botão. Os conteúdos publicados aparecem em Módulos → Instagram.</p></div><div class="cc-hero-side"><button type="button" class="cc-primary-btn" data-instagram-new>+ Novo vídeo</button></div></section><div class="cc-instagram-layout"><section class="cc-card"><header class="cc-card-head"><strong>Seus vídeos</strong><a class="cc-ghost-btn" href="/modulos#instagram">Ver no site ↗</a></header><div class="cc-instagram-list">${catalog.instagram.length ? catalog.instagram.map((m) => `<button type="button" data-instagram-edit="${m.id}"><span><strong>${esc(m.title)}</strong><small>${esc(m.description)}</small></span><span class="cc-badge ${m.published ? "green" : "gray"}">${m.published ? "Publicado" : "Rascunho"}</span></button>`).join("") : '<div class="cc-empty">Adicione seu primeiro vídeo.</div>'}</div></section><section class="cc-card cc-instagram-editor" id="instagramAdminEditor"></section></div>`;
+    host.querySelector("[data-instagram-new]").onclick = () => edit();
+    host
+      .querySelectorAll("[data-instagram-edit]")
+      .forEach(
+        (b) =>
+          (b.onclick = () =>
+            edit(
+              catalog.instagram.find((m) => m.id === b.dataset.instagramEdit),
+            )),
+      );
+    edit(catalog.instagram[0]);
+  }
+  function edit(item) {
+    const m = item || {
+        id: `ig-${crypto.randomUUID()}`,
+        title: "",
+        description: "",
+        url: "",
+        duration: "",
+        moduleId: "",
+        revision: 0,
+        published: false,
+      },
+      a = m.action || { kind: "none" },
+      root = host.querySelector("#instagramAdminEditor"),
+      options = (id) =>
+        catalog.modules
+          .map(
+            (v) =>
+              `<option value="${v.id}" ${id === v.id ? "selected" : ""}>${esc(v.title)}</option>`,
+          )
+          .join("");
+    root.innerHTML = `<header class="cc-card-head"><strong>${item ? "Editar vídeo" : "Novo vídeo"}</strong></header><form id="instagramAdminForm"><label>Título<input name="title" maxlength="120" required value="${esc(m.title)}"></label><label>Link do Instagram<input name="url" type="url" maxlength="2000" required placeholder="https://www.instagram.com/reel/..." value="${esc(m.url)}"></label><label>Descrição ou legenda<textarea name="description" rows="3" maxlength="600">${esc(m.description)}</textarea></label><div class="cc-instagram-fields"><label>Módulo relacionado<select name="moduleId"><option value="">Conteúdo geral</option>${options(m.moduleId)}</select></label><label>Duração<input name="duration" maxlength="30" placeholder="Ex.: 1 min" value="${esc(m.duration)}"></label></div><fieldset><legend>Ação do botão</legend><label>O que o aluno poderá abrir?<select name="actionKind"><option value="none">Sem botão adicional</option><option value="study">Módulo de estudo</option><option value="pdf">Resumo em PDF</option><option value="link">Link externo</option></select></label><div id="instagramActionFields"><label>Texto do botão<input name="actionLabel" maxlength="40" value="${esc(a.label || "")}" placeholder="Ex.: Praticar este módulo"></label><label id="instagramActionModule">Destino<select name="actionModule">${options(a.moduleId || m.moduleId)}</select></label><label id="instagramActionLink">Link HTTPS<input name="actionUrl" type="url" maxlength="2000" value="${esc(a.url || "")}" placeholder="https://"></label></div></fieldset><label class="cc-instagram-publish"><input type="checkbox" name="published" ${m.published ? "checked" : ""}> Publicar no site para os alunos</label><p role="alert" hidden></p><button type="submit" class="cc-primary-btn">Salvar vídeo e ação</button><p class="cc-instagram-hint">Para retirar do site, desmarque “Publicar” e salve. O rascunho fica disponível para a equipe.</p></form>`;
+    const form = root.querySelector("form");
+    form.elements.actionKind.value = a.kind;
+    function actionFields() {
+      const kind = form.elements.actionKind.value;
+      root.querySelector("#instagramActionFields").hidden = kind === "none";
+      root.querySelector("#instagramActionModule").hidden = ![
+        "study",
+        "pdf",
+      ].includes(kind);
+      root.querySelector("#instagramActionLink").hidden = kind !== "link";
+      form.elements.actionUrl.required = kind === "link";
+    }
+    form.elements.actionKind.onchange = actionFields;
+    actionFields();
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const b = form.querySelector("[type=submit]"),
+        err = form.querySelector("[role=alert]");
+      b.disabled = true;
+      err.hidden = true;
+      const data = Object.fromEntries(new FormData(form));
+      data.published = form.elements.published.checked;
+      data.revision = m.revision;
+      data.summary = "";
+      data.action = {
+        kind: data.actionKind,
+        label: data.actionLabel,
+        moduleId: data.actionModule,
+        url: data.actionUrl,
+      };
+      try {
+        await api(`/learning/content/${m.id}`, { method: "PUT", body: data });
+        catalog = await api("/learning/catalog");
+        render();
+        edit(catalog.instagram.find((v) => v.id === m.id));
+        notify(
+          data.published
+            ? "Vídeo e ação publicados no site."
+            : "Rascunho salvo.",
+        );
+      } catch (e) {
+        err.textContent = e.message;
+        err.hidden = false;
+        b.disabled = false;
+      }
+    };
+  }
+  window.TurmaInstagramAdmin = { open };
+})();

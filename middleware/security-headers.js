@@ -45,6 +45,7 @@ function securityHeaders(req, res, next) {
     res.setHeader("Pragma", "no-cache");
   }
 
+  const learningPage = /^\/(?:__premium\/)?modulos(?:\.html)?\/?$/i.test(req.path || "");
   const csp = [
     "default-src 'self'",
     "base-uri 'self'",
@@ -54,9 +55,9 @@ function securityHeaders(req, res, next) {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "script-src 'self' 'unsafe-inline'",
+    learningPage ? "script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com" : "script-src 'self' 'unsafe-inline'",
     "connect-src 'self'",
-    "frame-src 'none'",
+    learningPage ? "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.instagram.com" : "frame-src 'none'",
     "worker-src 'self' blob:",
     "media-src 'self' blob: https:",
     "manifest-src 'self'"

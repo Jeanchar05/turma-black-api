@@ -21,6 +21,7 @@
     revision: 0,
     modules: Object.fromEntries(ids.map((id) => [id, emptyEntry()])),
     lastModule: "",
+    videos: {},
     focus: {
       revision: 0,
       status: "idle",
@@ -55,6 +56,14 @@
       return;
     }
     if (!ids.includes(op.module)) reject("Módulo inválido.");
+    if (op.kind === "video") {
+      if (typeof op.source !== "string" || !/^https:\/\//.test(op.source) || op.source.length > 2000 ||
+        !Number.isFinite(op.position) || op.position < 0 || op.position > 43200 ||
+        !Number.isFinite(op.duration) || op.duration <= 0 || op.duration > 43200 || op.position > op.duration ||
+        !Number.isFinite(op.observedAt) || op.observedAt < 0 ||
+        typeof op.completed !== "boolean") reject("Progresso da videoaula inválido.");
+      return;
+    }
     if (op.kind === "game") {
       if (!G.validGame(op.game)) reject("Sessão inválida.");
       if (op.game.answers.length === 5 && op.id !== `game:${op.game.id}:finish`)
@@ -99,6 +108,7 @@
     }
   }
   function settle(state, now) {
+    state.videos ??= {};
     const f = state.focus;
     if (f.status === "running" && f.deadline <= now) {
       f.status = "completed";
@@ -116,7 +126,14 @@
   function apply(state, op, now = Date.now()) {
     validate(op);
     settle(state, now);
-    if (op.kind === "focus") {
+    if (op.kind === "video") {
+      const previous = state.videos[op.module];
+      // An old offline observation must not rewind a more recent device.
+      if (previous && previous.observedAt > op.observedAt) return state;
+      state.videos[op.module] = {source:op.source,position:op.position,duration:op.duration,
+        completed:op.completed || Boolean(previous?.source === op.source && previous.completed),
+        observedAt:Math.min(op.observedAt,now),updatedAt:now};
+    } else if (op.kind === "focus") {
       const f = state.focus;
       if (op.revision !== f.revision)
         reject(

@@ -1,0 +1,130 @@
+.cc-instagram-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 24px;
+  align-items: start;
+}
+.cc-instagram-list {
+  display: grid;
+  padding: 10px;
+}
+.cc-instagram-list > button {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  border-bottom: 1px solid #ffffff12;
+  padding: 18px 12px;
+  cursor: pointer;
+}
+.cc-instagram-list strong,
+.cc-instagram-list small {
+  display: block;
+}
+.cc-instagram-list strong {
+  font-size: 13px;
+}
+.cc-instagram-list small {
+  font-size: 11px;
+  line-height: 1.6;
+  opacity: 0.6;
+  margin-top: 8px;
+}
+.cc-instagram-editor form {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+}
+.cc-instagram-editor label {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  color: #c6c8d4;
+}
+.cc-instagram-editor :is(input:not([type="checkbox"]), select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #ffffff1c;
+  border-radius: 8px;
+  background: #0d101b;
+  color: #f5f6fb;
+  padding: 12px;
+  font:
+    400 13px Inter,
+    sans-serif;
+}
+.cc-instagram-editor textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+.cc-instagram-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.cc-instagram-editor fieldset {
+  border: 1px solid #ffffff19;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 0;
+  display: grid;
+  gap: 15px;
+}
+.cc-instagram-editor legend {
+  color: #bda3ed;
+  font-size: 12px;
+  padding: 0 7px;
+}
+.cc-instagram-editor fieldset > div {
+  display: grid;
+  gap: 14px;
+}
+.cc-instagram-editor [hidden] {
+  display: none !important;
+}
+.cc-instagram-editor .cc-instagram-publish {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.cc-instagram-publish input {
+  width: 18px;
+  height: 18px;
+  accent-color: #9870db;
+}
+.cc-instagram-hint {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #989cae;
+  margin: 0;
+}
+.cc-instagram-editor [role="alert"] {
+  color: #ff9fae;
+  font-size: 12px;
+}
+.cc-instagram-editor button:disabled {
+  opacity: 0.5;
+}
+.cc-instagram-editor :is(input, textarea, select):focus-visible {
+  outline: 2px solid #ae90e5;
+  outline-offset: 3px;
+}
+@media (max-width: 1100px) {
+  .cc-instagram-layout {
+    grid-template-columns: 1fr;
+  }
+  .cc-instagram-editor form {
+    padding: 18px;
+  }
+}
+@media (max-width: 500px) {
+  .cc-instagram-fields {
+    grid-template-columns: 1fr;
+  }
+}
