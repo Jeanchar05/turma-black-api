@@ -102,6 +102,7 @@ function aplicarCamadaResponsiva(html, allowFocus = false) {
     const estudoScripts = ["study-curriculum","study-games","study-state-model","study-sync","study-focus"].map(name => `<script defer src="/${name}.js?v=20260913-2"></script>`).join("");
     resultado = resultado.replace(/<head>/i, `<head>${estudoScripts}<link rel="stylesheet" href="/study-focus.css?v=20260913-2">`);
   }
+  if (allowFocus && !resultado.includes("free-dashboard-page") && !resultado.includes('src="/support-widget.js"')) resultado = resultado.replace("</head>", '<link rel="stylesheet" href="/support-widget.css"><script defer src="/support-widget.js"></script>');
   return resultado;
 }
 
@@ -446,6 +447,7 @@ carregarRota("/admin", "admin.js");
 carregarRota("/dashboard-premium", "dashboard-premium.js");
 carregarRota("/study", "study-state.js");
 carregarRota("/learning", "learning-content.js");
+carregarRota("/student", "student-hub.js");
 carregarRota("/", "alunos.js");
 carregarRota("/", "vendas.js");
 carregarRota("/", "dashboard.js");

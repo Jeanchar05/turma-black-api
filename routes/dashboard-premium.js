@@ -210,7 +210,8 @@ router.put("/perfil", auth, async (req, res) => {
     const foto = clampText(req.body?.foto, 1000);
     if (!nome) return res.status(400).json({ erro: "Nome é obrigatório." });
     const user = req.usuarioDoc;
-    user.nome = nome; user.telefone = telefone; user.foto = foto; user.atualizadoPor = req.usuario?.email || "dashboard";
+    if (telefone && telefone !== String(user.telefone || "")) return res.status(400).json({ erro: "Altere o telefone em Meu perfil, confirmando sua senha." });
+    user.nome = nome; if (foto) user.foto = foto; user.atualizadoPor = req.usuario?.email || "dashboard";
     await user.save();
     await ensureStructure();
     await database.query("INSERT INTO dashboard_atividades (id, usuario_id, tipo, titulo, descricao) VALUES (?, ?, 'perfil', 'Perfil atualizado', 'Dados pessoais atualizados no dashboard.')", [id24(), usuarioId(req)]);

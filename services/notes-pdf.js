@@ -79,19 +79,11 @@ function blocks(markup) {
   return result;
 }
 function create(note, student) {
-  const doc = registerFonts(
-      new PDFDocument({
-        size: "A4",
-        margins: { top: 64, bottom: 72, left: 54, right: 54 },
-        bufferPages: true,
-        info: {
-          Title: note.titulo,
-          Author: student,
-          Subject: "Caderno pessoal - Turma do Primo",
-        },
-      }),
-    ),
-    width = 487;
+  const brand = require("./pdf-brand"), doc = brand.create(note.titulo, true), width = 461;
+  doc.info.Author = student;
+  doc.info.Subject = "Caderno pessoal - Turma do Primo";
+  doc.save().roundedRect(82, 87, 461, 145, 14).fill("#f2ecf6").restore();
+  doc.x = 100; doc.y = 106;
   doc
     .font("PrimoBold")
     .fontSize(9)
@@ -99,9 +91,9 @@ function create(note, student) {
     .text("TURMA DO PRIMO  /  MEU CADERNO");
   doc
     .moveDown(1)
-    .fontSize(28)
+    .fontSize(24)
     .fillColor("#2d203b")
-    .text(note.titulo, { width, lineGap: 2 });
+    .text(note.titulo, { width: 425, lineGap: 2 });
   doc
     .moveDown(0.7)
     .font("Primo")
@@ -117,11 +109,11 @@ function create(note, student) {
     );
   if (note.tags?.length)
     doc.moveDown(0.4).text(note.tags.map((t) => `#${t}`).join("  "), { width });
-  doc.moveDown(1.5);
+  doc.y = Math.max(doc.y + 28, 254); doc.x = 82;
   for (const b of blocks(note.conteudo)) {
     if (doc.y > 705) doc.addPage();
     if (b.kind === "hr") {
-      doc.moveTo(54, doc.y).lineTo(541, doc.y).strokeColor("#ddd5e4").stroke();
+      doc.moveTo(82, doc.y).lineTo(541, doc.y).strokeColor("#ddd5e4").stroke();
       doc.moveDown(0.8);
       continue;
     }
@@ -147,10 +139,10 @@ function create(note, student) {
         oblique: !!r.italic,
         link: r.link || null,
       };
-      if (i === 0) doc.text(r.text, 54 + indent, doc.y, o);
+      if (i === 0) doc.text(r.text, 82 + indent, doc.y, o);
       else doc.text(r.text, o);
     });
-    doc.x = 54;
+    doc.x = 82;
     doc.moveDown(0.7);
   }
   for (const [title, items] of [
@@ -171,7 +163,7 @@ function create(note, student) {
         .font("PrimoBold")
         .fontSize(13)
         .fillColor("#634280")
-        .text(title, 54, doc.y, { width })
+        .text(title, 82, doc.y, { width })
         .moveDown(0.5);
       for (const item of items)
         doc
@@ -181,27 +173,7 @@ function create(note, student) {
           .text(item, { width, lineGap: 4 })
           .moveDown(0.4);
     }
-  const range = doc.bufferedPageRange();
-  for (let i = 0; i < range.count; i++) {
-    doc.switchToPage(i);
-    doc
-      .strokeColor("#e6deed")
-      .lineWidth(1)
-      .moveTo(54, 781)
-      .lineTo(541, 781)
-      .stroke();
-    doc
-      .font("Primo")
-      .fontSize(8)
-      .fillColor("#806b8c")
-      .text(
-        `Caderno do aluno • ${note.id.slice(0, 8).toUpperCase()}`,
-        54,
-        794,
-        { lineBreak: false },
-      );
-    doc.text(`${i + 1} / ${range.count}`, 501, 794, { lineBreak: false });
-  }
+  brand.footer(doc, "MEU CADERNO · " + String(note.id || "").slice(0,8).toUpperCase(), "Anotações de " + student);
   return doc;
 }
 module.exports = { create, blocks };

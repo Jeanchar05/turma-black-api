@@ -5,5 +5,5 @@
   try {
     theme = localStorage.getItem("turma.workspace.theme") || "dark";
   } catch {}
-  document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
+  document.documentElement.dataset.theme = theme === "light" || (theme === "system" && matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
 })();

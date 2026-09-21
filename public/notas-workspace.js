@@ -1022,6 +1022,8 @@
       render();
       $("studyLoading").hidden = true;
       $("notesApp").hidden = false;
+      const requested = (window.TurmaNavigation?.hash || location.hash).slice(1);
+      if (notes.some(n => n.id === requested && !n.excluida)) openEditor(requested);
       flush();
     } catch (e) {
       $("studyLoadTitle").textContent = "Vamos tentar novamente?";
