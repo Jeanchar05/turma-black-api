@@ -33,6 +33,9 @@ jobs:
       - name: Test evolution engine
         run: node scripts/evolution-regression.cjs
 
+      - name: Test management journal
+        run: node scripts/management-v6-regression.cjs
+
       - name: Test profile security helpers
         run: node scripts/profile-v6-regression.cjs
 
