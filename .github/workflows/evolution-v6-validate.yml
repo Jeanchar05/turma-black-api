@@ -48,6 +48,9 @@ jobs:
       - name: Test native student workspace V8
         run: node scripts/student-native-v8-regression.cjs
 
+      - name: Test canonical navigation and V9 pages
+        run: node scripts/student-nav-v9-regression.cjs
+
       - name: Run security regression
         run: npm run security:regression
 
