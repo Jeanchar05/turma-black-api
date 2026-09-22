@@ -10,5 +10,6 @@ const router = express.Router();
 router.use(require("./notificacoes-mysql"));
 router.use(require("./student-evolution"));
 router.use("/dashboard-premium", require("./profile-v6"));
+router.use("/profile-v6", require("./profile-save-v6"));
 
 module.exports = router;
