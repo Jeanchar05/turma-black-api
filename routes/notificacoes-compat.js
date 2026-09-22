@@ -7,7 +7,9 @@ const router = express.Router();
 // As notificações continuam no MySQL e este roteador também concentra
 // as extensões V6 que precisam viver na raiz sem duplicar configuração
 // no server.js.
-require("../services/bankroll-days-v6").patch(require("../services/student-evolution"));
+const evolution = require("../services/student-evolution");
+require("../services/bankroll-days-v6").patch(evolution);
+require("../services/journey-elite-v6").patch(evolution);
 router.use(require("./notificacoes-mysql"));
 router.use(require("./student-evolution"));
 router.use("/dashboard-premium", require("./profile-v6"));
