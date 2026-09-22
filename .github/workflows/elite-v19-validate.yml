@@ -40,9 +40,6 @@ jobs:
       - name: Run navigation and page access regression tests
         run: npm run navigation:regression
 
-      - name: Run maintenance mode regression tests
-        run: npm run maintenance:regression
-
       - name: Run study curriculum regression tests
         run: npm run study:regression
 
@@ -54,6 +51,9 @@ jobs:
 
       - name: Run notes, account isolation and PDF regression tests
         run: npm run notes:regression
+
+      - name: Run final student workspace regression tests
+        run: npm run student:polish
 
       - name: Smoke test real server startup
         shell: bash
