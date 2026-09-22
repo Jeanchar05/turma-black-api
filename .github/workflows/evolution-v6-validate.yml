@@ -54,6 +54,9 @@ jobs:
       - name: Test Esportiva affiliate CTA V10
         run: node scripts/roulette-affiliate-v10-regression.cjs
 
+      - name: Test roulette card art V11
+        run: node scripts/roulette-card-art-v11-regression.cjs
+
       - name: Run security regression
         run: npm run security:regression
 

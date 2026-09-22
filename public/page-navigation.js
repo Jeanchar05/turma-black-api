@@ -93,6 +93,7 @@
     if (path === "/roleta") {
       loadStyle("/roulette-esportiva-affiliate-v10.css?v=20260922-1", "roulette-esportiva-affiliate-v10-css");
       loadScript("/roulette-esportiva-affiliate-v10.js?v=20260922-1", "roulette-esportiva-affiliate-v10-js");
+      loadScript("/roulette-card-art-v11.js?v=20260922-1", "roulette-card-art-v11-js");
     }
   }
   loadEvolutionV6();
