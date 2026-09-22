@@ -3,8 +3,9 @@
 const assert = require("node:assert/strict");
 const BankrollDays = require("../services/bankroll-days-v6");
 
+const baseDate = Date.UTC(2024, 0, 1, 12, 0, 0);
 const raw = Array.from({ length: 740 }, (_, index) => ({
-  date: `2026-${String((index % 12) + 1).padStart(2, "0")}-${String((index % 28) + 1).padStart(2, "0")}`,
+  date: new Date(baseDate + index * 86400000).toISOString().slice(0, 10),
   initialBankroll: index === 0 ? -50 : 1000.129,
   entries: -2,
   greens: 3.8,
@@ -24,6 +25,7 @@ assert.equal(days[0].notes.length, 500);
 assert.match(days[0].date, /^\d{4}-\d{2}-\d{2}$/);
 assert.equal(Number.isFinite(days[0].result), true);
 assert.equal(days[0].finalBankroll, 1101);
+assert.equal(days[0].date, raw[10].date);
 
 const invalid = BankrollDays.sanitizeDays([
   { date: "not-a-date", result: 50 },
