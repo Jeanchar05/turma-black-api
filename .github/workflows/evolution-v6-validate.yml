@@ -42,6 +42,9 @@ jobs:
       - name: Test UI wiring
         run: node scripts/evolution-ui-regression.cjs
 
+      - name: Test unified student shell and support
+        run: node scripts/student-shell-v7-regression.cjs
+
       - name: Run security regression
         run: npm run security:regression
 
