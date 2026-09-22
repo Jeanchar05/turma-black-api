@@ -10,14 +10,14 @@
     "security:regression": "node scripts/security-regression.js",
     "sales:regression": "node scripts/sales-regression.js",
     "navigation:regression": "node scripts/navigation-regression.js",
-    "maintenance:regression": "node scripts/maintenance-regression.cjs",
     "study:regression": "node scripts/study-regression.js",
     "study:browser": "node scripts/study-browser-regression.cjs",
     "study:accounts": "node scripts/study-account-regression.cjs",
     "learning:regression": "node scripts/learning-regression.cjs",
     "learning:browser": "node scripts/learning-browser-regression.cjs",
     "notes:regression": "node scripts/notes-regression.cjs",
-    "notes:browser": "node scripts/notes-browser-regression.cjs"
+    "notes:browser": "node scripts/notes-browser-regression.cjs",
+    "student:polish": "node scripts/student-polish-regression.cjs"
   },
   "engines": {
     "node": "22.x"
