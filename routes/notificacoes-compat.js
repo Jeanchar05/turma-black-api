@@ -6,7 +6,9 @@ const router = express.Router();
 // Compatibilidade mantida no mesmo ponto de montagem do servidor.
 // As extensões que precisam interceptar rotas antigas entram aqui antes
 // dos roteadores legados carregados depois no server.js.
-require("../services/bankroll-days-v6").patch(require("../services/student-evolution"));
+const evolution = require("../services/student-evolution");
+require("../services/bankroll-days-v6").patch(evolution);
+require("../services/journey-elite-v6").patch(evolution);
 router.use(require("./support-admin-v7"));
 router.use(require("./notificacoes-mysql"));
 router.use(require("./student-evolution"));
