@@ -10,8 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <script src="/study-appearance.js?v=20260913-1"></script>
-  <link rel="stylesheet" href="/study-workspace.css?v=20260913-1">
+  <script src="/study-appearance.js?v=20260922-v8"></script>
+  <link rel="stylesheet" href="/study-workspace.css?v=20260922-v8">
+  <link rel="stylesheet" href="/notas-workspace.css?v=20260922-v8">
+  <link rel="stylesheet" href="/student-workspace-v8.css?v=20260922-v8">
   <script defer src="/study-curriculum.js?v=20260913-1"></script>
   <script defer src="/study-guides.js?v=20260914-1"></script>
   <script defer src="/study-games.js?v=20260913-2"></script>
@@ -19,8 +21,11 @@
   <script defer src="/study-sync.js?v=20260913-2"></script>
   <link rel="stylesheet" href="/study-focus.css?v=20260913-2">
   <script defer src="/study-focus.js?v=20260913-2"></script>
-<link rel="stylesheet" href="/notas-workspace.css"><script defer src="/vendor/dompurify.min.js"></script><script defer src="/notas-workspace.js"></script></head>
-<body class="learn-page notes-page" data-required-access="dashboard">
+  <script defer src="/student-workspace-v8.js?v=20260922-v8"></script>
+  <script defer src="/vendor/dompurify.min.js"></script>
+  <script defer src="/notas-workspace.js?v=20260922-v8"></script>
+</head>
+<body class="learn-page notes-page workspace-v8" data-required-access="dashboard" data-workspace-controller="page">
   <a class="learn-skip" href="#studyMain">Pular para o conteúdo</a>
   <div class="learn-backdrop" id="studyBackdrop" hidden></div>
   <aside class="learn-sidebar" id="studySidebar" aria-label="Menu principal">
@@ -35,10 +40,10 @@
     <header class="learn-topbar">
       <button class="learn-icon-button learn-menu" id="studyMenu" type="button" aria-label="Abrir menu" aria-controls="studySidebar" aria-expanded="false"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-menu"></use></svg></button>
       <div class="learn-breadcrumb"><a href="/dashboard">Meu espaço</a><span>/</span><strong>Anotações</strong></div>
-      <div class="learn-top-actions"><button class="learn-icon-button" id="studyTheme" type="button" aria-label="Ativar tema claro"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button><a class="learn-icon-button" href="/notificacoes" aria-label="Notificações"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-bell"></use></svg></a><a class="learn-account" href="/perfil"><span id="studyAvatar">P</span><span><strong id="studyName">Aluno</strong><small>Meu perfil</small></span></a></div>
+      <div class="learn-top-actions"><button class="learn-icon-button" id="studyTheme" type="button" aria-label="Ativar tema claro"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-moon"></use></svg></button><a class="learn-icon-button" href="/notificacoes" aria-label="Notificações"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-bell"></use></svg></a><a class="learn-account" href="/perfil"><span id="studyAvatar" data-workspace-avatar>P</span><span><strong id="studyName" data-workspace-name>Aluno</strong><small data-workspace-plan>Meu perfil</small></span></a></div>
     </header>
     <main class="learn-main" id="studyMain" tabindex="-1">
-      <section class="learn-loading" id="studyLoading" aria-live="polite"><div class="learn-loading-icon"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-book"></use></svg></div><h1 id="studyLoadTitle">Abrindo seu caderno</h1><p id="studyLoadMessage">Só um instante. Estamos carregando seu espaço.</p><button class="learn-button" id="studyRetry" type="button" hidden>Tentar novamente</button></section>
+      <section class="learn-loading" id="studyLoading" aria-live="polite"><div class="learn-loading-icon"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-note"></use></svg></div><h1 id="studyLoadTitle">Abrindo seu caderno</h1><p id="studyLoadMessage">Só um instante. Estamos carregando seu espaço.</p><button class="learn-button" id="studyRetry" type="button" hidden>Tentar novamente</button></section>
       <div id="notesApp" hidden></div>
       <p class="learn-storage-status" id="studyStorageStatus" role="status" hidden></p>
       <noscript>Ative o JavaScript para acessar as atividades interativas.</noscript>
@@ -47,5 +52,6 @@
   </div>
   <nav class="learn-dock" id="studyDock" aria-label="Atalhos no celular"><a href="/dashboard"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-home"></use></svg><span>Início</span></a><a href="/estudo"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-book"></use></svg><span>Estudo</span></a><a href="/modulos"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><span>Módulos</span></a><a href="/notas" aria-current="page"><svg aria-hidden="true"><use href="/assets/dashboard-icons.svg#i-note"></use></svg><span>Anotações</span></a></nav>
   <div class="learn-toast" id="studyToast" role="status" hidden></div>
-<dialog id="noteEditor" class="notes-editor-dialog" aria-labelledby="noteEditorLabel"></dialog><dialog id="notesAction" class="notes-dialog" aria-labelledby="notesActionTitle"></dialog></body>
+  <dialog id="noteEditor" class="notes-editor-dialog" aria-labelledby="noteEditorLabel"></dialog><dialog id="notesAction" class="notes-dialog" aria-labelledby="notesActionTitle"></dialog>
+</body>
 </html>
