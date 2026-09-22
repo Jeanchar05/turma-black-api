@@ -2,6 +2,7 @@
 
 const assert = require("node:assert/strict");
 const Evolution = require("../services/student-evolution");
+require("../services/journey-elite-v6").patch(Evolution);
 
 function utcDate(iso) {
   return new Date(`${iso}T15:00:00Z`);
@@ -61,7 +62,6 @@ function testServerSideScoring() {
     date: utcDate("2026-09-21"),
     nonce: 2,
   });
-
   const answers = generated.payload.questions.map((question) => ({
     questionId: question.id,
     alternativeId: String(question.correctOption),
@@ -128,8 +128,6 @@ for (const test of [
   testServerSideScoring,
   testJourneyRules,
   testBankrollSanitization,
-]) {
-  test();
-}
+]) test();
 
 console.log("Evolution V6 regression: OK");
