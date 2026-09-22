@@ -66,19 +66,20 @@
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/provas", "/favoritos"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
-    loadStyle("/student-evolution-v6.css?v=20260921-4", "evolution-css");
-    loadScript("/student-evolution-v6.js?v=20260921-4", "evolution-js");
+    loadStyle("/student-evolution-v6.css?v=20260921-5", "evolution-css");
+    loadScript("/student-evolution-v6.js?v=20260921-5", "evolution-js");
     if (!student) return;
-    loadStyle("/support-float-v6.css?v=20260921-4", "support-float-css");
-    loadStyle("/profile-v6.css?v=20260921-4", "profile-css");
-    loadStyle("/favorites-v6.css?v=20260921-4", "favorites-css");
-    loadScript("/support-float-v6.js?v=20260921-4", "support-float-js");
-    loadScript("/profile-v6.js?v=20260921-4", "profile-js");
-    loadScript("/profile-save-guard-v6.js?v=20260921-4", "profile-save-guard-js");
-    loadScript("/favorites-v6.js?v=20260921-4", "favorites-js");
+    loadStyle("/support-float-v6.css?v=20260921-5", "support-float-css");
+    loadStyle("/profile-v6.css?v=20260921-5", "profile-css");
+    loadStyle("/favorites-v6.css?v=20260921-5", "favorites-css");
+    loadScript("/support-float-v6.js?v=20260921-5", "support-float-js");
+    loadScript("/profile-v6.js?v=20260921-5", "profile-js");
+    loadScript("/profile-save-guard-v6.js?v=20260921-5", "profile-save-guard-js");
+    loadScript("/favorites-v6.js?v=20260921-5", "favorites-js");
+    loadScript("/activity-v6.js?v=20260921-5", "activity-js");
     if (path === "/gestao") {
-      loadStyle("/management-v6.css?v=20260921-4", "management-css");
-      loadScript("/management-v6.js?v=20260921-4", "management-js");
+      loadStyle("/management-v6.css?v=20260921-5", "management-css");
+      loadScript("/management-v6.js?v=20260921-5", "management-js");
     }
   }
   loadEvolutionV6();
