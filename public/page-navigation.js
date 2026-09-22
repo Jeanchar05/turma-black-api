@@ -95,6 +95,8 @@
       loadScript("/roulette-esportiva-affiliate-v10.js?v=20260922-1", "roulette-esportiva-affiliate-v10-js");
       loadScript("/roulette-card-art-v11.js?v=20260922-1", "roulette-card-art-v11-js");
     }
+    loadStyle("/final-fixes-v12.css?v=20260922-1", "final-fixes-v12-css");
+    loadScript("/final-fixes-v12.js?v=20260922-1", "final-fixes-v12-js");
   }
   loadEvolutionV6();
 })();
