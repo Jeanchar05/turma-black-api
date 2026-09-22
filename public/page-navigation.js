@@ -83,17 +83,21 @@
     loadScript("/support-float-v6.js?v=20260921-6", "support-float-js");
     loadScript("/profile-v6.js?v=20260921-6", "profile-js");
     loadScript("/profile-save-guard-v6.js?v=20260921-6", "profile-save-guard-js");
+    loadScript("/profile-link-v12.js?v=20260922-v12", "profile-link-v12-js");
     loadScript("/favorites-v6.js?v=20260921-6", "favorites-js");
     loadScript("/activity-v6.js?v=20260921-6", "activity-js");
     loadScript("/floating-controls-v7.js?v=20260921-1", "floating-controls-v7-js");
     if (path === "/gestao") {
       loadStyle("/management-v6.css?v=20260921-6", "management-css");
       loadScript("/management-v6.js?v=20260921-6", "management-js");
+      loadScript("/gestao-fix-v12.js?v=20260922-v12", "gestao-fix-v12-js");
     }
     if (path === "/roleta") {
       loadStyle("/roulette-esportiva-affiliate-v10.css?v=20260922-1", "roulette-esportiva-affiliate-v10-css");
+      loadStyle("/roulette-polish-v12.css?v=20260922-v12", "roulette-polish-v12-css");
       loadScript("/roulette-esportiva-affiliate-v10.js?v=20260922-1", "roulette-esportiva-affiliate-v10-js");
-      loadScript("/roulette-card-art-v11.js?v=20260922-1", "roulette-card-art-v11-js");
+      loadScript("/roulette-card-art-v11.js?v=20260922-v12", "roulette-card-art-v11-js");
+      loadScript("/roulette-polish-v12.js?v=20260922-v12", "roulette-polish-v12-js");
     }
   }
   loadEvolutionV6();
