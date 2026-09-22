@@ -95,11 +95,8 @@
       accountId = String(me.usuario?.id || me.usuario?._id || me.id || me._id || "");
       study = stateData.state || null;
       render();
-      const grid = $("#favoritesGrid");
-      if (grid) {
-        const observer = new MutationObserver(() => { clearTimeout(observer._timer); observer._timer = setTimeout(render, 80); });
-        observer.observe(grid, { childList: true });
-      }
+      setTimeout(render, 450);
+      setTimeout(render, 1200);
     } catch (_) {}
     document.addEventListener("click", (event) => {
       const button = event.target.closest("[data-remove-study-favorite]");
