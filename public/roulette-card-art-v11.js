@@ -8,33 +8,33 @@
       title: "Roullete immersive (Evolution)",
       badge: "EVOLUTION",
       match: /immersive|evolution/i,
-      dark: "/assets/roulette/cards/immersive-dark.svg?v=20260922-1",
-      light: "/assets/roulette/cards/immersive-light.svg?v=20260922-1"
+      dark: "/assets/roulette/v12/immersive-dark.webp?v=20260922-v12",
+      light: "/assets/roulette/v12/immersive-light.webp?v=20260922-v12"
     },
     playtech: {
       title: "Roleta Brasileira (Playtech)",
       badge: "PLAYTECH",
       match: /playtech/i,
-      dark: "/assets/roulette/cards/playtech-dark.svg?v=20260922-1",
-      light: "/assets/roulette/cards/playtech-light.svg?v=20260922-1"
+      dark: "/assets/roulette/v12/playtech-dark.webp?v=20260922-v12",
+      light: "/assets/roulette/v12/playtech-light.webp?v=20260922-v12"
     },
     pragmatic: {
       title: "Roleta Brasileira (Pragmatic)",
       badge: "PRAGMATIC PLAY",
       match: /pragmatic/i,
-      dark: "/assets/roulette/cards/pragmatic-dark.svg?v=20260922-1",
-      light: "/assets/roulette/cards/pragmatic-light.svg?v=20260922-1"
+      dark: "/assets/roulette/v12/pragmatic-dark.webp?v=20260922-v12",
+      light: "/assets/roulette/v12/pragmatic-light.webp?v=20260922-v12"
     },
-    turistas: {
-      title: "Turistas roullet",
+    tukias: {
+      title: "Tukias roullet",
       badge: "IMAGINE LIVE",
-      match: /turkish|turistas|imagine/i,
-      dark: "/assets/roulette/cards/turistas-dark.svg?v=20260922-1",
-      light: "/assets/roulette/cards/turistas-light.svg?v=20260922-1"
+      match: /turkish|turistas|tukias|imagine/i,
+      dark: "/assets/roulette/v12/tukias-dark.webp?v=20260922-v12",
+      light: "/assets/roulette/v12/tukias-light.webp?v=20260922-v12"
     }
   };
 
-  const order = ["immersive", "playtech", "pragmatic", "turistas"];
+  const order = ["immersive", "playtech", "pragmatic", "tukias"];
   const currentTheme = () => document.documentElement.dataset.theme === "light" ? "light" : "dark";
 
   function findCard(config) {
@@ -79,7 +79,7 @@
     if (!panel) return;
     const title = panel.querySelector("h2");
     const description = panel.querySelector("header p");
-    if (title) title.textContent = "Ferramentas opcionais";
+    if (title) title.textContent = "Ferramentas rápidas";
     if (description) description.textContent = "Atalhos extras para complementar sua rotina.";
     const tools = [...panel.querySelectorAll(".roulette-tool-card-new")];
     tools.slice(3).forEach(tool => tool.remove());
