@@ -1,0 +1,46 @@
+name: Validate Evolution V6
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evolution-v6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-fund
+
+      - name: Validate JavaScript syntax
+        run: npm run validate
+
+      - name: Test evolution engine
+        run: node scripts/evolution-regression.cjs
+
+      - name: Test profile security helpers
+        run: node scripts/profile-v6-regression.cjs
+
+      - name: Test UI wiring
+        run: node scripts/evolution-ui-regression.cjs
+
+      - name: Run security regression
+        run: npm run security:regression
+
+      - name: Audit production dependencies
+        run: npm audit --audit-level=high
