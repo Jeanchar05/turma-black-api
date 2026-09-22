@@ -11,6 +11,7 @@
     }
     return "";
   };
+  const systemTheme = () => matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   const resolvedTheme = () => document.documentElement.dataset.theme === "light" ? "light" : "dark";
   function applyTheme(theme, persist = true) {
     const next = theme === "light" ? "light" : "dark";
@@ -25,6 +26,15 @@
       if (token) fetch("/dashboard-premium/preferencias", { method:"PUT", headers:{Accept:"application/json",Authorization:`Bearer ${token}`,"Content-Type":"application/json"}, body:JSON.stringify({tema:next}), cache:"no-store" }).catch(()=>{});
     }
     window.dispatchEvent(new CustomEvent("turma:theme-change", { detail:{ theme: next } }));
+  }
+  function syncProfileTheme(value) {
+    const preference = String(value || "dark");
+    const next = preference === "system" ? systemTheme() : (preference === "light" ? "light" : "dark");
+    try {
+      if (preference === "system") localStorage.removeItem("turma.workspace.theme");
+      else localStorage.setItem("turma.workspace.theme", next);
+    } catch (_) {}
+    applyTheme(next, false);
   }
   function closeMenu(restore = false) {
     const sidebar = $("studySidebar"), menu = $("studyMenu"), backdrop = $("studyBackdrop"), shell = $("studyShell"), dock = $("studyDock");
@@ -61,7 +71,7 @@
       const preferred = data.preferencias?.tema;
       let localTheme = "";
       try { localTheme = localStorage.getItem("turma.workspace.theme") || ""; } catch (_) {}
-      if ((preferred === "dark" || preferred === "light") && !localTheme) applyTheme(preferred, false);
+      if (!localTheme && ["dark","light","system"].includes(preferred)) syncProfileTheme(preferred);
     } catch (_) {}
   }
   function logout() {
@@ -85,6 +95,16 @@
       document.addEventListener("keydown", event => { if (event.key === "Escape" && $("studySidebar")?.classList.contains("is-open")) closeMenu(true); });
       closeMenu();
     }
+    document.addEventListener("click", event => {
+      const choice = event.target.closest?.("[data-set-theme]");
+      if (choice) syncProfileTheme(choice.dataset.setTheme);
+    });
+    addEventListener("storage", event => {
+      if (event.key === "turma.workspace.theme" && event.newValue) applyTheme(event.newValue, false);
+    });
+    matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => {
+      if (document.querySelector('[data-set-theme="system"].active')) syncProfileTheme("system");
+    });
     loadAccount();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once:true }); else init();
