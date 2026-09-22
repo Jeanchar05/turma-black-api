@@ -40,6 +40,9 @@ jobs:
       - name: Run navigation and page access regression tests
         run: npm run navigation:regression
 
+      - name: Run final V12 regression tests
+        run: npm run final:regression
+
       - name: Run study curriculum regression tests
         run: npm run study:regression
 
