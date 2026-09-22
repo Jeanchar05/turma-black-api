@@ -3,7 +3,7 @@ const express = require("express"),
   { auth } = require("../middleware/auth"),
   { sensitiveWriteRateLimit } = require("../middleware/rate-limit"),
   service = require("../services/notes"),
-  pdf = require("../services/notes-pdf");
+  pdf = require("../services/notes-pdf-v12");
 const router = express.Router(),
   account = (req) => String(req.usuario?.id || req.usuario?._id || "");
 router.use(auth, (req, res, next) => {
