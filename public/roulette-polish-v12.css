@@ -1,0 +1,232 @@
+/* Roleta Operacional V12 — correção final de tema e responsividade */
+body.roulette-page {
+  --roulette-bg: #09030f;
+  --roulette-panel: #12091e;
+  --roulette-panel-2: #190d29;
+  --roulette-text: #f8f3ff;
+  --roulette-muted: #ad9bbb;
+  --roulette-border: rgba(197, 142, 255, .20);
+  --roulette-soft: rgba(143, 62, 226, .12);
+  --roulette-shadow: 0 24px 60px rgba(0,0,0,.30);
+  background: var(--roulette-bg) !important;
+  color: var(--roulette-text) !important;
+}
+
+body.roulette-page .learn-main,
+body.roulette-page .roulette-shell {
+  background: transparent !important;
+}
+
+body.roulette-page .v8-page-head,
+body.roulette-page .roulette-hero-new,
+body.roulette-page .roulette-platform-new,
+body.roulette-page .roulette-panel-new,
+body.roulette-page .roulette-responsible-new {
+  background: var(--roulette-panel) !important;
+  border-color: var(--roulette-border) !important;
+  color: var(--roulette-text) !important;
+  box-shadow: var(--roulette-shadow);
+}
+
+body.roulette-page .v8-page-head h1,
+body.roulette-page .roulette-hero-title h1,
+body.roulette-page .roulette-panel-head-new h2,
+body.roulette-page .roulette-casino-card h3,
+body.roulette-page .roulette-tool-card-new h3,
+body.roulette-page .roulette-responsible-new strong {
+  color: var(--roulette-text) !important;
+}
+
+body.roulette-page .v8-page-head p,
+body.roulette-page .roulette-hero-copy-new p,
+body.roulette-page .roulette-panel-head-new p,
+body.roulette-page .roulette-casino-card small,
+body.roulette-page .roulette-tool-card-new p,
+body.roulette-page .roulette-responsible-new p,
+body.roulette-page .roulette-platform-info p {
+  color: var(--roulette-muted) !important;
+}
+
+body.roulette-page .roulette-hero-new {
+  display: grid !important;
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
+  overflow: hidden;
+  min-height: 0 !important;
+  align-items: stretch;
+}
+
+body.roulette-page .roulette-hero-copy-new {
+  padding: 28px !important;
+  align-self: center;
+}
+
+body.roulette-page .roulette-hero-image {
+  min-height: 0 !important;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-left: 1px solid var(--roulette-border);
+  background: var(--roulette-panel-2) !important;
+}
+
+body.roulette-page .roulette-hero-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  filter: none !important;
+}
+
+body.roulette-page .roulette-casino-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+}
+
+body.roulette-page .roulette-casino-card,
+body.roulette-page .roulette-tool-card-new {
+  background: var(--roulette-panel-2) !important;
+  border-color: var(--roulette-border) !important;
+  overflow: hidden;
+}
+
+body.roulette-page .roulette-card-image {
+  aspect-ratio: 16 / 9;
+  min-height: 0 !important;
+  background: var(--roulette-panel-2) !important;
+}
+
+body.roulette-page .roulette-card-image img,
+body.roulette-page .roulette-tool-card-new > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+  filter: none !important;
+}
+
+body.roulette-page .roulette-theme-art {
+  image-rendering: auto !important;
+}
+
+body.roulette-page .roulette-tools-grid-new {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+body.roulette-page .roulette-tool-card-new {
+  display: grid !important;
+  grid-template-columns: 132px 1fr !important;
+  min-height: 156px;
+}
+
+body.roulette-page .roulette-tool-card-new > img {
+  min-height: 156px;
+  border-right: 1px solid var(--roulette-border);
+}
+
+body.roulette-page .roulette-tool-card-new > div {
+  padding: 18px !important;
+}
+
+body.roulette-page .roulette-platform-cta a,
+body.roulette-page .roulette-casino-card a,
+body.roulette-page .roulette-tool-card-new a {
+  transition: transform .18s ease, filter .18s ease, background .18s ease;
+}
+
+body.roulette-page .roulette-platform-cta a:hover,
+body.roulette-page .roulette-casino-card a:hover,
+body.roulette-page .roulette-tool-card-new a:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+:root[data-theme="light"] body.roulette-page {
+  --roulette-bg: #f6f3f9;
+  --roulette-panel: #ffffff;
+  --roulette-panel-2: #faf7fd;
+  --roulette-text: #21152c;
+  --roulette-muted: #6e6079;
+  --roulette-border: rgba(94, 52, 126, .14);
+  --roulette-soft: rgba(126, 64, 182, .08);
+  --roulette-shadow: 0 18px 46px rgba(56, 27, 78, .09);
+  background: var(--roulette-bg) !important;
+  color: var(--roulette-text) !important;
+}
+
+:root[data-theme="light"] body.roulette-page .learn-page-shell,
+:root[data-theme="light"] body.roulette-page .learn-main,
+:root[data-theme="light"] body.roulette-page .roulette-shell {
+  background: var(--roulette-bg) !important;
+}
+
+:root[data-theme="light"] body.roulette-page .roulette-label,
+:root[data-theme="light"] body.roulette-page .v8-kicker,
+:root[data-theme="light"] body.roulette-page .roulette-badge {
+  color: #8636c7 !important;
+}
+
+:root[data-theme="light"] body.roulette-page .roulette-esportiva strong,
+:root[data-theme="light"] body.roulette-page .roulette-esportiva b {
+  color: #24162f !important;
+}
+
+:root[data-theme="light"] body.roulette-page .roulette-feature-row span,
+:root[data-theme="light"] body.roulette-page .roulette-casino-card,
+:root[data-theme="light"] body.roulette-page .roulette-tool-card-new {
+  background: #fff !important;
+  box-shadow: 0 12px 30px rgba(65, 34, 87, .07) !important;
+}
+
+:root[data-theme="light"] body.roulette-page .roulette-provider,
+:root[data-theme="light"] body.roulette-page .roulette-platform-cta small {
+  color: #65566f !important;
+}
+
+:root[data-theme="light"] body.roulette-page .roulette-responsible-new {
+  background: #fffaf0 !important;
+  border-color: rgba(196, 143, 32, .22) !important;
+}
+
+:root[data-theme="light"] body.roulette-page .learn-dock {
+  background: rgba(255,255,255,.96) !important;
+  color: #5f5268 !important;
+  border-top-color: rgba(81, 51, 99, .12) !important;
+  box-shadow: 0 -12px 34px rgba(52, 28, 70, .07) !important;
+}
+
+:root[data-theme="light"] body.roulette-page .learn-topbar {
+  background: rgba(255,255,255,.94) !important;
+  border-bottom-color: rgba(81, 51, 99, .10) !important;
+}
+
+@media (max-width: 960px) {
+  body.roulette-page .roulette-hero-new {
+    grid-template-columns: 1fr !important;
+  }
+  body.roulette-page .roulette-hero-image {
+    border-left: 0;
+    border-top: 1px solid var(--roulette-border);
+  }
+  body.roulette-page .roulette-tools-grid-new {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 720px) {
+  body.roulette-page .learn-main { padding: 16px 14px 108px !important; }
+  body.roulette-page .roulette-shell { gap: 18px !important; }
+  body.roulette-page .v8-page-head { padding: 20px 18px !important; }
+  body.roulette-page .v8-page-head h1 { font-size: clamp(30px, 10vw, 42px) !important; }
+  body.roulette-page .v8-page-head p { font-size: 15px !important; line-height: 1.65 !important; }
+  body.roulette-page .v8-head-actions { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  body.roulette-page .v8-btn { min-height: 48px !important; padding: 0 12px !important; font-size: 13px !important; }
+  body.roulette-page .roulette-hero-copy-new { padding: 20px 18px !important; }
+  body.roulette-page .roulette-hero-title h1 { font-size: 30px !important; }
+  body.roulette-page .roulette-hero-image { aspect-ratio: 16 / 10; }
+  body.roulette-page .roulette-casino-grid { grid-template-columns: 1fr !important; }
+  body.roulette-page .roulette-panel-new,
+  body.roulette-page .roulette-platform-new,
+  body.roulette-page .roulette-responsible-new { border-radius: 22px !important; }
+  body.roulette-page .roulette-tool-card-new { grid-template-columns: 110px 1fr !important; min-height: 138px; }
+  body.roulette-page .roulette-tool-card-new > img { min-height: 138px; }
+}
