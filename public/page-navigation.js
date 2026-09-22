@@ -65,7 +65,6 @@
     const path = current.pathname.toLowerCase();
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/provas", "/favoritos"].includes(path) || path.startsWith("/estudo-");
-    const unified = ["/notas", "/perfil", "/provas", "/gestao", "/roleta", "/suporte"].includes(path);
     if (!admin && !student) return;
 
     if (admin) {
@@ -86,12 +85,6 @@
     loadScript("/favorites-v6.js?v=20260921-6", "favorites-js");
     loadScript("/activity-v6.js?v=20260921-6", "activity-js");
     loadScript("/floating-controls-v7.js?v=20260921-1", "floating-controls-v7-js");
-
-    if (unified) {
-      loadStyle("/study-workspace.css?v=20260921-shell-v7", "study-workspace-v7");
-      loadStyle("/student-shell-v7.css?v=20260921-1", "student-shell-v7-css");
-      loadScript("/student-shell-v7.js?v=20260921-1", "student-shell-v7-js");
-    }
     if (path === "/gestao") {
       loadStyle("/management-v6.css?v=20260921-6", "management-css");
       loadScript("/management-v6.js?v=20260921-6", "management-js");
