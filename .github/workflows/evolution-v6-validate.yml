@@ -51,6 +51,9 @@ jobs:
       - name: Test canonical navigation and V9 pages
         run: node scripts/student-nav-v9-regression.cjs
 
+      - name: Test Esportiva affiliate CTA V10
+        run: node scripts/roulette-affiliate-v10-regression.cjs
+
       - name: Run security regression
         run: npm run security:regression
 
