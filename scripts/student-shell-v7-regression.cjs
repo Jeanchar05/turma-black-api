@@ -24,10 +24,10 @@ for (const route of ["/notas", "/perfil", "/provas", "/gestao", "/roleta", "/sup
   assert.ok(shell.includes(`\"${route}\"`), `Shell V7 precisa reconhecer ${route}`);
 }
 
-assert.ok(floating.includes('id="supportFloatDiscard"'), "Chat flutuante precisa ter lixeira");
+assert.ok(floating.includes('button.id = "supportFloatDiscard"'), "Chat flutuante precisa ter lixeira");
 assert.ok(floating.includes("turma:support-ticket-open"), "Chat precisa registrar abertura de ticket");
 assert.ok(floating.includes("turma_support_float_v7_enabled"), "Chat precisa persistir o estado de exibição");
-assert.ok(floating.includes('id="focusDiscard"'), "Timer precisa ter lixeira");
+assert.ok(floating.includes('button.id = "focusDiscard"'), "Timer precisa ter lixeira");
 assert.ok(floating.includes("turma_focus_float_v7_dismissed"), "Timer precisa saber quando foi descartado");
 assert.ok(floating.includes('sync.focus("reset"'), "Descartar timer deve encerrar/resetar a sessão");
 
