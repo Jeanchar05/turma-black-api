@@ -90,6 +90,10 @@
       loadStyle("/management-v6.css?v=20260921-6", "management-css");
       loadScript("/management-v6.js?v=20260921-6", "management-js");
     }
+    if (path === "/roleta") {
+      loadStyle("/roulette-affiliate-v10.css?v=20260922-1", "roulette-affiliate-v10-css");
+      loadScript("/roulette-affiliate-v10.js?v=20260922-1", "roulette-affiliate-v10-js");
+    }
   }
   loadEvolutionV6();
 })();
