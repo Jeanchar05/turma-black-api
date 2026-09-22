@@ -51,12 +51,13 @@ assert.ok(management.includes("turma:bankroll-days-updated"));
 assert.ok(activity.includes("/student/atividades"));
 
 assert.ok(evolution.includes('type === "weekly"'));
-assert.ok(evolution.includes('type === "primo"'));
+assert.ok(evolution.includes("Desafio do Primo"));
 assert.ok(evolution.includes("/student/provas/iniciar"));
 assert.ok(evolution.includes("/student/gestao"));
 
 assert.ok(compat.includes('require("./student-evolution")'));
 assert.ok(compat.includes('require("./profile-v6")'));
 assert.ok(compat.includes("bankroll-days-v6"));
+assert.ok(compat.includes("journey-elite-v6"));
 
 console.log("Evolution UI regression: OK");
