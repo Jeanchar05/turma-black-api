@@ -59,7 +59,9 @@
       $$('[data-workspace-avatar]').forEach(el => { el.textContent = user.foto ? "" : initial; el.style.backgroundImage = user.foto ? `url("${String(user.foto).replaceAll('"','%22')}")` : ""; });
       $$('[data-workspace-plan]').forEach(el => el.textContent = data.plano?.rotulo || "Meu perfil");
       const preferred = data.preferencias?.tema;
-      if ((preferred === "dark" || preferred === "light") && !localStorage.getItem("turma.workspace.theme")) applyTheme(preferred, false);
+      let localTheme = "";
+      try { localTheme = localStorage.getItem("turma.workspace.theme") || ""; } catch (_) {}
+      if ((preferred === "dark" || preferred === "light") && !localTheme) applyTheme(preferred, false);
     } catch (_) {}
   }
   function logout() {
@@ -72,14 +74,17 @@
     let theme = "dark";
     try { theme = localStorage.getItem("turma.workspace.theme") || document.documentElement.dataset.theme || "dark"; } catch (_) {}
     applyTheme(theme, false);
-    $("studyMenu")?.addEventListener("click", openMenu);
-    $("studyCloseMenu")?.addEventListener("click", () => closeMenu(true));
-    $("studyBackdrop")?.addEventListener("click", () => closeMenu(true));
-    $("studyTheme")?.addEventListener("click", () => applyTheme(resolvedTheme() === "dark" ? "light" : "dark"));
-    $("studyLogout")?.addEventListener("click", logout);
-    matchMedia("(max-width:900px)").addEventListener?.("change", () => closeMenu());
-    document.addEventListener("keydown", event => { if (event.key === "Escape" && $("studySidebar")?.classList.contains("is-open")) closeMenu(true); });
-    closeMenu();
+    const pageOwnsShell = document.body?.dataset.workspaceController === "page";
+    if (!pageOwnsShell) {
+      $("studyMenu")?.addEventListener("click", openMenu);
+      $("studyCloseMenu")?.addEventListener("click", () => closeMenu(true));
+      $("studyBackdrop")?.addEventListener("click", () => closeMenu(true));
+      $("studyTheme")?.addEventListener("click", () => applyTheme(resolvedTheme() === "dark" ? "light" : "dark"));
+      $("studyLogout")?.addEventListener("click", logout);
+      matchMedia("(max-width:900px)").addEventListener?.("change", () => closeMenu());
+      document.addEventListener("keydown", event => { if (event.key === "Escape" && $("studySidebar")?.classList.contains("is-open")) closeMenu(true); });
+      closeMenu();
+    }
     loadAccount();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once:true }); else init();
