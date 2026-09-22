@@ -1,0 +1,13 @@
+"use strict";
+const fs = require("fs");
+const assert = require("assert");
+const html = fs.readFileSync("public/roleta.html", "utf8");
+const js = fs.readFileSync("public/roleta.js", "utf8");
+const AFF = "https://go.aff.esportiva.bet/bhotuu7q";
+assert(html.includes(AFF), "Roleta Operacional deve exibir o link afiliado oficial da Esportiva");
+assert(js.includes(AFF), "Busca da Roleta deve usar o link afiliado oficial da Esportiva");
+assert(!html.includes("ref=f4ae076a736d"), "HTML não pode manter o afiliado antigo");
+assert(!js.includes("ref=f4ae076a736d"), "JS não pode manter o afiliado antigo");
+assert(html.includes("esportiva-affiliate-banner"), "Página deve ter CTA dedicado da Esportiva");
+assert(html.includes("Turistas roullet"), "Quarta mesa deve manter o nome definido pelo produto");
+console.log("Esportiva affiliate regression: OK");
