@@ -65,21 +65,36 @@
     const path = current.pathname.toLowerCase();
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/provas", "/favoritos"].includes(path) || path.startsWith("/estudo-");
+    const unified = ["/notas", "/perfil", "/provas", "/gestao", "/roleta", "/suporte"].includes(path);
     if (!admin && !student) return;
-    loadStyle("/student-evolution-v6.css?v=20260921-5", "evolution-css");
-    loadScript("/student-evolution-v6.js?v=20260921-5", "evolution-js");
+
+    if (admin) {
+      loadStyle("/admin-support-v7.css?v=20260921-1", "admin-support-v7-css");
+      loadScript("/admin-support-v7.js?v=20260921-1", "admin-support-v7-js");
+    }
+
     if (!student) return;
-    loadStyle("/support-float-v6.css?v=20260921-5", "support-float-css");
-    loadStyle("/profile-v6.css?v=20260921-5", "profile-css");
-    loadStyle("/favorites-v6.css?v=20260921-5", "favorites-css");
-    loadScript("/support-float-v6.js?v=20260921-5", "support-float-js");
-    loadScript("/profile-v6.js?v=20260921-5", "profile-js");
-    loadScript("/profile-save-guard-v6.js?v=20260921-5", "profile-save-guard-js");
-    loadScript("/favorites-v6.js?v=20260921-5", "favorites-js");
-    loadScript("/activity-v6.js?v=20260921-5", "activity-js");
+    loadStyle("/student-evolution-v6.css?v=20260921-6", "evolution-css");
+    loadScript("/student-evolution-v6.js?v=20260921-6", "evolution-js");
+    loadStyle("/support-float-v6.css?v=20260921-6", "support-float-css");
+    loadStyle("/profile-v6.css?v=20260921-6", "profile-css");
+    loadStyle("/favorites-v6.css?v=20260921-6", "favorites-css");
+    loadStyle("/floating-controls-v7.css?v=20260921-1", "floating-controls-v7-css");
+    loadScript("/support-float-v6.js?v=20260921-6", "support-float-js");
+    loadScript("/profile-v6.js?v=20260921-6", "profile-js");
+    loadScript("/profile-save-guard-v6.js?v=20260921-6", "profile-save-guard-js");
+    loadScript("/favorites-v6.js?v=20260921-6", "favorites-js");
+    loadScript("/activity-v6.js?v=20260921-6", "activity-js");
+    loadScript("/floating-controls-v7.js?v=20260921-1", "floating-controls-v7-js");
+
+    if (unified) {
+      loadStyle("/study-workspace.css?v=20260921-shell-v7", "study-workspace-v7");
+      loadStyle("/student-shell-v7.css?v=20260921-1", "student-shell-v7-css");
+      loadScript("/student-shell-v7.js?v=20260921-1", "student-shell-v7-js");
+    }
     if (path === "/gestao") {
-      loadStyle("/management-v6.css?v=20260921-5", "management-css");
-      loadScript("/management-v6.js?v=20260921-5", "management-js");
+      loadStyle("/management-v6.css?v=20260921-6", "management-css");
+      loadScript("/management-v6.js?v=20260921-6", "management-js");
     }
   }
   loadEvolutionV6();
