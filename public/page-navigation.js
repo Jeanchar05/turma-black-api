@@ -64,7 +64,7 @@
   function loadEvolutionV6() {
     const path = current.pathname.toLowerCase();
     const admin = ["/admin", "/painel-admin"].includes(path);
-    const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/provas", "/favoritos"].includes(path) || path.startsWith("/estudo-");
+    const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/roleta-real", "/provas", "/favoritos", "/notificacoes"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
 
     if (admin) {
@@ -73,6 +73,7 @@
     }
 
     if (!student) return;
+    loadScript("/student-nav-standard-v9.js?v=20260922-1", "student-nav-standard-v9-js");
     loadStyle("/student-evolution-v6.css?v=20260921-6", "evolution-css");
     loadScript("/student-evolution-v6.js?v=20260921-6", "evolution-js");
     loadStyle("/support-float-v6.css?v=20260921-6", "support-float-css");
