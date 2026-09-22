@@ -10,16 +10,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="/study-appearance.js?v=20260922-v8"></script>
-  <link rel="stylesheet" href="/dashboard-premium.css?v=20260922-v8" />
-  <link rel="stylesheet" href="/provas.css?v=20260922-v8" />
-  <link rel="stylesheet" href="/study-workspace.css?v=20260922-v8" />
-  <link rel="stylesheet" href="/student-workspace-v8.css?v=20260922-v8" />
-  <script defer src="/protected-workspace-v8.js?v=20260922-v8"></script>
-  <script defer src="/student-workspace-v8.js?v=20260922-v8"></script>
-  <script defer src="/provas.js?v=20260922-v8"></script>
+  <script src="/study-appearance.js?v=20260922-v9"></script>
+  <link rel="stylesheet" href="/dashboard-premium.css?v=20260922-v9" />
+  <link rel="stylesheet" href="/provas.css?v=20260922-v9" />
+  <link rel="stylesheet" href="/study-workspace.css?v=20260922-v9" />
+  <link rel="stylesheet" href="/student-workspace-v8.css?v=20260922-v9" />
+  <link rel="stylesheet" href="/provas-v9.css?v=20260922-1" />
+  <script defer src="/protected-workspace-v8.js?v=20260922-v9"></script>
+  <script defer src="/student-workspace-v8.js?v=20260922-v9"></script>
+  <script defer src="/provas.js?v=20260922-v9"></script>
 </head>
-<body class="learn-page exams-page workspace-v8" data-required-access="dashboard">
+<body class="learn-page exams-page exams-v9 workspace-v8" data-required-access="dashboard">
   <a class="learn-skip" href="#studyMain">Pular para o conteúdo</a>
   <div class="learn-backdrop" id="studyBackdrop" hidden></div>
   <aside class="learn-sidebar" id="studySidebar" aria-label="Menu principal">
@@ -27,7 +28,7 @@
     <button class="learn-close-menu" id="studyCloseMenu" type="button" aria-label="Fechar menu">×</button>
     <div class="learn-space"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><span>Central de provas<small>Teste sua evolução</small></span></div>
     <p class="learn-nav-label">SEU APRENDIZADO</p>
-    <nav class="learn-nav"><a href="/dashboard"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><span>Dashboard</span></a><a href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><span>Estudo</span></a><a href="/modulos"><svg><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><span>Módulos</span></a><a href="/notas"><svg><use href="/assets/dashboard-icons.svg#i-note"></use></svg><span>Anotações</span></a><a href="/favoritos"><svg><use href="/assets/dashboard-icons.svg#i-star"></use></svg><span>Favoritos</span></a><a href="/roleta"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><span>Roleta Operacional</span></a><a href="/roleta-real"><svg><use href="/assets/dashboard-icons.svg#i-roulette"></use></svg><span>Roleta Real</span></a><a href="/provas" class="is-active" aria-current="page"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><span>Provas</span></a><a href="/gestao"><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><span>Gestão</span></a></nav>
+    <nav class="learn-nav" aria-label="Navegação principal"></nav>
     <div class="learn-sidebar-bottom"><a class="learn-support" href="/suporte"><svg><use href="/assets/dashboard-icons.svg#i-support"></use></svg><span>Precisa de uma ajuda?<small>Converse com o suporte</small></span>↗</a><button class="learn-logout" id="studyLogout" type="button"><svg><use href="/assets/dashboard-icons.svg#i-logout"></use></svg>Sair da conta</button><small class="learn-signature">CONHECIMENTO EM MOVIMENTO</small></div>
   </aside>
 
@@ -42,36 +43,40 @@
       <div class="dash-loading" id="examsLoading" data-workspace-loading role="status"><img src="/assets/turma-primo-logo.svg" alt="" /><div><strong>Preparando suas provas</strong><span>Carregando sua central de avaliações…</span></div></div>
 
       <div class="exam-content">
-        <section class="exam-heading">
-          <div class="exam-heading-main"><span class="exam-heading-icon"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg></span><div><span class="v8-kicker">AVALIAÇÕES</span><h1>Provas</h1><p>Teste seus conhecimentos com avaliações conectadas aos módulos e acompanhe sua evolução.</p></div></div>
-          <button class="exam-history" id="examHistoryBtn" type="button"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Histórico de Provas</button>
+        <section class="exam-v9-overview">
+          <div class="exam-v9-overview-copy"><span>AVALIAÇÕES DA TURMA DO PRIMO</span><h1>Provas</h1><p>Teste o que você aprendeu, acompanhe seu desempenho e avance na Jornada do Primo com avaliações conectadas aos módulos reais da plataforma.</p><div class="exam-v9-overview-actions"><button class="primary" id="examHistoryBtn" type="button"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Ver histórico</button><a class="secondary" href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg>Revisar estudos</a></div></div>
+          <aside class="exam-v9-today"><span>COMO FUNCIONA</span><strong>Uma rotina de evolução.</strong><p>A dificuldade cresce durante a semana e culmina no Desafio do Primo aos domingos.</p><div class="exam-v9-today-grid"><div><small>SEG–SEX</small><b>10 questões</b></div><div><small>SÁBADO</small><b>20 questões</b></div><div><small>DOMINGO</small><b>25 questões</b></div><div><small>CORREÇÃO</small><b>No servidor</b></div></div></aside>
         </section>
 
-        <section class="exam-toolbar" aria-label="Filtros de provas"><label class="exam-tool exam-search"><svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg><input id="examSearch" type="search" placeholder="Buscar provas…" autocomplete="off" /></label><select class="exam-tool exam-select" aria-label="Categoria"><option>Todas as categorias</option><option>Diária</option><option>Semanal</option><option>Desafio do Primo</option></select><select class="exam-tool exam-select" aria-label="Ordenação"><option>Agenda das provas</option><option>Mais recentes</option></select></section>
+        <section class="exam-toolbar" aria-label="Filtros de provas">
+          <label class="exam-search"><svg><use href="/assets/dashboard-icons.svg#i-search"></use></svg><input id="examSearch" type="search" placeholder="Buscar prova…" autocomplete="off" /></label>
+          <div class="exam-v9-filters" role="group" aria-label="Filtrar avaliações"><button class="active" type="button" data-exam-filter="all">Todas</button><button type="button" data-exam-filter="daily">Diária</button><button type="button" data-exam-filter="weekly">Semanal</button><button type="button" data-exam-filter="primo">Desafio do Primo</button></div>
+        </section>
 
-        <div class="exam-layout">
-          <section class="exam-grid" aria-label="Provas disponíveis">
-            <article class="exam-card primo" data-exam-card="desafio do primo domingo premium impossível extremo"><div class="exam-art"><img src="/assets/exams/primo.svg" alt="Troféu do Desafio do Primo" /><span class="exam-badge">DESAFIO PREMIUM</span></div><div class="exam-card-body"><h2>Desafio do Primo</h2><p class="exam-schedule"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Todo domingo</p><p class="exam-card-desc">O maior desafio da semana, com questões diferentes geradas a partir dos conteúdos reais estudados.</p><div class="exam-card-meta"><span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg>25 questões</span><span>Impossível</span></div><button class="exam-lock" type="button" data-exam-locked="primo"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg>Ver disponibilidade</button></div></article>
+        <section class="exam-v9-summary" aria-label="Resumo das avaliações">
+          <article class="exam-side-card exam-v9-performance"><div class="exam-score-ring"><div><strong>0%</strong><small>média atual</small></div></div><div><h3>Seu desempenho</h3><p class="exam-score-caption">Seu desempenho é atualizado automaticamente conforme as avaliações são concluídas.</p><div class="exam-stat-list"><span>Provas realizadas <b>0</b></span><span>Questões acertadas <b>0</b></span><span>Taxa de acerto <b>0%</b></span></div></div></article>
+          <article class="exam-side-card"><h3>Agenda da semana</h3><div class="exam-agenda"><div><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Prova Diária</b><em>Segunda a sexta</em></div><div><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg><b>Prova Semanal</b><em>Sábado</em></div><div class="gold"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg><b>Desafio do Primo</b><em>Domingo</em></div></div></article>
+        </section>
 
-            <article class="exam-card" data-exam-card="prova diária segunda terça quarta quinta sexta foco estudo"><div class="exam-art"><img src="/assets/exams/daily-v2.svg?v=20260730-2" alt="Prova Diária" /><span class="exam-badge">ROTINA DE ESTUDO</span></div><div class="exam-card-body"><h2>Prova Diária</h2><p class="exam-schedule"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Segunda a sexta</p><p class="exam-card-desc">10 questões por dia, com dificuldade progressiva ao longo da semana para revisar e consolidar o conteúdo.</p><div class="exam-card-meta"><span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg>10 questões</span><span>Diária</span></div><button class="exam-lock" type="button" data-exam-locked="daily"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg>Ver disponibilidade</button></div></article>
+        <div class="exam-v9-section-heading"><div><span>ESCOLHA SUA AVALIAÇÃO</span><h2>Pratique no ritmo da semana.</h2><p>A disponibilidade e as tentativas são atualizadas automaticamente.</p></div></div>
 
-            <article class="exam-card" data-exam-card="prova semanal sábado difícil revisão"><div class="exam-art"><img src="/assets/exams/weekly.svg" alt="Prova Semanal" /><span class="exam-badge">REVISÃO SEMANAL</span></div><div class="exam-card-body"><h2>Prova Semanal</h2><p class="exam-schedule"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Todo sábado</p><p class="exam-card-desc">Uma revisão de alta dificuldade para medir consistência, retenção e evolução antes do desafio de domingo.</p><div class="exam-card-meta"><span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg>20 questões</span><span>Alta dificuldade</span></div><button class="exam-lock" type="button" data-exam-locked="weekly"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg>Ver disponibilidade</button></div></article>
-          </section>
+        <section class="exam-grid" aria-label="Provas disponíveis">
+          <article class="exam-card" data-exam-type="daily" data-exam-card="prova diária segunda terça quarta quinta sexta foco estudo"><div class="exam-art"><img src="/assets/exams/daily-v2.svg?v=20260730-2" alt="Prova Diária" /><span class="exam-badge">ROTINA DE ESTUDO</span></div><div class="exam-card-body"><h2>Prova Diária</h2><p class="exam-schedule"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Segunda a sexta</p><p class="exam-card-desc">10 questões por dia, com dificuldade progressiva para revisar e consolidar o conteúdo estudado.</p><div class="exam-card-meta"><span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg>10 questões</span><span>Progressiva</span></div><button class="exam-lock" type="button" data-exam-locked="daily"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg>Ver disponibilidade</button></div></article>
 
-          <aside class="exam-side">
-            <section class="exam-side-card"><h3>Seu Desempenho</h3><div class="exam-score-ring"><div><strong>0%</strong><small>média atual</small></div></div><p class="exam-score-caption">Seu desempenho é atualizado automaticamente conforme as avaliações são concluídas.</p><div class="exam-stat-list"><span><i><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg></i>Provas realizadas <b>0</b></span><span><i><svg><use href="/assets/dashboard-icons.svg#i-target"></use></svg></i>Questões acertadas <b>0</b></span><span><i><svg><use href="/assets/dashboard-icons.svg#i-flame"></use></svg></i>Sequência atual <b>0 dias</b></span></div></section>
-            <section class="exam-side-card"><h3>Agenda das Provas</h3><div class="exam-agenda"><div><svg><use href="/assets/dashboard-icons.svg#i-activity"></use></svg><b>Prova Diária</b><em>Segunda a sexta</em></div><div><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg><b>Prova Semanal</b><em>Sábado</em></div><div class="gold"><svg><use href="/assets/dashboard-icons.svg#i-crown"></use></svg><b>Desafio do Primo</b><em>Domingo</em></div></div></section>
-          </aside>
-        </div>
+          <article class="exam-card" data-exam-type="weekly" data-exam-card="prova semanal sábado difícil revisão"><div class="exam-art"><img src="/assets/exams/weekly.svg" alt="Prova Semanal" /><span class="exam-badge">REVISÃO SEMANAL</span></div><div class="exam-card-body"><h2>Prova Semanal</h2><p class="exam-schedule"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Todo sábado</p><p class="exam-card-desc">20 questões de alta dificuldade para medir consistência, retenção e evolução ao longo da semana.</p><div class="exam-card-meta"><span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg>20 questões</span><span>Alta dificuldade</span></div><button class="exam-lock" type="button" data-exam-locked="weekly"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg>Ver disponibilidade</button></div></article>
+
+          <article class="exam-card primo" data-exam-type="primo" data-exam-card="desafio do primo domingo premium impossível extremo"><div class="exam-art"><img src="/assets/exams/primo.svg" alt="Troféu do Desafio do Primo" /><span class="exam-badge">DESAFIO PREMIUM</span></div><div class="exam-card-body"><h2>Desafio do Primo</h2><p class="exam-schedule"><svg><use href="/assets/dashboard-icons.svg#i-clock"></use></svg>Todo domingo</p><p class="exam-card-desc">25 questões no nível máximo, combinando conteúdos reais dos módulos em uma prova diferente a cada tentativa.</p><div class="exam-card-meta"><span><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg>25 questões</span><span>Impossível</span></div><button class="exam-lock" type="button" data-exam-locked="primo"><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg>Ver disponibilidade</button></div></article>
+        </section>
 
         <section class="exam-note"><span><svg><use href="/assets/dashboard-icons.svg#i-shield"></use></svg></span><div><strong>Avaliações vinculadas ao seu aprendizado</strong><p>As questões usam o conteúdo real dos módulos e são corrigidas no servidor. Cada nova tentativa recebe uma combinação diferente.</p></div></section>
         <section class="exam-workspace" id="examWorkspace" hidden aria-hidden="true"></section>
       </div>
       <div class="exam-toast-stack" id="examToastStack"></div>
     </main>
+
     <footer class="learn-footer"><span>Turma do Primo <b>·</b> Central de provas</span><span>Estude. Teste. Evolua.</span></footer>
   </div>
 
-  <nav class="learn-dock" id="studyDock" aria-label="Atalhos no celular"><a href="/dashboard"><svg><use href="/assets/dashboard-icons.svg#i-home"></use></svg><span>Início</span></a><a href="/estudo"><svg><use href="/assets/dashboard-icons.svg#i-book"></use></svg><span>Estudo</span></a><a href="/modulos"><svg><use href="/assets/dashboard-icons.svg#i-layers"></use></svg><span>Módulos</span></a><a href="/provas" aria-current="page"><svg><use href="/assets/dashboard-icons.svg#i-exam"></use></svg><span>Provas</span></a></nav>
+  <nav class="learn-dock" id="studyDock" aria-label="Atalhos no celular"></nav>
 </body>
 </html>
