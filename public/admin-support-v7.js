@@ -53,16 +53,18 @@
     if (replyBox) {
       replyBox.classList.toggle("cc-support-readonly-v7", !allowed);
       const textarea = $("textarea", replyBox);
+      const status = $("#ccSupportReplyStatus", replyBox);
       const button = $("[data-support-reply]", replyBox);
       const assume = $("[data-support-assume]", replyBox);
       if (textarea) textarea.disabled = !allowed;
+      if (status) { status.disabled = !allowed; status.hidden = !allowed; }
       if (button) button.hidden = !allowed;
       if (assume) assume.hidden = !allowed;
       let note = $(".cc-support-permission-v7", replyBox);
       if (!allowed && !note) {
         note = document.createElement("div");
         note.className = "cc-support-permission-v7";
-        note.textContent = "Somente administradores podem responder ou alterar este atendimento.";
+        note.textContent = "Somente administradores podem responder, assumir, fechar ou alterar este atendimento.";
         replyBox.prepend(note);
       }
       if (allowed && note) note.remove();
@@ -76,11 +78,13 @@
       const head = $(".cc-ticket-head", panel);
       (head || panel).appendChild(actions);
     } else if (actions) {
+      if (!allowed) { actions.remove(); return; }
       const close = $("[data-v7-close-ticket]", actions); if (close) close.dataset.v7CloseTicket = id;
       const del = $("[data-v7-delete-ticket]", actions); if (del) del.dataset.v7DeleteTicket = id;
     }
   }
   async function closeTicket(id) {
+    if (!ADMIN_ROLES.has(role)) return;
     if (!confirm("Fechar este chamado? O aluno continuará vendo o histórico, mas o atendimento ficará encerrado.")) return;
     try {
       await api(`/admin/suporte/${encodeURIComponent(id)}/status`, { method: "POST", body: { status: "fechado" } });
