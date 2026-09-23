@@ -46,6 +46,7 @@
   }
   function loadRuntime() {
     const path = current.pathname.toLowerCase();
+    loadScript("/platform-fixes-v17.js?v=20260923-v17", "platform-fixes-v17");
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/roleta-real", "/provas", "/favoritos", "/notificacoes"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
