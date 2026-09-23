@@ -17,48 +17,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - name: Install dependencies
         run: npm install --ignore-scripts --no-fund
-
       - name: Validate JavaScript syntax
         run: npm run validate
-
       - name: Test evolution engine
         run: node scripts/evolution-regression.cjs
-
-      - name: Test management journal
+      - name: Test management journal legacy compatibility
         run: node scripts/management-v6-regression.cjs
-
       - name: Test profile security helpers
         run: node scripts/profile-v6-regression.cjs
-
       - name: Test UI wiring
         run: node scripts/evolution-ui-regression.cjs
-
       - name: Test floating controls and admin support
         run: node scripts/student-shell-v7-regression.cjs
-
       - name: Test native student workspace V8
         run: node scripts/student-native-v8-regression.cjs
-
       - name: Test canonical navigation and V9 pages
         run: node scripts/student-nav-v9-regression.cjs
-
-      - name: Test Esportiva affiliate CTA V10
+      - name: Test Esportiva affiliate CTA V10 compatibility
         run: node scripts/roulette-affiliate-v10-regression.cjs
-
-      - name: Test final management, roulette, exams and maintenance removal
+      - name: Test roulette compatibility
+        run: npm run roulette:regression
+      - name: Test final stabilization
         run: npm run final:regression
-
       - name: Run security regression
         run: npm run security:regression
-
       - name: Audit production dependencies
         run: npm audit --audit-level=high
