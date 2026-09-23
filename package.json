@@ -10,7 +10,8 @@
     "security:regression": "node scripts/security-regression.js",
     "sales:regression": "node scripts/sales-regression.js",
     "navigation:regression": "node scripts/navigation-regression.js",
-    "final:regression": "node scripts/roulette-v12-regression.cjs",
+    "roulette:regression": "node scripts/roulette-v12-regression.cjs",
+    "final:regression": "node scripts/final-stabilization-regression.cjs",
     "study:regression": "node scripts/study-regression.js",
     "study:browser": "node scripts/study-browser-regression.cjs",
     "study:accounts": "node scripts/study-account-regression.cjs",
@@ -19,9 +20,7 @@
     "notes:regression": "node scripts/notes-regression.cjs",
     "notes:browser": "node scripts/notes-browser-regression.cjs"
   },
-  "engines": {
-    "node": "22.x"
-  },
+  "engines": { "node": "22.x" },
   "dependencies": {
     "cors": "^2.8.5",
     "dompurify": "^3.4.15",
