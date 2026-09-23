@@ -6,19 +6,21 @@
   if (route() !== "/favoritos") return;
 
   const TOKEN_KEYS = ["token", "adminToken", "authToken", "accessToken", "jwt"];
+  const cover = (slug) => ({ dark: `/assets/modules-v4/${slug}-dark.webp`, light: `/assets/modules-v4/${slug}-light.webp` });
   const MODULES = {
-    gemeos: { name: "Gêmeos", href: "/estudo-gemeos", category: "Famílias" },
-    espelhos: { name: "Espelhos", href: "/estudo-espelhos", category: "Conexões" },
-    fibonacci: { name: "Fibonacci", href: "/estudo-fibonacci", category: "Cálculos" },
-    magneto: { name: "Magneto", href: "/estudo-magneto", category: "Conexões" },
-    camaleoes: { name: "Camaleões", href: "/estudo-camaleoes", category: "Cálculos" },
-    pitagoras: { name: "Pitágoras", href: "/estudo-triangulacao", category: "Famílias" },
-    cavalo: { name: "Cavalo", href: "/estudo-cavalos", category: "Famílias" },
-    eclipse: { name: "Eclipse", href: "/estudo-eclipse", category: "Leitura" }
+    gemeos: { name: "Gêmeos", href: "/estudo-gemeos", category: "Famílias", cover: cover("gemeos") },
+    espelhos: { name: "Espelhos", href: "/estudo-espelhos", category: "Conexões", cover: cover("espelhos") },
+    fibonacci: { name: "Fibonacci", href: "/estudo-fibonacci", category: "Cálculos", cover: cover("fibonacci") },
+    magneto: { name: "Magneto", href: "/estudo-magneto", category: "Conexões", cover: cover("magneto") },
+    camaleoes: { name: "Camaleões", href: "/estudo-camaleoes", category: "Cálculos", cover: cover("camaleoes") },
+    pitagoras: { name: "Pitágoras", href: "/estudo-triangulacao", category: "Famílias", cover: cover("pitagoras") },
+    cavalo: { name: "Cavalo", href: "/estudo-cavalos", category: "Famílias", cover: cover("cavalo") },
+    eclipse: { name: "Eclipse", href: "/estudo-eclipse", category: "Leitura", cover: { dark: "/assets/modules-v4/eclipse-zero-dark.webp", light: "/assets/modules-v4/eclipse-zero-light.webp" } }
   };
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const esc = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  const theme = () => document.documentElement.dataset.theme === "light" ? "light" : "dark";
   let accountId = "";
   let study = null;
 
@@ -49,12 +51,21 @@
     const module = MODULES[moduleId];
     if (!module) return "";
     const done = Array.isArray(entry.steps) ? entry.steps.length : 0;
+    const initialCover = module.cover[theme()];
     return `<article class="favorite-card modulo favorites-v6-module" data-study-favorite="${esc(moduleId)}">
+      <img class="favorites-v6-cover" data-cover-dark="${esc(module.cover.dark)}" data-cover-light="${esc(module.cover.light)}" src="${esc(initialCover)}" alt="Capa do módulo ${esc(module.name)}" loading="lazy" style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:18px;margin:0 0 18px;">
       <div class="favorite-card-top"><span class="favorite-card-type">MÓDULO DE ESTUDO</span><button class="favorites-v6-remove" type="button" data-remove-study-favorite="${esc(moduleId)}" title="Remover dos favoritos">★</button></div>
-      <span class="favorite-card-icon"><svg><use href="assets/dashboard-icons.svg#i-book"></use></svg></span>
       <h2>${esc(module.name)}</h2><p>${esc(module.category)} • Conteúdo salvo diretamente da sua trilha de estudos.</p>
       <footer class="favorite-card-footer"><span class="favorite-card-meta">${done}/3 etapas concluídas</span><a class="favorite-card-open" href="${esc(module.href)}">Continuar <b>→</b></a></footer>
     </article>`;
+  }
+
+  function syncCovers() {
+    const key = theme() === "light" ? "coverLight" : "coverDark";
+    $$(".favorites-v6-cover").forEach((img) => {
+      const src = img.dataset[key];
+      if (src && img.getAttribute("src") !== src) img.src = src;
+    });
   }
 
   function render() {
@@ -72,6 +83,7 @@
       const legacyModules = $$(".favorite-card.modulo:not(.favorites-v6-module)", grid).length;
       moduleCount.textContent = String(legacyModules + favorites.length);
     }
+    syncCovers();
   }
 
   async function removeFavorite(moduleId, button) {
@@ -102,6 +114,8 @@
       const button = event.target.closest("[data-remove-study-favorite]");
       if (button) { event.preventDefault(); removeFavorite(button.dataset.removeStudyFavorite, button); }
     });
+    window.addEventListener("turma:theme-change", syncCovers);
+    new MutationObserver(syncCovers).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true }); else init();
 })();

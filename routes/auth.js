@@ -158,13 +158,21 @@ async function criarConta(req, res) {
       console.warn("Conta criada, mas não foi possível consultar compra Bestfy pendente:", error.message);
     }
 
+    let usuarioResposta;
+    try {
+      usuarioResposta = await respostaUsuario(usuario);
+    } catch (error) {
+      console.warn("Conta criada com sucesso; não foi possível hidratar permissões na resposta:", error.message);
+      usuarioResposta = montarUsuarioSeguro(usuario);
+    }
+
     return res.status(201).json({
       sucesso: true,
       mensagem: compraBestfy.aplicado
         ? "Conta criada e pagamento localizado. Seu acesso Premium foi liberado."
         : "Conta criada com sucesso. Faça login para acessar a plataforma.",
       premiumLiberado: Boolean(compraBestfy.aplicado),
-      usuario: await respostaUsuario(usuario)
+      usuario: usuarioResposta
     });
   } catch (error) {
     console.error("Erro ao criar conta:", error);

@@ -37,15 +37,19 @@
   });
 
   function loadStyle(href, key) {
+    if (typeof document === "undefined") return;
     if (document.querySelector(`link[data-turma-runtime="${key}"]`)) return;
     const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; link.dataset.turmaRuntime = key; document.head.appendChild(link);
   }
   function loadScript(src, key) {
+    if (typeof document === "undefined") return;
     if (document.querySelector(`script[data-turma-runtime="${key}"]`)) return;
     const script = document.createElement("script"); script.src = src; script.defer = true; script.dataset.turmaRuntime = key; document.head.appendChild(script);
   }
   function loadRuntime() {
+    if (typeof document === "undefined") return;
     const path = current.pathname.toLowerCase();
+    loadScript("/platform-fixes-v17.js?v=20260923-v17", "platform-fixes-v17");
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/roleta-real", "/provas", "/favoritos", "/notificacoes"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
@@ -54,6 +58,7 @@
       loadScript("/admin-support-v7.js?v=20260922-final", "admin-support-js");
     }
     if (!student) return;
+    loadScript("/dashboard-notifications-live.js?v=20260923-v17", "student-notifications-js");
     loadScript("/student-nav-standard-v9.js?v=20260922-final", "student-nav-js");
     loadStyle("/student-evolution-v6.css?v=20260922-final", "evolution-css");
     loadScript("/student-evolution-v6.js?v=20260922-final", "evolution-js");
