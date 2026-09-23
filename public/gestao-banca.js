@@ -1,46 +1,207 @@
 "use strict";
 (() => {
-  if(window.__TURMA_GESTAO_V24__)return;window.__TURMA_GESTAO_V24__=true;
-  const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-  const KEY="turma_bankroll_management_v8";
-  const base={initial:0,current:0,target:0,stop:0,unit:1,goalDays:30,startDate:"",entries:[],days:[]};
-  let state=load();let calendarCursor=new Date();
-  const money=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v||0));
-  const signed=v=>`${Number(v)>0?"+":Number(v)<0?"−":""}${money(Math.abs(Number(v)||0))}`;
-  const n=(v,f=0)=>{const x=Number(v);return Number.isFinite(x)?Math.max(0,x):f};
-  const pad=v=>String(v).padStart(2,"0");
-  const dayKey=d=>{const x=d instanceof Date?d:new Date(d||Date.now());return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}`};
-  const localDate=s=>new Date(`${s}T12:00:00`);
-  function load(){try{const old=JSON.parse(localStorage.getItem(KEY)||"{}");const merged={...base,...old};merged.entries=Array.isArray(old.entries)?old.entries:[];merged.days=Array.isArray(old.days)?old.days:[];if(!merged.startDate)merged.startDate=dayKey();return merged}catch{return{...base,startDate:dayKey()}}}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}render()}
-  function toast(text,type="success"){const el=$("#bankrollMessage");if(!el)return;el.textContent=text;el.className=`bank-toast ${type} show`;clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2600)}
-  function openModal(id){const modal=$("#"+id);if(!modal)return;try{modal.showModal()}catch{modal.setAttribute("open","")}}
-  function closeModal(id){const modal=$("#"+id);if(!modal)return;try{modal.close()}catch{modal.removeAttribute("open")}}
-  function normalizeEntries(){state.entries=state.entries.map((e,i)=>{const delta=Number(e.delta??(e.type==="loss"?-Number(e.amount||0):Number(e.amount||0)))||0;return{...e,id:e.id||Date.now()+i,type:delta<0?"loss":"profit",delta,amount:Math.abs(delta),date:e.date||new Date().toISOString(),note:e.note||""}}).sort((a,b)=>new Date(a.date)-new Date(b.date));if(state.initial&&!state.current){state.current=Math.max(0,state.initial+state.entries.reduce((s,e)=>s+e.delta,0))}}
-  function dayTotals(){const map=new Map();state.entries.forEach(e=>{const k=dayKey(e.date);map.set(k,(map.get(k)||0)+Number(e.delta||0))});return map}
-  function elapsedDays(){if(!state.startDate)return 0;const start=localDate(state.startDate),today=localDate(dayKey());const diff=Math.floor((today-start)/86400000)+1;return Math.max(0,Math.min(state.goalDays||0,diff))}
-  function renderSummary(){
-    const total=state.current-state.initial,today=dayTotals().get(dayKey())||0,targetTotal=(state.target||0)*(state.goalDays||0),progress=targetTotal?Math.max(0,Math.min(100,total/targetTotal*100)):0,day=elapsedDays(),remaining=Math.max(0,(state.goalDays||0)-day),unit=(state.current||0)*(state.unit||0)/100;
-    $("#currentBankrollValue")&&($("#currentBankrollValue").textContent=money(state.current));
-    const variation=$("#bankrollVariationLabel");if(variation)variation.textContent=state.initial?`${total>=0?"+":""}${((total/state.initial)*100).toFixed(1).replace(".",",")}% desde o início`:"Configure sua banca para começar";
-    const todayEl=$("#todayResultValue");if(todayEl){todayEl.textContent=signed(today);todayEl.className=today>0?"positive":today<0?"negative":""}
-    $("#dailyTargetValue")&&($("#dailyTargetValue").textContent=money(state.target));$("#dailyStopValue")&&($("#dailyStopValue").textContent=money(state.stop));$("#unitValue")&&($("#unitValue").textContent=money(unit));$("#daysRemainingValue")&&($("#daysRemainingValue").textContent=String(remaining));
-    $("#planDayLabel")&&($("#planDayLabel").textContent=state.initial?`Dia ${day} de ${state.goalDays}`:"Planejamento não iniciado");$("#planGoalValue")&&($("#planGoalValue").textContent=money(targetTotal));$("#planProfitValue")&&($("#planProfitValue").textContent=signed(total));$("#planGoalBar")?.style.setProperty("width",`${progress}%`);
-    const goalText=$("#planGoalText");if(goalText)goalText.textContent=!state.initial?"Configure o planejamento para acompanhar sua evolução.":total>=targetTotal&&targetTotal>0?"Meta do planejamento alcançada. Proteja o resultado e respeite seus limites.":`${Math.round(progress)}% da meta acumulada • ${remaining} ${remaining===1?"dia restante":"dias restantes"}.`;
+  if (window.__TURMA_GESTAO_CORE__) return;
+  window.__TURMA_GESTAO_CORE__ = true;
+  const Bank = window.TurmaBankrollModel;
+  if (!Bank) { console.error("TurmaBankrollModel não carregado."); return; }
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const KEY = "turma_bankroll_management_v8";
+  const money = (v) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(v || 0));
+  const signed = (v) => `${Number(v) > 0 ? "+" : Number(v) < 0 ? "−" : ""}${money(Math.abs(Number(v) || 0))}`;
+  const n = (v, f = 0) => Number.isFinite(Number(v)) ? Number(v) : f;
+  const localDate = (s) => new Date(`${s}T12:00:00`);
+  let state = load();
+  let calendarCursor = new Date();
+
+  function load() {
+    try { return Bank.normalizeState(JSON.parse(localStorage.getItem(KEY) || "{}")); }
+    catch (_) { return Bank.normalizeState({}); }
   }
-  function fillPlan(){const map={initialBankrollInput:state.initial||"",currentBankrollInput:state.current||"",sessionTargetInput:state.target||"",sessionStopInput:state.stop||"",goalDaysInput:state.goalDays||30,goalStartInput:state.startDate||dayKey(),unitPercentInput:state.unit||1};Object.entries(map).forEach(([id,v])=>{const el=$("#"+id);if(el)el.value=v});$("#unitPercentLabel")&&($("#unitPercentLabel").textContent=`${Number(state.unit||1).toFixed(1).replace(".",",")}%`)}
-  function chart(){const host=$("#bankrollChart");if(!host)return;const values=[state.initial||state.current||0];let balance=values[0];state.entries.slice(-24).forEach(e=>{balance+=Number(e.delta||0);values.push(balance)});if(values.length<2||!values[0]){host.innerHTML='<div class="bank-chart-empty">Registre lucros e perdas para visualizar a curva da banca.</div>';return}const w=760,h=194,p=18,min=Math.min(...values),max=Math.max(...values),span=max-min||Math.max(1,max*.02),x=i=>p+i*(w-p*2)/(values.length-1),y=v=>p+(max-v)*(h-p*2)/span;const lines=values.slice(1).map((v,i)=>`<line x1="${x(i)}" y1="${y(values[i])}" x2="${x(i+1)}" y2="${y(v)}" stroke="${v>=values[i]?"#2ed487":"#ff5d73"}" stroke-width="4" stroke-linecap="round"/>`).join("");const dots=values.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.8" fill="${i&&v<values[i-1]?"#ff5d73":"#2ed487"}" stroke="#09040e" stroke-width="2"/>`).join("");host.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Curva da banca"><line x1="${p}" y1="${h/2}" x2="${w-p}" y2="${h/2}" stroke="rgba(255,255,255,.055)"/>${lines}${dots}</svg>`}
-  function calendar(){const host=$("#bankCalendar");if(!host)return;const year=calendarCursor.getFullYear(),month=calendarCursor.getMonth(),first=new Date(year,month,1),last=new Date(year,month+1,0),totals=dayTotals(),today=dayKey();$("#calendarTitle")&&($("#calendarTitle").textContent=first.toLocaleDateString("pt-BR",{month:"long",year:"numeric"}));const cells=[];for(let i=0;i<first.getDay();i++)cells.push('<div class="bank-calendar-day empty"></div>');for(let d=1;d<=last.getDate();d++){const date=new Date(year,month,d),key=dayKey(date),value=totals.get(key)||0,cls=value>0?"profit":value<0?"loss":"";cells.push(`<div class="bank-calendar-day ${cls} ${key===today?"today":""}" title="${value?signed(value):"Sem lançamento"}"><span>${d}</span>${value?`<b>${signed(value)}</b>`:""}</div>`)}host.innerHTML=cells.join("")}
-  function movements(){const host=$("#bankrollHistoryList");if(!host)return;const list=[...state.entries].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,12);host.innerHTML=list.length?list.map(e=>{const loss=Number(e.delta)<0,d=new Date(e.date);return `<article class="bank-movement ${loss?"loss":"profit"}"><span class="bank-movement-icon">${loss?"−":"+"}</span><div><strong>${loss?"Perda registrada":"Lucro registrado"}</strong><small>${e.note||"Sem observação"}</small></div><time>${d.toLocaleDateString("pt-BR")}</time><em>${signed(e.delta)}</em></article>`}).join(""):'<div class="bank-empty">Nenhum resultado registrado ainda.</div>'}
-  function render(){normalizeEntries();renderSummary();fillPlan();chart();calendar();movements()}
-  function savePlan(e){e.preventDefault();const initial=n($("#initialBankrollInput")?.value),current=n($("#currentBankrollInput")?.value,initial),target=n($("#sessionTargetInput")?.value),stop=n($("#sessionStopInput")?.value),days=Math.max(1,Math.min(365,Math.round(n($("#goalDaysInput")?.value,30)))),unit=Math.max(.1,Math.min(5,n($("#unitPercentInput")?.value,1))),start=$("#goalStartInput")?.value||dayKey();if(!initial)return toast("Informe a banca inicial.","error");state={...state,initial,current:current||initial,target,stop,goalDays:days,unit,startDate:start};save();closeModal("bankPlanModal");toast("Planejamento salvo.")}
-  function openEntry(type){if(!state.initial||!state.current){fillPlan();openModal("bankPlanModal");toast("Configure sua banca antes de lançar resultados.","error");return}const loss=type==="loss";$("#entryTypeInput").value=loss?"loss":"profit";$("#entryDateInput").value=dayKey();$("#entryAmountInput").value="";$("#entryNoteInput").value="";$("#entryModalTitle").textContent=loss?"Registrar perda":"Registrar lucro";$("#entryEyebrow").textContent=loss?"CONTROLE DE PERDA":"RESULTADO POSITIVO";$("#entrySubmitButton").textContent=loss?"Registrar perda":"Registrar lucro";openModal("bankEntryModal");setTimeout(()=>$("#entryAmountInput")?.focus(),80)}
-  function addEntry(e){e.preventDefault();const type=$("#entryTypeInput").value==="loss"?"loss":"profit",amount=n($("#entryAmountInput")?.value),date=$("#entryDateInput")?.value||dayKey(),note=$("#entryNoteInput")?.value.trim()||"";if(!amount)return toast("Informe o valor do resultado.","error");const delta=type==="loss"?-amount:amount;state.current=Math.max(0,Number((Number(state.current||0)+delta).toFixed(2)));state.entries.push({id:Date.now(),type,amount,delta,note,date:`${date}T12:00:00`,balance:state.current});save();closeModal("bankEntryModal");toast(type==="loss"?"Perda registrada. Respeite seu stop.":"Lucro registrado.")}
-  function clearHistory(){if(!state.entries.length)return;if(!confirm("Limpar os resultados e reiniciar a banca atual para a banca inicial?"))return;state.entries=[];state.days=[];state.current=state.initial;save();toast("Histórico reiniciado.")}
-  function bind(){
-    $("#studyMenuToggle")?.addEventListener("click",()=>{$("#studySidebar")?.classList.add("open");const o=$("#studyMobileOverlay");if(o)o.hidden=false});$("#studyMobileOverlay")?.addEventListener("click",()=>{$("#studySidebar")?.classList.remove("open");$("#studyMobileOverlay").hidden=true});
-    $("#openPlanButton")?.addEventListener("click",()=>{fillPlan();openModal("bankPlanModal")});$("#openPlanButtonSecondary")?.addEventListener("click",()=>{fillPlan();openModal("bankPlanModal")});$$('[data-open-entry]').forEach(b=>b.addEventListener("click",()=>openEntry(b.dataset.openEntry)));$$('[data-close-modal]').forEach(b=>b.addEventListener("click",()=>closeModal(b.dataset.closeModal)));$("#bankrollConfigForm")?.addEventListener("submit",savePlan);$("#bankrollEntryForm")?.addEventListener("submit",addEntry);$("#unitPercentInput")?.addEventListener("input",e=>{$("#unitPercentLabel").textContent=`${Number(e.target.value).toFixed(1).replace(".",",")}%`});$("#calendarPrev")?.addEventListener("click",()=>{calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()-1,1);calendar()});$("#calendarNext")?.addEventListener("click",()=>{calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+1,1);calendar()});$("#clearHistoryButton")?.addEventListener("click",clearHistory);$$('.bank-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+  function save(next = state) {
+    state = Bank.normalizeState(next);
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {}
+    window.dispatchEvent(new CustomEvent("turma:bankroll-updated", { detail: { state } }));
+    render();
   }
-  function init(){calendarCursor=new Date();bind();render();document.body.classList.add("protected-ready");$("#studyLoading")?.remove()}
-  document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init,{once:true}):init();
+  function toast(text, type = "success") {
+    const el = $("#bankrollMessage"); if (!el) return;
+    el.textContent = text; el.className = `bank-toast ${type} show`;
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+  function openModal(id) { const modal = $("#" + id); if (!modal) return; try { modal.showModal(); } catch (_) { modal.setAttribute("open", ""); } }
+  function closeModal(id) { const modal = $("#" + id); if (!modal) return; try { modal.close(); } catch (_) { modal.removeAttribute("open"); } }
+
+  function elapsedDays() {
+    if (!state.startDate) return 0;
+    const start = localDate(state.startDate), today = localDate(Bank.dateKey());
+    return Math.max(0, Math.min(state.goalDays || 0, Math.floor((today - start) / 86400000) + 1));
+  }
+
+  function renderSummary() {
+    const summary = Bank.summarize(state);
+    const total = summary.accumulated;
+    const targetTotal = (state.target || 0) * (state.goalDays || 0);
+    const progress = targetTotal ? Math.max(0, Math.min(100, total / targetTotal * 100)) : 0;
+    const day = elapsedDays(), remaining = Math.max(0, (state.goalDays || 0) - day), unit = summary.current * (state.unit || 0) / 100;
+    $("#currentBankrollValue") && ($("#currentBankrollValue").textContent = money(summary.current));
+    const variation = $("#bankrollVariationLabel");
+    if (variation) variation.textContent = summary.initial ? `${total >= 0 ? "+" : ""}${(total / summary.initial * 100).toFixed(1).replace(".", ",")}% desde o início` : "Configure sua banca para começar";
+    const todayEl = $("#todayResultValue");
+    if (todayEl) { todayEl.textContent = signed(summary.today); todayEl.className = summary.today > 0 ? "positive" : summary.today < 0 ? "negative" : ""; }
+    $("#dailyTargetValue") && ($("#dailyTargetValue").textContent = money(state.target));
+    $("#dailyStopValue") && ($("#dailyStopValue").textContent = money(state.stop));
+    $("#unitValue") && ($("#unitValue").textContent = money(unit));
+    $("#daysRemainingValue") && ($("#daysRemainingValue").textContent = String(remaining));
+    $("#planDayLabel") && ($("#planDayLabel").textContent = summary.initial ? `Dia ${day} de ${state.goalDays}` : "Planejamento não iniciado");
+    $("#planGoalValue") && ($("#planGoalValue").textContent = money(targetTotal));
+    $("#planProfitValue") && ($("#planProfitValue").textContent = signed(total));
+    $("#planGoalBar")?.style.setProperty("width", `${progress}%`);
+    const goalText = $("#planGoalText");
+    if (goalText) goalText.textContent = !summary.initial ? "Configure o planejamento para acompanhar sua evolução." : total >= targetTotal && targetTotal > 0 ? "Meta do planejamento alcançada. Proteja o resultado e respeite seus limites." : `${Math.round(progress)}% da meta acumulada • ${remaining} ${remaining === 1 ? "dia restante" : "dias restantes"}.`;
+  }
+
+  function fillPlan() {
+    const summary = Bank.summarize(state);
+    const map = { initialBankrollInput: state.initial || "", currentBankrollInput: summary.current || "", sessionTargetInput: state.target || "", sessionStopInput: state.stop || "", goalDaysInput: state.goalDays || 30, goalStartInput: state.startDate || Bank.dateKey(), unitPercentInput: state.unit || 1 };
+    Object.entries(map).forEach(([id, value]) => { const el = $("#" + id); if (el) el.value = value; });
+    $("#unitPercentLabel") && ($("#unitPercentLabel").textContent = `${Number(state.unit || 1).toFixed(1).replace(".", ",")}%`);
+  }
+
+  function renderChart() {
+    const host = $("#bankrollChart"); if (!host) return;
+    const points = Bank.series(state).slice(-31);
+    if (points.length < 2) { host.innerHTML = '<div class="bank-chart-empty">Registre lucros e perdas para visualizar a curva da banca.</div>'; return; }
+    const values = points.map((p) => p.value), w = 760, h = 194, px = 22, py = 20;
+    const min = Math.min(...values), max = Math.max(...values), span = max - min || Math.max(1, Math.abs(max) * .02 || 1);
+    const x = (i) => px + i * (w - px * 2) / Math.max(1, values.length - 1), y = (v) => py + (max - v) * (h - py * 2) / span;
+    const path = values.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+    const area = `${path} L${x(values.length - 1)} ${h - py} L${x(0)} ${h - py} Z`;
+    const grids = [0,1,2,3].map((i) => `<line class="bank-grid" x1="${px}" y1="${py + i * (h - py * 2) / 3}" x2="${w - px}" y2="${py + i * (h - py * 2) / 3}"/>`).join("");
+    const dots = values.map((v, i) => `<circle class="bank-dot" cx="${x(i)}" cy="${y(v)}" r="4"/>`).join("");
+    host.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Curva da banca"><defs><linearGradient id="bankAreaCore" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a45cff" stop-opacity=".28"/><stop offset="1" stop-color="#a45cff" stop-opacity="0"/></linearGradient></defs>${grids}<path class="bank-area" d="${area}"/><path class="bank-line" d="${path}"/>${dots}</svg>`;
+    const label = $("#chartPeriodLabel"); if (label) label.textContent = `${points.length - 1} dias registrados`;
+  }
+
+  function renderCalendar() {
+    const host = $("#bankCalendar"); if (!host) return;
+    const year = calendarCursor.getFullYear(), month = calendarCursor.getMonth(), first = new Date(year, month, 1), last = new Date(year, month + 1, 0);
+    const buckets = new Map(Bank.dailyBuckets(state).map((item) => [item.date, item]));
+    const target = Number(state.target || 0);
+    $("#calendarTitle") && ($("#calendarTitle").textContent = first.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }));
+    const cells = [];
+    for (let i = 0; i < first.getDay(); i++) cells.push('<button class="bank-calendar-day empty" type="button" disabled></button>');
+    for (let d = 1; d <= last.getDate(); d++) {
+      const key = `${year}-${String(month + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      const bucket = buckets.get(key), result = Number(bucket?.result || 0);
+      const cls = result >= target && target > 0 ? "goal" : result > 0 ? "profit" : result < 0 ? "loss" : "";
+      cells.push(`<button class="bank-calendar-day ${cls} ${key === Bank.dateKey() ? "today" : ""}" type="button" data-day="${key}" title="${result ? signed(result) : "Sem lançamento"}"><span>${d}</span>${result ? `<b>${signed(result)}</b>` : ""}</button>`);
+    }
+    host.innerHTML = cells.join("");
+    $$('[data-day]', host).forEach((button) => button.addEventListener("click", () => openDay(button.dataset.day)));
+  }
+
+  function renderMovements() {
+    const host = $("#bankrollHistoryList"); if (!host) return;
+    const list = [...Bank.dailyBuckets(state)].reverse().slice(0, 12);
+    host.innerHTML = list.length ? list.map((item) => `<article class="bank-movement ${item.result < 0 ? "loss" : "profit"}"><span class="bank-movement-icon">${item.result < 0 ? "−" : "+"}</span><div><strong>${item.source === "journal" ? "Resultado diário" : item.result < 0 ? "Perda registrada" : "Lucro registrado"}</strong><small>${item.day?.notes || item.entries?.map((e) => e.note).filter(Boolean).join(" • ") || "Sem observação"}</small></div><time>${localDate(item.date).toLocaleDateString("pt-BR")}</time><em>${signed(item.result)}</em></article>`).join("") : '<div class="bank-empty">Nenhum resultado registrado ainda.</div>';
+  }
+
+  function ensureJournal() {
+    if ($("#bankDailyJournalV6")) return;
+    const section = document.createElement("section");
+    section.id = "bankDailyJournalV6"; section.className = "bank-card bank-journal-v6";
+    section.innerHTML = '<header><div><span>DIÁRIO DA BANCA</span><h2>Registro diário</h2><p>Entradas, greens, reds e observações conectados ao calendário.</p></div><div class="bank-journal-actions-v6"><button id="shareBankMonthV6" type="button">Compartilhar mês</button><button id="newBankDayV6" type="button">+ Registrar hoje</button></div></header><div class="bank-journal-summary-v6" id="bankJournalSummaryV6"></div><div class="bank-journal-list-v6" id="bankJournalListV6"></div>';
+    $(".bank-calendar-card")?.insertAdjacentElement("afterend", section);
+    $("#newBankDayV6")?.addEventListener("click", () => openDay(Bank.dateKey()));
+    $("#shareBankMonthV6")?.addEventListener("click", shareMonth);
+  }
+
+  function ensureDayModal() {
+    let modal = $("#bankDayModalV6"); if (modal) return modal;
+    modal = document.createElement("dialog"); modal.id = "bankDayModalV6"; modal.className = "bank-modal bank-day-modal-v6";
+    modal.innerHTML = `<form method="dialog" id="bankDayFormV6" class="bank-modal-box"><header><div><span>REGISTRO DIÁRIO</span><h2 id="bankDayTitleV6">Registrar dia</h2></div><button type="button" data-close-bank-day>×</button></header><input type="hidden" id="bankDayDateV6"><div class="bank-day-date-v6" id="bankDayDateLabelV6"></div><div class="bank-form-grid bank-day-form-grid-v6"><label><span>Banca inicial do dia</span><div class="bank-input"><b>R$</b><input id="bankDayInitialV6" type="number" min="0" step="0.01" required></div></label><div class="bank-day-outcome-core wide"><span>Resultado</span><div><button type="button" data-day-outcome="profit">✓ Lucro</button><button type="button" data-day-outcome="loss">− Perda</button></div></div><label class="wide"><span id="bankDayAmountLabel">Valor do lucro</span><div class="bank-input"><b>R$</b><input id="bankDayAmountCore" type="number" min="0" step="0.01" inputmode="decimal" required></div></label><label><span>Entradas realizadas</span><div class="bank-input"><b>#</b><input id="bankDayEntriesV6" type="number" min="0" step="1"></div></label><label><span>Greens</span><div class="bank-input"><b>✓</b><input id="bankDayGreensV6" type="number" min="0" step="1"></div></label><label><span>Reds</span><div class="bank-input"><b>×</b><input id="bankDayRedsV6" type="number" min="0" step="1"></div></label><label class="wide"><span>Observações</span><textarea id="bankDayNotesV6" maxlength="500" rows="4" placeholder="Ex.: sessão da noite, respeitei o stop…"></textarea></label></div><div class="bank-day-help-v6"><span>A banca final é calculada automaticamente a partir do resultado informado.</span><b id="bankDayFinalPreview">—</b></div><footer><button type="button" class="secondary" id="deleteBankDayV6">Excluir registro</button><span></span><button type="button" class="secondary" data-close-bank-day>Cancelar</button><button type="submit" class="primary">Salvar dia</button></footer></form>`;
+    document.body.appendChild(modal);
+    $$('[data-close-bank-day]', modal).forEach((b) => b.addEventListener("click", () => closeModal(modal.id)));
+    $("#bankDayFormV6", modal).addEventListener("submit", saveDay);
+    $("#deleteBankDayV6", modal).addEventListener("click", deleteDay);
+    $$('[data-day-outcome]', modal).forEach((b) => b.addEventListener("click", () => setDayOutcome(b.dataset.dayOutcome)));
+    $("#bankDayAmountCore", modal).addEventListener("input", updateDayPreview);
+    $("#bankDayInitialV6", modal).addEventListener("input", updateDayPreview);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(modal.id); });
+    return modal;
+  }
+
+  function dayRecord(date) { return state.days.find((item) => item.date === date) || null; }
+  function inferredInitial(date) {
+    const summary = Bank.summarize(state);
+    let balance = state.initial || summary.current;
+    for (const bucket of summary.buckets) { if (bucket.date >= date) break; balance = Math.max(0, balance + bucket.result); }
+    return balance;
+  }
+  function setDayOutcome(type) {
+    const modal = ensureDayModal(); modal.dataset.outcome = type === "loss" ? "loss" : "profit";
+    $$('[data-day-outcome]', modal).forEach((b) => b.classList.toggle("active", b.dataset.dayOutcome === modal.dataset.outcome));
+    $("#bankDayAmountLabel", modal).textContent = modal.dataset.outcome === "loss" ? "Valor da perda" : "Valor do lucro";
+    updateDayPreview();
+  }
+  function updateDayPreview() {
+    const modal = ensureDayModal(), initial = Math.max(0, n($("#bankDayInitialV6", modal).value)), amount = Math.max(0, n($("#bankDayAmountCore", modal).value));
+    const result = modal.dataset.outcome === "loss" ? -amount : amount;
+    $("#bankDayFinalPreview", modal).textContent = `Banca final: ${money(Math.max(0, initial + result))}`;
+  }
+  function openDay(date) {
+    const modal = ensureDayModal(), existing = dayRecord(date), initial = existing ? existing.initialBankroll : inferredInitial(date), result = Number(existing?.result || 0);
+    $("#bankDayDateV6", modal).value = date;
+    $("#bankDayDateLabelV6", modal).textContent = localDate(date).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+    $("#bankDayTitleV6", modal).textContent = existing ? "Editar registro do dia" : "Registrar resultado do dia";
+    $("#bankDayInitialV6", modal).value = initial || "";
+    $("#bankDayAmountCore", modal).value = Math.abs(result) || "";
+    $("#bankDayEntriesV6", modal).value = existing?.entries || 0; $("#bankDayGreensV6", modal).value = existing?.greens || 0; $("#bankDayRedsV6", modal).value = existing?.reds || 0; $("#bankDayNotesV6", modal).value = existing?.notes || "";
+    $("#deleteBankDayV6", modal).hidden = !existing; setDayOutcome(result < 0 ? "loss" : "profit"); openModal(modal.id);
+  }
+  function saveDay(event) {
+    event.preventDefault(); const modal = ensureDayModal(), date = $("#bankDayDateV6", modal).value, initial = Math.max(0, n($("#bankDayInitialV6", modal).value)), amount = Math.max(0, n($("#bankDayAmountCore", modal).value));
+    if (!amount) return toast("Informe o valor do resultado.", "error");
+    const result = modal.dataset.outcome === "loss" ? -amount : amount;
+    state = Bank.upsertDay(state, { date, initialBankroll: initial, finalBankroll: Math.max(0, initial + result), result, entries: n($("#bankDayEntriesV6", modal).value), greens: n($("#bankDayGreensV6", modal).value), reds: n($("#bankDayRedsV6", modal).value), notes: $("#bankDayNotesV6", modal).value.trim(), updatedAt: Date.now() });
+    save(state); closeModal(modal.id); toast(result < 0 ? "Perda registrada. Respeite seu stop." : "Lucro registrado.");
+  }
+  function deleteDay() { const date = $("#bankDayDateV6")?.value; if (!date || !confirm("Excluir o registro deste dia?")) return; state = Bank.removeDay(state, date); save(state); closeModal("bankDayModalV6"); toast("Registro removido."); }
+
+  function renderJournal() {
+    ensureJournal(); const prefix = `${calendarCursor.getFullYear()}-${String(calendarCursor.getMonth() + 1).padStart(2,"0")}-`, records = state.days.filter((day) => day.date.startsWith(prefix)).sort((a,b) => b.date.localeCompare(a.date));
+    const summary = $("#bankJournalSummaryV6"), list = $("#bankJournalListV6"); if (!summary || !list) return;
+    const total = records.reduce((s,d) => s + Number(d.result || 0), 0), entries = records.reduce((s,d) => s + Number(d.entries || 0), 0), greens = records.reduce((s,d) => s + Number(d.greens || 0), 0), reds = records.reduce((s,d) => s + Number(d.reds || 0), 0), accuracy = entries ? greens / entries * 100 : 0;
+    summary.innerHTML = `<article><small>Dias registrados</small><strong>${records.length}</strong></article><article><small>Entradas</small><strong>${entries}</strong></article><article><small>Greens / Reds</small><strong>${greens} / ${reds}</strong></article><article class="${total > 0 ? "positive" : total < 0 ? "negative" : ""}"><small>Resultado do mês</small><strong>${signed(total)}</strong></article><article><small>Taxa de greens</small><strong>${accuracy.toFixed(1).replace(".",",")}%</strong></article>`;
+    list.innerHTML = records.length ? records.map((item) => `<button type="button" data-open-bank-day="${item.date}"><time>${localDate(item.date).toLocaleDateString("pt-BR", { day:"2-digit", month:"short" })}</time><div><strong>${item.entries} entradas • ${item.greens}G / ${item.reds}R</strong><small>${item.notes || "Sem observação"}</small></div><b class="${item.result > 0 ? "positive" : item.result < 0 ? "negative" : ""}">${signed(item.result)}</b><span>→</span></button>`).join("") : '<div class="bank-journal-empty-v6"><strong>Nenhum registro neste mês</strong><span>Toque em um dia do calendário ou use “Registrar hoje”.</span></div>';
+    $$('[data-open-bank-day]', list).forEach((b) => b.addEventListener("click", () => openDay(b.dataset.openBankDay)));
+  }
+
+  async function shareMonth() {
+    const prefix = `${calendarCursor.getFullYear()}-${String(calendarCursor.getMonth() + 1).padStart(2,"0")}-`, records = state.days.filter((d) => d.date.startsWith(prefix)); if (!records.length) return toast("Não há registros neste mês.", "error");
+    const total = records.reduce((s,d) => s + Number(d.result || 0), 0), text = `Turma do Primo • Gestão\n${calendarCursor.toLocaleDateString("pt-BR", { month:"long", year:"numeric" })}\nDias registrados: ${records.length}\nResultado: ${signed(total)}`;
+    try { if (navigator.share) await navigator.share({ title: "Gestão • Turma do Primo", text }); else { await navigator.clipboard.writeText(text); toast("Resumo copiado."); } } catch (_) {}
+  }
+
+  function savePlan(e) {
+    e.preventDefault(); const initial = Math.max(0, n($("#initialBankrollInput")?.value)), target = Math.max(0, n($("#sessionTargetInput")?.value)), stop = Math.max(0, n($("#sessionStopInput")?.value));
+    if (!initial) return toast("Informe a banca inicial.", "error");
+    state = Bank.normalizeState({ ...state, initial, target, stop, goalDays: Math.max(1, Math.min(365, Math.round(n($("#goalDaysInput")?.value, 30)))), unit: Math.max(.1, Math.min(5, n($("#unitPercentInput")?.value, 1))), startDate: $("#goalStartInput")?.value || Bank.dateKey() });
+    save(state); closeModal("bankPlanModal"); toast("Planejamento salvo.");
+  }
+  function openEntry(type) { if (!state.initial) { fillPlan(); openModal("bankPlanModal"); return toast("Configure sua banca primeiro.", "error"); } const loss = type === "loss"; $("#entryTypeInput").value = loss ? "loss" : "profit"; $("#entryDateInput").value = Bank.dateKey(); $("#entryAmountInput").value = ""; $("#entryNoteInput").value = ""; $("#entryModalTitle").textContent = loss ? "Registrar perda" : "Registrar lucro"; $("#entrySubmitButton").textContent = loss ? "Registrar perda" : "Registrar lucro"; openModal("bankEntryModal"); }
+  function addEntry(e) { e.preventDefault(); const amount = Math.max(0, n($("#entryAmountInput")?.value)); if (!amount) return toast("Informe o valor do resultado.", "error"); state = Bank.addEntry(state, { type: $("#entryTypeInput").value === "loss" ? "loss" : "profit", amount, date: $("#entryDateInput").value || Bank.dateKey(), note: $("#entryNoteInput").value.trim() }); save(state); closeModal("bankEntryModal"); toast($("#entryTypeInput").value === "loss" ? "Perda registrada." : "Lucro registrado."); }
+  function clearHistory() { if (!Bank.dailyBuckets(state).length || !confirm("Limpar os resultados registrados?")) return; state = Bank.normalizeState({ ...state, entries: [], days: [] }); save(state); toast("Histórico reiniciado."); }
+
+  function render() { state = Bank.normalizeState(state); renderSummary(); fillPlan(); renderChart(); renderCalendar(); renderMovements(); renderJournal(); }
+  function bind() {
+    $("#openPlanButton")?.addEventListener("click", () => { fillPlan(); openModal("bankPlanModal"); }); $("#openPlanButtonSecondary")?.addEventListener("click", () => { fillPlan(); openModal("bankPlanModal"); });
+    $$('[data-open-entry]').forEach((b) => b.addEventListener("click", () => openEntry(b.dataset.openEntry))); $$('[data-close-modal]').forEach((b) => b.addEventListener("click", () => closeModal(b.dataset.closeModal)));
+    $("#bankrollConfigForm")?.addEventListener("submit", savePlan); $("#bankrollEntryForm")?.addEventListener("submit", addEntry); $("#unitPercentInput")?.addEventListener("input", (e) => { $("#unitPercentLabel").textContent = `${Number(e.target.value).toFixed(1).replace(".",",")}%`; });
+    $("#calendarPrev")?.addEventListener("click", () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1); renderCalendar(); renderJournal(); }); $("#calendarNext")?.addEventListener("click", () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 1); renderCalendar(); renderJournal(); }); $("#clearHistoryButton")?.addEventListener("click", clearHistory);
+    window.addEventListener("storage", (e) => { if (e.key === KEY) { state = load(); render(); } }); window.addEventListener("turma:bankroll-remote", (e) => { if (e.detail?.state) { state = Bank.normalizeState(e.detail.state); render(); } });
+  }
+  function init() { calendarCursor = new Date(); ensureJournal(); ensureDayModal(); bind(); render(); document.body.classList.add("protected-ready"); $("#studyLoading")?.remove(); }
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init, { once:true }) : init();
 })();

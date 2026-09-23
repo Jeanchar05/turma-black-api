@@ -17,44 +17,32 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: package.json
-
       - name: Install dependencies without project lifecycle scripts
         run: npm install --ignore-scripts --no-fund
-
       - name: Validate JavaScript syntax
         run: npm run validate
-
       - name: Run security regression tests
         run: npm run security:regression
-
       - name: Run Sales Command Center regression tests
         run: npm run sales:regression
-
       - name: Run navigation and page access regression tests
         run: npm run navigation:regression
-
-      - name: Run final V12 regression tests
+      - name: Run final stabilization regression tests
         run: npm run final:regression
-
       - name: Run study curriculum regression tests
         run: npm run study:regression
-
       - name: Run study account and timer regression tests
         run: npm run study:accounts
-
       - name: Run learning content, Race and PDF regression tests
         run: npm run learning:regression
-
       - name: Run notes, account isolation and PDF regression tests
         run: npm run notes:regression
-
       - name: Smoke test real server startup
         shell: bash
         env:
@@ -65,39 +53,22 @@ jobs:
           node server.js > /tmp/turma-server.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-
           READY=0
           for attempt in $(seq 1 30); do
-            if curl --fail --silent --show-error http://127.0.0.1:3999/api/status > /tmp/turma-status.json; then
-              READY=1
-              break
-            fi
-            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-              echo "Servidor encerrou antes do health-check."
-              cat /tmp/turma-server.log
-              exit 1
-            fi
+            if curl --fail --silent --show-error http://127.0.0.1:3999/api/status > /tmp/turma-status.json; then READY=1; break; fi
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then echo "Servidor encerrou antes do health-check."; cat /tmp/turma-server.log; exit 1; fi
             sleep 0.5
           done
-
-          if [ "$READY" -ne 1 ]; then
-            echo "Servidor não respondeu ao health-check dentro do prazo."
-            cat /tmp/turma-server.log
-            exit 1
-          fi
-
+          if [ "$READY" -ne 1 ]; then echo "Servidor não respondeu ao health-check dentro do prazo."; cat /tmp/turma-server.log; exit 1; fi
           grep -q '"status":"online"' /tmp/turma-status.json
           echo "Server startup smoke test: OK"
-
       - name: Dependency security audit
         run: npm audit --audit-level=high
-
       - name: Scan repository for committed secrets
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RInE --exclude-dir=.git --exclude='*.md' --exclude='.env.example' \
-            '(BESTFY_API_KEY|JWT_SECRET|SETUP_SECRET|DB_PASSWORD)[[:space:]]*=[[:space:]]*[^$<{[:space:]]{12,}' .; then
+          if grep -RInE --exclude-dir=.git --exclude='*.md' --exclude='.env.example' '(BESTFY_API_KEY|JWT_SECRET|SETUP_SECRET|DB_PASSWORD)[[:space:]]*=[[:space:]]*[^$<{[:space:]]{12,}' .; then
             echo 'Possible committed secret detected.'
             exit 1
           fi

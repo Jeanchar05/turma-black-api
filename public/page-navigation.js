@@ -11,17 +11,12 @@
         location.replace(restored.pathname + restored.search + restored.hash);
         return;
       }
-    } catch {}
+    } catch (_) {}
   }
   let current = original;
-  const replace = history.replaceState.bind(history);
-  const push = history.pushState.bind(history);
+  const replace = history.replaceState.bind(history), push = history.pushState.bind(history);
   const route = () => current.pathname + current.search + current.hash;
-  window.TurmaNavigation = Object.freeze({
-    get pathname() { return current.pathname; },
-    get search() { return current.search; },
-    get hash() { return current.hash; }
-  });
+  window.TurmaNavigation = Object.freeze({ get pathname(){ return current.pathname; }, get search(){ return current.search; }, get hash(){ return current.hash; } });
   function update(method, data, title, url) {
     const next = url == null ? current : new URL(String(url), current.href);
     if (next.origin !== location.origin) throw new DOMException("A navegação deve permanecer no mesmo site.", "SecurityError");
@@ -31,76 +26,47 @@
   history.replaceState = (data, title, url) => update(replace, data, title, url);
   history.pushState = (data, title, url) => update(push, data, title, url);
   replace({ ...history.state, turmaPage: route() }, "", "/");
-  window.addEventListener("hashchange", () => {
-    if (location.hash) current.hash = location.hash;
-    replace({ ...history.state, turmaPage: route() }, "", "/");
-  });
-  window.addEventListener("popstate", event => {
+  window.addEventListener("hashchange", () => { if (location.hash) current.hash = location.hash; replace({ ...history.state, turmaPage: route() }, "", "/"); });
+  window.addEventListener("popstate", (event) => {
     if (!event.state?.turmaPage) return;
     const next = new URL(event.state.turmaPage, location.origin);
     if (next.origin !== location.origin) return;
     if (next.pathname !== current.pathname) { location.replace(next.pathname + next.search + next.hash); return; }
-    const previousHash = current.hash;
-    current = next;
+    const previousHash = current.hash; current = next;
     if (previousHash !== current.hash) window.dispatchEvent(new HashChangeEvent("hashchange"));
   });
 
   function loadStyle(href, key) {
-    if (document.querySelector(`link[data-turma-v6="${key}"]`)) return;
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    link.dataset.turmaV6 = key;
-    document.head.appendChild(link);
+    if (document.querySelector(`link[data-turma-runtime="${key}"]`)) return;
+    const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; link.dataset.turmaRuntime = key; document.head.appendChild(link);
   }
   function loadScript(src, key) {
-    if (document.querySelector(`script[data-turma-v6="${key}"]`)) return;
-    const script = document.createElement("script");
-    script.src = src;
-    script.defer = true;
-    script.dataset.turmaV6 = key;
-    document.head.appendChild(script);
+    if (document.querySelector(`script[data-turma-runtime="${key}"]`)) return;
+    const script = document.createElement("script"); script.src = src; script.defer = true; script.dataset.turmaRuntime = key; document.head.appendChild(script);
   }
-  function loadEvolutionV6() {
+  function loadRuntime() {
     const path = current.pathname.toLowerCase();
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/roleta-real", "/provas", "/favoritos", "/notificacoes"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
-
     if (admin) {
-      loadStyle("/admin-support-v7.css?v=20260921-1", "admin-support-v7-css");
-      loadScript("/admin-support-v7.js?v=20260921-1", "admin-support-v7-js");
+      loadStyle("/admin-support-v7.css?v=20260922-final", "admin-support-css");
+      loadScript("/admin-support-v7.js?v=20260922-final", "admin-support-js");
     }
-
     if (!student) return;
-    loadScript("/student-nav-standard-v9.js?v=20260922-1", "student-nav-standard-v9-js");
-    loadStyle("/student-evolution-v6.css?v=20260921-6", "evolution-css");
-    loadScript("/student-evolution-v6.js?v=20260921-6", "evolution-js");
-    loadStyle("/support-float-v6.css?v=20260921-6", "support-float-css");
-    loadStyle("/profile-v6.css?v=20260921-6", "profile-css");
-    loadStyle("/favorites-v6.css?v=20260921-6", "favorites-css");
-    loadStyle("/floating-controls-v7.css?v=20260921-1", "floating-controls-v7-css");
-    loadScript("/support-float-v6.js?v=20260921-6", "support-float-js");
-    loadScript("/profile-v6.js?v=20260921-6", "profile-js");
-    loadScript("/profile-save-guard-v6.js?v=20260921-6", "profile-save-guard-js");
-    loadScript("/favorites-v6.js?v=20260921-6", "favorites-js");
-    loadScript("/activity-v6.js?v=20260921-6", "activity-js");
-    loadScript("/floating-controls-v7.js?v=20260921-1", "floating-controls-v7-js");
-    if (path === "/gestao") {
-      loadStyle("/management-v6.css?v=20260921-6", "management-css");
-      loadScript("/management-v6.js?v=20260921-6", "management-js");
-      loadStyle("/final-fixes-v12.css?v=20260922-2", "final-fixes-v12-css");
-      loadScript("/management-final-v12.js?v=20260922-2", "management-final-v12-js");
-      return;
-    }
-    if (path === "/roleta") {
-      loadStyle("/roulette-esportiva-affiliate-v10.css?v=20260922-1", "roulette-esportiva-affiliate-v10-css");
-      loadScript("/roulette-esportiva-affiliate-v10.js?v=20260922-1", "roulette-esportiva-affiliate-v10-js");
-      loadStyle("/roulette-quality-v13.css?v=20260922-2", "roulette-quality-v13-css");
-      loadScript("/roulette-quality-v13.js?v=20260922-2", "roulette-quality-v13-js");
-    }
-    loadStyle("/final-fixes-v12.css?v=20260922-2", "final-fixes-v12-css");
-    loadScript("/final-fixes-v12.js?v=20260922-2", "final-fixes-v12-js");
+    loadScript("/student-nav-standard-v9.js?v=20260922-final", "student-nav-js");
+    loadStyle("/student-evolution-v6.css?v=20260922-final", "evolution-css");
+    loadScript("/student-evolution-v6.js?v=20260922-final", "evolution-js");
+    loadStyle("/support-float-v6.css?v=20260922-final", "support-float-css");
+    loadScript("/support-float-v6.js?v=20260922-final", "support-float-js");
+    loadStyle("/profile-v6.css?v=20260922-final", "profile-css");
+    loadScript("/profile-v6.js?v=20260922-final", "profile-js");
+    loadScript("/profile-save-guard-v6.js?v=20260922-final", "profile-save-guard-js");
+    loadStyle("/favorites-v6.css?v=20260922-final", "favorites-css");
+    loadScript("/favorites-v6.js?v=20260922-final", "favorites-js");
+    loadScript("/activity-v6.js?v=20260922-final", "activity-js");
+    loadStyle("/floating-controls-v7.css?v=20260922-final", "floating-controls-css");
+    loadScript("/floating-controls-v7.js?v=20260922-final", "floating-controls-js");
   }
-  loadEvolutionV6();
+  loadRuntime();
 })();
