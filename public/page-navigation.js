@@ -89,12 +89,18 @@
     if (path === "/gestao") {
       loadStyle("/management-v6.css?v=20260921-6", "management-css");
       loadScript("/management-v6.js?v=20260921-6", "management-js");
+      loadStyle("/final-fixes-v12.css?v=20260922-2", "final-fixes-v12-css");
+      loadScript("/management-final-v12.js?v=20260922-2", "management-final-v12-js");
+      return;
     }
     if (path === "/roleta") {
       loadStyle("/roulette-esportiva-affiliate-v10.css?v=20260922-1", "roulette-esportiva-affiliate-v10-css");
       loadScript("/roulette-esportiva-affiliate-v10.js?v=20260922-1", "roulette-esportiva-affiliate-v10-js");
-      loadScript("/roulette-card-art-v11.js?v=20260922-1", "roulette-card-art-v11-js");
+      loadStyle("/roulette-quality-v13.css?v=20260922-2", "roulette-quality-v13-css");
+      loadScript("/roulette-quality-v13.js?v=20260922-2", "roulette-quality-v13-js");
     }
+    loadStyle("/final-fixes-v12.css?v=20260922-2", "final-fixes-v12-css");
+    loadScript("/final-fixes-v12.js?v=20260922-2", "final-fixes-v12-js");
   }
   loadEvolutionV6();
 })();

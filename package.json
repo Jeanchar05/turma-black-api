@@ -10,7 +10,7 @@
     "security:regression": "node scripts/security-regression.js",
     "sales:regression": "node scripts/sales-regression.js",
     "navigation:regression": "node scripts/navigation-regression.js",
-    "maintenance:regression": "node scripts/maintenance-regression.cjs",
+    "final:regression": "node scripts/roulette-v12-regression.cjs",
     "study:regression": "node scripts/study-regression.js",
     "study:browser": "node scripts/study-browser-regression.cjs",
     "study:accounts": "node scripts/study-account-regression.cjs",
