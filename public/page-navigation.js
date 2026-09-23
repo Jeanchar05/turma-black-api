@@ -55,6 +55,7 @@
       loadScript("/admin-support-v7.js?v=20260922-final", "admin-support-js");
     }
     if (!student) return;
+    loadScript("/dashboard-notifications-live.js?v=20260923-v17", "student-notifications-js");
     loadScript("/student-nav-standard-v9.js?v=20260922-final", "student-nav-js");
     loadStyle("/student-evolution-v6.css?v=20260922-final", "evolution-css");
     loadScript("/student-evolution-v6.js?v=20260922-final", "evolution-js");
