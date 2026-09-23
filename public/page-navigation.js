@@ -49,7 +49,7 @@
   function loadRuntime() {
     if (typeof document === "undefined") return;
     const path = current.pathname.toLowerCase();
-    loadScript("/platform-fixes-v17.js?v=20260923-v17", "platform-fixes-v17");
+    loadScript("/platform-fixes-v17.js?v=20260923-v18", "platform-fixes-v17");
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/roleta-real", "/provas", "/favoritos", "/notificacoes"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
@@ -58,10 +58,11 @@
       loadScript("/admin-support-v7.js?v=20260922-final", "admin-support-js");
     }
     if (!student) return;
-    loadScript("/dashboard-notifications-live.js?v=20260923-v17", "student-notifications-js");
+    loadScript("/dashboard-notifications-live.js?v=20260923-v18", "student-notifications-js");
     loadScript("/student-nav-standard-v9.js?v=20260922-final", "student-nav-js");
-    loadStyle("/student-evolution-v6.css?v=20260922-final", "evolution-css");
-    loadScript("/student-evolution-v6.js?v=20260922-final", "evolution-js");
+    loadStyle("/student-evolution-v6.css?v=20260923-v18", "evolution-css");
+    loadScript("/student-evolution-v6.js?v=20260923-v18", "evolution-js");
+    if (path === "/gestao") loadScript("/management-stop-entries-v18.js?v=20260923-v18", "management-stop-entries-v18");
     loadStyle("/support-float-v6.css?v=20260922-final", "support-float-css");
     loadScript("/support-float-v6.js?v=20260922-final", "support-float-js");
     loadStyle("/profile-v6.css?v=20260922-final", "profile-css");
