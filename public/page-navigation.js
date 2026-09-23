@@ -37,14 +37,17 @@
   });
 
   function loadStyle(href, key) {
+    if (typeof document === "undefined") return;
     if (document.querySelector(`link[data-turma-runtime="${key}"]`)) return;
     const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; link.dataset.turmaRuntime = key; document.head.appendChild(link);
   }
   function loadScript(src, key) {
+    if (typeof document === "undefined") return;
     if (document.querySelector(`script[data-turma-runtime="${key}"]`)) return;
     const script = document.createElement("script"); script.src = src; script.defer = true; script.dataset.turmaRuntime = key; document.head.appendChild(script);
   }
   function loadRuntime() {
+    if (typeof document === "undefined") return;
     const path = current.pathname.toLowerCase();
     loadScript("/platform-fixes-v17.js?v=20260923-v17", "platform-fixes-v17");
     const admin = ["/admin", "/painel-admin"].includes(path);
