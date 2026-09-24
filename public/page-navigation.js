@@ -50,6 +50,7 @@
     if (typeof document === "undefined") return;
     const path = current.pathname.toLowerCase();
     loadScript("/platform-fixes-v18.js?v=20260923-v18", "platform-fixes-v18");
+    loadScript("/auth-registration-v18.js?v=20260923-v18", "auth-registration-v18");
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/roleta-real", "/provas", "/favoritos", "/notificacoes"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
