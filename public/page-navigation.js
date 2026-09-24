@@ -49,7 +49,8 @@
   function loadRuntime() {
     if (typeof document === "undefined") return;
     const path = current.pathname.toLowerCase();
-    loadScript("/platform-fixes-v17.js?v=20260923-v17", "platform-fixes-v17");
+    loadScript("/platform-fixes-v18.js?v=20260923-v18", "platform-fixes-v18");
+    loadScript("/auth-registration-v18.js?v=20260923-v18", "auth-registration-v18");
     const admin = ["/admin", "/painel-admin"].includes(path);
     const student = ["/dashboard", "/notas", "/estudo", "/modulos", "/gestao", "/suporte", "/perfil", "/roleta", "/roleta-real", "/provas", "/favoritos", "/notificacoes"].includes(path) || path.startsWith("/estudo-");
     if (!admin && !student) return;
@@ -59,7 +60,7 @@
     }
     if (!student) return;
     if (path === "/gestao") loadScript("/gestao-stop-entries-v18.js?v=20260923-v18", "gestao-stop-entries-v18");
-    loadScript("/dashboard-notifications-live.js?v=20260923-v17", "student-notifications-js");
+    loadScript("/dashboard-notifications-live-v18.js?v=20260923-v18", "student-notifications-v18-js");
     loadScript("/student-nav-standard-v9.js?v=20260922-final", "student-nav-js");
     loadStyle("/student-evolution-v6.css?v=20260922-final", "evolution-css");
     loadScript("/student-evolution-v6.js?v=20260922-final", "evolution-js");
