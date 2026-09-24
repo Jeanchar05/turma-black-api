@@ -8,15 +8,24 @@
   const route = () => window.TurmaNavigation?.pathname || location.pathname;
   const theme = () => document.documentElement.dataset.theme === "light" ? "light" : "dark";
 
+  const PLANOS = Object.freeze({
+    monthly: { price: "R$ 99,90", detail: "aprox. R$ 3,33 por dia", saving: "Ideal para começar com um período menor." },
+    six_months: { price: "R$ 239,99", detail: "equivale a R$ 40,00 por mês", badge: "ECONOMIZE R$ 359,41", saving: "R$ 599,40 no mensal → R$ 239,99" },
+    annual: { price: "R$ 396,99", detail: "equivale a R$ 33,08 por mês", saving: "Economia de R$ 801,81 vs. mensal por 12 meses." }
+  });
   const PORTRAIT = Object.freeze({
     dark: "/assets/hero-jean-transparent.webp?v=20260923-v18",
     light: "/assets/primo-portrait-light-v5.webp?v=20260923-v18"
   });
-
   const TOOL_ART = Object.freeze({
     gemeos: { dark: "/assets/modules-v4/gemeos-dark.webp", light: "/assets/modules-v4/gemeos-light.webp" },
     pitagoras: { dark: "/assets/modules-v4/pitagoras-dark.webp", light: "/assets/modules-v4/pitagoras-light.webp" },
     reel: { dark: "/assets/roulette/tools/reel-dark.svg?v=20260923-v18", light: "/assets/roulette/tools/reel-light.svg?v=20260923-v18" }
+  });
+  const EXAM_ART = Object.freeze({
+    daily: { dark: "/assets/exams/daily-final-dark.svg?v=20260923-v18", light: "/assets/exams/daily-final-light.svg?v=20260923-v18" },
+    weekly: { dark: "/assets/exams/weekly-final-dark.svg?v=20260923-v18", light: "/assets/exams/weekly-final-light.svg?v=20260923-v18" },
+    primo: { dark: "/assets/exams/primo-final-dark.svg?v=20260923-v18", light: "/assets/exams/primo-final-light.svg?v=20260923-v18" }
   });
 
   function installStyles() {
@@ -38,6 +47,23 @@
       @media(max-width:760px){.login-v18-art{border-radius:20px;min-height:260px;aspect-ratio:auto}.login-v18-art img{width:58%;opacity:.82}.login-v18-copy{left:7%;max-width:52%}.login-v18-copy span{font-size:10px}.roulette-card-art.v18-art img{width:58%;opacity:.9}.real-v18-art{min-height:260px;border-radius:22px}.real-v18-art img{width:58%;right:-7%;opacity:.88}.real-v18-art div{left:7%;max-width:52%}}
     `;
     document.head.appendChild(style);
+  }
+
+  function syncPlanPrices() {
+    if (route() !== "/dashboard-free") return;
+    Object.entries(PLANOS).forEach(([key, data]) => {
+      const button = $(`[data-plan="${key}"]`);
+      const card = button?.closest(".free-v10-plan");
+      if (!card) return;
+      const price = $(".free-v10-price strong", card);
+      const detail = $(".free-v10-price small", card);
+      const saving = $(".free-v10-saving", card);
+      const badge = $(".free-v10-plan-badge", card);
+      if (price) price.textContent = data.price;
+      if (detail) detail.textContent = data.detail;
+      if (saving) saving.textContent = data.saving;
+      if (badge && data.badge) badge.textContent = data.badge;
+    });
   }
 
   function currentPortrait() { return PORTRAIT[theme()]; }
@@ -76,6 +102,48 @@
     });
   }
 
+  function syncExamMedia() {
+    if (route() !== "/provas") return;
+    const labels = { daily: "PROVA DIÁRIA", weekly: "PROVA SEMANAL", primo: "DESAFIO DO PRIMO" };
+    Object.entries(labels).forEach(([type, text]) => {
+      const card = $(`[data-exam-type="${type}"]`);
+      if (!card) return;
+      const badge = $(".exam-art .exam-badge", card);
+      if (badge) badge.textContent = text;
+      const img = $(".exam-art img", card);
+      if (img) {
+        img.src = EXAM_ART[type][theme()];
+        img.alt = text;
+        Object.assign(img.style, { width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" });
+      }
+    });
+  }
+
+  function fixExamWorkspace() {
+    if (route() !== "/provas") return;
+    const workspace = $("#examWorkspace");
+    if (!workspace || workspace.dataset.v18Observed === "1") return;
+    workspace.dataset.v18Observed = "1";
+    const reveal = () => {
+      if (workspace.childElementCount > 0 || workspace.textContent.trim()) {
+        workspace.hidden = false;
+        workspace.removeAttribute("hidden");
+        workspace.setAttribute("aria-hidden", "false");
+        Object.assign(workspace.style, { display: "block", visibility: "visible", opacity: "1", minHeight: "240px", position: "relative", zIndex: "2" });
+        const grid = $(".exam-grid"); if (grid) grid.hidden = true;
+        const note = $(".exam-note"); if (note) note.hidden = true;
+      }
+    };
+    new MutationObserver(reveal).observe(workspace, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden", "aria-hidden", "style"] });
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-exam-locked], [data-evolution-exam-type]")) return;
+      [150, 350, 700, 1200].forEach((delay, index) => setTimeout(() => {
+        reveal();
+        if (index === 1 && !workspace.hidden && workspace.childElementCount) workspace.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, delay));
+    }, true);
+  }
+
   function installRealArtwork() {
     if (route() !== "/roleta-real") return;
     const welcome = $(".real-welcome");
@@ -93,13 +161,16 @@
 
   function syncAll() {
     installStyles();
+    syncPlanPrices();
     installLoginArtwork();
     syncRouletteMedia();
+    syncExamMedia();
     installRealArtwork();
   }
 
   function init() {
     syncAll();
+    fixExamWorkspace();
     window.addEventListener("turma:theme-change", syncAll);
     new MutationObserver((records) => {
       if (records.some((record) => record.attributeName === "data-theme")) syncAll();
