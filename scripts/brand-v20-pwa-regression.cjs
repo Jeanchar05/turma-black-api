@@ -1,0 +1,2 @@
+"use strict";
+const fs=require("fs"),path=require("path");const root=path.resolve(__dirname,"..");const read=f=>fs.readFileSync(path.join(root,f),"utf8");const manifest=JSON.parse(read("public/manifest.json"));if(manifest.icons?.[0]?.src!=="favicon-v20.svg")throw new Error("PWA precisa usar favicon-v20.svg");if(!fs.existsSync(path.join(root,"public/favicon-v20.svg")))throw new Error("favicon-v20.svg ausente");console.log("Brand V20 PWA regression: OK");
