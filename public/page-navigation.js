@@ -35,7 +35,6 @@
     const previousHash = current.hash; current = next;
     if (previousHash !== current.hash) window.dispatchEvent(new HashChangeEvent("hashchange"));
   });
-
   function loadStyle(href, key) {
     if (typeof document === "undefined") return;
     if (document.querySelector(`link[data-turma-runtime="${key}"]`)) return;
@@ -60,6 +59,10 @@
     }
     if (!student) return;
     if (path === "/gestao") loadScript("/gestao-stop-entries-v18.js?v=20260923-v18", "gestao-stop-entries-v18");
+    if (path === "/roleta") {
+      loadStyle("/roulette-production-v20.css?v=20260924-v20", "roulette-production-v20-css");
+      loadScript("/roulette-production-v20.js?v=20260924-v20", "roulette-production-v20-js");
+    }
     loadScript("/dashboard-notifications-live-v18.js?v=20260923-v18", "student-notifications-v18-js");
     loadScript("/student-nav-standard-v9.js?v=20260922-final", "student-nav-js");
     loadStyle("/student-evolution-v6.css?v=20260922-final", "evolution-css");

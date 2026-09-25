@@ -31,6 +31,10 @@ jobs:
         run: node scripts/platform-v17-regression.cjs
       - name: Run Platform V18 final regression tests
         run: node scripts/platform-v18-regression.cjs
+      - name: Run Brand/Admin/Roulette V20 regression tests
+        run: node scripts/brand-v20-regression.cjs
+      - name: Run Brand V20 PWA regression tests
+        run: node scripts/brand-v20-pwa-regression.cjs
       - name: Run security regression tests
         run: npm run security:regression
       - name: Run Sales Command Center regression tests

@@ -10,7 +10,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "assets/turma-primo-logo.svg",
+      "src": "favicon-v20.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
