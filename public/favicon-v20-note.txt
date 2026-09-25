@@ -1,2 +1,0 @@
-Favicon V20: /favicon-v20.svg
-O favicon atual do index usa o mesmo emblema oficial /assets/turma-primo-logo.svg, garantindo consistência visual entre navegador, PWA e plataforma.
