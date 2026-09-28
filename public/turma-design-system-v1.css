@@ -1,0 +1,176 @@
+/* Turma do Primo — Design System v1
+   Apple HIG principles in behavior and hierarchy; Turma do Primo in identity. */
+:root{
+  --tp-bg:#08070c;
+  --tp-bg-subtle:#0d0b13;
+  --tp-surface:#121018;
+  --tp-surface-elevated:#191520;
+  --tp-surface-soft:#201827;
+  --tp-border:#2b2632;
+  --tp-border-strong:#40364b;
+  --tp-text:#f7f4fa;
+  --tp-text-secondary:#c1b8c9;
+  --tp-text-tertiary:#93899d;
+  --tp-accent:#a855f7;
+  --tp-accent-hover:#bb72fb;
+  --tp-accent-soft:#2b173d;
+  --tp-gold:#e4b85f;
+  --tp-success:#65d7a8;
+  --tp-warning:#e5b961;
+  --tp-danger:#ff7d91;
+  --tp-info:#8db8ff;
+  --tp-focus:#d69cff;
+  --tp-radius-sm:10px;
+  --tp-radius-md:14px;
+  --tp-radius-lg:20px;
+  --tp-radius-xl:26px;
+  --tp-shadow-sm:0 8px 24px rgba(0,0,0,.18);
+  --tp-shadow-md:0 18px 54px rgba(0,0,0,.26);
+  --tp-shadow-lg:0 30px 90px rgba(0,0,0,.36);
+  --tp-motion-fast:160ms;
+  --tp-motion-base:220ms;
+  --tp-motion-slow:300ms;
+  --tp-ease:cubic-bezier(.22,1,.36,1);
+  --tp-safe-top:max(0px,env(safe-area-inset-top));
+  --tp-safe-right:max(0px,env(safe-area-inset-right));
+  --tp-safe-bottom:max(0px,env(safe-area-inset-bottom));
+  --tp-safe-left:max(0px,env(safe-area-inset-left));
+  --tp-control-min:44px;
+  --tp-content-max:1480px;
+  --tp-font-display:Sora,Manrope,Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --tp-font-body:Inter,"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+:root[data-theme="light"],html[data-theme="light"]{
+  --tp-bg:#f4f1f7;
+  --tp-bg-subtle:#efebf3;
+  --tp-surface:#fbfafc;
+  --tp-surface-elevated:#ffffff;
+  --tp-surface-soft:#f0eaf5;
+  --tp-border:#ddd5e4;
+  --tp-border-strong:#c8bbd3;
+  --tp-text:#251e2b;
+  --tp-text-secondary:#5f5667;
+  --tp-text-tertiary:#7a7083;
+  --tp-accent:#73449a;
+  --tp-accent-hover:#613582;
+  --tp-accent-soft:#eee3f6;
+  --tp-gold:#8b682d;
+  --tp-success:#257d5b;
+  --tp-warning:#89651f;
+  --tp-danger:#b33e55;
+  --tp-info:#3b66a8;
+  --tp-focus:#6f3f94;
+  --tp-shadow-sm:0 8px 24px rgba(61,39,73,.07);
+  --tp-shadow-md:0 18px 54px rgba(61,39,73,.10);
+  --tp-shadow-lg:0 30px 90px rgba(61,39,73,.13);
+}
+
+.tp-hig-pilot,
+.auth-body.auth-2026{
+  font-family:var(--tp-font-body);
+  color:var(--tp-text);
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+}
+
+.tp-hig-pilot *,
+.auth-body.auth-2026 *{box-sizing:border-box}
+
+.tp-hig-pilot button,
+.tp-hig-pilot a,
+.tp-hig-pilot input,
+.tp-hig-pilot select,
+.tp-hig-pilot textarea,
+.auth-body.auth-2026 button,
+.auth-body.auth-2026 a,
+.auth-body.auth-2026 input,
+.auth-body.auth-2026 select,
+.auth-body.auth-2026 textarea{
+  -webkit-tap-highlight-color:transparent;
+}
+
+.tp-hig-pilot button:focus-visible,
+.tp-hig-pilot a:focus-visible,
+.tp-hig-pilot input:focus-visible,
+.tp-hig-pilot select:focus-visible,
+.tp-hig-pilot textarea:focus-visible,
+.auth-body.auth-2026 button:focus-visible,
+.auth-body.auth-2026 a:focus-visible,
+.auth-body.auth-2026 input:focus-visible,
+.auth-body.auth-2026 select:focus-visible,
+.auth-body.auth-2026 textarea:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--tp-focus) 82%,white);
+  outline-offset:3px;
+}
+
+.tp-hig-pilot button:disabled,
+.tp-hig-pilot [aria-disabled="true"],
+.auth-body.auth-2026 button:disabled,
+.auth-body.auth-2026 [aria-disabled="true"]{
+  cursor:not-allowed;
+  opacity:.52;
+}
+
+.tp-hig-pilot .tp-surface,
+.auth-body.auth-2026 .tp-surface{
+  background:var(--tp-surface);
+  border:1px solid var(--tp-border);
+  border-radius:var(--tp-radius-lg);
+  box-shadow:var(--tp-shadow-sm);
+}
+
+.tp-hig-pilot .tp-badge,
+.auth-body.auth-2026 .tp-badge{
+  display:inline-flex;
+  min-height:28px;
+  align-items:center;
+  gap:7px;
+  padding:0 10px;
+  border:1px solid var(--tp-border);
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--tp-text-secondary);
+  background:var(--tp-surface-soft);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .tp-hig-pilot *,
+  .tp-hig-pilot *::before,
+  .tp-hig-pilot *::after,
+  .auth-body.auth-2026 *,
+  .auth-body.auth-2026 *::before,
+  .auth-body.auth-2026 *::after{
+    scroll-behavior:auto!important;
+    animation:none!important;
+    transition:none!important;
+  }
+}
+
+@media (prefers-contrast:more){
+  :root{
+    --tp-border:#5c5364;
+    --tp-border-strong:#84798d;
+    --tp-text-secondary:#ddd6e2;
+    --tp-text-tertiary:#c3bac9;
+  }
+  :root[data-theme="light"],html[data-theme="light"]{
+    --tp-border:#807486;
+    --tp-border-strong:#62576a;
+    --tp-text-secondary:#3d3543;
+    --tp-text-tertiary:#554b5c;
+  }
+}
+
+@media (prefers-reduced-transparency:reduce){
+  .tp-hig-pilot .topbar,
+  .tp-hig-pilot .mobile-dock,
+  .tp-hig-pilot .menu-backdrop,
+  .auth-body.auth-2026 .login-v30-topbar,
+  .auth-body.auth-2026 .login-v30-status,
+  .auth-body.auth-2026 .login-v30-security{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+}
