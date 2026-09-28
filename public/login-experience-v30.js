@@ -10,6 +10,8 @@
   if (window.matchMedia?.("(min-width:981px)")?.matches) loadStyle("/login-desktop-v32.css?v=20260908-desktop-v32", "desktop", "screen and (min-width:981px)");
   loadStyle("/brand-index-v20.css?v=20260924-v20", "brand-v20");
   loadStyle("/admin-choice-v20.css?v=20260924-v20", "admin-choice-v20");
+  loadStyle("/turma-design-system-v1.css?v=20260927-hig1", "turma-design-system-v1");
+  loadStyle("/turma-hig-login-v1.css?v=20260927-hig1", "turma-hig-login-v1");
 
   const setEye = (button, visible) => {
     if (!button) return;
