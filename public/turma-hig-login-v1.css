@@ -1,0 +1,146 @@
+/* Turma do Primo — Apple HIG pilot / Login v1 */
+.auth-body.auth-2026{
+  padding-left:var(--tp-safe-left);
+  padding-right:var(--tp-safe-right);
+  background:
+    radial-gradient(circle at 16% 10%,rgba(119,53,162,.18),transparent 28%),
+    radial-gradient(circle at 84% 12%,rgba(168,85,247,.10),transparent 30%),
+    linear-gradient(145deg,#050309,#09060e 54%,#030205 100%)!important;
+}
+
+.login-v30-topbar{
+  min-height:calc(78px + var(--tp-safe-top));
+  padding-top:var(--tp-safe-top);
+}
+
+.login-v30-brand{min-height:var(--tp-control-min)}
+.login-v30-brand-copy small{font-size:12px;letter-spacing:.14em;color:var(--tp-text-secondary)}
+.login-v30-brand-copy strong{font-size:24px}
+.login-v30-status,.login-v30-security{min-height:44px;font-size:13px;padding-inline:16px}
+
+.login-v30-stage,.login-v30-auth{
+  border-radius:var(--tp-radius-xl);
+  border-color:rgba(213,156,255,.14);
+}
+.login-v30-stage{
+  background:
+    radial-gradient(circle at 72% 28%,rgba(168,85,247,.15),transparent 28%),
+    linear-gradient(145deg,#100918,#07040b)!important;
+}
+.login-v30-title{letter-spacing:-.055em}
+.login-v30-eyebrow{font-size:12px;min-height:36px}
+.login-v30-lead{font-size:16px;line-height:1.65;color:#c3bac9}
+.login-v30-benefits span{min-height:40px;font-size:13px}
+
+.login-v30-product{
+  border-radius:var(--tp-radius-lg)!important;
+  box-shadow:var(--tp-shadow-md)!important;
+}
+.login-v20-hero-copy small{font-size:12px!important}
+.login-v20-hero-copy p{font-size:13px!important;line-height:1.6!important;color:#bfb4c8!important}
+.login-v20-hero-copy b{font-size:11px!important;min-height:34px;align-items:center}
+
+.login-v30-auth{
+  background:linear-gradient(155deg,rgba(22,14,31,.96),rgba(9,6,13,.985))!important;
+  box-shadow:var(--tp-shadow-lg)!important;
+}
+.login-v30-auth-badge{font-size:12px;min-height:34px;padding-inline:12px}
+.login-v30-auth .auth-tabs{min-height:56px;border-radius:16px;padding:5px}
+.login-v30-auth .auth-tab{min-height:46px;font-size:14px;border-radius:12px}
+.login-v30-auth .auth-card-header h2{font-size:clamp(30px,2.5vw,38px)}
+.login-v30-auth .auth-card-header p{font-size:15px;color:#aaa1b4}
+.login-v30-auth .input-group>label{font-size:13px;color:#ded6e4}
+.login-v30-auth .auth-input-shell{min-height:58px;border-radius:15px}
+.login-v30-auth .auth-input-shell input{height:56px;font-size:16px;line-height:1.3;color:#fff}
+.login-v30-auth .auth-input-shell input::placeholder{color:#827889}
+.login-v30-auth .auth-input-icon{width:50px;min-width:50px}
+.login-v30-auth .toggle-password{width:44px;height:44px;right:6px}
+.login-v30-auth .auth-submit{min-height:54px;font-size:15px;border-radius:14px;transition:transform var(--tp-motion-fast) var(--tp-ease),filter var(--tp-motion-fast),box-shadow var(--tp-motion-base)}
+.login-v30-auth .auth-submit:active{transform:scale(.985)}
+.login-v30-form-note{font-size:12px;line-height:1.55;color:#9b91a5}
+.login-v30-auth .senha-forca-topline{font-size:12px}
+.login-v30-auth .auth-message{font-size:14px;line-height:1.5;padding:12px 14px}
+.login-v30-auth .auth-security-note{font-size:12px;line-height:1.55}
+.login-v30-footer{font-size:12px;padding-bottom:calc(10px + var(--tp-safe-bottom))}
+
+/* Glass is kept on floating/system-like layers, not on normal content. */
+.login-v30-console,.login-v30-sidecard{
+  background:linear-gradient(145deg,#17101f,#0d0912)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.login-v30-topbar,.login-v30-status,.login-v30-security{
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+@media (max-width:920px){
+  .login-v30-topbar{width:calc(100% - 28px);padding-left:0;padding-right:0}
+  .login-v30-shell{width:calc(100% - 28px);gap:16px}
+  .login-v30-stage{min-height:540px;padding:34px 30px}
+  .login-v30-title{font-size:clamp(40px,9vw,58px)}
+  .login-v30-product{margin-top:34px!important;min-height:240px!important}
+  .login-v30-auth-inner{padding:30px 26px calc(26px + var(--tp-safe-bottom))}
+}
+
+@media (max-width:620px){
+  .login-v30-topbar{width:calc(100% - 24px);min-height:calc(68px + var(--tp-safe-top))}
+  .login-v30-brand img{width:42px;height:46px}
+  .login-v30-brand-copy small{font-size:11px}
+  .login-v30-brand-copy strong{font-size:20px}
+  .login-v30-status{font-size:12px;min-height:38px}
+  .login-v30-shell{width:calc(100% - 24px);gap:12px}
+  .login-v30-stage,.login-v30-auth{border-radius:22px}
+  .login-v30-stage{padding:24px 20px 18px;min-height:auto}
+  .login-v30-eyebrow{font-size:11px;min-height:34px}
+  .login-v30-title{font-size:clamp(35px,10.6vw,46px);line-height:1.02;margin-top:18px}
+  .login-v30-lead{font-size:15px;line-height:1.58;margin-top:16px}
+  .login-v30-benefits{margin-top:18px;gap:8px}
+  .login-v30-benefits span{font-size:12px;min-height:38px;padding-inline:10px}
+  .login-v30-product{min-height:220px!important;margin-top:24px!important;border-radius:18px!important}
+  .login-v20-hero-copy{left:6%!important;max-width:55%!important}
+  .login-v20-hero-copy h3{font-size:24px!important;line-height:1.02!important}
+  .login-v20-hero-copy p{font-size:12px!important}
+  .login-v20-hero-copy b{font-size:10px!important;padding:8px 10px!important;margin-top:12px!important}
+  .login-v20-portrait{width:68%!important;right:-15%!important;height:108%!important}
+  .login-v30-auth{padding:6px}
+  .login-v30-auth-inner{padding:22px 16px calc(22px + var(--tp-safe-bottom))}
+  .login-v30-auth-badge{font-size:11px}
+  .login-v30-auth .auth-tabs{margin-top:18px}
+  .login-v30-auth .auth-tab{font-size:14px}
+  .login-v30-auth .auth-card-header{margin-top:24px}
+  .login-v30-auth .auth-card-header h2{font-size:28px;line-height:1.08}
+  .login-v30-auth .auth-card-header p{font-size:15px}
+  .login-v30-auth .auth-form{margin-top:22px;gap:16px}
+  .login-v30-auth .input-group>label{font-size:14px}
+  .login-v30-auth .auth-input-shell{min-height:58px}
+  .login-v30-auth .auth-input-shell input{font-size:16px!important;height:56px!important}
+  .login-v30-auth .auth-submit{font-size:15px;min-height:54px}
+  .login-v30-form-note,.login-v30-auth .auth-security-note{font-size:12px}
+  .login-v30-footer{width:calc(100% - 24px);font-size:12px;padding-bottom:calc(16px + var(--tp-safe-bottom))}
+}
+
+@media (max-width:390px){
+  .login-v30-topbar{width:calc(100% - 18px)}
+  .login-v30-status{display:none}
+  .login-v30-shell{width:calc(100% - 18px)}
+  .login-v30-stage{padding-inline:18px}
+  .login-v30-title{font-size:34px}
+  .login-v30-benefits span{width:100%;justify-content:flex-start}
+  .login-v30-product{min-height:205px!important}
+  .login-v20-hero-copy p{display:none}
+  .login-v20-portrait{width:72%!important;right:-21%!important}
+  .login-v30-auth-inner{padding-inline:14px}
+}
+
+@media (max-width:340px){
+  .login-v30-title{font-size:31px}
+  .login-v30-product{min-height:190px!important}
+  .login-v20-hero-copy h3{font-size:21px!important}
+  .login-v30-auth .auth-card-header h2{font-size:25px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #loginParticleCanvas{display:none!important}
+  .login-v30-status i{box-shadow:none!important}
+}
