@@ -35,6 +35,8 @@ jobs:
         run: node scripts/brand-v20-regression.cjs
       - name: Run Brand V20 PWA regression tests
         run: node scripts/brand-v20-pwa-regression.cjs
+      - name: Run Apple HIG pilot regression tests
+        run: node scripts/apple-hig-pilot-regression.cjs
       - name: Run security regression tests
         run: npm run security:regression
       - name: Run Sales Command Center regression tests
