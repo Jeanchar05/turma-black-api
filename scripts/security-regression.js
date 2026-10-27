@@ -52,6 +52,37 @@ function testDevIdentity() {
   else process.env.DEV_EMAIL = previous;
 }
 
+function testMissingJwtSecretDoesNotUseKnownFallback() {
+  const { spawnSync } = require("child_process");
+  const code = [
+    'const jwt = require("jsonwebtoken");',
+    'const { gerarToken } = require("./middleware/auth");',
+    'const token = gerarToken({ _id: "0123456789abcdef01234567", email: "student@example.invalid", nome: "Student", cargo: "aluno", tipo: "aluno", plano: "free" });',
+    'try { jwt.verify(token, "turma_black_secret_dev", { algorithms: ["HS256"] }); process.exit(4); }',
+    'catch (error) { if (error.message !== "invalid signature") throw error; }'
+  ].join("\n");
+  const result = spawnSync(process.execPath, ["-e", code], {
+    cwd: path.resolve(__dirname, ".."),
+    env: { ...process.env, NODE_ENV: "test", JWT_SECRET: "" },
+    encoding: "utf8"
+  });
+  assert.strictEqual(result.status, 0, "JWT sem segredo configurado nao pode ser assinado pela chave publica de desenvolvimento: " + result.stderr);
+}
+
+function testPrivilegedAccountProtection() {
+  const { isProtectedAccount } = require("../middleware/permissions");
+  assert.strictEqual(typeof isProtectedAccount, "function", "politica de conta protegida deve existir");
+  assert.strictEqual(isProtectedAccount({ cargo: "dono" }), true);
+  assert.strictEqual(isProtectedAccount({ cargo: "superadmin" }), true);
+  assert.strictEqual(isProtectedAccount({ cargo: "dev" }), true);
+  assert.strictEqual(isProtectedAccount({ contaDev: true, cargo: "aluno" }), true);
+  assert.strictEqual(isProtectedAccount({ cargo: "aluno" }), false);
+  assert.strictEqual(isProtectedAccount({ cargo: "admin" }), false);
+  const source = fs.readFileSync(path.join(__dirname, "..", "routes", "usuarios.js"), "utf8");
+  const updateRoute = source.split('router.put("/usuario/:identificador"')[1]?.split('router.post("/usuario/cargo"')[0] || "";
+  assert.ok(updateRoute.includes("isProtectedAccount(usuario)"), "edicao generica deve barrar contas protegidas");
+}
+
 function testPremiumGuard() {
   const { isPremiumPath } = require("../middleware/premium-content-guard");
   const protectedPaths = [
@@ -172,6 +203,8 @@ function testWiring() {
 (async () => {
   await testPasswords();
   testDevIdentity();
+  testMissingJwtSecretDoesNotUseKnownFallback();
+  testPrivilegedAccountProtection();
   testPremiumGuard();
   testPremiumVault();
   await testUploads();
