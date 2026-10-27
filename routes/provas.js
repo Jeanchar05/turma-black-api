@@ -344,6 +344,12 @@ router.get("/provas/:id", auth, async (req, res) => {
 
 router.post("/provas/:id/responder", auth, async (req, res) => {
   try {
+    const respostasUsuario = req.body?.respostas;
+    if (!Array.isArray(respostasUsuario) ||
+        respostasUsuario.some((item) => !item || typeof item !== "object" || Array.isArray(item))) {
+      return res.status(400).json({ erro: "Envie as respostas da prova como uma lista de respostas válidas." });
+    }
+
     const prova = await buscarProvaPorId(req.params.id);
 
     if (!prova) {
@@ -371,7 +377,6 @@ router.post("/provas/:id/responder", auth, async (req, res) => {
       });
     }
 
-    const respostasUsuario = Array.isArray(req.body.respostas) ? req.body.respostas : [];
 
     let acertos = 0;
     let erros = 0;
