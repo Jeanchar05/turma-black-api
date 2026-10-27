@@ -3,6 +3,7 @@
 const express = require("express");
 const crypto = require("crypto");
 const database = require("../config/database");
+const { withTransaction } = require("../services/db-transaction");
 const { auth, requirePremium } = require("../middleware/auth");
 const { requirePermission } = require("../middleware/permissions");
 const studyState = require("../services/study-state");
@@ -171,33 +172,47 @@ router.put("/student/gestao", async (req, res) => {
   try {
     await ensureStructure();
     const id = userId(req);
-    const next = Evolution.sanitizeBankrollState(req.body?.state || {});
-    const requestedRevision = Number(req.body?.revision || 0);
-    const rows = await database.query("SELECT revision FROM student_bankroll_state WHERE user_id = ? LIMIT 1", [id]);
-    if (rows.length && requestedRevision && requestedRevision !== Number(rows[0].revision)) {
+    const requestedRevision = Number(req.body?.revision);
+    if (!Number.isInteger(requestedRevision) || requestedRevision < 0) {
+      return res.status(400).json({ error: "Informe a revisão atual da gestão antes de salvar.", code: "BANKROLL_REVISION_REQUIRED" });
+    }
+    if (!req.body?.state || typeof req.body.state !== "object" || Array.isArray(req.body.state)) {
+      return res.status(400).json({ error: "Estado da banca inválido." });
+    }
+    const next = Evolution.sanitizeBankrollState(req.body.state);
+    async function conflict() {
       const current = await database.query("SELECT state, revision, updated_at FROM student_bankroll_state WHERE user_id = ? LIMIT 1", [id]);
       return res.status(409).json({
         error: "Sua gestão mudou em outro dispositivo.",
         code: "BANKROLL_REVISION_CONFLICT",
-        revision: Number(current[0].revision || 1),
-        state: Evolution.sanitizeBankrollState(parseJson(current[0].state, {})),
-        updatedAt: current[0].updated_at,
+        revision: current.length ? Number(current[0].revision || 1) : 0,
+        state: current.length ? Evolution.sanitizeBankrollState(parseJson(current[0].state, {})) : null,
+        updatedAt: current[0]?.updated_at || null
       });
     }
-    if (!rows.length) {
-      await database.query("INSERT INTO student_bankroll_state (user_id, state, revision) VALUES (?, ?, 1)", [id, JSON.stringify(next)]);
-      await logActivity(id, "bankroll", "Gestão da banca configurada", { current: next.current, entries: next.entries.length });
+    if (requestedRevision === 0) {
+      try {
+        await database.query("INSERT INTO student_bankroll_state (user_id, state, revision) VALUES (?, ?, 1)", [id, JSON.stringify(next)]);
+      } catch (error) {
+        if (error.code === "ER_DUP_ENTRY") return conflict();
+        throw error;
+      }
+      await logActivity(id, "bankroll", "Gestão da banca configurada", { current: next.current, entries: next.entries.length }).catch(error =>
+        console.warn("Gestão salva; falha no log de atividades:", error.message)
+      );
       return res.json({ success: true, revision: 1, state: next });
     }
-    const revision = Number(rows[0].revision || 1) + 1;
-    await database.query("UPDATE student_bankroll_state SET state = ?, revision = ? WHERE user_id = ?", [JSON.stringify(next), revision, id]);
-    return res.json({ success: true, revision, state: next });
+    const result = await database.query(
+      "UPDATE student_bankroll_state SET state = ?, revision = revision + 1 WHERE user_id = ? AND revision = ?",
+      [JSON.stringify(next), id, requestedRevision]
+    );
+    if (!result.affectedRows) return conflict();
+    return res.json({ success: true, revision: requestedRevision + 1, state: next });
   } catch (error) {
     console.error("Erro ao salvar gestão:", error);
     return res.status(503).json({ error: "Não foi possível sincronizar sua gestão agora." });
   }
 });
-
 router.get("/student/provas/agenda", async (req, res) => {
   try {
     const attempts = await listAttempts(userId(req), 250);
@@ -235,24 +250,40 @@ router.post("/student/provas/iniciar", async (req, res) => {
     const type = String(req.body?.type || "").trim().toLowerCase();
     const config = Evolution.examConfig(type);
     if (!config.available) return res.status(403).json({ error: "Esta prova não está disponível hoje." });
-    const countRows = await database.query(
-      "SELECT COUNT(*) AS total FROM student_exam_attempts WHERE user_id = ? AND exam_type = ? AND exam_date = ?",
-      [id, type, config.date],
-    );
-    const used = Number(countRows[0]?.total || 0);
-    if (used >= config.attempts) {
-      return res.status(403).json({ error: "Você atingiu o limite de tentativas desta prova hoje.", attemptsUsed: used, attempts: config.attempts });
-    }
-    const exam = Evolution.generateExam({ type, userId: id, date: new Date(), nonce: used + 1 });
-    await database.query(
-      `INSERT INTO student_exam_attempts (
-        id, user_id, user_name, user_email, exam_type, exam_title, exam_date,
-        difficulty, min_score, status, payload, total_questions
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'started', ?, ?)`,
-      [exam.id, id, userName(req), userEmail(req), type, config.title, config.date, config.difficulty, config.minScore, JSON.stringify(exam.payload), exam.publicExam.totalQuestions],
-    );
-    await logActivity(id, "exam_started", `${config.title} iniciada`, { attemptId: exam.id, type, questions: exam.publicExam.totalQuestions });
-    return res.status(201).json({ success: true, exam: exam.publicExam, attemptsUsed: used + 1, attemptsRemaining: Math.max(0, config.attempts - used - 1) });
+
+    // InnoDB locks the authenticated student row, serializing all attempt
+    // allocations including the very first attempt of a given day.
+    const result = await withTransaction(async (tx) => {
+      const owners = await tx.query("SELECT id FROM usuarios WHERE id = ? FOR UPDATE", [id]);
+      if (!owners.length) return { missing: true };
+      const countRows = await tx.query(
+        "SELECT COUNT(*) AS total FROM student_exam_attempts WHERE user_id = ? AND exam_type = ? AND exam_date = ?",
+        [id, type, config.date]
+      );
+      const used = Number(countRows[0]?.total || 0);
+      if (used >= config.attempts) return { denied: true, used };
+      const exam = Evolution.generateExam({ type, userId: id, date: new Date(), nonce: used + 1 });
+      await tx.query(
+        "INSERT INTO student_exam_attempts (id, user_id, user_name, user_email, exam_type, exam_title, exam_date, difficulty, min_score, status, payload, total_questions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'started', ?, ?)",
+        [exam.id, id, userName(req), userEmail(req), type, config.title, config.date,
+          config.difficulty, config.minScore, JSON.stringify(exam.payload), exam.publicExam.totalQuestions]
+      );
+      return { exam, used };
+    });
+
+    if (result.missing) return res.status(403).json({ error: "Conta inválida para iniciar uma prova." });
+    if (result.denied) return res.status(403).json({
+      error: "Você atingiu o limite de tentativas desta prova hoje.",
+      attemptsUsed: result.used, attempts: config.attempts
+    });
+    await logActivity(id, "exam_started", config.title + " iniciada", {
+      attemptId: result.exam.id, type, questions: result.exam.publicExam.totalQuestions
+    }).catch(error => console.warn("Tentativa criada; falha no log de atividades:", error.message));
+    return res.status(201).json({
+      success: true, exam: result.exam.publicExam,
+      attemptsUsed: result.used + 1,
+      attemptsRemaining: Math.max(0, config.attempts - result.used - 1)
+    });
   } catch (error) {
     const status = Number(error.status || 0);
     if (status) return res.status(status).json({ error: error.message });
@@ -260,7 +291,6 @@ router.post("/student/provas/iniciar", async (req, res) => {
     return res.status(503).json({ error: "Não foi possível iniciar a prova agora." });
   }
 });
-
 router.post("/student/provas/finalizar", async (req, res) => {
   try {
     await ensureStructure();
@@ -272,11 +302,12 @@ router.post("/student/provas/finalizar", async (req, res) => {
     const attempt = rows[0];
     if (attempt.status === "finished") return res.status(409).json({ error: "Esta prova já foi finalizada." });
     const result = Evolution.scoreExam(parseJson(attempt.payload, null), Array.isArray(req.body?.answers) ? req.body.answers : []);
-    await database.query(
-      "UPDATE student_exam_attempts SET status = 'finished', answers = ?, score = ?, correct_answers = ?, finished_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
+    const finalized = await database.query(
+      "UPDATE student_exam_attempts SET status = 'finished', answers = ?, score = ?, correct_answers = ?, finished_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ? AND status = 'started'",
       [JSON.stringify(req.body?.answers || []), result.score, result.correct, attemptId, id],
     );
-    await logActivity(id, "exam_finished", `${attempt.exam_title} finalizada`, { attemptId, type: attempt.exam_type, score: result.score, correct: result.correct, total: result.total, approved: result.approved });
+    if (!finalized.affectedRows) return res.status(409).json({ error: "Esta prova já foi finalizada." });
+    await logActivity(id, "exam_finished", `${attempt.exam_title} finalizada`, { attemptId, type: attempt.exam_type, score: result.score, correct: result.correct, total: result.total, approved: result.approved }).catch(error => console.warn("Prova finalizada; falha no log:", error.message));
     return res.json({ success: true, result: { attemptId, title: attempt.exam_title, type: attempt.exam_type, difficulty: attempt.difficulty, ...result }, evolution: await homePayload(id) });
   } catch (error) {
     const status = Number(error.status || 0);
