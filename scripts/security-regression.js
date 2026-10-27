@@ -97,6 +97,29 @@ function testCompatLoginDoesNotApprovePendingFreeAccount() {
   assert.strictEqual(student.aprovado, false, "aluno nao aprovado nao pode receber token de uma conta aparentemente aprovada");
 }
 
+async function testMalformedExamSubmission() {
+  const router = require("../routes/provas");
+  const route = router.stack.find((layer) =>
+    layer.route?.path === "/provas/:id/responder" && layer.route.methods?.post
+  );
+  assert.ok(route, "rota de envio de prova deve estar registrada");
+  const handler = route.route.stack.at(-1).handle;
+  for (const body of [undefined, {}, { respostas: "texto" }, { respostas: [null] }]) {
+    const result = { statusCode: 200, data: null };
+    const res = {
+      status(code) { result.statusCode = code; return this; },
+      json(data) { result.data = data; return this; }
+    };
+    const promise = Promise.resolve(handler({ body, params: { id: "invalido" } }, res));
+    await Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Entrada invalida nao foi rejeitada antes de acessar o banco.")), 500))
+    ]);
+    assert.strictEqual(result.statusCode, 400, "entrada vazia/malformada deve retornar HTTP 400");
+    assert.ok(result.data?.erro, "cliente deve receber mensagem legivel");
+  }
+}
+
 function testPremiumGuard() {
   const { isPremiumPath } = require("../middleware/premium-content-guard");
   const protectedPaths = [
@@ -220,6 +243,7 @@ function testWiring() {
   testMissingJwtSecretDoesNotUseKnownFallback();
   testPrivilegedAccountProtection();
   testCompatLoginDoesNotApprovePendingFreeAccount();
+  await testMalformedExamSubmission();
   testPremiumGuard();
   testPremiumVault();
   await testUploads();
