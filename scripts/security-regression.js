@@ -211,7 +211,7 @@ function testSalesCommandCenter() {
 
   assert.ok(security.includes('status: "pendente"'), "nova venda manual deve nascer pendente");
   assert.ok(security.includes('Vendas da Bestfy são somente leitura'), "transações Bestfy devem ser somente leitura");
-  assert.ok(security.includes('Boolean(user.suspenso)'), "concessão manual deve preservar suspensão");
+  assert.ok(security.includes('Boolean(Number(user.suspenso))') || security.includes('Boolean(user.suspenso)'), "concessão manual deve preservar suspensão");
   assert.ok(security.includes('bestfyTransactionId'), "venda manual não pode sobrescrever entitlement Bestfy");
   assert.ok(security.includes('venda-manual:'), "entitlement manual deve registrar sua origem");
 
