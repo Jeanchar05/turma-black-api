@@ -139,6 +139,15 @@ function isDevAccount(usuario) {
   return Boolean(esperado && atual && atual === esperado);
 }
 
+function isProtectedAccount(usuario) {
+  if (!usuario) return false;
+  if (usuario.contaDev === true) return true;
+  const email = String(usuario.email || "").trim().toLowerCase();
+  if (email && email === devEmailConfigurado()) return true;
+  const cargo = normalizarCargo(usuario.cargo || usuario.tipo);
+  return [CARGOS.DEV, CARGOS.DONO, CARGOS.SUPERADMIN].includes(cargo);
+}
+
 function getCargo(usuario) {
   if (!usuario) return CARGOS.ALUNO;
   if (isDevAccount(usuario)) return CARGOS.DEV;
@@ -276,6 +285,7 @@ module.exports = {
   normalizarCargo,
   devEmailConfigurado,
   isDevAccount,
+  isProtectedAccount,
   sanitizarPermissoes,
   getCargo,
   getPermissoes,
