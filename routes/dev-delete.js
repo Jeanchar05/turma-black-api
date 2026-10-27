@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 
 const Usuario = require("../models/Usuario");
 const { auth } = require("../middleware/auth");
-const { requireDev } = require("../middleware/permissions");
+const { requireDev, isProtectedAccount } = require("../middleware/permissions");
 
 const router = express.Router();
 
@@ -23,8 +23,8 @@ router.delete("/dev/usuarios/:id", auth, requireDev, async (req, res) => {
       return res.status(404).json({ erro: "Conta não encontrada." });
     }
 
-    if (usuario.contaDev || String(usuario.cargo || "").toLowerCase() === "dev") {
-      return res.status(403).json({ erro: "A conta Dev principal não pode ser apagada." });
+    if (isProtectedAccount(usuario)) {
+      return res.status(403).json({ erro: "Esta conta administrativa protegida não pode ser apagada." });
     }
 
     const usuarioAtualId = String(req.usuarioDoc?._id || req.usuario?.id || req.usuario?._id || "");
