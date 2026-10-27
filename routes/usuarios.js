@@ -9,7 +9,8 @@ const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 const {
   requirePermission,
   requireSuperAdmin,
-  getPermissoes
+  getPermissoes,
+  isProtectedAccount
 } = require("../middleware/permissions");
 
 const router = express.Router();
@@ -322,6 +323,10 @@ router.put("/usuario/:identificador", auth, requirePermission("usuarios"), async
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.params.identificador);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+
+    if (isProtectedAccount(usuario)) {
+      return res.status(403).json({ erro: "Esta conta administrativa protegida não pode ser alterada por esta rota." });
+    }
 
     if (req.body?.nome !== undefined) usuario.nome = String(req.body.nome).trim().slice(0, 160);
     if (req.body?.telefone !== undefined) usuario.telefone = String(req.body.telefone).trim().slice(0, 40);
