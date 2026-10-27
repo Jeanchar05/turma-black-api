@@ -205,12 +205,34 @@ router.post("/suporte", auth, async (req, res) => {
 
 router.put("/perfil", auth, async (req, res) => {
   try {
-    const nome = clampText(req.body?.nome, 160);
-    const telefone = clampText(req.body?.telefone, 30);
-    const foto = clampText(req.body?.foto, 1000);
+    const Profile = require("../services/profile-security-v6");
+    const nome = Profile.safeDisplayName(req.body?.nome);
     if (!nome) return res.status(400).json({ erro: "Nome é obrigatório." });
     const user = req.usuarioDoc;
-    user.nome = nome; user.telefone = telefone; user.foto = foto; user.atualizadoPor = req.usuario?.email || "dashboard";
+    if (!user) return res.status(401).json({ erro: "Conta não encontrada." });
+    const currentPhone = Profile.normalizePhone(user.telefone || "");
+    if (req.body?.telefone !== undefined) {
+      const requestedPhone = Profile.normalizePhone(String(req.body.telefone || ""));
+      if (String(req.body.telefone || "").trim() && !requestedPhone) {
+        return res.status(400).json({ erro: "Informe um telefone válido com DDD." });
+      }
+      if (requestedPhone !== currentPhone) {
+        return res.status(409).json({
+          erro: "Confirme o novo telefone com o código de verificação antes de salvar.",
+          codigo: "PHONE_VERIFICATION_REQUIRED"
+        });
+      }
+    }
+    if (req.body?.foto !== undefined) {
+      const photo = String(req.body.foto || "").trim();
+      if (photo && !/^https:\/\//i.test(photo) && !/^data:image\/webp;base64,/i.test(photo)) {
+        return res.status(400).json({ erro: "Foto de perfil inválida." });
+      }
+      if (photo.length > 350000) return res.status(413).json({ erro: "Foto de perfil muito grande." });
+      user.foto = photo;
+    }
+    user.nome = nome;
+    user.atualizadoPor = req.usuario?.email || "dashboard";
     await user.save();
     await ensureStructure();
     await database.query("INSERT INTO dashboard_atividades (id, usuario_id, tipo, titulo, descricao) VALUES (?, ?, 'perfil', 'Perfil atualizado', 'Dados pessoais atualizados no dashboard.')", [id24(), usuarioId(req)]);
