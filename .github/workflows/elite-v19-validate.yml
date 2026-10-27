@@ -122,3 +122,14 @@ jobs:
           DB_PASSWORD: ephemeral-user-test
           JWT_SECRET: test-jwt-only-unique-32-character-seed
         run: node scripts/mysql-concurrency-integration.cjs
+
+      - name: Exercise real MySQL sale entitlement rollback
+        env:
+          NODE_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_PORT: "3306"
+          DB_NAME: turma_test
+          DB_USER: turma_test
+          DB_PASSWORD: ephemeral-user-test
+          JWT_SECRET: test-jwt-only-unique-32-character-seed
+        run: node scripts/sales-mysql-atomic.cjs
