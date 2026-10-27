@@ -85,7 +85,7 @@ function testPrivilegedAccountProtection() {
 
 function testCompatLoginDoesNotApprovePendingFreeAccount() {
   const vm = require("vm");
-  const source = fs.readFileSync(path.join(__dirname, "..", "routes", "login-compat.js"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "..", "services", "login-core.js"), "utf8");
   const start = source.indexOf("function montarCompatibilidade(usuario) {");
   const end = source.indexOf("\nasync function respostaUsuario(", start);
   assert.ok(start >= 0 && end > start, "normalizacao de login compativel deve existir");
