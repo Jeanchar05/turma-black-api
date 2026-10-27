@@ -125,6 +125,7 @@ jobs:
 
       - name: Exercise real MySQL sale entitlement rollback
         env:
+          MYSQL_TEST_ROOT_PASSWORD: ephemeral-root-test
           NODE_ENV: test
           DB_HOST: 127.0.0.1
           DB_PORT: "3306"
