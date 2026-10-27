@@ -99,7 +99,8 @@ function montarCompatibilidade(usuario) {
     contaDev: Boolean(isDevAccount(base) && cargo === "dev"),
     plano,
     status: base.status || "ativo",
-    aprovado: base.aprovado !== false || plano === "free",
+    // Nao emitir sessao aprovada para conta marcada como pendente no banco.
+    aprovado: base.aprovado === true,
     suspenso: Boolean(base.suspenso),
     vendedor: Boolean(
       base.vendedor ||
