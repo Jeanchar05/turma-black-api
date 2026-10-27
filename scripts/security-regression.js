@@ -83,6 +83,20 @@ function testPrivilegedAccountProtection() {
   assert.ok(updateRoute.includes("isProtectedAccount(usuario)"), "edicao generica deve barrar contas protegidas");
 }
 
+function testCompatLoginDoesNotApprovePendingFreeAccount() {
+  const vm = require("vm");
+  const source = fs.readFileSync(path.join(__dirname, "..", "routes", "login-compat.js"), "utf8");
+  const start = source.indexOf("function montarCompatibilidade(usuario) {");
+  const end = source.indexOf("\nasync function respostaUsuario(", start);
+  assert.ok(start >= 0 && end > start, "normalizacao de login compativel deve existir");
+  const functionCode = source.slice(start, end);
+  const student = vm.runInNewContext(
+    functionCode + '\nmontarCompatibilidade({ aprovado: false, cargo: "aluno", tipo: "aluno", plano: "free" })',
+    { normalizarCargo: () => "aluno", normalizarPlano: () => "free", isDevAccount: () => false }
+  );
+  assert.strictEqual(student.aprovado, false, "aluno nao aprovado nao pode receber token de uma conta aparentemente aprovada");
+}
+
 function testPremiumGuard() {
   const { isPremiumPath } = require("../middleware/premium-content-guard");
   const protectedPaths = [
@@ -205,6 +219,7 @@ function testWiring() {
   testDevIdentity();
   testMissingJwtSecretDoesNotUseKnownFallback();
   testPrivilegedAccountProtection();
+  testCompatLoginDoesNotApprovePendingFreeAccount();
   testPremiumGuard();
   testPremiumVault();
   await testUploads();
