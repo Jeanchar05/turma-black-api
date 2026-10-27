@@ -84,7 +84,7 @@ function testBackendContracts() {
     "controlado pela Bestfy",
     "Transações sincronizadas da Bestfy não podem ser apagadas",
     "Venda confirmada não pode ser apagada",
-    "Boolean(user.suspenso)",
+    "Boolean(Number(user.suspenso))",
     "bestfyTransactionId",
     "manualSaleId"
   ], "regras de segurança comercial");
