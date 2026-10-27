@@ -9,6 +9,7 @@ const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 const {
   requirePermission,
   requireSuperAdmin,
+  getCargo,
   getPermissoes,
   isProtectedAccount
 } = require("../middleware/permissions");
@@ -201,6 +202,7 @@ router.post("/aprovar", auth, requirePermission("aprovacoes"), async (req, res) 
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    if (isProtectedAccount(usuario)) return res.status(403).json({ erro: "Conta administrativa protegida." });
     if (contaRestrita(usuario)) {
       return res.status(409).json({ erro: "A conta está suspensa ou bloqueada. Use a ação explícita de reativação antes de aprovar." });
     }
@@ -233,6 +235,7 @@ router.post("/usuario/plano", auth, requirePermission("planos"), async (req, res
     const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
 
+    if (isProtectedAccount(usuario)) return res.status(403).json({ erro: "Conta administrativa protegida." });
     const planoFinal = normalizarPlano(req.body?.plano);
     if (!planoFinal) return res.status(400).json({ erro: "Plano inválido." });
     const diasPlano = PLANOS_DIAS[planoFinal];
@@ -261,7 +264,7 @@ router.post("/suspender", auth, requirePermission("usuarios"), async (req, res) 
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
-    if (["superadmin", "dono", "dev"].includes(String(usuario.cargo || "").toLowerCase())) {
+    if (isProtectedAccount(usuario)) {
       return res.status(403).json({ erro: "Não é permitido suspender esta conta administrativa por esta rota." });
     }
 
@@ -283,6 +286,7 @@ router.post("/reativar", auth, requirePermission("usuarios"), async (req, res) =
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
+    if (isProtectedAccount(usuario)) return res.status(403).json({ erro: "Conta administrativa protegida." });
 
     usuario.suspenso = false;
     usuario.status = "ativo";
@@ -290,6 +294,7 @@ router.post("/reativar", auth, requirePermission("usuarios"), async (req, res) =
     usuario.atualizadoPor = req.usuario.email;
     if (!usuario.aprovadoEm) usuario.aprovadoEm = hojeISO();
     await usuario.save();
+    await revogarSessoes(usuario, "account-reactivated");
 
     return res.json({ sucesso: true, mensagem: "Usuário reativado com sucesso. Um novo login será necessário.", usuario: limparUsuario(usuario) });
   } catch (error) {
@@ -302,7 +307,7 @@ router.post("/usuario/bloquear", auth, requirePermission("usuarios"), async (req
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
-    if (["superadmin", "dono", "dev"].includes(String(usuario.cargo || "").toLowerCase())) {
+    if (isProtectedAccount(usuario)) {
       return res.status(403).json({ erro: "Não é permitido bloquear esta conta administrativa por esta rota." });
     }
 
@@ -332,7 +337,10 @@ router.put("/usuario/:identificador", auth, requirePermission("usuarios"), async
     if (req.body?.telefone !== undefined) usuario.telefone = String(req.body.telefone).trim().slice(0, 40);
     if (req.body?.foto !== undefined) usuario.foto = String(req.body.foto).trim().slice(0, 2000);
     if (req.body?.codigo !== undefined) usuario.codigo = String(req.body.codigo).trim().slice(0, 80);
-    if (req.body?.aprovado !== undefined) usuario.aprovado = Boolean(req.body.aprovado);
+    if (req.body?.aprovado !== undefined) {
+      if (typeof req.body.aprovado !== "boolean") return res.status(400).json({ erro: "Aprovação deve ser verdadeiro ou falso." });
+      usuario.aprovado = req.body.aprovado;
+    }
 
     let securityStateChanged = false;
     if (req.body?.status !== undefined) {
@@ -342,7 +350,8 @@ router.put("/usuario/:identificador", auth, requirePermission("usuarios"), async
       usuario.suspenso = status === "suspenso" || status === "bloqueado";
       securityStateChanged = usuario.suspenso;
     } else if (req.body?.suspenso !== undefined) {
-      usuario.suspenso = Boolean(req.body.suspenso);
+      if (typeof req.body.suspenso !== "boolean") return res.status(400).json({ erro: "Suspensão deve ser verdadeiro ou falso." });
+      usuario.suspenso = req.body.suspenso;
       if (usuario.suspenso) {
         usuario.status = "suspenso";
         securityStateChanged = true;
@@ -365,7 +374,9 @@ router.post("/usuario/cargo", auth, requireSuperAdmin, async (req, res) => {
     const usuario = await buscarUsuarioPorIdentificador(req.body?.email || req.body?.id || req.body?.codigo);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
 
+    if (isProtectedAccount(usuario)) return res.status(403).json({ erro: "Conta administrativa protegida." });
     const cargoFinal = normalizarCargo(req.body?.cargo);
+    if (cargoFinal === "superadmin" && getCargo(req.usuarioDoc || req.usuario) !== "dev") return res.status(403).json({ erro: "Apenas Dev pode conceder Super Admin." });
     usuario.cargo = cargoFinal;
     usuario.tipo = cargoFinal === "aluno" || cargoFinal === "vendedor" ? "aluno" : "admin";
     usuario.vendedor = cargoFinal === "vendedor" ? true : req.body?.vendedor !== undefined ? Boolean(req.body.vendedor) : usuario.vendedor;
@@ -396,7 +407,7 @@ router.delete("/usuario/:identificador", auth, requireSuperAdmin, async (req, re
   try {
     const usuario = await buscarUsuarioPorIdentificador(req.params.identificador);
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado." });
-    if (["superadmin", "dono", "dev"].includes(String(usuario.cargo || "").toLowerCase())) {
+    if (isProtectedAccount(usuario)) {
       return res.status(403).json({ erro: "Não é permitido excluir esta conta administrativa por esta rota." });
     }
 
