@@ -37,6 +37,8 @@ jobs:
         run: node scripts/brand-v20-pwa-regression.cjs
       - name: Run security regression tests
         run: npm run security:regression
+      - name: Reproduce P0 authorization and readiness blockers
+        run: node scripts/blockers-integration.cjs
       - name: Run Sales Command Center regression tests
         run: npm run sales:regression
       - name: Run navigation and page access regression tests
