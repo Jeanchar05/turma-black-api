@@ -14,7 +14,8 @@ const { auth, montarUsuarioSeguro } = require("../middleware/auth");
 const {
   CARGOS,
   getCargo,
-  requirePermission
+  requirePermission,
+  isProtectedAccount
 } = require("../middleware/permissions");
 const { sensitiveWriteRateLimit } = require("../middleware/rate-limit");
 
@@ -41,8 +42,7 @@ function devEmail() {
 }
 
 function alvoDev(usuario) {
-  if (!usuario) return false;
-  return usuario.contaDev === true || getCargo(usuario) === CARGOS.DEV || normalizarEmail(usuario.email) === devEmail();
+  return isProtectedAccount(usuario);
 }
 
 function codigoAdmin() {
@@ -267,7 +267,7 @@ router.post("/controle-admins", ...controleGuard, async (req, res) => {
     if (!cargo || !status || !podeGerenciar(callerRole, cargo)) return res.status(403).json({ erro: "Operação administrativa não permitida." });
 
     let usuario = await Usuario.findOne({ email });
-    if (usuario && alvoDev(usuario)) return res.status(403).json({ erro: "A conta Dev não pode ser alterada por esta rota." });
+    if (usuario && alvoDev(usuario)) return res.status(403).json({ erro: "Esta conta administrativa está protegida." });
 
     const nome = String(req.body?.nome || usuario?.nome || email.split("@")[0]).trim().slice(0, 160);
     const senha = String(req.body?.senha || "");
@@ -338,7 +338,7 @@ async function atualizarAdmin(req, res, mode) {
     if (!idValido(req.params.id)) return res.status(400).json({ erro: "Conta inválida." });
     const usuario = await Usuario.findById(req.params.id);
     if (!usuario) return res.status(404).json({ erro: "Conta não encontrada." });
-    if (alvoDev(usuario)) return res.status(403).json({ erro: "A conta Dev não pode ser alterada por esta rota." });
+    if (alvoDev(usuario)) return res.status(403).json({ erro: "Esta conta administrativa está protegida." });
 
     const callerRole = getCargo(req.usuarioDoc || req.usuario);
     const roleAtual = getCargo(usuario);

@@ -389,6 +389,22 @@ if (fs.existsSync(publicDir)) {
   );
 }
 
+// Liveness checks the HTTP process only; readiness requires the primary MySQL service.
+app.get("/health/live", (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  return res.status(200).json({ status: "alive" });
+});
+app.get("/health/ready", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  try {
+    if (!connectDatabase.isConnected()) return res.status(503).json({ status: "not_ready" });
+    await connectDatabase.query("SELECT 1 AS ok");
+    return res.status(200).json({ status: "ready" });
+  } catch (_) {
+    return res.status(503).json({ status: "not_ready" });
+  }
+});
+
 app.get("/api/status", async (_req, res) => {
   let banco = "desconectado";
   try {

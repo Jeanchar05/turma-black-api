@@ -22,9 +22,8 @@ function carregarJwtConfig() {
     "changeme",
     "secret"
   ]);
-  const invalidoEmProducao = producao && (
-    secret.length < 32 || placeholders.has(secret.toLowerCase())
-  );
+  const segredoInseguro = secret.length < 32 || placeholders.has(secret.toLowerCase());
+  const invalidoEmProducao = producao && segredoInseguro;
 
   if (invalidoEmProducao) {
     console.error(
@@ -35,7 +34,9 @@ function carregarJwtConfig() {
   }
 
   return {
-    secret: secret || "turma_black_secret_dev",
+    // Ambiente nao produtivo sem segredo forte usa segredo efemero e imprevisivel.
+    // Nao permitir a chave fixa de desenvolvimento conhecida publicamente.
+    secret: segredoInseguro ? crypto.randomBytes(32).toString("hex") : secret,
     valido: true,
     producao,
     tamanho: secret.length

@@ -33,6 +33,8 @@ const {
   aplicarCompraPendentePorEmail
 } = require("../services/bestfy-hardened");
 
+const { loginCompativel } = require("../services/login-core");
+
 const router = express.Router();
 
 function normalizarEmail(email) {
@@ -180,61 +182,6 @@ async function criarConta(req, res) {
   }
 }
 
-async function login(req, res) {
-  try {
-    const email = normalizarEmail(req.body?.email);
-    const senha = String(req.body?.senha || "");
-    if (!email || !senha) return res.status(400).json({ erro: "E-mail e senha são obrigatórios." });
-
-    const usuario = await Usuario.findOne({ email });
-    const passwordCheck = usuario
-      ? await verifyPassword(usuario.senha, senha)
-      : { valid: false, needsRehash: false };
-
-    if (!usuario || !passwordCheck.valid) return res.status(401).json({ erro: "E-mail ou senha incorretos." });
-
-    if (passwordCheck.needsRehash) {
-      usuario.senha = senha;
-      usuario.atualizadoPor = "migracao-senha-segura";
-      await usuario.save();
-    }
-
-    if (usuario.suspenso || usuario.status === "suspenso") return res.status(403).json({ erro: "Sua conta está suspensa.", status: "suspenso" });
-    if (usuario.status === "bloqueado") return res.status(403).json({ erro: "Sua conta está bloqueada.", status: "bloqueado" });
-
-    try {
-      await aplicarCompraPendentePorEmail(usuario);
-    } catch (error) {
-      console.warn("Não foi possível aplicar compra Bestfy pendente no login:", error.message);
-    }
-
-    if (!usuario.aprovado && usuario.plano === "free" && getCargo(usuario) === "aluno") {
-      usuario.aprovado = true;
-      usuario.status = "ativo";
-      usuario.aprovadoEm = usuario.aprovadoEm || new Date().toISOString();
-    }
-
-    if (!usuario.aprovado && getCargo(usuario) !== "dev") {
-      return res.status(403).json({ erro: "Sua conta ainda está pendente de aprovação.", status: "pendente", aprovado: false });
-    }
-
-    usuario.acessos = Number(usuario.acessos || 0) + 1;
-    usuario.ultimoLogin = new Date().toISOString();
-    usuario.status = usuario.status === "pendente" ? "ativo" : usuario.status;
-    usuario.plano = usuario.plano || "free";
-    await usuario.save({ validateModifiedOnly: true });
-
-    const token = gerarToken(usuario);
-    definirCookieSessao(res, token);
-    return res.json({ sucesso: true, mensagem: "Login realizado com sucesso.", token, usuario: await respostaUsuario(usuario) });
-  } catch (error) {
-    console.error("Erro no login:", error);
-    if (error?.code === "JWT_NAO_CONFIGURADO") {
-      return res.status(503).json({ erro: "Login temporariamente indisponível por configuração de segurança.", codigo: "JWT_NAO_CONFIGURADO" });
-    }
-    return res.status(500).json({ erro: "Não foi possível concluir o login. Tente novamente em alguns instantes.", codigo: "LOGIN_INTERNAL_ERROR" });
-  }
-}
 
 async function me(req, res) {
   try {
@@ -273,12 +220,12 @@ async function logout(req, res) {
 }
 
 router.post("/criar", signupRateLimit, criarConta);
-router.post("/login", loginIpRateLimit, loginRateLimit, login);
+router.post("/login", loginIpRateLimit, loginRateLimit, loginCompativel);
 router.get("/me", auth, me);
 router.get("/validar-token", auth, validarToken);
 router.post("/logout", auth, logout);
 router.post("/auth/criar", signupRateLimit, criarConta);
-router.post("/auth/login", loginIpRateLimit, loginRateLimit, login);
+router.post("/auth/login", loginIpRateLimit, loginRateLimit, loginCompativel);
 router.get("/auth/me", auth, me);
 router.get("/auth/validar-token", auth, validarToken);
 router.post("/auth/logout", auth, logout);

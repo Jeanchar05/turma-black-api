@@ -52,6 +52,86 @@ function testDevIdentity() {
   else process.env.DEV_EMAIL = previous;
 }
 
+function testMissingJwtSecretDoesNotUseKnownFallback() {
+  const { spawnSync } = require("child_process");
+  const code = [
+    'const jwt = require("jsonwebtoken");',
+    'const { gerarToken } = require("./middleware/auth");',
+    'const token = gerarToken({ _id: "0123456789abcdef01234567", email: "student@example.invalid", nome: "Student", cargo: "aluno", tipo: "aluno", plano: "free" });',
+    'try { jwt.verify(token, "turma_black_secret_dev", { algorithms: ["HS256"] }); process.exit(4); }',
+    'catch (error) { if (error.message !== "invalid signature") throw error; }'
+  ].join("\n");
+  const result = spawnSync(process.execPath, ["-e", code], {
+    cwd: path.resolve(__dirname, ".."),
+    env: { ...process.env, NODE_ENV: "test", JWT_SECRET: "" },
+    encoding: "utf8"
+  });
+  assert.strictEqual(result.status, 0, "JWT sem segredo configurado nao pode ser assinado pela chave publica de desenvolvimento: " + result.stderr);
+}
+
+function testPrivilegedAccountProtection() {
+  const { isProtectedAccount } = require("../middleware/permissions");
+  assert.strictEqual(typeof isProtectedAccount, "function", "politica de conta protegida deve existir");
+  assert.strictEqual(isProtectedAccount({ cargo: "dono" }), true);
+  assert.strictEqual(isProtectedAccount({ cargo: "superadmin" }), true);
+  assert.strictEqual(isProtectedAccount({ cargo: "dev" }), true);
+  assert.strictEqual(isProtectedAccount({ contaDev: true, cargo: "aluno" }), true);
+  assert.strictEqual(isProtectedAccount({ cargo: "aluno" }), false);
+  assert.strictEqual(isProtectedAccount({ cargo: "admin" }), false);
+  const source = fs.readFileSync(path.join(__dirname, "..", "routes", "usuarios.js"), "utf8");
+  const updateRoute = source.split('router.put("/usuario/:identificador"')[1]?.split('router.post("/usuario/cargo"')[0] || "";
+  assert.ok(updateRoute.includes("isProtectedAccount(usuario)"), "edicao generica deve barrar contas protegidas");
+}
+
+function testCompatLoginDoesNotApprovePendingFreeAccount() {
+  const vm = require("vm");
+  const source = fs.readFileSync(path.join(__dirname, "..", "services", "login-core.js"), "utf8");
+  const start = source.indexOf("function montarCompatibilidade(usuario) {");
+  const end = source.indexOf("\nasync function respostaUsuario(", start);
+  assert.ok(start >= 0 && end > start, "normalizacao de login compativel deve existir");
+  const functionCode = source.slice(start, end);
+  const student = vm.runInNewContext(
+    functionCode + '\nmontarCompatibilidade({ aprovado: false, cargo: "aluno", tipo: "aluno", plano: "free" })',
+    { normalizarCargo: () => "aluno", normalizarPlano: () => "free", isDevAccount: () => false }
+  );
+  assert.strictEqual(student.aprovado, false, "aluno nao aprovado nao pode receber token de uma conta aparentemente aprovada");
+}
+
+async function testMalformedExamSubmission() {
+  const router = require("../routes/provas");
+  const route = router.stack.find((layer) =>
+    layer.route?.path === "/provas/:id/responder" && layer.route.methods?.post
+  );
+  assert.ok(route, "rota de envio de prova deve estar registrada");
+  const handler = route.route.stack.at(-1).handle;
+  for (const body of [undefined, {}, { respostas: "texto" }, { respostas: [null] }]) {
+    const result = { statusCode: 200, data: null };
+    const res = {
+      status(code) { result.statusCode = code; return this; },
+      json(data) { result.data = data; return this; }
+    };
+    const promise = Promise.resolve(handler({ body, params: { id: "invalido" } }, res));
+    await Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Entrada invalida nao foi rejeitada antes de acessar o banco.")), 500))
+    ]);
+    assert.strictEqual(result.statusCode, 400, "entrada vazia/malformada deve retornar HTTP 400");
+    assert.ok(result.data?.erro, "cliente deve receber mensagem legivel");
+  }
+}
+
+function testUnifiedLogin() {
+  const compatibility = require("../routes/login-compat");
+  const primary = require("../routes/auth");
+  const handler = (router, path) => {
+    const item = router.stack.find((layer) => layer.route?.path === path && layer.route.methods.post);
+    assert.ok(item, "endpoint de login ausente: " + path);
+    return item.route.stack.at(-1).handle;
+  };
+  assert.strictEqual(handler(compatibility, "/login"), handler(primary, "/login"), "login e login legado devem executar o mesmo serviço");
+  assert.strictEqual(handler(compatibility, "/auth/login"), handler(primary, "/auth/login"), "aliases precisam compartilhar as mesmas regras de login");
+}
+
 function testPremiumGuard() {
   const { isPremiumPath } = require("../middleware/premium-content-guard");
   const protectedPaths = [
@@ -143,7 +223,7 @@ function testSalesCommandCenter() {
 
   assert.ok(security.includes('status: "pendente"'), "nova venda manual deve nascer pendente");
   assert.ok(security.includes('Vendas da Bestfy são somente leitura'), "transações Bestfy devem ser somente leitura");
-  assert.ok(security.includes('Boolean(user.suspenso)'), "concessão manual deve preservar suspensão");
+  assert.ok(security.includes('Boolean(Number(user.suspenso))') || security.includes('Boolean(user.suspenso)'), "concessão manual deve preservar suspensão");
   assert.ok(security.includes('bestfyTransactionId'), "venda manual não pode sobrescrever entitlement Bestfy");
   assert.ok(security.includes('venda-manual:'), "entitlement manual deve registrar sua origem");
 
@@ -172,6 +252,11 @@ function testWiring() {
 (async () => {
   await testPasswords();
   testDevIdentity();
+  testMissingJwtSecretDoesNotUseKnownFallback();
+  testPrivilegedAccountProtection();
+  testCompatLoginDoesNotApprovePendingFreeAccount();
+  testUnifiedLogin();
+  await testMalformedExamSubmission();
   testPremiumGuard();
   testPremiumVault();
   await testUploads();
