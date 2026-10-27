@@ -120,6 +120,18 @@ async function testMalformedExamSubmission() {
   }
 }
 
+function testUnifiedLogin() {
+  const compatibility = require("../routes/login-compat");
+  const primary = require("../routes/auth");
+  const handler = (router, path) => {
+    const item = router.stack.find((layer) => layer.route?.path === path && layer.route.methods.post);
+    assert.ok(item, "endpoint de login ausente: " + path);
+    return item.route.stack.at(-1).handle;
+  };
+  assert.strictEqual(handler(compatibility, "/login"), handler(primary, "/login"), "login e login legado devem executar o mesmo serviço");
+  assert.strictEqual(handler(compatibility, "/auth/login"), handler(primary, "/auth/login"), "aliases precisam compartilhar as mesmas regras de login");
+}
+
 function testPremiumGuard() {
   const { isPremiumPath } = require("../middleware/premium-content-guard");
   const protectedPaths = [
@@ -243,6 +255,7 @@ function testWiring() {
   testMissingJwtSecretDoesNotUseKnownFallback();
   testPrivilegedAccountProtection();
   testCompatLoginDoesNotApprovePendingFreeAccount();
+  testUnifiedLogin();
   await testMalformedExamSubmission();
   testPremiumGuard();
   testPremiumVault();
