@@ -34,10 +34,10 @@ async function main(){
     await database.query("INSERT INTO usuarios (id,nome,email,senha,cargo,tipo,plano,aprovado,status) VALUES (?, ?, ?,'nonlogin-test','aluno','aluno','free',1,'ativo')",[id,"Cliente Teste",account.email]);
     await database.query("INSERT INTO vendas (id,cliente_id,cliente_email,produto_codigo,status,data_venda) VALUES (?,?,?,?,?,CURRENT_DATE())",[saleId,id,account.email,"black30","pendente"]);
 
-    await database.query("CREATE TRIGGER "+trigger+" BEFORE UPDATE ON usuarios FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'simulated entitlement failure'");
+    await database.getPool().query("CREATE TRIGGER "+trigger+" BEFORE UPDATE ON usuarios FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'simulated entitlement failure'");
     let result;
     try { result=await setStatus("pago"); }
-    finally { await database.query("DROP TRIGGER IF EXISTS "+trigger); }
+    finally { await database.getPool().query("DROP TRIGGER IF EXISTS "+trigger); }
     const afterFailedGrant=await state();
     assert.equal(result.code,500,"Falha de concessão deve ser reportada ao cliente");
     assert.equal(afterFailedGrant.sale.status,"pendente","Venda deve fazer rollback se falhar concessão do acesso");
@@ -61,7 +61,7 @@ async function main(){
     assert.equal(afterRefund.user.plano,"free");
     console.log("PASS sale-and-entitlement-atomic-rollback, idempotency and reversal");
   } finally {
-    await database.query("DROP TRIGGER IF EXISTS "+trigger).catch(()=>{});
+    await database.getPool().query("DROP TRIGGER IF EXISTS "+trigger).catch(()=>{});
     await database.close();
   }
 }
